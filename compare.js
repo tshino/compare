@@ -25,8 +25,8 @@
         updateImageView();
         return false;
       }
-      // '+;' (187) / PageUp (33)
-      if (e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
+      // '+;' (59 or 187) / PageUp (33)
+      if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
       {
         if (viewZoom < 30)
         {
@@ -35,8 +35,8 @@
         updateImageView();
         return false;
       }
-      // '-' (189) / PageDown (34)
-      if (e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
+      // '-' (173 or 189) / PageDown (34)
+      if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
       {
         if (viewZoom > 0)
         {
