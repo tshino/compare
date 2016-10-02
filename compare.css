@@ -1,0 +1,58 @@
+﻿body
+{
+    margin          : 0px;
+    padding         : 0px;
+}
+#view
+{
+    background-color    : #444;
+    height : 100vh;
+}
+#view .imageBox
+{
+    display         : inline-block;
+    position        : relative;
+    height          : 100%;
+    overflow        : hidden;
+}
+#view .imageName
+{
+    position        : absolute;
+    font-size       : 2em;
+    color           : #fff;
+    text-shadow     : -1px 0px 2px #000, 0px -1px 2px #000, 1px 0px 2px #000, 0px 1px 2px #000;
+    opacity         : 0.5;
+    left            : 50%;
+    transform       : translate(-50%);
+}
+#view .imageBox img
+{
+    display         : block;
+    position        : absolute;
+    max-width       : 100%;
+    max-height      : 100%;
+    margin          : 0px;
+    border          : 0px;
+    padding         : 0px;
+}
+.dropHere
+{
+    display         : block;
+    position        : absolute;
+    border          : 2px dashed #888;
+    border-radius   : 5px;
+    left            : 0px;
+    top             : 0px;
+    right           : 0px;
+    bottom          : 0px;
+    margin          : 5px;
+    padding         : 1.5em;
+    color           : #888;
+}
+#log
+{
+    color           : #000;
+    line-height     : 1.1em;
+    background      : #eee;
+    overflow        : auto;
+}
