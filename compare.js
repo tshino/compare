@@ -94,51 +94,51 @@
     var isSingleView =
             currentImageIndex != 0 &&
             currentImageIndex <= images.length;
+    var numColumns =
+            isSingleView ? 1 :
+            2 < images.length ? images.length : 2;
+    
+    view.innerHTML = '';
     var html = [];
+    var htmlCount = 0;
     for (var i = 0, img; img = images[i]; i++)
     {
         if (isSingleView && i + 1 != currentImageIndex)
         {
             continue;
         }
-        html.push(
-            '<div>' +
-                '<img src="' + img.url + '">' +
-                '<span>' + (i + 1) + ': ' + escapeHtml(img.name) + '</span>' +
-            '</div>');
+        if (vw / numColumns * img.height < vh * img.width)
+        {
+            $(img.element).css( { width : '100%', height : 'auto' });
+        }
+        else
+        {
+            $(img.element).css( { width : 'auto', height : '100%' });
+        }
+        $(view).append(
+            $('<div/>').append(
+                img.element,
+                $('<span/>').text(''+(i + 1) + ': ' + img.name)
+            )
+        );
+        htmlCount += 1;
     }
-    var numColumns =
-            isSingleView ? 1 :
-            2 < html.length ? html.length : 2;
-    while (html.length < numColumns)
+    while (htmlCount < numColumns)
     {
-        html.push(
-            '<div>' +
-                '<div class="dropHere">Drop image files here</div>' +
-            '</div>');
+        $(view).append(
+            $('<div/>').append(
+                $('<div/>').addClass('dropHere').text("Drop image files here")
+            )
+        );
+        htmlCount += 1;
     }
-    view.innerHTML = html.join('');
     
     $('#view > div').addClass('imageBox').css(
         {
             width       : ''+(100/numColumns)+'%',
         });
     $('#view .imageBox span').addClass('imageName');
-    $('#view .imageBox img').on('load', function()
-        {
-            var temp = new Image;
-            temp.src = $(this).attr('src');
-            var w = temp.width;
-            var h = temp.height;
-            if (vw / numColumns * h < vh * w)
-            {
-                $(this).css( { width : '100%' });
-            }
-            else
-            {
-                $(this).css( { height : '100%' });
-            }
-            $(this).css(
+    $('#view .imageBox img').css(
                 {
                     left        : '50%',
                     top         : '50%',
@@ -146,7 +146,6 @@
                                   'scale(' + scale + ') ' +
                                   'translate(' + offsetX + '%, ' + offsetY + '%)',
                 });
-        });
   }
 
   function handleFileSelect(evt) {
@@ -169,12 +168,19 @@
         {
             return function(e)
             {
-                images.push(
-                    {
-                        url : e.target.result,
-                        name : theFile.name,
-                    });
-                updateImageView();
+                var img = new Image;
+                $(img).on('load', function()
+                {
+                    images.push(
+                        {
+                            element : img,
+                            width   : img.width,
+                            height  : img.height,
+                            name    : theFile.name,
+                        });
+                    updateImageView();
+                });
+                img.src = e.target.result;
             };
         })(f);
         reader.readAsDataURL(f);
