@@ -70,6 +70,16 @@
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
 
+  function escapeHtml(str)
+  {
+    str = str.replace(/&/g, '&amp;');
+    str = str.replace(/</g, '&lt;');
+    str = str.replace(/>/g, '&gt;');
+    str = str.replace(/"/g, '&quot;');
+    str = str.replace(/'/g, '&#39;');
+    return str;
+  }
+
   function updateImageView()
   {
     var view = document.getElementById('view');
@@ -94,7 +104,7 @@
         html.push(
             '<div>' +
                 '<img src="' + img.url + '">' +
-                '<span>' + (i + 1) + ': ' + escape(img.name) + '</span>' +
+                '<span>' + (i + 1) + ': ' + escapeHtml(img.name) + '</span>' +
             '</div>');
     }
     var numColumns =
@@ -150,7 +160,7 @@
     {
       if (!f.type || !(f.type == 'image/png' || f.type == 'image/jpeg'))
       {
-        log.push('Error: ', escape(f.name), ' is not an image <br>');
+        log.push('Error: ', escapeHtml(f.name), ' is not an image <br>');
       }
       else
       {
