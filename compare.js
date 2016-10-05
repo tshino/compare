@@ -57,6 +57,16 @@
         updateImageView();
         return false;
       }
+      // ESC (27)
+      if (e.keyCode == 27 && !e.shiftKey)
+      {
+        currentImageIndex = 0;
+        viewZoom = 0;
+        viewOffset.x = 0.5;
+        viewOffset.y = 0.5;
+        updateImageView();
+        return false;
+      }
       //alert(e.keyCode);
     });
   
