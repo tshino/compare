@@ -1,5 +1,9 @@
 ﻿$( function()
 {
+  var MaxZoomLevel  = 8.0;
+  var ZoomStepKey   = 0.25;
+  var ZoomStepWheel = 0.125;
+  
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob))
   {
@@ -28,20 +32,14 @@
       // '+;' (59 or 187) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
       {
-        if (viewZoom < 30)
-        {
-            viewZoom += 1;
-        }
+        viewZoom = Math.min(viewZoom + ZoomStepKey, MaxZoomLevel);
         updateImageView();
         return false;
       }
       // '-' (173 or 189) / PageDown (34)
       if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
       {
-        if (viewZoom > 0)
-        {
-            viewZoom -= 1;
-        }
+        viewZoom = Math.max(viewZoom - ZoomStepKey, 0);
         updateImageView();
         return false;
       }
@@ -70,6 +68,27 @@
       //alert(e.keyCode);
     });
   
+  $(window).on("wheel", function(e)
+  {
+    var event = e.originalEvent;
+    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey)
+    {
+        return true;
+    }
+    if (event.deltaY < 0)
+    {
+        viewZoom = Math.min(viewZoom + ZoomStepWheel, MaxZoomLevel);
+        updateImageView();
+        return false;
+    }
+    else if (event.deltaY > 0)
+    {
+        viewZoom = Math.max(viewZoom - ZoomStepWheel, 0);
+        updateImageView();
+        return false;
+    }
+  });
+  
   updateImageView();
 });
 
@@ -96,7 +115,7 @@
     var vw = $(view).width();
     var vh = $(view).height();
     
-    var scalePercent = Math.round(Math.pow(1.2, viewZoom) * 100);
+    var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
     scale = scalePercent / 100;
     var offsetX = (50 - 100 * viewOffset.x) * (1.0 - 1.0 / scale);
     var offsetY = (50 - 100 * viewOffset.y) * (1.0 - 1.0 / scale);
