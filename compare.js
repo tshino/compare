@@ -1,8 +1,8 @@
 ﻿$( function()
 {
-  var MaxZoomLevel  = 8.0;
-  var ZoomStepKey   = 0.25;
-  var ZoomStepWheel = 0.125;
+  var MAX_ZOOM_LEVEL    = 8.0;
+  var ZOOM_STEP_KEY     = 0.25;
+  var ZOOM_STEP_WHEEL   = 0.125;
   
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob))
@@ -32,14 +32,14 @@
       // '+;' (59 or 187) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
       {
-        viewZoom = Math.min(viewZoom + ZoomStepKey, MaxZoomLevel);
+        viewZoom = Math.min(viewZoom + ZOOM_STEP_KEY, MAX_ZOOM_LEVEL);
         updateTransform();
         return false;
       }
       // '-' (173 or 189) / PageDown (34)
       if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
       {
-        viewZoom = Math.max(viewZoom - ZoomStepKey, 0);
+        viewZoom = Math.max(viewZoom - ZOOM_STEP_KEY, 0);
         updateTransform();
         return false;
       }
@@ -77,13 +77,13 @@
     }
     if (event.deltaY < 0)
     {
-        viewZoom = Math.min(viewZoom + ZoomStepWheel, MaxZoomLevel);
+        viewZoom = Math.min(viewZoom + ZOOM_STEP_WHEEL, MAX_ZOOM_LEVEL);
         updateTransform();
         return false;
     }
     else if (event.deltaY > 0)
     {
-        viewZoom = Math.max(viewZoom - ZoomStepWheel, 0);
+        viewZoom = Math.max(viewZoom - ZOOM_STEP_WHEEL, 0);
         updateTransform();
         return false;
     }
