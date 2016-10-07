@@ -15,7 +15,7 @@
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileSelect, false);
   
-  $(window).resize(updateImageView);
+  $(window).resize(updateDOM);
   $(window).keydown(function(e)
     {
       if (e.ctrlKey || e.altKey)
@@ -26,21 +26,21 @@
       if (48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey)
       {
         currentImageIndex = e.keyCode - 48;
-        updateImageView();
+        updateDOM();
         return false;
       }
       // '+;' (59 or 187) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
       {
         viewZoom = Math.min(viewZoom + ZoomStepKey, MaxZoomLevel);
-        updateImageView();
+        updateTransform();
         return false;
       }
       // '-' (173 or 189) / PageDown (34)
       if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
       {
         viewZoom = Math.max(viewZoom - ZoomStepKey, 0);
-        updateImageView();
+        updateTransform();
         return false;
       }
       // cursor key
@@ -52,7 +52,7 @@
         viewOffset.y += y * 0.4 / scale;
         viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
         viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
-        updateImageView();
+        updateTransform();
         return false;
       }
       // ESC (27)
@@ -62,7 +62,7 @@
         viewZoom = 0;
         viewOffset.x = 0.5;
         viewOffset.y = 0.5;
-        updateImageView();
+        updateDOM();
         return false;
       }
       //alert(e.keyCode);
@@ -78,18 +78,18 @@
     if (event.deltaY < 0)
     {
         viewZoom = Math.min(viewZoom + ZoomStepWheel, MaxZoomLevel);
-        updateImageView();
+        updateTransform();
         return false;
     }
     else if (event.deltaY > 0)
     {
         viewZoom = Math.max(viewZoom - ZoomStepWheel, 0);
-        updateImageView();
+        updateTransform();
         return false;
     }
   });
   
-  updateImageView();
+  updateDOM();
 });
 
   var images = [];
@@ -109,16 +109,11 @@
     return str;
   }
 
-  function updateImageView()
+  function updateDOM()
   {
     var view = document.getElementById('view');
     var vw = $(view).width();
     var vh = $(view).height();
-    
-    var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
-    scale = scalePercent / 100;
-    var offsetX = (50 - 100 * viewOffset.x) * (1.0 - 1.0 / scale);
-    var offsetY = (50 - 100 * viewOffset.y) * (1.0 - 1.0 / scale);
     
     var isSingleView =
             currentImageIndex != 0 &&
@@ -167,6 +162,16 @@
             width       : ''+(100/numColumns)+'%',
         });
     $('#view .imageBox span').addClass('imageName');
+    
+    updateTransform();
+  }
+  
+  function updateTransform() {
+    
+    var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
+    scale = scalePercent / 100;
+    var offsetX = (50 - 100 * viewOffset.x) * (1.0 - 1.0 / scale);
+    var offsetY = (50 - 100 * viewOffset.y) * (1.0 - 1.0 / scale);
     $('#view .imageBox img').css(
                 {
                     left        : '50%',
@@ -207,7 +212,7 @@
                             height  : img.height,
                             name    : theFile.name,
                         });
-                    updateImageView();
+                    updateDOM();
                 });
                 img.src = e.target.result;
             };
@@ -216,7 +221,7 @@
       }
     }
     currentImageIndex = 0;
-    updateImageView();
+    updateDOM();
     document.getElementById('log').innerHTML = log.join('');
   }
 
