@@ -98,6 +98,7 @@
   var viewZoom = 0;
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
+  var dragLastPoint = null;
 
   function escapeHtml(str)
   {
@@ -122,6 +123,8 @@
             isSingleView ? 1 :
             2 < images.length ? images.length : 2;
     
+    dragLastPoint = null;
+    
     view.innerHTML = '';
     var html = [];
     var htmlCount = 0;
@@ -131,7 +134,8 @@
         {
             continue;
         }
-        if (vw / numColumns * img.height < vh * img.width)
+        var isLetterBox = vw / numColumns * img.height < vh * img.width;
+        if (isLetterBox)
         {
             $(img.element).css( { width : '100%', height : 'auto' });
         }
@@ -145,6 +149,47 @@
                 $('<span/>').text(''+(i + 1) + ': ' + img.name)
             )
         );
+        $(img.element).off('mousedown');
+        $(img.element).on('mousedown', function(e)
+        {
+          if (e.which == 1)
+          {
+            dragLastPoint = { x : e.clientX, y : e.clientY };
+            return false;
+          }
+        });
+        $(img.element).off('mousemove');
+        $(img.element).on('mousemove', {
+            baseW : (isLetterBox ? vw / numColumns : vh * img.width / img.height),
+            baseH : (isLetterBox ? vw / numColumns * img.height / img.width : vh) }, function(e)
+        {
+          if (dragLastPoint && e.buttons != 1)
+          {
+            dragLastPoint = null;
+          }
+          if (dragLastPoint)
+          {
+            var dx = e.clientX - dragLastPoint.x;
+            var dy = e.clientY - dragLastPoint.y;
+            dragLastPoint = { x : e.clientX, y : e.clientY };
+            var x = dx / e.data.baseW;
+            var y = dy / e.data.baseH;
+            if (1.0 < scale)
+            {
+              viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
+              viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
+            }
+            viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
+            viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
+            updateTransform();
+            return false;
+          }
+        });
+        $(img.element).off('mouseup');
+        $(img.element).on('mouseup', function(e)
+        {
+          dragLastPoint = null;
+        });
         htmlCount += 1;
     }
     while (htmlCount < numColumns)
