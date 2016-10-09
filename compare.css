@@ -18,6 +18,7 @@
 #view .imageName
 {
     position        : absolute;
+    pointer-events  : none;
     font-size       : 2em;
     color           : #fff;
     text-shadow     : -1px 0px 2px #000, 0px -1px 2px #000, 1px 0px 2px #000, 0px 1px 2px #000;
