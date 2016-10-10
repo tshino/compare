@@ -15,6 +15,10 @@
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileSelect, false);
   
+  $('#file').on('change', function(e) {
+    addFiles(e.target.files);
+  });
+  
   $(window).resize(updateDOM);
   $(window).keydown(function(e)
     {
@@ -196,7 +200,11 @@
     {
         $(view).append(
             $('<div/>').append(
-                $('<div/>').addClass('dropHere').text("Drop image files here")
+                $('<div/>').addClass('dropHere').
+                    text("Drop image files here").
+                    click(function() {
+                      $('#file').click();
+                    })
             )
         );
         htmlCount += 1;
@@ -230,10 +238,11 @@
   function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
-
-    var files = evt.dataTransfer.files;
-
-    // files is a FileList of File objects. List some properties.
+    addFiles(evt.dataTransfer.files);
+  }
+  function addFiles(files)
+  {
+    // files is a FileList of File objects.
     for (var i = 0, f; f = files[i]; i++)
     {
       if (!f.type || !(f.type == 'image/png' || f.type == 'image/jpeg'))
