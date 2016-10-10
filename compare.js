@@ -69,6 +69,12 @@
         updateDOM();
         return false;
       }
+      // 'f' (70)
+      if (e.keyCode == 70 && !e.shiftKey)
+      {
+        toggleFullscreen();
+        return false;
+      }
       //alert(e.keyCode);
     });
   
@@ -285,3 +291,30 @@
     evt.dataTransfer.dropEffect = 'copy';
   }
 
+  function toggleFullscreen()
+  {
+    var fullscreen = document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement;
+    if (!fullscreen)
+    {
+      var view = document.getElementById('view');
+      if (view.webkitRequestFullscreen) {
+        view.webkitRequestFullscreen();
+      } else if (view.mozRequestFullScreen) {
+        view.mozRequestFullScreen();
+      } else {
+        view.requestFullscreen();
+      }
+    }
+    else
+    {
+      if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  }

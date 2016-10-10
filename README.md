@@ -14,6 +14,7 @@ Usage:
 | cursor        | scroll                |
 | '1', '2'...   | single view           |
 | '0'           | multiple view         |
+| 'f'           | full screen           |
 
 
 # compare
