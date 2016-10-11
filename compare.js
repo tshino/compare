@@ -156,7 +156,8 @@
         $(view).append(
             $('<div/>').append(
                 img.element,
-                $('<span/>').text(''+(i + 1) + ': ' + img.name)
+                $('<span/>').addClass('imageName'). 
+                    text(''+(i + 1) + ': ' + img.name)
             )
         );
         $(img.element).off('mousedown');
@@ -220,7 +221,6 @@
         {
             width       : ''+(100/numColumns)+'%',
         });
-    $('#view .imageBox span').addClass('imageName');
     
     updateTransform();
   }

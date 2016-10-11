@@ -18,14 +18,15 @@
 }
 #view .imageName
 {
+    display         : inline-block;
     position        : absolute;
+    width           : 100%;
+    text-align      : center;
     pointer-events  : none;
-    font-size       : 2em;
+    font-size       : 1.5em;
     color           : #fff;
     text-shadow     : -1px 0px 2px #000, 0px -1px 2px #000, 1px 0px 2px #000, 0px 1px 2px #000;
-    opacity         : 0.5;
-    left            : 50%;
-    transform       : translate(-50%);
+    opacity         : 0.7;
 }
 #view .imageBox img
 {
