@@ -1,8 +1,8 @@
 ﻿$( function()
 {
-  var MAX_ZOOM_LEVEL    = 8.0;
+  var MAX_ZOOM_LEVEL    = 6.0;
   var ZOOM_STEP_KEY     = 0.25;
-  var ZOOM_STEP_WHEEL   = 0.125;
+  var ZOOM_STEP_WHEEL   = 0.0625;
   
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob))
@@ -85,15 +85,11 @@
     {
         return true;
     }
-    if (event.deltaY < 0)
+    var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+    var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
+    if (steps != 0)
     {
-        viewZoom = Math.min(viewZoom + ZOOM_STEP_WHEEL, MAX_ZOOM_LEVEL);
-        updateTransform();
-        return false;
-    }
-    else if (event.deltaY > 0)
-    {
-        viewZoom = Math.max(viewZoom - ZOOM_STEP_WHEEL, 0);
+        viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom - steps * ZOOM_STEP_WHEEL));
         updateTransform();
         return false;
     }
