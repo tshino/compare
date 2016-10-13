@@ -19,7 +19,7 @@
     addFiles(e.target.files);
   });
   
-  $(window).resize(updateDOM);
+  $(window).resize(updateLayout);
   $(window).keydown(function(e)
     {
       if (e.ctrlKey || e.altKey)
@@ -30,7 +30,7 @@
       if (48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey)
       {
         currentImageIndex = e.keyCode - 48;
-        updateDOM();
+        updateLayout();
         return false;
       }
       // '+;' (59 or 187) / PageUp (33)
@@ -66,12 +66,14 @@
         viewZoom = 0;
         viewOffset.x = 0.5;
         viewOffset.y = 0.5;
-        updateDOM();
+        resetMouseDrag();
+        updateLayout();
         return false;
       }
       // 'f' (70)
       if (e.keyCode == 70 && !e.shiftKey)
       {
+        resetMouseDrag();
         toggleFullscreen();
         return false;
       }
@@ -119,38 +121,11 @@
   function updateDOM()
   {
     var view = document.getElementById('view');
-    var vw = $(view).width();
-    var vh = $(view).height();
-    
-    var isSingleView =
-            currentImageIndex != 0 &&
-            currentImageIndex <= images.length;
-    var numColumns =
-            isSingleView ? 1 :
-            2 < images.length ? images.length : 2;
-    
-    dragLastPoint = null;
-    
     view.innerHTML = '';
-    var html = [];
-    var htmlCount = 0;
     for (var i = 0, img; img = images[i]; i++)
     {
-        if (isSingleView && i + 1 != currentImageIndex)
-        {
-            continue;
-        }
-        var isLetterBox = vw / numColumns * img.height < vh * img.width;
-        if (isLetterBox)
-        {
-            $(img.element).css( { width : '100%', height : 'auto' });
-        }
-        else
-        {
-            $(img.element).css( { width : 'auto', height : '100%' });
-        }
         $(view).append(
-            $('<div/>').append(
+            $('<div/>').addClass('imageBox').append(
                 img.element,
                 $('<span/>').addClass('imageName'). 
                     text(''+(i + 1) + ': ' + img.name)
@@ -166,9 +141,7 @@
           }
         });
         $(img.element).off('mousemove');
-        $(img.element).on('mousemove', {
-            baseW : (isLetterBox ? vw / numColumns : vh * img.width / img.height),
-            baseH : (isLetterBox ? vw / numColumns * img.height / img.width : vh) }, function(e)
+        $(img.element).on('mousemove', { index : i }, function(e)
         {
           if (dragLastPoint && e.buttons != 1)
           {
@@ -179,8 +152,8 @@
             var dx = e.clientX - dragLastPoint.x;
             var dy = e.clientY - dragLastPoint.y;
             dragLastPoint = { x : e.clientX, y : e.clientY };
-            var x = dx / e.data.baseW;
-            var y = dy / e.data.baseH;
+            var x = dx / images[e.data.index].baseWidth;
+            var y = dy / images[e.data.index].baseHeight;
             if (1.0 < scale)
             {
               viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
@@ -197,12 +170,11 @@
         {
           dragLastPoint = null;
         });
-        htmlCount += 1;
     }
-    while (htmlCount < numColumns)
+    for (var i = 0; i < 2; ++i)
     {
         $(view).append(
-            $('<div/>').append(
+            $('<div/>').addClass('imageBox').append(
                 $('<div/>').addClass('dropHere').
                     text("Drop image files here").
                     click(function() {
@@ -210,14 +182,64 @@
                     })
             )
         );
-        htmlCount += 1;
     }
-    
-    $('#view > div').addClass('imageBox').css(
+    resetMouseDrag();
+    updateLayout();
+  }
+
+  function resetMouseDrag()
+  {
+    dragLastPoint = null;
+  }
+
+  function updateLayout()
+  {
+    var vw = $('#view').width();
+    var vh = $('#view').height();
+    var isSingleView =
+            currentImageIndex != 0 &&
+            currentImageIndex <= images.length;
+    var numColumns =
+            isSingleView ? 1 :
+            2 < images.length ? images.length : 2;
+    $('#view .imageBox').each(function(index)
+    {
+      if (index < images.length)
+      {
+        var img = images[index];
+        img.isLetterBox = vw / numColumns * img.height < vh * img.width;
+        img.baseWidth = img.isLetterBox ? vw / numColumns : vh * img.width / img.height;
+        img.baseHeight = img.isLetterBox ? vw / numColumns * img.height / img.width : vh;
+        if (isSingleView && index + 1 != currentImageIndex)
         {
-            width       : ''+(100/numColumns)+'%',
-        });
-    
+          $(this).css({ display : 'none' });
+          return true; // continue
+        }
+        else
+        {
+          if (img.isLetterBox)
+          {
+            $(img.element).css( { width : '100%', height : 'auto' });
+          }
+          else
+          {
+            $(img.element).css( { width : 'auto', height : '100%' });
+          }
+        }
+      }
+      else
+      {
+        if (index - images.length >= numColumns - (isSingleView ? 1 : images.length))
+        {
+          $(this).css({ display : 'none' });
+          return true; // continue
+        }
+      }
+      $(this).css({
+        display : 'inline-block',
+        width   : ''+(100/numColumns)+'%'
+      });
+    });
     updateTransform();
   }
   
