@@ -269,7 +269,7 @@
     // files is a FileList of File objects.
     for (var i = 0, f; f = files[i]; i++)
     {
-      if (!f.type || !(f.type == 'image/png' || f.type == 'image/jpeg'))
+      if (!f.type || !(/^image\/.+$/.test(f.type)))
       {
         log.push('Error: ', escapeHtml(f.name), ' is not an image <br>');
       }
