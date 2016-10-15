@@ -131,45 +131,6 @@
                     text(''+(i + 1) + ': ' + img.name)
             )
         );
-        $(img.element).off('mousedown');
-        $(img.element).on('mousedown', function(e)
-        {
-          if (e.which == 1)
-          {
-            dragLastPoint = { x : e.clientX, y : e.clientY };
-            return false;
-          }
-        });
-        $(img.element).off('mousemove');
-        $(img.element).on('mousemove', { index : i }, function(e)
-        {
-          if (dragLastPoint && e.buttons != 1)
-          {
-            dragLastPoint = null;
-          }
-          if (dragLastPoint)
-          {
-            var dx = e.clientX - dragLastPoint.x;
-            var dy = e.clientY - dragLastPoint.y;
-            dragLastPoint = { x : e.clientX, y : e.clientY };
-            var x = dx / images[e.data.index].baseWidth;
-            var y = dy / images[e.data.index].baseHeight;
-            if (1.0 < scale)
-            {
-              viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
-              viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
-            }
-            viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
-            viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
-            updateTransform();
-            return false;
-          }
-        });
-        $(img.element).off('mouseup');
-        $(img.element).on('mouseup', function(e)
-        {
-          dragLastPoint = null;
-        });
     }
     for (var i = 0; i < 2; ++i)
     {
@@ -183,8 +144,59 @@
             )
         );
     }
+    makeMouseDraggable();
     resetMouseDrag();
     updateLayout();
+  }
+
+  function makeMouseDraggable()
+  {
+    $('#view > div').on('mousedown', function(e)
+    {
+      var index = $('#view > div').index(this);
+      if (index >= images.length)
+      {
+        return true;
+      }
+      if (e.which == 1)
+      {
+        dragLastPoint = { x : e.clientX, y : e.clientY };
+        return false;
+      }
+    });
+    $('#view > div').on('mousemove', function(e)
+    {
+      if (images.length == 0)
+      {
+        return true;
+      }
+      var index = Math.min(images.length - 1, $('#view > div').index(this));
+      if (dragLastPoint && e.buttons != 1)
+      {
+        dragLastPoint = null;
+      }
+      if (dragLastPoint)
+      {
+        var dx = e.clientX - dragLastPoint.x;
+        var dy = e.clientY - dragLastPoint.y;
+        dragLastPoint = { x : e.clientX, y : e.clientY };
+        var x = dx / images[index].baseWidth;
+        var y = dy / images[index].baseHeight;
+        if (1.0 < scale)
+        {
+          viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
+          viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
+        }
+        viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
+        viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
+        updateTransform();
+        return false;
+      }
+    });
+    $('#view > div').on('mouseup', function(e)
+    {
+      dragLastPoint = null;
+    });
   }
 
   function resetMouseDrag()
