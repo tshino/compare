@@ -9,7 +9,7 @@
     width  : 100%;
     height : 100vh;
 }
-#view .imageBox
+#view .imageBox, #view .emptyBox
 {
     display         : inline-block;
     position        : relative;

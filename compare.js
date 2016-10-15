@@ -18,6 +18,11 @@
   $('#file').on('change', function(e) {
     addFiles(e.target.files);
   });
+  $('#view .dropHere').
+    text("Drop image files here").
+    click(function() {
+      $('#file').click();
+    });
   
   $(window).resize(updateLayout);
   $(window).keydown(function(e)
@@ -121,26 +126,14 @@
   function updateDOM()
   {
     var view = document.getElementById('view');
-    view.innerHTML = '';
+    $('#view > div.imageBox').remove();
     for (var i = 0, img; img = images[i]; i++)
     {
-        $(view).append(
+        $('#drop').before(
             $('<div/>').addClass('imageBox').append(
                 img.element,
                 $('<span/>').addClass('imageName'). 
                     text(''+(i + 1) + ': ' + img.name)
-            )
-        );
-    }
-    for (var i = 0; i < 2; ++i)
-    {
-        $(view).append(
-            $('<div/>').addClass('imageBox').append(
-                $('<div/>').addClass('dropHere').
-                    text("Drop image files here").
-                    click(function() {
-                      $('#file').click();
-                    })
             )
         );
     }
@@ -214,38 +207,39 @@
     var numColumns =
             isSingleView ? 1 :
             2 < images.length ? images.length : 2;
-    $('#view .imageBox').each(function(index)
+    $('#view > div.imageBox').each(function(index)
     {
-      if (index < images.length)
+      var img = images[index];
+      img.isLetterBox = vw / numColumns * img.height < vh * img.width;
+      img.baseWidth = img.isLetterBox ? vw / numColumns : vh * img.width / img.height;
+      img.baseHeight = img.isLetterBox ? vw / numColumns * img.height / img.width : vh;
+      if (isSingleView && index + 1 != currentImageIndex)
       {
-        var img = images[index];
-        img.isLetterBox = vw / numColumns * img.height < vh * img.width;
-        img.baseWidth = img.isLetterBox ? vw / numColumns : vh * img.width / img.height;
-        img.baseHeight = img.isLetterBox ? vw / numColumns * img.height / img.width : vh;
-        if (isSingleView && index + 1 != currentImageIndex)
-        {
-          $(this).css({ display : 'none' });
-          return true; // continue
-        }
-        else
-        {
-          if (img.isLetterBox)
-          {
-            $(img.element).css( { width : '100%', height : 'auto' });
-          }
-          else
-          {
-            $(img.element).css( { width : 'auto', height : '100%' });
-          }
-        }
+        $(this).css({ display : 'none' });
+        return true; // continue
       }
       else
       {
-        if (index - images.length >= numColumns - (isSingleView ? 1 : images.length))
+        if (img.isLetterBox)
         {
-          $(this).css({ display : 'none' });
-          return true; // continue
+          $(img.element).css( { width : '100%', height : 'auto' });
         }
+        else
+        {
+          $(img.element).css( { width : 'auto', height : '100%' });
+        }
+      }
+      $(this).css({
+        display : 'inline-block',
+        width   : ''+(100/numColumns)+'%'
+      });
+    });
+    $('#view > div.emptyBox').each(function(index)
+    {
+      if (index >= (isSingleView ? 0 : numColumns - images.length))
+      {
+        $(this).css({ display : 'none' });
+        return true; // continue
       }
       $(this).css({
         display : 'inline-block',
