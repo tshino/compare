@@ -133,7 +133,12 @@
             $('<div/>').addClass('imageBox').append(
                 img.element,
                 $('<span/>').addClass('imageName'). 
-                    text(''+(i + 1) + ': ' + img.name)
+                    text(''+(i + 1) + ': ' + img.name).
+                    click({index : i}, function(e)
+                    {
+                      currentImageIndex = currentImageIndex == 0 ? e.data.index + 1 : 0;
+                      updateLayout();
+                    })
             )
         );
     }
