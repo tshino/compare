@@ -221,7 +221,6 @@
       if (isSingleView && index + 1 != currentImageIndex)
       {
         $(this).css({ display : 'none' });
-        return true; // continue
       }
       else
       {
@@ -233,23 +232,19 @@
         {
           $(img.element).css( { width : 'auto', height : '100%' });
         }
+        $(this).css({ display : 'inline-block' });
       }
-      $(this).css({
-        display : 'inline-block',
-        width   : ''+(100/numColumns)+'%'
-      });
     });
     $('#view > div.emptyBox').each(function(index)
     {
       if (index >= (isSingleView ? 0 : numColumns - images.length))
       {
         $(this).css({ display : 'none' });
-        return true; // continue
       }
-      $(this).css({
-        display : 'inline-block',
-        width   : ''+(100/numColumns)+'%'
-      });
+      else
+      {
+        $(this).css({ display : 'inline-block' });
+      }
     });
     updateTransform();
   }
