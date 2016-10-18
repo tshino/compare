@@ -10,11 +10,19 @@
 <body>
 
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
-<div id="view">
-	<div class="emptyBox" id="drop">
-		<div class="dropHere"></div>
-	</div><div class="emptyBox">
-		<div class="dropHere"></div>
+<div id="viewroot">
+	<div id="sidebar">
+		<div class="button" id="add" onclick="$('#file').click()">＋</div>
+		<div class="space"></div>
+		<div class="button" id="all" onclick="showAll()">ALL</div>
+	</div>
+	<div id="view">
+		<div class="emptyBox" id="drop">
+			<div class="dropHere"></div>
+		</div>
+		<div class="emptyBox">
+			<div class="dropHere"></div>
+		</div>
 	</div>
 </div>
 <div id="log"></div>

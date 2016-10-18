@@ -123,9 +123,16 @@
     return str;
   }
 
+  function showAll()
+  {
+    currentImageIndex = 0;
+    updateLayout();
+  }
+
   function updateDOM()
   {
     var view = document.getElementById('view');
+    $('#sidebar > .selector').remove();
     $('#view > div.imageBox').remove();
     for (var i = 0, img; img = images[i]; i++)
     {
@@ -140,6 +147,15 @@
                       updateLayout();
                     })
             )
+        );
+        $('#sidebar').append(
+          $('<div/>').addClass('button selector').
+            text(''+(i + 1)).
+            click({index : i}, function(e)
+            {
+              currentImageIndex = e.data.index + 1;
+              updateLayout();
+            })
         );
     }
     makeMouseDraggable();
@@ -246,6 +262,12 @@
         $(this).css({ display : 'inline-block' });
       }
     });
+    $('#all')[isSingleView ? 'removeClass' : 'addClass']('disabled');
+    if (isSingleView) {
+      $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
+    } else {
+      $('.selector').removeClass('disabled');
+    }
     updateTransform();
   }
   
@@ -322,7 +344,7 @@
                 document.mozFullScreenElement;
     if (!fullscreen)
     {
-      var view = document.getElementById('view');
+      var view = document.getElementById('viewroot');
       if (view.webkitRequestFullscreen) {
         view.webkitRequestFullscreen();
       } else if (view.mozRequestFullScreen) {
