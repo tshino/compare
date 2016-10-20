@@ -15,6 +15,7 @@ Usage:
 | '1', '2'...   | single view           |
 | '0'           | multiple view         |
 | 'f'           | full screen           |
+| '?'           | help                  |
 
 
 # compare

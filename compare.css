@@ -105,6 +105,44 @@
     padding         : 1.5em;
     color           : #888;
 }
+#shortcuts
+{
+    display         : none;
+    position        : fixed;
+    z-index         : 99;
+    background      : rgba(0,0,0, 0.4);
+    left            : 0px;
+    top             : 0px;
+    right           : 0px;
+    bottom          : 0px;
+}
+#shortcuts > div
+{
+    background      : #ddd;
+    border          : #bbb double 4px;
+    border-radius   : 5px;
+    box-shadow      : 2px 2px 10px #000;
+    margin          : 25vh auto;
+    width           : 50vw;
+}
+#shortcuts p, #shortcuts table
+{
+    margin          : 0.5em;
+    padding         : 0.5em 1.0em;
+    border          : #bbb solid 1px;
+    line-height     : 1.5em;
+}
+#shortcuts td
+{
+    padding         : 0.2em 0.5em;
+}
+.key
+{
+    border          : #aaa solid 1px;
+    border-radius   : 4px;
+    box-shadow      : 1px 1px 2px rgba(0,0,0, 0.4);
+    padding         : 2px 7px;
+}
 #log
 {
     color           : #000;

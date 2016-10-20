@@ -31,6 +31,11 @@
       {
         return true;
       }
+      if ($('#shortcuts').is(':visible'))
+      {
+        $('#shortcuts').hide();
+        return false;
+      }
       // '0' - '9'
       if (48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey)
       {
@@ -84,6 +89,22 @@
       }
       //alert(e.keyCode);
     });
+  $(window).keypress(function(e)
+  {
+    // '?' (63)
+    if (e.which == 63) {
+      var shortcuts = $('#shortcuts');
+      if (shortcuts.is(':visible')) {
+        shortcuts.hide();
+      } else {
+        $('#shortcuts').
+          css({ display: 'block' }).
+          click(function() { shortcuts.hide(); });
+      }
+      return false;
+    }
+    //alert(e.which);
+  });
   
   $(window).on("wheel", function(e)
   {
