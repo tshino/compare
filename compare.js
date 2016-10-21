@@ -93,14 +93,7 @@
   {
     // '?' (63)
     if (e.which == 63) {
-      var shortcuts = $('#shortcuts');
-      if (shortcuts.is(':visible')) {
-        shortcuts.hide();
-      } else {
-        $('#shortcuts').
-          css({ display: 'block' }).
-          click(function() { shortcuts.hide(); });
-      }
+      showHelp();
       return false;
     }
     //alert(e.which);
@@ -148,6 +141,17 @@
   {
     currentImageIndex = 0;
     updateLayout();
+  }
+  function showHelp()
+  {
+    var shortcuts = $('#shortcuts');
+    if (shortcuts.is(':visible')) {
+      shortcuts.hide();
+    } else {
+      $('#shortcuts').
+        css({ display: 'block' }).
+        click(function() { shortcuts.hide(); });
+    }
   }
 
   function updateDOM()

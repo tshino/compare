@@ -10,6 +10,7 @@
 }
 #sidebar
 {
+    position        : relative;
     background-color: #666;
     width           : 60px;
     height          : 100vh;
@@ -27,6 +28,11 @@
 {
     height  : 0px;
     margin  : 5px;
+}
+#sidebar > div.bottom
+{
+    position : absolute;
+    bottom  : 5px;
 }
 .button
 {
