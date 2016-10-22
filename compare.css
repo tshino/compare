@@ -32,6 +32,7 @@
 #sidebar > div.bottom
 {
     position : absolute;
+    left    : 0px;
     bottom  : 5px;
 }
 .button
