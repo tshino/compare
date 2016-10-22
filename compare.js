@@ -31,9 +31,10 @@
       {
         return true;
       }
-      if ($('#shortcuts').is(':visible'))
+      if (dialog)
       {
-        $('#shortcuts').hide();
+        dialog.hide();
+        dialog = null;
         return false;
       }
       // '0' - '9'
@@ -80,13 +81,6 @@
         updateLayout();
         return false;
       }
-      // 'f' (70)
-      if (e.keyCode == 70 && !e.shiftKey)
-      {
-        resetMouseDrag();
-        toggleFullscreen();
-        return false;
-      }
       //alert(e.keyCode);
     });
   $(window).keypress(function(e)
@@ -94,6 +88,17 @@
     // '?' (63)
     if (e.which == 63) {
       showHelp();
+      return false;
+    }
+    // 'f' (102)
+    if (e.which == 102) {
+      resetMouseDrag();
+      toggleFullscreen();
+      return false;
+    }
+    // 'i' (105)
+    if (e.which == 105) {
+      showInfo();
       return false;
     }
     //alert(e.which);
@@ -126,6 +131,7 @@
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
   var dragLastPoint = null;
+  var dialog = null;
 
   function escapeHtml(str)
   {
@@ -144,14 +150,24 @@
   }
   function showHelp()
   {
-    var shortcuts = $('#shortcuts');
-    if (shortcuts.is(':visible')) {
-      shortcuts.hide();
-    } else {
-      $('#shortcuts').
-        css({ display: 'block' }).
-        click(function() { shortcuts.hide(); });
+    if (dialog) { dialog.hide(); }
+    dialog = $('#shortcuts');
+    dialog.css({ display: 'block' }).
+        click(function() { dialog.hide(); dialog = null;});
+  }
+  function showInfo()
+  {
+    if (dialog) { dialog.hide(); }
+    $('#infoTable td:not(.prop)').remove();
+    for (var i = 0, img; img = images[i]; i++)
+    {
+      $('#infoName').append($('<td>').text(img.name));
+      $('#infoWidth').append($('<td>').text(img.width));
+      $('#infoHeight').append($('<td>').text(img.height));
     }
+    dialog = $('#info');
+    dialog.css({ display: 'block' }).
+        click(function() { dialog.hide(); dialog = null; });
   }
 
   function updateDOM()

@@ -14,6 +14,7 @@
 	<div id="sidebar">
 		<div class="button" id="add" onclick="$('#file').click()">＋</div>
 		<div class="space"></div>
+		<div class="button" id="infobtn" onclick="showInfo()">i</div>
 		<div class="button" id="all" onclick="showAll()">ALL</div>
 		<div class="button bottom" id="help" onclick="showHelp()">?</div>
 	</div>
@@ -25,7 +26,7 @@
 			<div class="dropHere"></div>
 		</div>
 	</div>
-	<div id="shortcuts">
+	<div id="shortcuts" class="dialog">
 		<div>
 			<p><b>Keyboard shortcuts</b></p>
 			<table>
@@ -36,8 +37,19 @@
 				<tr><td><span class="key">1</span> / <span class="key">2</span> / ... <td>single view</tr>
 				<tr><td><span class="key">0</span><td>multiple view</tr>
 				<tr><td><span class="key">Esc</span><td>reset zoom</tr>
-				<tr><td><span class="key">F</span><td>full screen</tr>
+				<tr><td><span class="key">i</span><td>information</tr>
+				<tr><td><span class="key">f</span><td>full screen</tr>
 				<tr><td><span class="key">?</span><td>help</tr>
+			</table>
+		</div>
+	</div>
+	<div id="info" class="dialog">
+		<div>
+			<p><b>Image information</b></p>
+			<table id="infoTable">
+				<tr id="infoName"><td class="prop">name</tr>
+				<tr id="infoWidth" class="num"><td class="prop">width</tr>
+				<tr id="infoHeight" class="num"><td class="prop">height</tr>
 			</table>
 		</div>
 	</div>
