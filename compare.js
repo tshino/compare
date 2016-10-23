@@ -1,9 +1,9 @@
-﻿$( function()
+﻿var MAX_ZOOM_LEVEL    = 6.0;
+var ZOOM_STEP_KEY     = 0.25;
+var ZOOM_STEP_WHEEL   = 0.0625;
+
+$( function()
 {
-  var MAX_ZOOM_LEVEL    = 6.0;
-  var ZOOM_STEP_KEY     = 0.25;
-  var ZOOM_STEP_WHEEL   = 0.0625;
-  
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob))
   {
@@ -52,15 +52,13 @@
       // '+;' (59 or 187) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
       {
-        viewZoom = Math.min(viewZoom + ZOOM_STEP_KEY, MAX_ZOOM_LEVEL);
-        updateTransform();
+        zoomIn();
         return false;
       }
       // '-' (173 or 189) / PageDown (34)
       if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
       {
-        viewZoom = Math.max(viewZoom - ZOOM_STEP_KEY, 0);
-        updateTransform();
+        zoomOut();
         return false;
       }
       // cursor key
@@ -136,6 +134,7 @@
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
   var dragLastPoint = null;
+  var touchState = null;
   var dialog = null;
 
   function escapeHtml(str)
@@ -152,6 +151,16 @@
   {
     currentImageIndex = 0;
     updateLayout();
+  }
+  function zoomIn()
+  {
+    viewZoom = Math.min(viewZoom + ZOOM_STEP_KEY, MAX_ZOOM_LEVEL);
+    updateTransform();
+  }
+  function zoomOut()
+  {
+    viewZoom = Math.max(viewZoom - ZOOM_STEP_KEY, 0);
+    updateTransform();
   }
   function toggleHelp()
   {
@@ -213,6 +222,7 @@
         );
     }
     makeMouseDraggable();
+    makeTouchDraggable();
     resetMouseDrag();
     updateLayout();
   }
@@ -248,15 +258,7 @@
         var dx = e.clientX - dragLastPoint.x;
         var dy = e.clientY - dragLastPoint.y;
         dragLastPoint = { x : e.clientX, y : e.clientY };
-        var x = dx / images[index].baseWidth;
-        var y = dy / images[index].baseHeight;
-        if (1.0 < scale)
-        {
-          viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
-          viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
-        }
-        viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
-        viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
+        moveImageByPx(index, dx, dy);
         updateTransform();
         return false;
       }
@@ -266,10 +268,49 @@
       dragLastPoint = null;
     });
   }
-
   function resetMouseDrag()
   {
     dragLastPoint = null;
+  }
+  function makeTouchDraggable()
+  {
+    $('#view > div').on('touchmove', function(e)
+    {
+      if (images.length == 0) {
+        return true;
+      }
+      var index = Math.min(images.length - 1, $('#view > div').index(this));
+      var event = e.originalEvent;
+      if (event.targetTouches.length == 1) {
+        var touch = event.targetTouches[0];
+        if (!touchState || touchState.identifier != touch.identifier) {
+          touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
+        }
+        var dx = touch.clientX - touchState.x;
+        var dy = touch.clientY - touchState.y;
+        touchState.x = touch.clientX;
+        touchState.y = touch.clientY;
+        moveImageByPx(index, dx, dy);
+        updateTransform();
+        return false;
+      }
+    });
+    $('#view > div').on('touchend', function(e)
+    {
+      touchState = null;
+    });
+  }
+  function moveImageByPx(index, dx, dy)
+  {
+    var x = dx / images[index].baseWidth;
+    var y = dy / images[index].baseHeight;
+    if (1.0 < scale)
+    {
+      viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
+      viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
+    }
+    viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
+    viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
   }
 
   function updateLayout()
