@@ -33,9 +33,14 @@
       }
       if (dialog)
       {
-        dialog.hide();
-        dialog = null;
-        return false;
+        // ESC (27), ENTER (13)
+        if ((e.keyCode == 27 || e.keyCode == 13) && !e.shiftKey) {
+          dialog.hide();
+          dialog = null;
+          return false;
+        } else {
+          return true;
+        }
       }
       // '0' - '9'
       if (48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey)
@@ -87,7 +92,7 @@
   {
     // '?' (63)
     if (e.which == 63) {
-      showHelp();
+      toggleHelp();
       return false;
     }
     // 'f' (102)
@@ -98,13 +103,13 @@
     }
     // 'i' (105)
     if (e.which == 105) {
-      showInfo();
+      toggleInfo();
       return false;
     }
     //alert(e.which);
   });
   
-  $(window).on("wheel", function(e)
+  $('#view').on("wheel", function(e)
   {
     var event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey)
@@ -148,16 +153,12 @@
     currentImageIndex = 0;
     updateLayout();
   }
-  function showHelp()
+  function toggleHelp()
   {
-    if (dialog) { dialog.hide(); }
-    dialog = $('#shortcuts');
-    dialog.css({ display: 'block' }).
-        click(function() { dialog.hide(); dialog = null;});
+    toggleDialog($('#shortcuts'));
   }
-  function showInfo()
+  function toggleInfo()
   {
-    if (dialog) { dialog.hide(); }
     $('#infoTable td:not(.prop)').remove();
     for (var i = 0, img; img = images[i]; i++)
     {
@@ -165,7 +166,19 @@
       $('#infoWidth').append($('<td>').text(img.width));
       $('#infoHeight').append($('<td>').text(img.height));
     }
-    dialog = $('#info');
+    toggleDialog($('#info'));
+  }
+  function toggleDialog(target)
+  {
+    if (dialog) {
+      if (target.is(':visible')) {
+        dialog.hide();
+        dialog = null;
+        return;
+      }
+      dialog.hide();
+    }
+    dialog = target;
     dialog.css({ display: 'block' }).
         click(function() { dialog.hide(); dialog = null; });
   }

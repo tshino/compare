@@ -130,9 +130,13 @@ div.dialog > div
     border-radius   : 5px;
     box-shadow      : 2px 2px 10px #000;
     margin          : 25vh auto;
+    width           : -webkit-max-content;
+    width           : -moz-max-content;
     width           : max-content;
     max-width       : 90vw;
     min-width       : 50vw;
+    max-height      : 90vh;
+    overflow        : auto;
 }
 div.dialog p, div.dialog table
 {
