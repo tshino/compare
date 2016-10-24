@@ -14,6 +14,7 @@
     background-color: #666;
     width           : 60px;
     height          : 100vh;
+    overflow        : auto;
 }
 #sidebar > div
 {
@@ -129,13 +130,13 @@ div.dialog > div
     border          : #bbb double 4px;
     border-radius   : 5px;
     box-shadow      : 2px 2px 10px #000;
-    margin          : 25vh auto;
+    margin          : 20vh auto;
     width           : -webkit-max-content;
     width           : -moz-max-content;
     width           : max-content;
     max-width       : 90vw;
     min-width       : 50vw;
-    max-height      : 90vh;
+    max-height      : 60vh;
     overflow        : auto;
 }
 div.dialog p, div.dialog table
