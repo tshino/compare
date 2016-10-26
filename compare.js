@@ -335,14 +335,9 @@ $( function()
       }
       else
       {
-        if (img.isLetterBox)
-        {
-          $(img.element).css( { width : '100%', height : 'auto' });
-        }
-        else
-        {
-          $(img.element).css( { width : 'auto', height : '100%' });
-        }
+        var wPercent = 100 * img.baseWidth / (vw / numColumns);
+        var hPercent = 100 * img.baseHeight / vh;
+        $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
         $(this).css({ display : 'inline-block' });
       }
     });
