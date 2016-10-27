@@ -127,6 +127,7 @@ $( function()
   updateDOM();
 });
 
+  var loading = [];
   var images = [];
   var log = [];
   var currentImageIndex = 0;
@@ -176,6 +177,20 @@ $( function()
       $('#infoHeight').append($('<td>').text(img.height));
     }
     toggleDialog($('#info'));
+  }
+  function showNowLoading()
+  {
+    if (dialog) {
+      dialog.hide();
+      dialog = null;
+    }
+    $('#loadingList > tr').remove();
+    for (var i = 0, n; n = loading[i]; i++) {
+      $('#loadingList').append($('<tr>').addClass('b').append($('<td>').text(n)));
+    }
+    if (0 < loading.length) {
+      toggleDialog($('#loading'));
+    }
   }
   function toggleDialog(target)
   {
@@ -393,6 +408,7 @@ $( function()
       }
       else
       {
+        loading.push(f.name);
         var reader = new FileReader();
         reader.onload = (function(theFile)
         {
@@ -401,6 +417,8 @@ $( function()
                 var img = new Image;
                 $(img).on('load', function()
                 {
+                    loading.splice(loading.indexOf(theFile.name), 1);
+                    showNowLoading();
                     images.push(
                         {
                             element : img,
@@ -419,6 +437,7 @@ $( function()
     currentImageIndex = 0;
     updateDOM();
     document.getElementById('log').innerHTML = log.join('');
+    showNowLoading();
   }
 
   function handleDragOver(evt) {
