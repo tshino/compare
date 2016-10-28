@@ -146,6 +146,10 @@ $( function()
     str = str.replace(/'/g, '&#39;');
     return str;
   }
+  function addComma(num)
+  {
+    return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+  }
 
   function showAll()
   {
@@ -172,8 +176,10 @@ $( function()
     for (var i = 0, img; img = images[i]; i++)
     {
       $('#infoName').append($('<td>').text(img.name));
-      $('#infoWidth').append($('<td>').text(img.width));
-      $('#infoHeight').append($('<td>').text(img.height));
+      $('#infoWidth').append($('<td>').text(addComma(img.width)));
+      $('#infoHeight').append($('<td>').text(addComma(img.height)));
+      $('#infoFileSize').append($('<td>').text(addComma(img.size)));
+      $('#infoLastModified').append($('<td>').text(img.lastModified.toLocaleString()));
     }
     toggleDialog($('#info'));
   }
@@ -430,6 +436,8 @@ $( function()
                             width   : img.width,
                             height  : img.height,
                             name    : theFile.name,
+                            size          : theFile.size,
+                            lastModified  : new Date(theFile.lastModified),
                         });
                     updateDOM();
                 });
