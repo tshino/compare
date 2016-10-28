@@ -35,8 +35,7 @@ $( function()
       {
         // ESC (27), ENTER (13)
         if ((e.keyCode == 27 || e.keyCode == 13) && !e.shiftKey) {
-          dialog.hide();
-          dialog = null;
+          hideDialog();
           return false;
         } else {
           return true;
@@ -180,10 +179,7 @@ $( function()
   }
   function showNowLoading()
   {
-    if (dialog) {
-      dialog.hide();
-      dialog = null;
-    }
+    hideDialog();
     $('#loadingList > tr').remove();
     for (var i = 0, n; n = loading[i]; i++) {
       $('#loadingList').append($('<tr>').addClass('b').append($('<td>').text(n)));
@@ -196,15 +192,24 @@ $( function()
   {
     if (dialog) {
       if (target.is(':visible')) {
-        dialog.hide();
-        dialog = null;
+        hideDialog();
         return;
       }
-      dialog.hide();
+      hideDialog();
     }
     dialog = target;
     dialog.css({ display: 'block' }).
-        click(function() { dialog.hide(); dialog = null; });
+        off('click').on('click', function() { hideDialog(); });
+    dialog.children().
+        focus().
+        off('click').on('click', function() { return false; });
+  }
+  function hideDialog()
+  {
+    if (dialog) {
+      dialog.hide();
+      dialog = null;
+    }
   }
 
   function updateDOM()
