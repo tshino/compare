@@ -150,6 +150,34 @@ $( function()
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   }
+  function calcAspectRatio(w, h)
+  {
+    var m = w > h ? w : h, n = w > h ? h : w;
+    while (n > 0) {
+      var r = m % n;
+      m = n;
+      n = r;
+    }
+    var gcd = m;
+    var result = addComma(w / gcd) + ':' + addComma(h / gcd);
+    if (w / gcd <= 50 || h / gcd <= 50) {
+      return result;
+    } else {
+      for (var i = 1; i <= 10; ++i) {
+        var a = w / h * i;
+        var b = Math.floor(a + 0.5);
+        if (Math.max(b - a, a - b) < Math.min(i,b) * 0.004) {
+          return result + '\n(approx. ' + addComma(b) + ':' + i + ')';
+        }
+        var c = h / w * i;
+        var d = Math.floor(c + 0.5);
+        if (Math.max(d - c, c - d) < Math.min(i,d) * 0.004) {
+          return result + '\n(approx. ' + i + ':' + addComma(d) + ')';
+        }
+      }
+      return result;
+    }
+  }
 
   function showAll()
   {
@@ -178,6 +206,7 @@ $( function()
       $('#infoName').append($('<td>').text(img.name));
       $('#infoWidth').append($('<td>').text(addComma(img.width)));
       $('#infoHeight').append($('<td>').text(addComma(img.height)));
+      $('#infoAspect').append($('<td>').text(calcAspectRatio(img.width, img.height)));
       $('#infoFileSize').append($('<td>').text(addComma(img.size)));
       $('#infoLastModified').append($('<td>').text(img.lastModified.toLocaleString()));
     }

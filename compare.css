@@ -170,13 +170,14 @@ tr.b > td:not(.prop)
 {
     font-weight : bold;
 }
-tr:nth-child(even)
+div.dialog tr:nth-child(even)
 {
     background      : #e8e8e8;
 }
-.prop
+div.dialog td:not(.prop)
 {
     font-size       : 1.2em;
+    white-space     : pre-wrap;
 }
 #log
 {
