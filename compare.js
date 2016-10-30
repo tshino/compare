@@ -1,6 +1,7 @@
 ﻿var MAX_ZOOM_LEVEL    = 6.0;
 var ZOOM_STEP_KEY     = 0.25;
 var ZOOM_STEP_WHEEL   = 0.0625;
+var ZOOM_STEP_DBLCLK  = 2.00;
 
 $( function()
 {
@@ -278,6 +279,7 @@ $( function()
     }
     makeMouseDraggable();
     makeTouchDraggable();
+    makeDoubleClickable();
     resetMouseDrag();
     updateLayout();
   }
@@ -355,17 +357,42 @@ $( function()
       touchState = null;
     });
   }
+  function makeDoubleClickable()
+  {
+    $('#view > div.imageBox img').on('dblclick', function(e)
+    {
+      var index = $('#view > div').index($(this).parent());
+      if (index >= images.length) {
+        return true;
+      }
+      var img = images[index];
+      var x = (e.pageX - $(this).offset().left) / (img.baseWidth * scale);
+      var y = (e.pageY - $(this).offset().top) / (img.baseHeight * scale);
+      zoomWithTarget(index, x, y);
+    });
+  }
   function moveImageByPx(index, dx, dy)
   {
-    var x = dx / images[index].baseWidth;
-    var y = dy / images[index].baseHeight;
+    var x = dx / (images[index].baseWidth * scale);
+    var y = dy / (images[index].baseHeight * scale);
     if (1.0 < scale)
     {
-      viewOffset.x -= (x / scale) / (1.0 - 1.0 / scale);
-      viewOffset.y -= (y / scale) / (1.0 - 1.0 / scale);
+      viewOffset.x -= x / (1.0 - 1.0 / scale);
+      viewOffset.y -= y / (1.0 - 1.0 / scale);
     }
     viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
     viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
+  }
+  function zoomWithTarget(index, x, y)
+  {
+    if (viewZoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
+      viewZoom = Math.min(viewZoom + ZOOM_STEP_DBLCLK, MAX_ZOOM_LEVEL);
+      viewOffset.x = Math.min(1, Math.max(0, x));
+      viewOffset.y = Math.min(1, Math.max(0, y));
+    } else {
+      viewZoom = 0;
+    }
+    updateTransform();
   }
 
   function updateLayout()
