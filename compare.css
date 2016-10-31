@@ -15,18 +15,18 @@
 {
     position        : relative;
     background-color: #666;
-    width           : 60px;
+    width           : 45px;
     height          : 100%;
     overflow        : auto;
 }
 #sidebar > div
 {
     display : inline-block;
-    width   : 50px;
-    height  : 50px;
+    width   : 35px;
+    height  : 35px;
     margin  : 5px;
-    line-height : 50px;
-    font-size   : 24px;
+    line-height : 35px;
+    font-size   : 18px;
 }
 #sidebar > div.space
 {
@@ -37,7 +37,7 @@
 {
     position : absolute;
     left    : 0px;
-    bottom  : 5px;
+    bottom  : 10px;
 }
 .button
 {
@@ -46,6 +46,10 @@
     color       : #444;
     text-align  : center;
     cursor      : pointer;
+}
+.button img
+{
+    width       : 100%;
 }
 .button.disabled
 {

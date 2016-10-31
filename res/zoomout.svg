@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page4">
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2551,2269 C 2480,2199 2339,2199 2268,2269 L 2268,2269 C 2198,2340 2197,2482 2268,2553 L 3115,3401 C 3186,3471 3328,3471 3399,3400 L 3399,3400 C 3470,3329 3470,3188 3399,3117 L 2551,2269 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2551,2269 C 2480,2199 2339,2199 2268,2269 L 2268,2269 C 2198,2340 2197,2482 2268,2553 L 3115,3401 C 3186,3471 3328,3471 3399,3400 L 3399,3400 C 3470,3329 3470,3188 3399,3117 L 2551,2269 Z"/>
+   <rect fill="none" stroke="none" x="2127" y="2128" width="1415" height="1415"/>
+  </g>
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 1700,2700 C 1516,2700 1359,2658 1200,2566 1041,2474 926,2359 834,2200 742,2041 700,1884 700,1700 700,1516 742,1359 834,1200 926,1041 1041,926 1200,834 1359,742 1516,700 1700,700 1884,700 2041,742 2200,834 2359,926 2474,1041 2566,1200 2658,1359 2700,1516 2700,1700 2700,1884 2658,2041 2566,2200 2474,2359 2359,2474 2200,2566 2041,2658 1884,2700 1700,2700 L 1700,2700 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" d="M 1700,2700 C 1516,2700 1359,2658 1200,2566 1041,2474 926,2359 834,2200 742,2041 700,1884 700,1700 700,1516 742,1359 834,1200 926,1041 1041,926 1200,834 1359,742 1516,700 1700,700 1884,700 2041,742 2200,834 2359,926 2474,1041 2566,1200 2658,1359 2700,1516 2700,1700 2700,1884 2658,2041 2566,2200 2474,2359 2359,2474 2200,2566 2041,2658 1884,2700 1700,2700 L 1700,2700 Z"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2200,1700 L 1200,1700"/>
+  </g>
+ </g>
+</svg>

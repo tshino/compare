@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page1">
+  <g>
+   <path fill="rgb(0,204,255)" stroke="none" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2900,2000 C 2734,2000 2593,1962 2450,1879 2307,1797 2203,1693 2121,1550 2038,1407 2000,1266 2000,1100 2000,934 2038,793 2121,650 2203,507 2307,403 2450,321 2593,238 2734,200 2900,200 3066,200 3207,238 3350,321 3493,403 3597,507 3679,650 3762,793 3800,934 3800,1100 3800,1266 3762,1407 3679,1550 3597,1693 3493,1797 3350,1879 3207,1962 3066,2000 2900,2000 L 2900,2000 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" d="M 2900,2000 C 2734,2000 2593,1962 2450,1879 2307,1797 2203,1693 2121,1550 2038,1407 2000,1266 2000,1100 2000,934 2038,793 2121,650 2203,507 2307,403 2450,321 2593,238 2734,200 2900,200 3066,200 3207,238 3350,321 3493,403 3597,507 3679,650 3762,793 3800,934 3800,1100 3800,1266 3762,1407 3679,1550 3597,1693 3493,1797 3350,1879 3207,1962 3066,2000 2900,2000 L 2900,2000 Z"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2400,1100 L 3400,1100"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_4_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2900,600 L 2900,1600"/>
+  </g>
+  <g>
+   <path fill="rgb(204,255,102)" stroke="none" d="M 500,3500 C 500,3000 500,2100 500,1600 884,1600 1206,1698 1590,1915 1974,2132 2299,2512 2510,2823 2721,3134 2833,3390 2900,3500 2100,3500 1300,3500 500,3500 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 500,3500 C 500,3000 500,2100 500,1600 884,1600 1206,1698 1590,1915 1974,2132 2299,2512 2510,2823 2721,3134 2833,3390 2900,3500 2100,3500 1300,3500 500,3500 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(0,204,0)" stroke="none" d="M 3500,3500 C 3500,3100 3500,2700 3500,2300 3180,2300 2944,2448 2821,2557 2585,2748 2300,3100 2200,3500 2633,3500 3067,3500 3500,3500 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_6_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 3500,3500 C 3500,3100 3500,2700 3500,2300 3180,2300 2944,2448 2821,2557 2585,2748 2300,3100 2200,3500 2633,3500 3067,3500 3500,3500 Z"/>
+  </g>
+ </g>
+</svg>
