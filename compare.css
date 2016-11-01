@@ -19,33 +19,30 @@
     height          : 100%;
     overflow        : auto;
 }
-#sidebar > div
-{
-    display : inline-block;
-    width   : 35px;
-    height  : 35px;
-    margin  : 5px;
-    line-height : 35px;
-    font-size   : 18px;
-}
-#sidebar > div.space
-{
-    height  : 0px;
-    margin  : 5px;
-}
 #sidebar > div.bottom
 {
     position : absolute;
     left    : 0px;
     bottom  : 10px;
 }
+#sidebar div.space
+{
+    height  : 5px;
+    margin  : 5px;
+}
 .button
 {
+    width   : 35px;
+    height  : 35px;
+    margin  : 5px;
     background  : #ccc;
     box-shadow  : 1px 2px 5px #000;
     color       : #444;
+    line-height : 35px;
+    font-size   : 18px;
     text-align  : center;
     cursor      : pointer;
+    overflow    : hidden;
 }
 .button img
 {
