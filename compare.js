@@ -160,23 +160,24 @@ $( function()
       n = r;
     }
     var gcd = m;
+    var ratio = (w/gcd) / (h/gcd);  // use gcd to avoid comparison error
     var result = addComma(w / gcd) + ':' + addComma(h / gcd);
     if (w / gcd <= 50 || h / gcd <= 50) {
-      return result;
+      return [ratio, result];
     } else {
       for (var i = 1; i <= 10; ++i) {
         var a = w / h * i;
         var b = Math.floor(a + 0.5);
         if (Math.max(b - a, a - b) < Math.min(i,b) * 0.004) {
-          return result + '\n(approx. ' + addComma(b) + ':' + i + ')';
+          return [ratio, result + '\n(approx. ' + addComma(b) + ':' + i + ')'];
         }
         var c = h / w * i;
         var d = Math.floor(c + 0.5);
         if (Math.max(d - c, c - d) < Math.min(i,d) * 0.004) {
-          return result + '\n(approx. ' + i + ':' + addComma(d) + ')';
+          return [ratio, result + '\n(approx. ' + i + ':' + addComma(d) + ')'];
         }
       }
-      return result;
+      return [ratio, result];
     }
   }
 
@@ -199,18 +200,40 @@ $( function()
   {
     toggleDialog($('#shortcuts'));
   }
-  function toggleInfo()
+  function updateInfoTable()
   {
     $('#infoTable td:not(.prop)').remove();
+    var rows = [
+      $('#infoName'),
+      $('#infoWidth'),
+      $('#infoHeight'),
+      $('#infoAspect'),
+      $('#infoFileSize'),
+      $('#infoLastModified') ];
+    var val = [];
     for (var i = 0, img; img = images[i]; i++)
     {
-      $('#infoName').append($('<td>').text(img.name));
-      $('#infoWidth').append($('<td>').text(addComma(img.width)));
-      $('#infoHeight').append($('<td>').text(addComma(img.height)));
-      $('#infoAspect').append($('<td>').text(calcAspectRatio(img.width, img.height)));
-      $('#infoFileSize').append($('<td>').text(addComma(img.size)));
-      $('#infoLastModified').append($('<td>').text(img.lastModified.toLocaleString()));
+      val[i] = [
+        [null, img.name ],
+        [img.width, addComma(img.width) ],
+        [img.height, addComma(img.height) ],
+        calcAspectRatio(img.width, img.height),
+        [img.size, addComma(img.size) ],
+        [img.lastModified, img.lastModified.toLocaleString()] ];
+      for (var j = 0, v; v = val[i][j]; ++j) {
+        var e = $('<td>').text(val[i][j][1]);
+        if (0 < i && val[i][j][0]) {
+          e.addClass(
+              val[0][j][0] < val[i][j][0] ? 'sign lt' :
+              val[0][j][0] > val[i][j][0] ? 'sign gt' : 'sign eq');
+        }
+        rows[j].append(e);
+      }
     }
+  }
+  function toggleInfo()
+  {
+    updateInfoTable();
     toggleDialog($('#info'));
   }
   function showNowLoading()

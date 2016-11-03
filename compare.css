@@ -166,7 +166,7 @@ div.dialog table td
     text-align      : center;
     min-width       : 1.0em;
 }
-tr.num > td:not(.prop)
+tr.num > td:not(.prop), tr.date > td:not(.prop)
 {
     text-align    : right;
 }
@@ -182,6 +182,37 @@ div.dialog td:not(.prop)
 {
     font-size       : 1.2em;
     white-space     : pre-wrap;
+}
+div.dialog td.sign:not(.prop):before
+{
+    float       : left;
+    font-weight : bold;
+    margin      : 0px 10px 0px 0px;
+}
+div.dialog td.eq:not(.prop):before
+{
+    content     : "=";
+    color       : gray;
+}
+div.dialog tr.num td.lt:not(.prop):before
+{
+    content     : "<";
+    color       : blue;
+}
+div.dialog tr.num td.gt:not(.prop):before
+{
+    content     : ">";
+    color       : red;
+}
+div.dialog tr.date td.lt:not(.prop):before
+{
+    content     : "newer";
+    color       : blue;
+}
+div.dialog tr.date td.gt:not(.prop):before
+{
+    content     : "older";
+    color       : red;
 }
 #log
 {
