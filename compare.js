@@ -42,21 +42,24 @@ $( function()
           return true;
         }
       }
-      // '0' - '9'
-      if (48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey)
+      // '0' - '9' (48-57 or 96-105 for numpad)
+      if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
+          (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey))
       {
-        currentImageIndex = e.keyCode - 48;
+        currentImageIndex = e.keyCode % 48;
         updateLayout();
         return false;
       }
-      // '+;' (59 or 187) / PageUp (33)
-      if (e.keyCode == 59 || e.keyCode == 187 || (e.keyCode == 33 && !e.shiftKey))
+      // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+      if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
+          (e.keyCode == 33 && !e.shiftKey))
       {
         zoomIn();
         return false;
       }
-      // '-' (173 or 189) / PageDown (34)
-      if (e.keyCode == 173 || e.keyCode == 189 || (e.keyCode == 34 && !e.shiftKey))
+      // '-' (173, 189 or 109 for numpad) / PageDown (34)
+      if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
+          (e.keyCode == 34 && !e.shiftKey))
       {
         zoomOut();
         return false;
