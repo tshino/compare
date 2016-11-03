@@ -516,7 +516,7 @@ $( function()
                             height  : img.height,
                             name    : theFile.name,
                             size          : theFile.size,
-                            lastModified  : new Date(theFile.lastModified),
+                            lastModified  : new Date(theFile.lastModified || theFile.lastModifiedDate),
                         });
                     updateDOM();
                 });
