@@ -542,7 +542,8 @@ $( function()
   {
     var fullscreen = document.fullscreenElement ||
                 document.webkitFullscreenElement ||
-                document.mozFullScreenElement;
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
     if (!fullscreen)
     {
       var view = document.getElementById('viewroot');
@@ -550,6 +551,8 @@ $( function()
         view.webkitRequestFullscreen();
       } else if (view.mozRequestFullScreen) {
         view.mozRequestFullScreen();
+      } else if (view.msRequestFullscreen) {
+        view.msRequestFullscreen();
       } else {
         view.requestFullscreen();
       }
@@ -560,6 +563,8 @@ $( function()
         document.webkitExitFullscreen();
       } else if (document.mozCancelFullScreen) {
         document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
       } else {
         document.exitFullscreen();
       }
