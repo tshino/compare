@@ -189,30 +189,38 @@ div.dialog td.sign:not(.prop):before
     font-weight : bold;
     margin      : 0px 10px 0px 0px;
 }
+div.dialog td.lt:not(.prop)
+{
+    background  : rgba(51,136,238,0.2);
+}
+div.dialog td.gt:not(.prop)
+{
+    background  : rgba(238,68,119,0.2);
+}
 div.dialog td.eq:not(.prop):before
 {
     content     : "=";
-    color       : gray;
+    color       : #aaa;
 }
 div.dialog tr.num td.lt:not(.prop):before
 {
     content     : "<";
-    color       : blue;
+    color       : #59f;
 }
 div.dialog tr.num td.gt:not(.prop):before
 {
     content     : ">";
-    color       : red;
+    color       : #f68;
 }
 div.dialog tr.date td.lt:not(.prop):before
 {
     content     : "newer";
-    color       : blue;
+    color       : #59f;
 }
 div.dialog tr.date td.gt:not(.prop):before
 {
     content     : "older";
-    color       : red;
+    color       : #f68;
 }
 #log
 {
