@@ -183,6 +183,24 @@ $( function()
       return [ratio, result];
     }
   }
+  function detectImageFormat(dataURI)
+  {
+    var p = dataURI.indexOf(',');
+    var decode = dataURI.slice(0,p).indexOf('base64') >= 0 ? atob : unescape;
+    var bytes = decode(dataURI.slice(p + 1));
+    var magic = bytes.length < 4 ? 0 :
+        ((bytes.charCodeAt(0) * 256 +
+        bytes.charCodeAt(1)) * 256 +
+        bytes.charCodeAt(2)) * 256 +
+        bytes.charCodeAt(3);
+    if (magic == 0x89504e47) { return 'PNG'; }
+    if (magic == 0x47494638) { return 'GIF'; }
+    if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
+    if ((magic - (magic & 255)) == 0xffd8ff00) { return 'JPEG'; }
+    if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
+    //alert(magic);
+    return null;
+  }
 
   function showAll()
   {
@@ -208,6 +226,7 @@ $( function()
     $('#infoTable td:not(.prop)').remove();
     var rows = [
       $('#infoName'),
+      $('#infoFormat'),
       $('#infoWidth'),
       $('#infoHeight'),
       $('#infoAspect'),
@@ -218,6 +237,7 @@ $( function()
     {
       val[i] = [
         [null, img.name ],
+        [null, img.format ],
         [img.width, addComma(img.width) ],
         [img.height, addComma(img.height) ],
         calcAspectRatio(img.width, img.height),
@@ -507,6 +527,7 @@ $( function()
         {
             return function(e)
             {
+                var format = detectImageFormat(e.target.result);
                 var img = new Image;
                 $(img).on('load', function()
                 {
@@ -518,6 +539,7 @@ $( function()
                             width   : img.width,
                             height  : img.height,
                             name    : theFile.name,
+                            format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
                             lastModified  : new Date(theFile.lastModified || theFile.lastModifiedDate),
                         });
