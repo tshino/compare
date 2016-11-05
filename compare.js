@@ -187,13 +187,19 @@ $( function()
   function detectImageFormat(dataURI)
   {
     var p = dataURI.indexOf(',');
-    var decode = dataURI.slice(0,p).indexOf('base64') >= 0 ? atob : unescape;
-    var bytes = decode(dataURI.slice(p + 1));
-    var magic = bytes.length < 4 ? 0 :
-        ((bytes.charCodeAt(0) * 256 +
-        bytes.charCodeAt(1)) * 256 +
-        bytes.charCodeAt(2)) * 256 +
-        bytes.charCodeAt(3);
+    if (0 <= dataURI.slice(0, p).indexOf(';base64')) {
+      if (dataURI.length - (p + 1) < 8) {
+        return null;
+      }
+      var head = atob(dataURI.slice(p + 1, p + 9));
+    } else {
+      var head = decodeURIComponent(dataURI.slice(p + 1));
+    }
+    var magic = head.length < 4 ? 0 :
+        ((head.charCodeAt(0) * 256 +
+        head.charCodeAt(1)) * 256 +
+        head.charCodeAt(2)) * 256 +
+        head.charCodeAt(3);
     if (magic == 0x89504e47) { return 'PNG'; }
     if (magic == 0x47494638) { return 'GIF'; }
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
