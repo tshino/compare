@@ -20,6 +20,7 @@
 		<div class="button" onclick="zoomOut()"><img src="res/zoomout.svg" width="100%"></div>
 		<div class="button" id="all" onclick="showAll()">ALL</div>
 		<div class="bottom">
+			<div class="button" onclick="toggleHistogram()">H</div>
 			<div class="button" id="help" onclick="toggleFullscreen()"><img src="res/full.svg" width="100%"></div>
 			<div class="space"></div>
 			<div class="button" id="help" onclick="toggleHelp()"><img src="res/help.svg" width="100%"></div>
@@ -67,6 +68,15 @@
 		<div>
 			<h3>Now loading...</h3>
 			<table id="loadingList">
+			</table>
+		</div>
+	</div>
+	<div id="histogram" class="dialog">
+		<div>
+			<h3>Histogram</h3>
+			<table id="histoTable">
+				<tr id="histoName" class="b"></tr>
+				<tr id="histograms"></tr>
 			</table>
 		</div>
 	</div>

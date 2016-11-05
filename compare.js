@@ -103,6 +103,11 @@ $( function()
       toggleFullscreen();
       return false;
     }
+    // 'h' (104)
+    if (e.which == 104) {
+      toggleHistogram();
+      return false;
+    }
     // 'i' (105)
     if (e.which == 105) {
       toggleInfo();
@@ -276,6 +281,64 @@ $( function()
     if (0 < loading.length) {
       toggleDialog($('#loading'));
     }
+  }
+  function toggleHistogram()
+  {
+    if ($('#histogram').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    $('#histoTable td').remove();
+    for (var k = 0, img; img = images[k]; k++) {
+      var w = img.element.naturalWidth;
+      var h = img.element.naturalHeight;
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var context = canvas.getContext('2d');
+      context.drawImage(img.element, 0, 0);
+      var bits = context.getImageData(0, 0, w, h);
+      var hist = new Array(256);
+      for (var i = 0; i < 256; ++i) {
+        hist[i] = 0;
+      }
+      for (var i = 0, n = bits.width * bits.height; i < n; ++i) {
+        var r = bits.data[i * 4 + 0];
+        var g = bits.data[i * 4 + 1];
+        var b = bits.data[i * 4 + 2];
+        var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        ++hist[y];
+      }
+      //
+      canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      context = canvas.getContext('2d');
+      var max = 0;
+      for (var i = 0; i < 256; ++i) {
+        max = Math.max(max, hist[i]);
+      }
+      context.fillStyle = '#444';
+      context.fillRect(0,0,1024,1024);
+      context.fillStyle = '#fff';
+      for (var i = 0; i < 256; ++i) {
+        var h = 1024 * hist[i] / max;
+        context.fillRect(i*4, 1024-h, 4, h);
+      }
+      $('#histoName').append($('<td>').text(img.name));
+      $('#histograms').append(
+        $('<td>').append(
+          $(canvas).css({
+            width: '320px',
+            height:'200px',
+            background:'#aaa',
+            padding:'10px'
+          })
+        )
+      );
+    }
+    toggleDialog($('#histogram'));
   }
   function toggleDialog(target)
   {
@@ -545,8 +608,8 @@ $( function()
                             view    : null,
                             button  : null,
                             element : img,
-                            width   : img.width,
-                            height  : img.height,
+                            width   : img.naturalWidth,
+                            height  : img.naturalHeight,
                             name    : theFile.name,
                             format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
