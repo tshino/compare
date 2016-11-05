@@ -18,6 +18,7 @@ $( function()
   
   $('#file').on('change', function(e) {
     addFiles(e.target.files);
+    e.target.value = null;
   });
   $('#view .dropHere').
     text("Drop image files here").
