@@ -21,6 +21,7 @@
 		<div class="button" id="all" onclick="showAll()">ALL</div>
 		<div class="bottom">
 			<div class="button" onclick="toggleHistogram()">H</div>
+			<div class="button" onclick="toggleWaveform()">W</div>
 			<div class="button" id="help" onclick="toggleFullscreen()"><img src="res/full.svg" width="100%"></div>
 			<div class="space"></div>
 			<div class="button" id="help" onclick="toggleHelp()"><img src="res/help.svg" width="100%"></div>
@@ -45,6 +46,8 @@
 				<tr><td><span class="key">0</span><td>multiple view</tr>
 				<tr><td><span class="key">Esc</span><td>reset zoom</tr>
 				<tr><td><span class="key">i</span><td>information</tr>
+				<tr><td><span class="key">h</span><td>histogram</tr>
+				<tr><td><span class="key">w</span><td>waveform</tr>
 				<tr><td><span class="key">f</span><td>full screen</tr>
 				<tr><td><span class="key">?</span><td>help</tr>
 			</table>
@@ -77,6 +80,15 @@
 			<table id="histoTable">
 				<tr id="histoName" class="b"></tr>
 				<tr id="histograms"></tr>
+			</table>
+		</div>
+	</div>
+	<div id="waveform" class="dialog">
+		<div>
+			<h3>Waveform</h3>
+			<table id="waveTable">
+				<tr id="waveName" class="b"></tr>
+				<tr id="waveforms"></tr>
 			</table>
 		</div>
 	</div>

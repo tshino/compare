@@ -108,6 +108,11 @@ $( function()
       toggleHistogram();
       return false;
     }
+    // 'w' (119)
+    if (e.which == 119) {
+      toggleWaveform();
+      return false;
+    }
     // 'i' (105)
     if (e.which == 105) {
       toggleInfo();
@@ -331,7 +336,7 @@ $( function()
         $('<td>').append(
           $(canvas).css({
             width: '320px',
-            height:'200px',
+            height:'256px',
             background:'#aaa',
             padding:'10px'
           })
@@ -339,6 +344,75 @@ $( function()
       );
     }
     toggleDialog($('#histogram'));
+  }
+  function toggleWaveform()
+  {
+    if ($('#waveform').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    $('#waveTable td').remove();
+    for (var k = 0, img; img = images[k]; k++) {
+      var w = img.element.naturalWidth;
+      var h = img.element.naturalHeight;
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var context = canvas.getContext('2d');
+      context.drawImage(img.element, 0, 0);
+      var bits = context.getImageData(0, 0, w, h);
+      var histW = Math.min(w, 1024);
+      var hist = new Array(256 * histW);
+      var histN = new Array(histW);
+      var histMap = new Array(bits.width);
+      for (var i = 0; i < 256 * histW; ++i) {
+        hist[i] = 0;
+      }
+      for (var i = 0; i < histW; ++i) {
+        histN[i] = 0;
+      }
+      for (var i = 0; i < bits.width; ++i) {
+        var x = Math.round((i + 0.5) / bits.width * histW - 0.5);
+        histMap[i] = x;
+        ++histN[x];
+      }
+      for (var i = 0, n = bits.width * bits.height; i < n; ++i) {
+        var x = histMap[i % bits.width];
+        var r = bits.data[i * 4 + 0];
+        var g = bits.data[i * 4 + 1];
+        var b = bits.data[i * 4 + 2];
+        var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        ++hist[x * 256 + y];
+      }
+      //
+      canvas = document.createElement('canvas');
+      canvas.width = histW;
+      canvas.height = 256;
+      context = canvas.getContext('2d');
+      context.fillStyle = '#000';
+      context.fillRect(0,0,histW,256);
+      for (var x = 0; x < histW; ++x) {
+        var max = histN[x] * bits.height;
+        for (var y = 0; y < 256; ++y) {
+          var h = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
+          context.fillStyle = 'rgba(255,255,255,'+h+')';
+          context.fillRect(x,255-y,1,1);
+        }
+      }
+      $('#waveName').append($('<td>').text(img.name));
+      $('#waveforms').append(
+        $('<td>').append(
+          $(canvas).css({
+            width: '320px',
+            height:'256px',
+            background:'#666',
+            padding:'10px'
+          })
+        )
+      );
+    }
+    toggleDialog($('#waveform'));
   }
   function toggleDialog(target)
   {
