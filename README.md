@@ -1,26 +1,22 @@
-﻿# compare
+﻿# Compare
 
-Compare is a simple application that helps visual comparison of images.
+Compare is a simple web application that helps visual comparison of pictures.
 
-Zooming and scrolling are performed for all target images simultaneously.
+Zooming and scrolling are performed for each picture simultaneously.
 
-Usage:
-- Open compare.html on your browser.
-- Drop two or more image files onto the page.
+See the [demo page](https://tshino.github.io/compare/compare.html).
 
-| keyboard | |
-|---------------|-----------------------|
-| '+' / '-'     | zoom                  |
-| cursor        | scroll                |
-| '1', '2'...   | single view           |
-| '0'           | multiple view         |
-| 'f'           | full screen           |
-| '?'           | help                  |
+You can simply bookmark the demo page,
+or download zip of this repository to use it as a local application.
 
+# Compare
 
-# compare
-
-これは画像を目視で比較することに特化した画像表示ツールです。
+これは画像を目視で比較することに特化した画像表示ツールです。ブラウザ上で動きます。
 
 拡大縮小とスクロールが複数の画像に対して同時にできるので、
 同じ場所を見比べる作業が簡単にできるのがポイントです。
+
+[デモページ](https://tshino.github.io/compare/compare.html)があります。
+
+デモページをブックマークしても使えます。
+リポジトリのzipをダウンロードすればローカルアプリのように使うこともできます。
