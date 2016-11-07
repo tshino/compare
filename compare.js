@@ -287,15 +287,8 @@ $( function()
       toggleDialog($('#loading'));
     }
   }
-  function toggleHistogram()
+  function makeHistogram(img)
   {
-    if ($('#histogram').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    $('#histoTable td').remove();
-    for (var k = 0, img; img = images[k]; k++) {
       var w = img.element.naturalWidth;
       var h = img.element.naturalHeight;
       var canvas = document.createElement('canvas');
@@ -331,10 +324,24 @@ $( function()
         var h = 1024 * hist[i] / max;
         context.fillRect(i*4, 1024-h, 4, h);
       }
+      return canvas;
+  }
+  function toggleHistogram()
+  {
+    if ($('#histogram').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    $('#histoTable td').remove();
+    for (var k = 0, img; img = images[k]; k++) {
+      if (!img.histogram) {
+        img.histogram = makeHistogram(img);
+      }
       $('#histoName').append($('<td>').text(img.name));
       $('#histograms').append(
         $('<td>').append(
-          $(canvas).css({
+          $(img.histogram).css({
             width: '320px',
             height:'256px',
             background:'#aaa',
@@ -345,15 +352,8 @@ $( function()
     }
     toggleDialog($('#histogram'));
   }
-  function toggleWaveform()
+  function makeWaveform(img)
   {
-    if ($('#waveform').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    $('#waveTable td').remove();
-    for (var k = 0, img; img = images[k]; k++) {
       var w = img.element.naturalWidth;
       var h = img.element.naturalHeight;
       var canvas = document.createElement('canvas');
@@ -400,10 +400,24 @@ $( function()
           context.fillRect(x,255-y,1,1);
         }
       }
+      return canvas;
+  }
+  function toggleWaveform()
+  {
+    if ($('#waveform').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    $('#waveTable td').remove();
+    for (var k = 0, img; img = images[k]; k++) {
+      if (!img.waveform) {
+        img.waveform = makeWaveform(img);
+      }
       $('#waveName').append($('<td>').text(img.name));
       $('#waveforms').append(
         $('<td>').append(
-          $(canvas).css({
+          $(img.waveform).css({
             width: '320px',
             height:'256px',
             background:'#666',
@@ -688,6 +702,8 @@ $( function()
                             format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
                             lastModified  : new Date(theFile.lastModified || theFile.lastModifiedDate),
+                            histogram   : null,
+                            waveform    : null,
                         });
                     updateDOM();
                 });
