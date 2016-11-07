@@ -297,14 +297,14 @@ $( function()
       var context = canvas.getContext('2d');
       context.drawImage(img.element, 0, 0);
       var bits = context.getImageData(0, 0, w, h);
-      var hist = new Array(256);
+      var hist = new Uint32Array(256);
       for (var i = 0; i < 256; ++i) {
         hist[i] = 0;
       }
-      for (var i = 0, n = bits.width * bits.height; i < n; ++i) {
-        var r = bits.data[i * 4 + 0];
-        var g = bits.data[i * 4 + 1];
-        var b = bits.data[i * 4 + 2];
+      for (var i = 0, n = 4 * w * h; i < n; i+=4) {
+        var r = bits.data[i + 0];
+        var g = bits.data[i + 1];
+        var b = bits.data[i + 2];
         var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
         ++hist[y];
       }
@@ -363,43 +363,48 @@ $( function()
       context.drawImage(img.element, 0, 0);
       var bits = context.getImageData(0, 0, w, h);
       var histW = Math.min(w, 1024);
-      var hist = new Array(256 * histW);
-      var histN = new Array(histW);
-      var histMap = new Array(bits.width);
+      var hist = new Uint32Array(256 * histW);
+      var histN = new Uint32Array(histW);
+      var histOff = new Uint32Array(bits.width);
       for (var i = 0; i < 256 * histW; ++i) {
         hist[i] = 0;
       }
       for (var i = 0; i < histW; ++i) {
         histN[i] = 0;
       }
-      for (var i = 0; i < bits.width; ++i) {
-        var x = Math.round((i + 0.5) / bits.width * histW - 0.5);
-        histMap[i] = x;
+      for (var i = 0; i < w; ++i) {
+        var x = Math.round((i + 0.5) / w * histW - 0.5);
+        histOff[i] = x * 256;
         ++histN[x];
       }
-      for (var i = 0, n = bits.width * bits.height; i < n; ++i) {
-        var x = histMap[i % bits.width];
-        var r = bits.data[i * 4 + 0];
-        var g = bits.data[i * 4 + 1];
-        var b = bits.data[i * 4 + 2];
-        var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-        ++hist[x * 256 + y];
+      for (var i = 0, y = 0; y < h; ++y) {
+        for (var x = 0; x < w; ++x, i+=4) {
+          var r = bits.data[i + 0];
+          var g = bits.data[i + 1];
+          var b = bits.data[i + 2];
+          var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+          ++hist[histOff[x] + my];
+        }
       }
       //
       canvas = document.createElement('canvas');
       canvas.width = histW;
       canvas.height = 256;
       context = canvas.getContext('2d');
-      context.fillStyle = '#000';
-      context.fillRect(0,0,histW,256);
+      bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
-        var max = histN[x] * bits.height;
+        var max = histN[x] * h;
         for (var y = 0; y < 256; ++y) {
-          var h = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
-          context.fillStyle = 'rgba(255,255,255,'+h+')';
-          context.fillRect(x,255-y,1,1);
+          var a = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
+          var c = Math.round(a * 255);
+          var off = ((255-y)*histW+x) * 4;
+          bits.data[off + 0] = c;
+          bits.data[off + 1] = c;
+          bits.data[off + 2] = c;
+          bits.data[off + 3] = 255;
         }
       }
+      context.putImageData(bits, 0, 0);
       return canvas;
   }
   function toggleWaveform()
