@@ -289,8 +289,8 @@ $( function()
   }
   function makeHistogram(img)
   {
-      var w = img.element.naturalWidth;
-      var h = img.element.naturalHeight;
+      var w = img.naturalWidth;
+      var h = img.naturalHeight;
       var canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
@@ -354,8 +354,8 @@ $( function()
   }
   function makeWaveform(img)
   {
-      var w = img.element.naturalWidth;
-      var h = img.element.naturalHeight;
+      var w = img.naturalWidth;
+      var h = img.naturalHeight;
       var canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
@@ -365,7 +365,7 @@ $( function()
       var histW = Math.min(w, 1024);
       var hist = new Uint32Array(256 * histW);
       var histN = new Uint32Array(histW);
-      var histOff = new Uint32Array(bits.width);
+      var histOff = new Uint32Array(w);
       for (var i = 0; i < 256 * histW; ++i) {
         hist[i] = 0;
       }
@@ -474,6 +474,9 @@ $( function()
                     })
             );
           $('#drop').before(img.view);
+          // possibly fix mobile Safari's orientation issue.
+          img.width = img.element.naturalWidth;
+          img.height = img.element.naturalHeight;
         }
         if (!img.button) {
           img.button = $('<div/>').addClass('button selector').
@@ -703,6 +706,8 @@ $( function()
                             element : img,
                             width   : img.width,
                             height  : img.height,
+                            naturalWidth   : img.naturalWidth,
+                            naturalHeight  : img.naturalHeight,
                             name    : theFile.name,
                             format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
