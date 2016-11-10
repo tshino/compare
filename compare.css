@@ -92,7 +92,7 @@
 {
     color           : #69f;
 }
-#view .imageBox img
+#view .imageBox canvas
 {
     display         : block;
     position        : absolute;

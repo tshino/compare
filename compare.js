@@ -560,7 +560,7 @@ $( function()
   }
   function makeDoubleClickable()
   {
-    $('#view > div.imageBox img').off('dblclick').on('dblclick', function(e)
+    $('#view > div.imageBox canvas').off('dblclick').on('dblclick', function(e)
     {
       var index = $('#view > div').index($(this).parent());
       if (index >= images.length) {
@@ -650,7 +650,7 @@ $( function()
     scale = scalePercent / 100;
     var offsetX = (50 - 100 * viewOffset.x) * (1.0 - 1.0 / scale);
     var offsetY = (50 - 100 * viewOffset.y) * (1.0 - 1.0 / scale);
-    $('#view .imageBox img').css(
+    $('#view .imageBox canvas').css(
                 {
                     left        : '50%',
                     top         : '50%',
@@ -698,12 +698,12 @@ $( function()
                         {
                             view    : null,
                             button  : null,
-                            element : img,
+                            element     : canvas,
+                            asCanvas    : canvas,
                             width   : img.width,
                             height  : img.height,
                             naturalWidth   : img.naturalWidth,
                             naturalHeight  : img.naturalHeight,
-                            asCanvas    : canvas,
                             name    : theFile.name,
                             format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
