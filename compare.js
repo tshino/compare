@@ -291,11 +291,7 @@ $( function()
   {
       var w = img.naturalWidth;
       var h = img.naturalHeight;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var context = canvas.getContext('2d');
-      context.drawImage(img.element, 0, 0);
+      var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
       var hist = new Uint32Array(256);
       for (var i = 0; i < 256; ++i) {
@@ -309,7 +305,7 @@ $( function()
         ++hist[y];
       }
       //
-      canvas = document.createElement('canvas');
+      var canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 1024;
       context = canvas.getContext('2d');
@@ -356,11 +352,7 @@ $( function()
   {
       var w = img.naturalWidth;
       var h = img.naturalHeight;
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var context = canvas.getContext('2d');
-      context.drawImage(img.element, 0, 0);
+      var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
       var histW = Math.min(w, 1024);
       var hist = new Uint32Array(256 * histW);
@@ -387,7 +379,7 @@ $( function()
         }
       }
       //
-      canvas = document.createElement('canvas');
+      var canvas = document.createElement('canvas');
       canvas.width = histW;
       canvas.height = 256;
       context = canvas.getContext('2d');
@@ -474,9 +466,6 @@ $( function()
                     })
             );
           $('#drop').before(img.view);
-          // possibly fix mobile Safari's orientation issue.
-          img.width = img.element.naturalWidth;
-          img.height = img.element.naturalHeight;
         }
         if (!img.button) {
           img.button = $('<div/>').addClass('button selector').
@@ -697,6 +686,12 @@ $( function()
                 var img = new Image;
                 $(img).on('load', function()
                 {
+                    var canvas = document.createElement('canvas');
+                    canvas.width  = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    var context = canvas.getContext('2d');
+                    context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+                    //
                     loading.splice(loading.indexOf(theFile.name), 1);
                     showNowLoading();
                     images.push(
@@ -708,6 +703,7 @@ $( function()
                             height  : img.height,
                             naturalWidth   : img.naturalWidth,
                             naturalHeight  : img.naturalHeight,
+                            asCanvas    : canvas,
                             name    : theFile.name,
                             format  : format || '('+theFile.type+')' || '(unknown)',
                             size          : theFile.size,
