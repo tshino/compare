@@ -130,17 +130,20 @@ div.dialog
 }
 div.dialog > div
 {
+    position        : absolute;
     background      : #eee;
     border          : #bbb double 4px;
     border-radius   : 5px;
     box-shadow      : 2px 2px 10px #000;
-    margin          : 20vh auto;
     width           : -webkit-max-content;
     width           : -moz-max-content;
     width           : max-content;
     max-width       : 90vw;
     min-width       : 50vw;
-    max-height      : 60vh;
+    max-height      : 90vh;
+    left            : 50%;
+    top             : 50%;
+    transform       : translate(-50%, -50%);
     overflow        : auto;
 }
 div.dialog > div > *
