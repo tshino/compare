@@ -148,26 +148,33 @@ div.dialog > div
 }
 div.dialog > div > *
 {
-    margin          : 0.5em;
+    margin          : 0.3em;
     padding         : 0.5em 1.0em;
     border          : #bbb solid 1px;
-    line-height     : 1.5em;
+    line-height     : 1.2em;
 }
-div.dialog table td
+div.dialog a
+{
+    color           : #44e;
+    text-decoration : none;
+}
+div.dialog table td, div.dialog table th
 {
     padding         : 0.2em 0.5em;
     border          : #bbb solid 1px;
 }
-.key
+.keys > span
 {
     background      : #eee;
     display         : inline-block;
-    border          : #aaa solid 1px;
+    box-sizing      : border-box;
+    border          : #bbb solid 1px;
     border-radius   : 4px;
-    box-shadow      : 1px 1px 2px rgba(0,0,0, 0.4);
-    padding         : 1px 7px;
+    box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
+    padding         : 1px 3px;
+    font-weight     : bold;
     text-align      : center;
-    min-width       : 1.0em;
+    min-width       : 1.5em;
 }
 tr.num > td:not(.prop), tr.date > td:not(.prop)
 {
@@ -177,11 +184,11 @@ tr.b > td:not(.prop)
 {
     font-weight : bold;
 }
-div.dialog tr:nth-child(even)
+div.dialog tr:nth-of-type(even)
 {
     background      : #e8e8e8;
 }
-div.dialog td:not(.prop)
+div.dialog td:not(.prop):not(.keys)
 {
     font-size       : 1.2em;
     white-space     : pre-wrap;

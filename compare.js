@@ -439,7 +439,7 @@ $( function()
         off('click').on('click', function() { hideDialog(); });
     dialog.children().
         focus().
-        off('click').on('click', function() { return false; });
+        off('click').on('click', function(e) { e.stopPropagation(); return true; });
   }
   function hideDialog()
   {
