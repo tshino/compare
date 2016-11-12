@@ -118,6 +118,14 @@ $( function()
       toggleInfo();
       return false;
     }
+    if (dialog) {
+      return true;
+    }
+    // 'a' (97)
+    if (e.which == 97) {
+      arrangeLayout();
+      return false;
+    }
     //alert(e.which);
   });
   
@@ -148,6 +156,7 @@ $( function()
   var viewZoom = 0;
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
+  var layoutMode = 'x';
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
@@ -219,11 +228,6 @@ $( function()
     return null;
   }
 
-  function showAll()
-  {
-    currentImageIndex = 0;
-    updateLayout();
-  }
   function zoomIn()
   {
     viewZoom = Math.min(viewZoom + ZOOM_STEP_KEY, MAX_ZOOM_LEVEL);
@@ -233,6 +237,27 @@ $( function()
   {
     viewZoom = Math.max(viewZoom - ZOOM_STEP_KEY, 0);
     updateTransform();
+  }
+  function arrangeLayout()
+  {
+    var isSingleView =
+            currentImageIndex != 0 &&
+            currentImageIndex <= images.length;
+    if (isSingleView) {
+      currentImageIndex = 0;
+    } else if (layoutMode == 'x') {
+      layoutMode = 'y';
+    } else {
+      layoutMode = 'x';
+    }
+    if (layoutMode == 'x') {
+      $('#view').css({ flexDirection : 'row' });
+      $('#arrange img').get(0).src = 'res/layout_x.svg';
+    } else {
+      $('#view').css({ flexDirection : 'column' });
+      $('#arrange img').get(0).src = 'res/layout_y.svg';
+    }
+    updateLayout();
   }
   function toggleHelp()
   {
@@ -598,35 +623,35 @@ $( function()
 
   function updateLayout()
   {
-    var vw = $('#view').width();
-    var vh = $('#view').height();
     var isSingleView =
             currentImageIndex != 0 &&
             currentImageIndex <= images.length;
-    var numColumns =
-            isSingleView ? 1 :
-            2 < images.length ? images.length : 2;
+    var numSlots = isSingleView ? 1 : Math.max(images.length, 2);
+    var numColumns = layoutMode == 'x' ? numSlots : 1;
+    var numRows    = layoutMode != 'x' ? numSlots : 1;
+    var boxW = $('#view').width() / numColumns;
+    var boxH = $('#view').height() / numRows;
     $('#view > div.imageBox').each(function(index)
     {
       var img = images[index];
-      img.isLetterBox = vw / numColumns * img.height < vh * img.width;
-      img.baseWidth = img.isLetterBox ? vw / numColumns : vh * img.width / img.height;
-      img.baseHeight = img.isLetterBox ? vw / numColumns * img.height / img.width : vh;
+      img.isLetterBox = boxW * img.height < boxH * img.width;
+      img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
+      img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
       if (isSingleView && index + 1 != currentImageIndex)
       {
         $(this).css({ display : 'none' });
       }
       else
       {
-        var wPercent = 100 * img.baseWidth / (vw / numColumns);
-        var hPercent = 100 * img.baseHeight / vh;
+        var wPercent = 100 * img.baseWidth / boxW;
+        var hPercent = 100 * img.baseHeight / boxH;
         $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
         $(this).css({ display : 'inline-block' });
       }
     });
     $('#view > div.emptyBox').each(function(index)
     {
-      if (index >= (isSingleView ? 0 : numColumns - images.length))
+      if (index >= (isSingleView ? 0 : numSlots - images.length))
       {
         $(this).css({ display : 'none' });
       }
@@ -635,7 +660,6 @@ $( function()
         $(this).css({ display : 'inline-block' });
       }
     });
-    $('#all')[isSingleView ? 'removeClass' : 'addClass']('disabled');
     if (isSingleView) {
       $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
     } else {
