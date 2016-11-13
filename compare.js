@@ -84,6 +84,7 @@ $( function()
         viewZoom = 0;
         viewOffset.x = 0.5;
         viewOffset.y = 0.5;
+        overlayMode = false;
         resetMouseDrag();
         updateLayout();
         return false;
@@ -126,6 +127,11 @@ $( function()
       arrangeLayout();
       return false;
     }
+    // 'o' (111)
+    if (e.which == 111) {
+      toggleOverlay();
+      return false;
+    }
     //alert(e.which);
   });
   
@@ -157,6 +163,7 @@ $( function()
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
   var layoutMode = 'x';
+  var overlayMode = false;
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
@@ -258,6 +265,20 @@ $( function()
       $('#arrange img').get(0).src = 'res/layout_y.svg';
     }
     updateLayout();
+  }
+  function toggleOverlay()
+  {
+    if (!overlayMode && 2 <= images.length) {
+      if (currentImageIndex <= 1 || images.length < currentImageIndex) {
+        currentImageIndex = Math.min(2, images.length);
+      }
+      overlayMode = true;
+      updateLayout();
+    } else if (overlayMode) {
+      currentImageIndex = 1;
+      overlayMode = false;
+      updateLayout();
+    }
   }
   function toggleHelp()
   {
@@ -500,7 +521,7 @@ $( function()
               currentImageIndex = e.data.index + 1;
               updateLayout();
             });
-          $('#sidebar').append(img.button);
+          $('#overlay').before(img.button);
         }
     }
     makeMouseDraggable();
@@ -626,6 +647,9 @@ $( function()
     var isSingleView =
             currentImageIndex != 0 &&
             currentImageIndex <= images.length;
+    if (!isSingleView && overlayMode) {
+      overlayMode = false;
+    }
     var numSlots = isSingleView ? 1 : Math.max(images.length, 2);
     var numColumns = layoutMode == 'x' ? numSlots : 1;
     var numRows    = layoutMode != 'x' ? numSlots : 1;
@@ -637,7 +661,8 @@ $( function()
       img.isLetterBox = boxW * img.height < boxH * img.width;
       img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
       img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
-      if (isSingleView && index + 1 != currentImageIndex)
+      var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
+      if (isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode))
       {
         $(this).css({ display : 'none' });
       }
@@ -646,7 +671,13 @@ $( function()
         var wPercent = 100 * img.baseWidth / boxW;
         var hPercent = 100 * img.baseHeight / boxH;
         $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
-        $(this).css({ display : 'inline-block' });
+        $(this).css({ display : '' });
+        $(this).css({
+          position  : overlayMode ? 'absolute' : '',
+          width     : overlayMode ? $('#view').width() + 'px' : '',
+          opacity   : isOverlay ? '0.5' : '',
+          background : overlayMode ? '#000' : '',
+        });
       }
     });
     $('#view > div.emptyBox').each(function(index)
@@ -657,14 +688,24 @@ $( function()
       }
       else
       {
-        $(this).css({ display : 'inline-block' });
+        $(this).css({ display : '' });
       }
     });
+    if (overlayMode) {
+      $('#mode').
+        text( 'OVERLAY MODE : ' +
+          ((isSingleView && 1 < currentImageIndex)
+            ? '1 + ' + currentImageIndex : '1 only' )).
+        css({ display : 'inline-block' });
+    } else {
+      $('#mode').text('').css({ display : '' });
+    }
     if (isSingleView) {
       $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
     } else {
       $('.selector').removeClass('disabled');
     }
+    $('#overlay').css({ display : 2 <= images.length ? '' : 'none' });
     updateTransform();
   }
   

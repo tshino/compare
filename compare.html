@@ -19,6 +19,7 @@
 		<div class="button" onclick="zoomIn()"><img src="res/zoomin.svg" width="100%"></div>
 		<div class="button" onclick="zoomOut()"><img src="res/zoomout.svg" width="100%"></div>
 		<div class="button" id="arrange" onclick="arrangeLayout()"><img src="res/layout_x.svg" width="100%"></div>
+		<div class="button" id="overlay" onclick="toggleOverlay()"><img src="res/overlay.svg" width="100%"></div>
 		<div class="bottom">
 			<div class="button" onclick="toggleHistogram()">H</div>
 			<div class="button" onclick="toggleWaveform()">W</div>
@@ -34,6 +35,8 @@
 		<div class="emptyBox">
 			<div class="dropHere"></div>
 		</div>
+		<div id="mode" class="indicator">
+		</div>
 	</div>
 	<div id="shortcuts" class="dialog">
 		<div>
@@ -48,6 +51,7 @@
 				<tr><td class="keys"><span>1</span> / <span>2</span> / ... <td>show single picture</tr>
 				<tr><td class="keys"><span>0</span><td>show all pictures</tr>
 				<tr><td class="keys"><span>a</span><td>arrange layout</tr>
+				<tr><td class="keys"><span>o</span><td>overlay mode</tr>
 				<tr><td class="keys"><span>Esc</span><td>reset zoom</tr>
 				<tr><td class="keys"><span>i</span><td>image information</tr>
 				<tr><td class="keys"><span>h</span><td>histogram</tr>
