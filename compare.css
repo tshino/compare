@@ -17,7 +17,6 @@
     background-color: #666;
     width           : 45px;
     height          : 100%;
-    overflow        : auto;
 }
 #sidebar > div.bottom
 {
@@ -60,6 +59,30 @@
 {
     box-shadow  : 1px 1px 1px #000;
     transform   : translate(0px, 2px);
+}
+[data-tooltip].button:after
+{
+    content     : attr(data-tooltip);
+    display     : inline;
+    position    : absolute;
+    pointer-events : none;
+    z-index         : 99;
+    background      : #def;
+    box-shadow      : 2px 4px 10px rgba(0,0,0, 0.5);
+    border-radius   : 4px;
+    color           : #444;
+    line-height     : 30px;
+    margin          : 0px 20px;
+    padding         : 0px 15px;
+    font-size       : 18px;
+    white-space     : nowrap;
+    transition      : 200ms;
+    opacity         : 0.0;
+}
+[data-tooltip].button:hover:after
+{
+    transition-delay    : 300ms;
+    opacity             : 1.0;
 }
 #view
 {
@@ -121,7 +144,7 @@
 {
     display         : none;
     position        : absolute;
-    z-index         : 99;
+    z-index         : 50;
     background      : rgba(238,238,238, 0.8);
     color           : #444;
     font-size       : 1.2em;

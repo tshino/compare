@@ -515,6 +515,7 @@ $( function()
         }
         if (!img.button) {
           img.button = $('<div/>').addClass('button selector').
+            attr('data-tooltip', 'Select picture').
             text(''+(i + 1)).
             click({index : i}, function(e)
             {
