@@ -29,7 +29,7 @@ $( function()
   $(window).resize(updateLayout);
   $(window).keydown(function(e)
     {
-      if (e.ctrlKey || e.altKey)
+      if (e.ctrlKey || e.altKey || e.metaKey)
       {
         return true;
       }
@@ -93,6 +93,9 @@ $( function()
     });
   $(window).keypress(function(e)
   {
+    if (e.altKey || e.metaKey) {
+      return true;
+    }
     // '?' (63)
     if (e.which == 63) {
       toggleHelp();
