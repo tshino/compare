@@ -159,6 +159,7 @@ $( function()
 });
 
   var loading = [];
+  var entries = [];
   var images = [];
   var log = [];
   var currentImageIndex = 0;
@@ -252,7 +253,7 @@ $( function()
   {
     var isSingleView =
             currentImageIndex != 0 &&
-            currentImageIndex <= images.length;
+            currentImageIndex <= entries.length;
     if (isSingleView) {
       currentImageIndex = 0;
     } else if (layoutMode == 'x') {
@@ -271,9 +272,9 @@ $( function()
   }
   function toggleOverlay()
   {
-    if (!overlayMode && 2 <= images.length) {
-      if (currentImageIndex <= 1 || images.length < currentImageIndex) {
-        currentImageIndex = Math.min(2, images.length);
+    if (!overlayMode && 2 <= entries.length) {
+      if (currentImageIndex <= 1 || entries.length < currentImageIndex) {
+        currentImageIndex = Math.min(2, entries.length);
       }
       overlayMode = true;
       updateLayout();
@@ -501,23 +502,32 @@ $( function()
   function updateDOM()
   {
     var view = document.getElementById('view');
-    for (var i = 0, img; img = images[i]; i++)
+    images = [];
+    for (var i = 0, ent; ent = entries[i]; i++) {
+        if (ent.ready()) {
+          images.push(ent);
+        }
+    }
+    for (var i = 0, ent; ent = entries[i]; i++)
     {
-        if (!img.view) {
-          img.view = $('<div/>').addClass('imageBox').append(
-                img.element,
-                $('<span/>').addClass('imageName'). 
-                    text(''+(i + 1) + ': ' + img.name).
+        if (!ent.view) {
+          ent.view = $('<div/>').addClass('imageBox').
+              append(
+                $('<span/>').addClass('imageName').
+                    text(''+(i + 1) + ': ' + ent.name).
                     click({index : i}, function(e)
                     {
                       currentImageIndex = currentImageIndex == 0 ? e.data.index + 1 : 0;
                       updateLayout();
                     })
-            );
-          $('#drop').before(img.view);
+              );
+          $('#drop').before(ent.view);
         }
-        if (!img.button) {
-          img.button = $('<div/>').addClass('button selector').
+        if (ent.element && 0 == ent.view.find('canvas').length) {
+          ent.view.prepend(ent.element);
+        }
+        if (!ent.button) {
+          ent.button = $('<div/>').addClass('button selector').
             attr('data-tooltip', 'Select picture').
             text(''+(i + 1)).
             click({index : i}, function(e)
@@ -525,7 +535,7 @@ $( function()
               currentImageIndex = e.data.index + 1;
               updateLayout();
             });
-          $('#overlay').before(img.button);
+          $('#overlay').before(ent.button);
         }
     }
     makeMouseDraggable();
@@ -540,7 +550,7 @@ $( function()
     $('#view > div').off('mousedown').on('mousedown', function(e)
     {
       var index = $('#view > div').index(this);
-      if (index >= images.length)
+      if (index >= entries.length)
       {
         return true;
       }
@@ -552,11 +562,11 @@ $( function()
     });
     $('#view > div').off('mousemove').on('mousemove', function(e)
     {
-      if (images.length == 0)
+      if (entries.length == 0)
       {
         return true;
       }
-      var index = Math.min(images.length - 1, $('#view > div').index(this));
+      var index = Math.min(entries.length - 1, $('#view > div').index(this));
       if (dragLastPoint && e.buttons != 1)
       {
         dragLastPoint = null;
@@ -584,10 +594,10 @@ $( function()
   {
     $('#view > div').off('touchmove').on('touchmove', function(e)
     {
-      if (images.length == 0) {
+      if (entries.length == 0) {
         return true;
       }
-      var index = Math.min(images.length - 1, $('#view > div').index(this));
+      var index = Math.min(entries.length - 1, $('#view > div').index(this));
       var event = e.originalEvent;
       if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
@@ -613,10 +623,10 @@ $( function()
     $('#view > div.imageBox canvas').off('dblclick').on('dblclick', function(e)
     {
       var index = $('#view > div').index($(this).parent());
-      if (index >= images.length) {
+      if (index >= entries.length || !entries[index].ready()) {
         return true;
       }
-      var img = images[index];
+      var img = entries[index];
       var x = (e.pageX - $(this).offset().left) / (img.baseWidth * scale);
       var y = (e.pageY - $(this).offset().top) / (img.baseHeight * scale);
       zoomWithTarget(index, x, y);
@@ -624,8 +634,11 @@ $( function()
   }
   function moveImageByPx(index, dx, dy)
   {
-    var x = dx / (images[index].baseWidth * scale);
-    var y = dy / (images[index].baseHeight * scale);
+    if (!entries[index].ready()) {
+      return;
+    }
+    var x = dx / (entries[index].baseWidth * scale);
+    var y = dy / (entries[index].baseHeight * scale);
     if (1.0 < scale)
     {
       viewOffset.x -= x / (1.0 - 1.0 / scale);
@@ -650,31 +663,33 @@ $( function()
   {
     var isSingleView =
             currentImageIndex != 0 &&
-            currentImageIndex <= images.length;
+            currentImageIndex <= entries.length;
     if (!isSingleView && overlayMode) {
       overlayMode = false;
     }
-    var numSlots = isSingleView ? 1 : Math.max(images.length, 2);
+    var numSlots = isSingleView ? 1 : Math.max(entries.length, 2);
     var numColumns = layoutMode == 'x' ? numSlots : 1;
     var numRows    = layoutMode != 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
     $('#view > div.imageBox').each(function(index)
     {
-      var img = images[index];
-      img.isLetterBox = boxW * img.height < boxH * img.width;
-      img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
-      img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
-      var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
       if (isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode))
       {
         $(this).css({ display : 'none' });
       }
       else
       {
-        var wPercent = 100 * img.baseWidth / boxW;
-        var hPercent = 100 * img.baseHeight / boxH;
-        $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
+        var img = entries[index];
+        var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
+        if (img.element) {
+          img.isLetterBox = boxW * img.height < boxH * img.width;
+          img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
+          img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
+          var wPercent = 100 * img.baseWidth / boxW;
+          var hPercent = 100 * img.baseHeight / boxH;
+          $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
+        }
         $(this).css({ display : '' });
         $(this).css({
           position  : overlayMode ? 'absolute' : '',
@@ -686,7 +701,7 @@ $( function()
     });
     $('#view > div.emptyBox').each(function(index)
     {
-      if (index >= (isSingleView ? 0 : numSlots - images.length))
+      if (index >= (isSingleView ? 0 : numSlots - entries.length))
       {
         $(this).css({ display : 'none' });
       }
@@ -709,7 +724,7 @@ $( function()
     } else {
       $('.selector').removeClass('disabled');
     }
-    $('#overlay').css({ display : 2 <= images.length ? '' : 'none' });
+    $('#overlay').css({ display : 2 <= entries.length ? '' : 'none' });
     updateTransform();
   }
   
@@ -737,7 +752,15 @@ $( function()
   function addFiles(files)
   {
     // files is a FileList of File objects.
-    for (var i = 0, f; f = files[i]; i++)
+    var sorted = [];
+    for (var i = 0, f; f = files[i]; i++) {
+      sorted.push(f);
+    }
+    sorted.sort(
+      function(a, b) {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+      });
+    for (var i = 0, f; f = sorted[i]; i++)
     {
       if (!f.type || !(/^image\/.+$/.test(f.type)))
       {
@@ -746,8 +769,27 @@ $( function()
       else
       {
         loading.push(f.name);
+        var entry = {
+            name            : f.name,
+            size            : f.size,
+            lastModified    : new Date(f.lastModified || f.lastModifiedDate),
+            format          : '',
+            width           : 0,
+            height          : 0,
+            naturalWidth    : 0,
+            naturalHeight   : 0,
+            view        : null,
+            button      : null,
+            element     : null,
+            asCanvas    : null,
+            histogram   : null,
+            waveform    : null,
+            
+            ready   : function() { return null != this.element; },
+        };
+        entries.push(entry);
         var reader = new FileReader();
-        reader.onload = (function(theFile)
+        reader.onload = (function(theEntry, theFile)
         {
             return function(e)
             {
@@ -763,33 +805,25 @@ $( function()
                     //
                     loading.splice(loading.indexOf(theFile.name), 1);
                     showNowLoading();
-                    images.push(
-                        {
-                            view    : null,
-                            button  : null,
-                            element     : canvas,
-                            asCanvas    : canvas,
-                            width   : img.width,
-                            height  : img.height,
-                            naturalWidth   : img.naturalWidth,
-                            naturalHeight  : img.naturalHeight,
-                            name    : theFile.name,
-                            format  : format || '('+theFile.type+')' || '(unknown)',
-                            size          : theFile.size,
-                            lastModified  : new Date(theFile.lastModified || theFile.lastModifiedDate),
-                            histogram   : null,
-                            waveform    : null,
-                        });
+                    
+                    theEntry.element    = canvas;
+                    theEntry.asCanvas   = canvas;
+                    theEntry.width      = img.width;
+                    theEntry.height     = img.height;
+                    theEntry.naturalWidth   = img.naturalWidth;
+                    theEntry.naturalHeight  = img.naturalHeight;
+                    theEntry.format     = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
+                    
                     updateDOM();
                 });
                 img.src = e.target.result;
             };
-        })(f);
+        })(entry, f);
         reader.readAsDataURL(f);
       }
     }
     currentImageIndex = 0;
-    updateLayout();
+    updateDOM();
     document.getElementById('log').innerHTML = log.join('');
     showNowLoading();
   }
