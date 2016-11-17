@@ -13,19 +13,49 @@
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
 <div id="viewroot">
 	<div id="sidebar">
-		<div class="button" data-tooltip="Add new picture" id="add" onclick="$('#file').click()"><img src="res/add.svg" width="100%"></div>
+		<div class="button" id="add" onclick="$('#file').click()">
+			<img src="res/add.svg" width="100%">
+			<span class="tooltip">Add new picture</span>
+		</div>
 		<div class="space"></div>
-		<div class="button" data-tooltip="Show image information" id="infobtn" onclick="toggleInfo()"><img src="res/info.svg" width="100%"></div>
-		<div class="button" data-tooltip="Zoom in" onclick="zoomIn()"><img src="res/zoomin.svg" width="100%"></div>
-		<div class="button" data-tooltip="Zoom out" onclick="zoomOut()"><img src="res/zoomout.svg" width="100%"></div>
-		<div class="button" data-tooltip="Arrange layout" id="arrange" onclick="arrangeLayout()"><img src="res/layout_x.svg" width="100%"></div>
-		<div class="button" data-tooltip="Overlay mode" id="overlay" onclick="toggleOverlay()"><img src="res/overlay.svg" width="100%"></div>
+		<div class="button" id="infobtn" onclick="toggleInfo()">
+			<img src="res/info.svg" width="100%">
+			<span class="tooltip keys">Show image information <span>i</span></span>
+		</div>
+		<div class="button" onclick="zoomIn()">
+			<img src="res/zoomin.svg" width="100%">
+			<span class="tooltip keys">Zoom in <span>+</span></span>
+		</div>
+		<div class="button" onclick="zoomOut()">
+			<img src="res/zoomout.svg" width="100%">
+			<span class="tooltip keys">Zoom out <span>-</span></span>
+		</div>
+		<div class="button" id="arrange" onclick="arrangeLayout()">
+			<img src="res/layout_x.svg" width="100%">
+			<span class="tooltip keys">Arrange layout <span>a</span></span>
+		</div>
+		<div class="button" id="overlay" onclick="toggleOverlay()">
+			<img src="res/overlay.svg" width="100%">
+			<span class="tooltip keys">Overlay mode <span>o</span></span>
+		</div>
 		<div class="bottom">
-			<div class="button" data-tooltip="Show histogram" onclick="toggleHistogram()">H</div>
-			<div class="button" data-tooltip="Show waveform" onclick="toggleWaveform()">W</div>
-			<div class="button" data-tooltip="Fullscreen" onclick="toggleFullscreen()"><img src="res/full.svg" width="100%"></div>
+			<div class="button" onclick="toggleHistogram()">
+				H
+				<span class="tooltip keys">Show histogram <span>h</span></span>
+			</div>
+			<div class="button" onclick="toggleWaveform()">
+				W
+				<span class="tooltip keys">Show waveform <span>w</span></span>
+			</div>
+			<div class="button" onclick="toggleFullscreen()">
+				<img src="res/full.svg" width="100%">
+				<span class="tooltip keys">Fullscreen <span>f</span></span>
+			</div>
 			<div class="space"></div>
-			<div class="button" data-tooltip="Show help" id="help" onclick="toggleHelp()"><img src="res/help.svg" width="100%"></div>
+			<div class="button" id="help" onclick="toggleHelp()">
+				<img src="res/help.svg" width="100%">
+				<span class="tooltip keys">Show help <span>?</span></span>
+			</div>
 		</div>
 	</div>
 	<div id="view">

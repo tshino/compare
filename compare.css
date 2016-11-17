@@ -42,6 +42,7 @@
     text-align  : center;
     cursor      : pointer;
     overflow    : hidden;
+    white-space : nowrap;
 }
 .button img
 {
@@ -60,9 +61,8 @@
     box-shadow  : 1px 1px 1px #000;
     transform   : translate(0px, 2px);
 }
-[data-tooltip].button:after
+.button span.tooltip
 {
-    content     : attr(data-tooltip);
     display     : inline;
     position    : absolute;
     pointer-events : none;
@@ -72,14 +72,16 @@
     border-radius   : 4px;
     color           : #444;
     line-height     : 30px;
-    margin          : 0px 20px;
+    right           : -15px;
+    margin          : 0px 0px;
     padding         : 0px 15px;
+    transform       : translate(100%,0px);
     font-size       : 18px;
     white-space     : nowrap;
     transition      : 200ms;
     opacity         : 0.0;
 }
-[data-tooltip].button:hover:after
+.button:hover span.tooltip
 {
     transition-delay    : 300ms;
     opacity             : 1.0;
@@ -206,11 +208,16 @@ div.dialog table td, div.dialog table th
     box-sizing      : border-box;
     border          : #bbb solid 1px;
     border-radius   : 4px;
-    box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
     padding         : 1px 3px;
+    line-height     : 1.2em;
+    font-size       : 16px;
     font-weight     : bold;
     text-align      : center;
     min-width       : 1.5em;
+}
+.keys:not(.tooltip) > span
+{
+    box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
 }
 tr.num > td:not(.prop), tr.date > td:not(.prop)
 {
