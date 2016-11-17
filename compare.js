@@ -528,13 +528,22 @@ $( function()
         }
         if (!ent.button) {
           ent.button = $('<div/>').addClass('button selector').
-            attr('data-tooltip', 'Select picture').
             text(''+(i + 1)).
+            append(
+              $('<span/>').addClass('tooltip').
+                text('Select picture ')
+              ).
             click({index : i}, function(e)
             {
               currentImageIndex = e.data.index + 1;
               updateLayout();
             });
+          if (i < 9) {
+            $(ent.button).find('span.tooltip').addClass('keys').
+              append(
+                $('<span/>').text(i + 1)
+                );
+          }
           $('#overlay').before(ent.button);
         }
     }
