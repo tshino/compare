@@ -227,6 +227,16 @@ tr.b > td:not(.prop)
 {
     font-weight : bold;
 }
+td.error
+{
+    color       : red;
+    background  : #ecc;
+}
+td.ok
+{
+    color       : green;
+    background  : #cec;
+}
 div.dialog tr:nth-of-type(even)
 {
     background      : #e8e8e8;

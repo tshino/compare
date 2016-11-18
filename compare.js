@@ -161,7 +161,6 @@ $( function()
   var loading = [];
   var entries = [];
   var images = [];
-  var log = [];
   var currentImageIndex = 0;
   var viewZoom = 0;
   var scale = 1.0;
@@ -326,15 +325,57 @@ $( function()
     updateInfoTable();
     toggleDialog($('#info'));
   }
-  function showNowLoading()
+  function updateNowLoading()
   {
     hideDialog();
     $('#loadingList > tr').remove();
-    for (var i = 0, n; n = loading[i]; i++) {
-      $('#loadingList').append($('<tr>').addClass('b').append($('<td>').text(n)));
-    }
     if (0 < loading.length) {
+      var finished = true, errors = 0;
+      for (var i = 0, ent; ent = loading[i]; i++) {
+        var td = $('<td>').css({ minWidth: '400px' });
+        if (ent.loading) {
+          td.text('Loading...');
+          finished = false;
+        } else if (ent.error) {
+          td.addClass('error').text(ent.error);
+          ++errors;
+        } else {
+          td.addClass('ok').text('OK!');
+        }
+        $('#loadingList').append(
+          $('<tr>').append(
+            $('<td>').addClass('b').text(ent.name),
+            td
+          )
+        );
+      }
+      if (finished) {
+        loading = [];
+        if (0 < errors) {
+          $('#loadingStatus').text(
+            1 == errors ? 'An error occurred.' : 'Some errors occured.');
+        } else {
+          $('#loadingStatus').text('Finished!');
+        }
+      } else {
+        $('#loadingStatus').text('Now loading...');
+      }
       toggleDialog($('#loading'));
+      if (finished && 0 == errors) {
+        window.setTimeout(
+          function() {
+            window.setTimeout(
+              function() {
+                if ($('#loading').is(':visible')) {
+                  hideDialog();
+                }
+              },
+              500
+            );
+          },
+          0
+        );
+      }
     }
   }
   function makeHistogram(img)
@@ -771,14 +812,7 @@ $( function()
       });
     for (var i = 0, f; f = sorted[i]; i++)
     {
-      if (!f.type || !(/^image\/.+$/.test(f.type)))
-      {
-        log.push('Error: ', escapeHtml(f.name), ' is not an image <br>');
-      }
-      else
-      {
-        loading.push(f.name);
-        var entry = {
+      var entry = {
             name            : f.name,
             size            : f.size,
             lastModified    : new Date(f.lastModified || f.lastModifiedDate),
@@ -793,10 +827,14 @@ $( function()
             asCanvas    : null,
             histogram   : null,
             waveform    : null,
+            loading     : true,
+            error       : null,
             
             ready   : function() { return null != this.element; },
-        };
-        entries.push(entry);
+      };
+      entries.push(entry);
+      loading.push(entry);
+      {
         var reader = new FileReader();
         reader.onload = (function(theEntry, theFile)
         {
@@ -805,15 +843,13 @@ $( function()
                 var format = detectImageFormat(e.target.result);
                 var img = new Image;
                 $(img).on('load', function()
-                {
+                  {
                     var canvas = document.createElement('canvas');
                     canvas.width  = img.naturalWidth;
                     canvas.height = img.naturalHeight;
                     var context = canvas.getContext('2d');
                     context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
                     //
-                    loading.splice(loading.indexOf(theFile.name), 1);
-                    showNowLoading();
                     
                     theEntry.element    = canvas;
                     theEntry.asCanvas   = canvas;
@@ -822,9 +858,24 @@ $( function()
                     theEntry.naturalWidth   = img.naturalWidth;
                     theEntry.naturalHeight  = img.naturalHeight;
                     theEntry.format     = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
+                    theEntry.loading    = false;
                     
                     updateDOM();
-                });
+                    updateNowLoading();
+                  }).
+                  on('error', function()
+                  {
+                    theEntry.loading = false;
+                    theEntry.error = 'Failed.';
+                    if (!theFile.type || !(/^image\/.+$/.test(theFile.type))) {
+                      theEntry.error += ' Maybe not an image file.';
+                    } else if (format != 'PNG' && format != 'JPEG' && format != 'GIF' && format != 'BMP') {
+                      theEntry.error += ' Maybe unsupported format for the browser.';
+                    }
+                    
+                    updateDOM();
+                    updateNowLoading();
+                  });
                 img.src = e.target.result;
             };
         })(entry, f);
@@ -833,8 +884,7 @@ $( function()
     }
     currentImageIndex = 0;
     updateDOM();
-    document.getElementById('log').innerHTML = log.join('');
-    showNowLoading();
+    updateNowLoading();
   }
 
   function handleDragOver(evt) {
