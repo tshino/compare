@@ -232,6 +232,10 @@ td.error
     color       : red;
     background  : #ecc;
 }
+td.loading
+{
+    color       : blue;
+}
 td.ok
 {
     color       : green;

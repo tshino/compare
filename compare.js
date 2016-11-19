@@ -334,7 +334,12 @@ $( function()
       for (var i = 0, ent; ent = loading[i]; i++) {
         var td = $('<td>').css({ minWidth: '400px' });
         if (ent.loading) {
-          td.text('Loading...');
+          td.addClass('loading').
+            text('Loading...').
+            css({
+              background: 'linear-gradient(to right, '+
+                '#cde, #cde '+ent.progress+'%, transparent '+ent.progress+'%, transparent)'
+            });
           finished = false;
         } else if (ent.error) {
           td.addClass('error').text(ent.error);
@@ -828,6 +833,7 @@ $( function()
             histogram   : null,
             waveform    : null,
             loading     : true,
+            progress    : 0,
             error       : null,
             
             ready   : function() { return null != this.element; },
@@ -836,6 +842,15 @@ $( function()
       loading.push(entry);
       {
         var reader = new FileReader();
+        reader.onprogress = (function(theEntry)
+        {
+          return function(e) {
+            if (e.lengthComputable && 0 < e.total) {
+              theEntry.progress = Math.round(e.loaded * 100 / e.total);
+            }
+            updateNowLoading();
+          };
+        })(entry);
         reader.onload = (function(theEntry, theFile)
         {
             return function(e)
@@ -859,6 +874,7 @@ $( function()
                     theEntry.naturalHeight  = img.naturalHeight;
                     theEntry.format     = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
                     theEntry.loading    = false;
+                    theEntry.progress   = 100;
                     
                     updateDOM();
                     updateNowLoading();
@@ -879,6 +895,16 @@ $( function()
                 img.src = e.target.result;
             };
         })(entry, f);
+        reader.onerror = (function(theEntry, theFile, theReader)
+        {
+          return function(e) {
+            theEntry.loading = false;
+            theEntry.error = 'Failed. File could not be read. (' + theReader.error.name + ')';
+            
+            updateDOM();
+            updateNowLoading();
+          };
+        })(entry, f, reader);
         reader.readAsDataURL(f);
       }
     }
