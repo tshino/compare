@@ -371,7 +371,7 @@ $( function()
         [img.width, addComma(img.width) ],
         [img.height, addComma(img.height) ],
         calcAspectRatio(img.width, img.height),
-        [null, orientationToString(img.orientation)],
+        [orientationToString(img.orientation), orientationToString(img.orientation)],
         [img.size, addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()] ];
       for (var j = 0, v; v = val[i][j]; ++j) {
