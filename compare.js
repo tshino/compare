@@ -213,28 +213,91 @@ $( function()
       return [ratio, result];
     }
   }
-  function detectImageFormat(dataURI)
-  {
-    var p = dataURI.indexOf(',');
-    if (0 <= dataURI.slice(0, p).indexOf(';base64')) {
-      if (dataURI.length - (p + 1) < 8) {
+  function orientationToString(orientation) {
+    return (
+      !orientation ? '‐' :
+      orientation == 0 ? 'Undefined' :
+      orientation == 1 ? 'TopLeft' :
+      orientation == 2 ? 'TopRight' :
+      orientation == 3 ? 'BottomRight' :
+      orientation == 4 ? 'BottomLeft' :
+      orientation == 5 ? 'LeftTop' :
+      orientation == 6 ? 'RightTop' :
+      orientation == 7 ? 'RightBottom' :
+      orientation == 8 ? 'LeftBottom' : 'Invalid'
+    );
+  }
+  function binaryFromDataURI(dataURI) {
+    var offset = dataURI.indexOf(',') + 1;
+    var isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
+    var binary = null;
+    var len;
+    if (isBase64) {
+      len = (dataURI.length - offset) / 4 * 3;
+      if (3 <= len) {
+        len = len - 3 +
+            atob(dataURI.slice(dataURI.length - 4, dataURI.length)).length;
+      }
+    } else {
+      binary = decodeURIComponent(dataURI.slice(offset));
+      len = binary.length;
+    }
+    var read = function(addr) {
+      if (addr >= len) {
         return null;
       }
-      var head = atob(dataURI.slice(p + 1, p + 9));
-    } else {
-      var head = decodeURIComponent(dataURI.slice(p + 1));
-    }
-    var magic = head.length < 4 ? 0 :
-        ((head.charCodeAt(0) * 256 +
-        head.charCodeAt(1)) * 256 +
-        head.charCodeAt(2)) * 256 +
-        head.charCodeAt(3);
+      if (isBase64) {
+        var mod = addr % 3;
+        var pos = (addr - mod) / 3 * 4;
+        var bytes = atob(dataURI.slice(offset + pos, offset + pos + 4));
+        var ret = bytes.charCodeAt(mod);
+        return ret;
+      } else {
+        return binary.charCodeAt(addr);
+      }
+    };
+    return {
+      length    : len,
+      at        : read,
+      big16     : function (addr) { return read(addr) * 256 + read(addr + 1); },
+      little16  : function (addr) { return read(addr) + read(addr + 1) * 256; },
+    };
+  }
+  function detectImageFormat(binary)
+  {
+    var magic = binary.length < 4 ? 0 :
+        ((binary.at(0) * 256 +
+        binary.at(1)) * 256 +
+        binary.at(2)) * 256 +
+        binary.at(3);
     if (magic == 0x89504e47) { return 'PNG'; }
     if (magic == 0x47494638) { return 'GIF'; }
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
     if ((magic - (magic & 255)) == 0xffd8ff00) { return 'JPEG'; }
     if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
     //alert(magic);
+    return null;
+  }
+  function detectExifOrientation(binary)
+  {
+    for (var p = 0; p + 4 <= binary.length; ) {
+      var m = binary.big16(p);
+      if (m == 0xffda /* SOS */) { break; }
+      if (m == 0xffe1 /* APP1 */) {
+        if (p + 20 > binary.length) { break; }
+        var big = binary.big16(p + 10) == 0x4d4d; /* MM */
+        var read16 = big ? binary.big16 : binary.little16;
+        var fields = read16(p + 18);
+        if (p + 20 + fields * 12 > binary.length) { break; }
+        for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
+          if (read16(f)== 0x0112 /* ORIENTATION */) {
+            return read16(f + 8);
+          }
+        }
+        break;
+      }
+      p += 2 + (m == 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
+    }
     return null;
   }
 
@@ -296,6 +359,7 @@ $( function()
       $('#infoWidth'),
       $('#infoHeight'),
       $('#infoAspect'),
+      $('#infoOrientation'),
       $('#infoFileSize'),
       $('#infoLastModified') ];
     var val = [];
@@ -307,6 +371,7 @@ $( function()
         [img.width, addComma(img.width) ],
         [img.height, addComma(img.height) ],
         calcAspectRatio(img.width, img.height),
+        [null, orientationToString(img.orientation)],
         [img.size, addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()] ];
       for (var j = 0, v; v = val[i][j]; ++j) {
@@ -826,6 +891,7 @@ $( function()
             height          : 0,
             naturalWidth    : 0,
             naturalHeight   : 0,
+            orientation     : null,
             view        : null,
             button      : null,
             element     : null,
@@ -855,7 +921,11 @@ $( function()
         {
             return function(e)
             {
-                var format = detectImageFormat(e.target.result);
+                var binary = binaryFromDataURI(e.target.result)
+                var format = detectImageFormat(binary);
+                if (format == 'JPEG') {
+                  theEntry.orientation = detectExifOrientation(binary);
+                }
                 var img = new Image;
                 $(img).on('load', function()
                   {
