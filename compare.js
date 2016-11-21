@@ -300,6 +300,24 @@ $( function()
     }
     return null;
   }
+  function applyExifOrientation(entry)
+  {
+    var o = entry.orientation;
+    var w = entry.naturalWidth, h = entry.naturalHeight;
+    var temp =
+      o == 2 ? [ w, h, false, ' scale(-1,1)' ] :
+      o == 3 ? [ w, h, false, ' rotate(180deg)' ] :
+      o == 4 ? [ w, h, false, ' scale(-1,1) rotate(180deg)' ] :
+      o == 5 ? [ h, w, true,  ' scale(-1,1) rotate(90deg)' ] :
+      o == 6 ? [ h, w, true,  ' rotate(90deg)' ] :
+      o == 7 ? [ h, w, true,  ' scale(-1,1) rotate(-90deg)' ] :
+      o == 8 ? [ h, w, true,  ' rotate(-90deg)' ] :
+               [ w, h, false, '' ];
+    entry.width = temp[0];
+    entry.height = temp[1];
+    entry.transposed = temp[2];
+    entry.orientationAsCSS = temp[3];
+  }
 
   function zoomIn()
   {
@@ -806,9 +824,11 @@ $( function()
           img.isLetterBox = boxW * img.height < boxH * img.width;
           img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
           img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
-          var wPercent = 100 * img.baseWidth / boxW;
-          var hPercent = 100 * img.baseHeight / boxH;
-          $(img.element).css( { width : wPercent+'%', height : hPercent+'%' });
+          var w = img.baseWidth, h = img.baseHeight;
+          if (img.transposed) {
+            var temp = w; w = h; h = temp;
+          }
+          $(img.element).css({ width: w+'px', height: h+'px' });
         }
         $(this).css({ display : '' });
         $(this).css({
@@ -852,16 +872,22 @@ $( function()
     
     var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
     scale = scalePercent / 100;
-    var offsetX = (50 - 100 * viewOffset.x) * (1.0 - 1.0 / scale);
-    var offsetY = (50 - 100 * viewOffset.y) * (1.0 - 1.0 / scale);
-    $('#view .imageBox canvas').css(
-                {
-                    left        : '50%',
-                    top         : '50%',
-                    transform   : 'translate(-50%, -50%) ' +
-                                  'scale(' + scale + ') ' +
-                                  'translate(' + offsetX + '%, ' + offsetY + '%)',
-                });
+    var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / scale);
+    var commonOffsetY = (0.5 - viewOffset.y) * (1.0 - 1.0 / scale);
+    for (var i = 0, ent; ent = entries[i]; i++) {
+      if (ent.element) {
+        var offsetX = commonOffsetX * ent.baseWidth;
+        var offsetY = commonOffsetY * ent.baseHeight;
+        $(ent.element).css({
+          left        : '50%',
+          top         : '50%',
+          transform   : 'translate(-50%, -50%) ' +
+                        'scale(' + scale + ') ' +
+                        'translate(' + offsetX + 'px, ' + offsetY + 'px)' +
+                        ent.orientationAsCSS,
+        });
+      }
+    }
   }
 
   function handleFileSelect(evt) {
@@ -892,6 +918,8 @@ $( function()
             naturalWidth    : 0,
             naturalHeight   : 0,
             orientation     : null,
+            transposed      : false,
+            orientationAsCSS    : '',
             view        : null,
             button      : null,
             element     : null,
@@ -935,7 +963,6 @@ $( function()
                     var context = canvas.getContext('2d');
                     context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
                     //
-                    
                     theEntry.element    = canvas;
                     theEntry.asCanvas   = canvas;
                     theEntry.width      = img.width;
@@ -946,6 +973,7 @@ $( function()
                     theEntry.loading    = false;
                     theEntry.progress   = 100;
                     
+                    applyExifOrientation(theEntry);
                     updateDOM();
                     updateNowLoading();
                   }).
