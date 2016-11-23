@@ -655,6 +655,9 @@ $( function()
         if (ent.element && 0 == ent.view.find('canvas').length) {
           ent.view.prepend(ent.element);
         }
+        if (ent.error) {
+          ent.view.addClass('error');
+        }
         if (!ent.button) {
           ent.button = $('<div/>').addClass('button selector').
             text(''+(i + 1)).
