@@ -501,13 +501,8 @@ $( function()
       }
       return canvas;
   }
-  function toggleHistogram()
+  function updateHistogramTable()
   {
-    if ($('#histogram').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
     $('#histoTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.histogram) {
@@ -525,6 +520,15 @@ $( function()
         )
       );
     }
+  }
+  function toggleHistogram()
+  {
+    if ($('#histogram').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    window.setTimeout(updateHistogramTable, 0);
     toggleDialog($('#histogram'));
   }
   function makeWaveform(img)
@@ -578,13 +582,8 @@ $( function()
       context.putImageData(bits, 0, 0);
       return canvas;
   }
-  function toggleWaveform()
+  function updateWaveformTable()
   {
-    if ($('#waveform').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
     $('#waveTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.waveform) {
@@ -602,6 +601,15 @@ $( function()
         )
       );
     }
+  }
+  function toggleWaveform()
+  {
+    if ($('#waveform').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    window.setTimeout(updateWaveformTable, 0);
     toggleDialog($('#waveform'));
   }
   function toggleDialog(target)
