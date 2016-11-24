@@ -256,25 +256,38 @@ $( function()
         return binary.charCodeAt(addr);
       }
     };
+    var readBig16    = function (addr) { return read(addr) * 256 + read(addr + 1); };
+    var readLittle16 = function (addr) { return read(addr) + read(addr + 1) * 256; };
+    var readBig32    = function (addr) { return readBig16(addr) * 65536 + readBig16(addr + 2); };
     return {
       length    : len,
       at        : read,
-      big16     : function (addr) { return read(addr) * 256 + read(addr + 1); },
-      little16  : function (addr) { return read(addr) + read(addr + 1) * 256; },
+      big16     : readBig16,
+      little16  : readLittle16,
+      big32     : readBig32,
     };
   }
   function detectImageFormat(binary)
   {
-    var magic = binary.length < 4 ? 0 :
-        ((binary.at(0) * 256 +
-        binary.at(1)) * 256 +
-        binary.at(2)) * 256 +
-        binary.at(3);
+    var magic = binary.length < 4 ? 0 : binary.big32(0);
+    var magic2 = binary.length < 8 ? 0 : binary.big32(4);
     if (magic == 0x89504e47) { return 'PNG'; }
     if (magic == 0x47494638) { return 'GIF'; }
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
     if ((magic - (magic & 255)) == 0xffd8ff00) { return 'JPEG'; }
     if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
+    if ((magic  == 0xefbbbf3c /* BOM + '<' */ && magic2 == 0x3f786d6c /* '?xml' */) ||
+        (magic == 0x3c3f786d /* '<?xm' */ && (magic2 & 0xff000000) == 0x6c000000 /* 'l' */)) {
+        // XML
+        var i = 4;
+        for (var x; x = binary.at(i); ++i) {
+          if (x == 0x3c /* '<' */) { break; }
+        }
+        var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
+        if (sig1 == 0x3c737667 /* <svg */) {
+          return 'SVG';
+        }
+    }
     //alert(magic);
     return null;
   }
