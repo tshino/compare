@@ -126,7 +126,7 @@
 {
     color           : #69f;
 }
-#view .imageBox canvas
+#view .imageBox .image
 {
     display         : block;
     position        : absolute;

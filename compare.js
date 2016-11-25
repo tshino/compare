@@ -2,6 +2,10 @@
 var ZOOM_STEP_KEY     = 0.25;
 var ZOOM_STEP_WHEEL   = 0.0625;
 var ZOOM_STEP_DBLCLK  = 2.00;
+var NEEDS_IOS_EXIF_WORKAROUND = (function(){
+  var ua = window.navigator.userAgent.toLowerCase();
+  return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
+})();
 
 $( function()
 {
@@ -673,7 +677,7 @@ $( function()
               );
           $('#drop').before(ent.view);
         }
-        if (ent.element && 0 == ent.view.find('canvas').length) {
+        if (ent.element && 0 == ent.view.find('.image').length) {
           ent.view.prepend(ent.element);
         }
         if (ent.error) {
@@ -782,7 +786,7 @@ $( function()
   }
   function makeDoubleClickable()
   {
-    $('#view > div.imageBox canvas').off('dblclick').on('dblclick', function(e)
+    $('#view > div.imageBox .image').off('dblclick').on('dblclick', function(e)
     {
       var index = $('#view > div').index($(this).parent());
       if (index >= entries.length || !entries[index].ready()) {
@@ -987,7 +991,12 @@ $( function()
                     var context = canvas.getContext('2d');
                     context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
                     //
-                    theEntry.element    = canvas;
+                    if (NEEDS_IOS_EXIF_WORKAROUND && format == 'JPEG') {
+                      theEntry.element    = canvas;
+                    } else {
+                      theEntry.element    = img;
+                    }
+                    $(theEntry.element).addClass('image');
                     theEntry.asCanvas   = canvas;
                     theEntry.width      = img.width;
                     theEntry.height     = img.height;
