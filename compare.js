@@ -326,7 +326,7 @@ $( function()
   function applyExifOrientation(entry)
   {
     var o = entry.orientation;
-    var w = entry.naturalWidth, h = entry.naturalHeight;
+    var w = entry.width, h = entry.height;
     var temp =
       o == 2 ? [ w, h, false, ' scale(-1,1)' ] :
       o == 3 ? [ w, h, false, ' rotate(180deg)' ] :
@@ -404,14 +404,15 @@ $( function()
       $('#infoFileSize'),
       $('#infoLastModified') ];
     var val = [];
+    var unknown = [null, '‐'];
     for (var i = 0, img; img = images[i]; i++)
     {
       val[i] = [
         [null, img.name ],
         [null, img.format ],
-        [img.width, addComma(img.width) ],
-        [img.height, addComma(img.height) ],
-        calcAspectRatio(img.width, img.height),
+        img.sizeUnknown ? unknown : [img.width, addComma(img.width) ],
+        img.sizeUnknown ? unknown : [img.height, addComma(img.height) ],
+        img.sizeUnknown ? unknown : calcAspectRatio(img.width, img.height),
         [orientationToString(img.orientation), orientationToString(img.orientation)],
         [img.size, addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()] ];
@@ -504,8 +505,8 @@ $( function()
   }
   function makeHistogram(img)
   {
-      var w = img.naturalWidth;
-      var h = img.naturalHeight;
+      var w = img.canvasWidth;
+      var h = img.canvasHeight;
       var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
       var hist = new Uint32Array(256 * 3);
@@ -588,8 +589,8 @@ $( function()
   }
   function makeWaveform(img)
   {
-      var w = img.naturalWidth;
-      var h = img.naturalHeight;
+      var w = img.canvasWidth;
+      var h = img.canvasHeight;
       var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
       var histW = Math.min(w, 1024);
@@ -981,8 +982,8 @@ $( function()
             format          : '',
             width           : 0,
             height          : 0,
-            naturalWidth    : 0,
-            naturalHeight   : 0,
+            canvasWidth     : 0,
+            canvasHeight    : 0,
             orientation     : null,
             transposed      : false,
             orientationAsCSS    : '',
@@ -1023,11 +1024,18 @@ $( function()
                 var img = new Image;
                 $(img).on('load', function()
                   {
+                    var w = img.naturalWidth;
+                    var h = img.naturalHeight;
+                    if (format == 'SVG' && (w == 0 && h == 0)) {
+                      w = 150;
+                      h = 150;
+                      theEntry.sizeUnknown = true;
+                    }
                     var canvas = document.createElement('canvas');
-                    canvas.width  = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
+                    canvas.width  = w;
+                    canvas.height = h;
                     var context = canvas.getContext('2d');
-                    context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+                    context.drawImage(img, 0, 0, w, h);
                     //
                     if (NEEDS_IOS_EXIF_WORKAROUND && format == 'JPEG') {
                       theEntry.element    = canvas;
@@ -1036,10 +1044,10 @@ $( function()
                     }
                     $(theEntry.element).addClass('image');
                     theEntry.asCanvas   = canvas;
-                    theEntry.width      = img.width;
-                    theEntry.height     = img.height;
-                    theEntry.naturalWidth   = img.naturalWidth;
-                    theEntry.naturalHeight  = img.naturalHeight;
+                    theEntry.width      = w;
+                    theEntry.height     = h;
+                    theEntry.canvasWidth   = w;
+                    theEntry.canvasHeight  = h;
                     theEntry.format     = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
                     theEntry.loading    = false;
                     theEntry.progress   = 100;
