@@ -305,10 +305,36 @@ div.dialog tr.date td.gt:not(.prop):before
     content     : "older";
     color       : #f68;
 }
-#log
+div.header
 {
-    color           : #000;
-    line-height     : 1.1em;
-    background      : #eee;
-    overflow        : auto;
+    display     : flex;
+}
+div.header > *
+{
+    flex        : 0 1 auto;
+    display     : inline-block;
+    margin      : 0px;
+    padding     : 5px;
+}
+div.header > h3
+{
+    flex        : 1 1 auto;
+}
+div.mode-sw
+{
+    display     : flex;
+    padding     : 0px;
+}
+div.mode-sw > *
+{
+    box-sizing  : border-box;
+    margin      : 0px;
+    height      : 100%;
+    font-size   : 14px;
+    color       : #444;
+}
+div.mode-sw > *.current
+{
+    color       : #36f;
+    text-shadow : 0px 0px 20px;
 }

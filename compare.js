@@ -29,6 +29,11 @@ $( function()
     click(function() {
       $('#file').click();
     });
+  $('#histogramType > *').click(function()
+  {
+    var index = $('#histogramType > *').index(this);
+    changeHistogramType(index);
+  });
   
   $(window).resize(updateLayout);
   $(window).keydown(function(e)
@@ -174,6 +179,7 @@ $( function()
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
+  var histogramType = 0;
 
   function escapeHtml(str)
   {
@@ -483,40 +489,72 @@ $( function()
       }
     }
   }
+  function changeHistogramType(type)
+  {
+    if (histogramType != type) {
+      histogramType = type;
+      for (var i = 0, img; img = images[i]; i++) {
+        img.histogram = null;
+      }
+      $('#histogramType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      window.setTimeout(updateHistogramTable, 0);
+    }
+  }
   function makeHistogram(img)
   {
       var w = img.naturalWidth;
       var h = img.naturalHeight;
       var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
-      var hist = new Uint32Array(256);
-      for (var i = 0; i < 256; ++i) {
+      var hist = new Uint32Array(256 * 3);
+      for (var i = 0; i < 256 * 3; ++i) {
         hist[i] = 0;
       }
-      for (var i = 0, n = 4 * w * h; i < n; i+=4) {
-        var r = bits.data[i + 0];
-        var g = bits.data[i + 1];
-        var b = bits.data[i + 2];
-        var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-        ++hist[y];
+      if (histogramType == 0) { // RGB
+        for (var i = 0, n = 4 * w * h; i < n; i+=4) {
+          ++hist[bits.data[i + 0]];
+          ++hist[bits.data[i + 1] + 256];
+          ++hist[bits.data[i + 2] + 512];
+        }
+      } else { // Luminance
+        for (var i = 0, n = 4 * w * h; i < n; i+=4) {
+          var r = bits.data[i + 0];
+          var g = bits.data[i + 1];
+          var b = bits.data[i + 2];
+          var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+          ++hist[y];
+        }
       }
       //
       var canvas = document.createElement('canvas');
       canvas.width = 1024;
-      canvas.height = 1024;
+      canvas.height = 512;
       context = canvas.getContext('2d');
       var max = 0;
-      for (var i = 0; i < 256; ++i) {
+      for (var i = 0; i < 256 * 3; ++i) {
         max = Math.max(max, hist[i]);
       }
-      context.fillStyle = '#444';
-      context.fillRect(0,0,1024,1024);
-      context.fillStyle = '#fff';
-      for (var i = 0; i < 256; ++i) {
-        var h = 1024 * hist[i] / max;
-        context.fillRect(i*4, 1024-h, 4, h);
+      context.fillStyle = '#222';
+      context.fillRect(0,0,1024,512);
+      if (histogramType == 0) { // RGB
+        context.globalCompositeOperation = 'lighter';
+        drawHistogram('#f00', 0);
+        drawHistogram('#0f0', 256);
+        drawHistogram('#00f', 512);
+      } else { // Luminance
+        drawHistogram('#fff', 0);
       }
       return canvas;
+      
+      function drawHistogram(color, offset) {
+        context.fillStyle = color;
+        for (var i = 0; i < 256; ++i) {
+          var h = 512 * hist[i + offset] / max;
+          context.fillRect(i*4, 512-h, 4, h);
+        }
+      }
   }
   function updateHistogramTable()
   {
