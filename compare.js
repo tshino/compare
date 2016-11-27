@@ -34,6 +34,11 @@ $( function()
     var index = $('#histogramType > *').index(this);
     changeHistogramType(index);
   });
+  $('#waveformType > *').click(function()
+  {
+    var index = $('#waveformType > *').index(this);
+    changeWaveformType(index);
+  });
   
   $(window).resize(updateLayout);
   $(window).keydown(function(e)
@@ -180,6 +185,7 @@ $( function()
   var touchState = null;
   var dialog = null;
   var histogramType = 0;
+  var waveformType = 0;
 
   function escapeHtml(str)
   {
@@ -587,6 +593,19 @@ $( function()
     window.setTimeout(updateHistogramTable, 0);
     toggleDialog($('#histogram'));
   }
+  function changeWaveformType(type)
+  {
+    if (waveformType != type) {
+      waveformType = type;
+      for (var i = 0, img; img = images[i]; i++) {
+        img.waveform = null;
+      }
+      $('#waveformType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      window.setTimeout(updateWaveformTable, 0);
+    }
+  }
   function makeWaveform(img)
   {
       var w = img.canvasWidth;
@@ -594,10 +613,10 @@ $( function()
       var context = img.asCanvas.getContext('2d');
       var bits = context.getImageData(0, 0, w, h);
       var histW = Math.min(w, 1024);
-      var hist = new Uint32Array(256 * histW);
+      var hist = new Uint32Array(256 * histW * 3);
       var histN = new Uint32Array(histW);
       var histOff = new Uint32Array(w);
-      for (var i = 0; i < 256 * histW; ++i) {
+      for (var i = 0; i < 256 * histW * 3; ++i) {
         hist[i] = 0;
       }
       for (var i = 0; i < histW; ++i) {
@@ -609,12 +628,25 @@ $( function()
         ++histN[x];
       }
       for (var i = 0, y = 0; y < h; ++y) {
-        for (var x = 0; x < w; ++x, i+=4) {
-          var r = bits.data[i + 0];
-          var g = bits.data[i + 1];
-          var b = bits.data[i + 2];
-          var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-          ++hist[histOff[x] + my];
+        if (waveformType == 0) { // RGB
+          var gOff = 256 * histW;
+          var bOff = 512 * histW;
+          for (var x = 0; x < w; ++x, i+=4) {
+            var r = bits.data[i + 0];
+            var g = bits.data[i + 1];
+            var b = bits.data[i + 2];
+            ++hist[histOff[x] + r];
+            ++hist[histOff[x] + g + gOff];
+            ++hist[histOff[x] + b + bOff];
+          }
+        } else { // Luminance
+          for (var x = 0; x < w; ++x, i+=4) {
+            var r = bits.data[i + 0];
+            var g = bits.data[i + 1];
+            var b = bits.data[i + 2];
+            var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+            ++hist[histOff[x] + my];
+          }
         }
       }
       //
@@ -625,14 +657,32 @@ $( function()
       bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
         var max = histN[x] * h;
-        for (var y = 0; y < 256; ++y) {
-          var a = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
-          var c = Math.round(a * 255);
-          var off = ((255-y)*histW+x) * 4;
-          bits.data[off + 0] = c;
-          bits.data[off + 1] = c;
-          bits.data[off + 2] = c;
-          bits.data[off + 3] = 255;
+        if (waveformType == 0) { // RGB
+          var gOff = 256 * histW;
+          var bOff = 512 * histW;
+          for (var y = 0; y < 256; ++y) {
+            var aR = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
+            var aG = 1 - Math.pow(1 - hist[x*256+gOff+y] / max, 200.0);
+            var aB = 1 - Math.pow(1 - hist[x*256+bOff+y] / max, 200.0);
+            var cR = Math.round(aR * 255);
+            var cG = Math.round(aG * 255);
+            var cB = Math.round(aB * 255);
+            var off = ((255-y)*histW+x) * 4;
+            bits.data[off + 0] = cR;
+            bits.data[off + 1] = cG;
+            bits.data[off + 2] = cB;
+            bits.data[off + 3] = 255;
+          }
+        } else { // Luminance
+          for (var y = 0; y < 256; ++y) {
+            var a = 1 - Math.pow(1 - hist[x*256+y] / max, 200.0);
+            var c = Math.round(a * 255);
+            var off = ((255-y)*histW+x) * 4;
+            bits.data[off + 0] = c;
+            bits.data[off + 1] = c;
+            bits.data[off + 2] = c;
+            bits.data[off + 3] = 255;
+          }
         }
       }
       context.putImageData(bits, 0, 0);
