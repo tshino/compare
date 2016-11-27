@@ -297,7 +297,10 @@ $( function()
         // XML
         var i = 4;
         for (var x; x = binary.at(i); ++i) {
-          if (x == 0x3c /* '<' */) { break; }
+          if (x == 0x3c /* '<' */) {
+            var y = binary.at(i + 1);
+            if (y != 0x3f /* '?' */ && y != 0x21 /* '!' */) { break; }
+          }
         }
         var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
         if (sig1 == 0x3c737667 /* <svg */) {
