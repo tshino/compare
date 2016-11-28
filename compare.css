@@ -328,7 +328,7 @@ div.mode-sw
 div.mode-sw > *
 {
     box-sizing  : border-box;
-    margin      : 0px;
+    margin      : 2px;
     height      : 100%;
     font-size   : 14px;
     color       : #444;
@@ -337,4 +337,16 @@ div.mode-sw > *.current
 {
     color       : #36f;
     text-shadow : 0px 0px 20px;
+}
+button
+{
+    border      : 0px;
+    background  : #fff;
+    box-shadow  : 1px 2px 5px rgba(0,0,0, 0.5);
+}
+button:active
+{
+    background  : #eee;
+    box-shadow  : 1px 1px 1px rgba(0,0,0, 0.5);
+    transform   : translate(0px, 2px);
 }
