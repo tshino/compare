@@ -335,18 +335,28 @@ div.mode-sw > *
 }
 div.mode-sw > *.current
 {
-    color       : #36f;
-    text-shadow : 0px 0px 20px;
+    background  : #7af;
+    color       : white;
+    text-shadow : 0px 0px 10px #36f;
 }
 button
 {
     border      : 0px;
     background  : #fff;
     box-shadow  : 1px 2px 5px rgba(0,0,0, 0.5);
+    cursor      : pointer;
 }
 button:active
 {
     background  : #eee;
     box-shadow  : 1px 1px 1px rgba(0,0,0, 0.5);
     transform   : translate(0px, 2px);
+}
+button:hover
+{
+    background  : #bcf;
+}
+.mode-sw button:not(.current):hover
+{
+    background  : #eee;
 }
