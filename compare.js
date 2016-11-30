@@ -499,6 +499,16 @@ $( function()
       }
     }
   }
+  function getImageData(img)
+  {
+    if (!img.imageData) {
+      var w = img.canvasWidth;
+      var h = img.canvasHeight;
+      var context = img.asCanvas.getContext('2d');
+      img.imageData = context.getImageData(0, 0, w, h);
+    }
+    return img.imageData;
+  }
   function changeHistogramType(type)
   {
     if (histogramType != type) {
@@ -516,8 +526,7 @@ $( function()
   {
       var w = img.canvasWidth;
       var h = img.canvasHeight;
-      var context = img.asCanvas.getContext('2d');
-      var bits = context.getImageData(0, 0, w, h);
+      var bits = getImageData(img);
       var hist = new Uint32Array(256 * 3);
       for (var i = 0; i < 256 * 3; ++i) {
         hist[i] = 0;
@@ -541,7 +550,7 @@ $( function()
       var canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 512;
-      context = canvas.getContext('2d');
+      var context = canvas.getContext('2d');
       var max = 0;
       for (var i = 0; i < 256 * 3; ++i) {
         max = Math.max(max, hist[i]);
@@ -613,8 +622,7 @@ $( function()
   {
       var w = img.canvasWidth;
       var h = img.canvasHeight;
-      var context = img.asCanvas.getContext('2d');
-      var bits = context.getImageData(0, 0, w, h);
+      var bits = getImageData(img);
       var histW = Math.min(w, 1024);
       var hist = new Uint32Array(256 * histW * 3);
       var histN = new Uint32Array(histW);
@@ -656,7 +664,7 @@ $( function()
       var canvas = document.createElement('canvas');
       canvas.width = histW;
       canvas.height = 256;
-      context = canvas.getContext('2d');
+      var context = canvas.getContext('2d');
       bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
         var max = histN[x] * h;
@@ -1044,6 +1052,7 @@ $( function()
             button      : null,
             element     : null,
             asCanvas    : null,
+            imageData   : null,
             histogram   : null,
             waveform    : null,
             loading     : true,
