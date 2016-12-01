@@ -588,8 +588,10 @@ $( function()
       if (!img.histogram) {
         window.setTimeout((function(img) {
           return function() {
-            img.histogram = makeHistogram(img);
-            updateHistogramTable();
+            if (!img.histogram) {
+              img.histogram = makeHistogram(img);
+              updateHistogramTable();
+            }
           };
         })(img), 0);
       }
@@ -716,8 +718,10 @@ $( function()
       if (!img.waveform) {
         window.setTimeout((function(img) {
           return function() {
-            img.waveform = makeWaveform(img);
-            updateWaveformTable();
+            if (!img.waveform) {
+              img.waveform = makeWaveform(img);
+              updateWaveformTable();
+            }
           };
         })(img), 0);
       }
