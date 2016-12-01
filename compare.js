@@ -509,6 +509,14 @@ $( function()
     }
     return img.imageData;
   }
+  function makeBlankFigure(w, h)
+  {
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var context = canvas.getContext('2d');
+    return { canvas: canvas, context: context };
+  }
   function changeHistogramType(type)
   {
     if (histogramType != type) {
@@ -519,7 +527,7 @@ $( function()
       $('#histogramType > *').
         removeClass('current').
         eq(type).addClass('current');
-      window.setTimeout(updateHistogramTable, 0);
+      updateHistogramTable();
     }
   }
   function makeHistogram(img)
@@ -547,10 +555,8 @@ $( function()
         }
       }
       //
-      var canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 512;
-      var context = canvas.getContext('2d');
+      var fig = makeBlankFigure(1024, 512);
+      var context = fig.context;
       var max = 0;
       for (var i = 0; i < 256 * 3; ++i) {
         max = Math.max(max, hist[i]);
@@ -565,7 +571,7 @@ $( function()
       } else { // Luminance
         drawHistogram('#fff', 0);
       }
-      return canvas;
+      return fig.canvas;
       
       function drawHistogram(color, offset) {
         context.fillStyle = color;
@@ -580,12 +586,18 @@ $( function()
     $('#histoTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.histogram) {
-        img.histogram = makeHistogram(img);
+        window.setTimeout((function(img) {
+          return function() {
+            img.histogram = makeHistogram(img);
+            updateHistogramTable();
+          };
+        })(img), 0);
       }
+      var histogram = img.histogram || makeBlankFigure(8, 8).canvas;
       $('#histoName').append($('<td>').text(img.name));
       $('#histograms').append(
         $('<td>').append(
-          $(img.histogram).css({
+          $(histogram).css({
             width: '320px',
             height:'256px',
             background:'#aaa',
@@ -602,7 +614,7 @@ $( function()
       return;
     }
     hideDialog();
-    window.setTimeout(updateHistogramTable, 0);
+    updateHistogramTable();
     toggleDialog($('#histogram'));
   }
   function changeWaveformType(type)
@@ -615,7 +627,7 @@ $( function()
       $('#waveformType > *').
         removeClass('current').
         eq(type).addClass('current');
-      window.setTimeout(updateWaveformTable, 0);
+      updateWaveformTable();
     }
   }
   function makeWaveform(img)
@@ -661,10 +673,8 @@ $( function()
         }
       }
       //
-      var canvas = document.createElement('canvas');
-      canvas.width = histW;
-      canvas.height = 256;
-      var context = canvas.getContext('2d');
+      var fig = makeBlankFigure(histW, 256);
+      var context = fig.context;
       bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
         var max = histN[x] * h;
@@ -697,19 +707,25 @@ $( function()
         }
       }
       context.putImageData(bits, 0, 0);
-      return canvas;
+      return fig.canvas;
   }
   function updateWaveformTable()
   {
     $('#waveTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.waveform) {
-        img.waveform = makeWaveform(img);
+        window.setTimeout((function(img) {
+          return function() {
+            img.waveform = makeWaveform(img);
+            updateWaveformTable();
+          };
+        })(img), 0);
       }
+      var waveform = img.waveform || makeBlankFigure(8, 8).canvas;
       $('#waveName').append($('<td>').text(img.name));
       $('#waveforms').append(
         $('<td>').append(
-          $(img.waveform).css({
+          $(waveform).css({
             width: '320px',
             height:'256px',
             background:'#666',
@@ -726,7 +742,7 @@ $( function()
       return;
     }
     hideDialog();
-    window.setTimeout(updateWaveformTable, 0);
+    updateWaveformTable();
     toggleDialog($('#waveform'));
   }
   function toggleDialog(target)
@@ -1093,19 +1109,16 @@ $( function()
                       h = 150;
                       theEntry.sizeUnknown = true;
                     }
-                    var canvas = document.createElement('canvas');
-                    canvas.width  = w;
-                    canvas.height = h;
-                    var context = canvas.getContext('2d');
-                    context.drawImage(img, 0, 0, w, h);
+                    var fig = makeBlankFigure(w, h);
+                    fig.context.drawImage(img, 0, 0, w, h);
                     //
                     if (NEEDS_IOS_EXIF_WORKAROUND && format == 'JPEG') {
-                      theEntry.element    = canvas;
+                      theEntry.element    = fig.canvas;
                     } else {
                       theEntry.element    = img;
                     }
                     $(theEntry.element).addClass('image');
-                    theEntry.asCanvas   = canvas;
+                    theEntry.asCanvas   = fig.canvas;
                     theEntry.width      = w;
                     theEntry.height     = h;
                     theEntry.canvasWidth   = w;
