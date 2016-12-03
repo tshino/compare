@@ -541,9 +541,9 @@ $( function()
       }
       if (histogramType == 0) { // RGB
         for (var i = 0, n = 4 * w * h; i < n; i+=4) {
-          ++hist[bits.data[i + 0]];
-          ++hist[bits.data[i + 1] + 256];
-          ++hist[bits.data[i + 2] + 512];
+          hist[bits.data[i + 0]] += 1;
+          hist[bits.data[i + 1] + 256] += 1;
+          hist[bits.data[i + 2] + 512] += 1;
         }
       } else { // Luminance
         for (var i = 0, n = 4 * w * h; i < n; i+=4) {
@@ -551,7 +551,7 @@ $( function()
           var g = bits.data[i + 1];
           var b = bits.data[i + 2];
           var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-          ++hist[y];
+          hist[y] += 1;
         }
       }
       //
@@ -652,25 +652,31 @@ $( function()
         histOff[i] = x * 256;
         ++histN[x];
       }
-      for (var i = 0, y = 0; y < h; ++y) {
-        if (waveformType == 0) { // RGB
-          var gOff = 256 * histW;
-          var bOff = 512 * histW;
-          for (var x = 0; x < w; ++x, i+=4) {
+      if (waveformType == 0) { // RGB
+        for (var x = 0; x < w; ++x) {
+          var i = x * 4;
+          var rOff = histOff[x];
+          var gOff = histOff[x] + 256 * histW;
+          var bOff = histOff[x] + 512 * histW;
+          for (var y = 0; y < h; ++y, i += w*4) {
             var r = bits.data[i + 0];
             var g = bits.data[i + 1];
             var b = bits.data[i + 2];
-            ++hist[histOff[x] + r];
-            ++hist[histOff[x] + g + gOff];
-            ++hist[histOff[x] + b + bOff];
+            hist[rOff + r] += 1;
+            hist[gOff + g] += 1;
+            hist[bOff + b] += 1;
           }
-        } else { // Luminance
-          for (var x = 0; x < w; ++x, i+=4) {
+        }
+      } else { // Luminance
+        for (var x = 0; x < w; ++x) {
+          var i = x * 4;
+          var off = histOff[x];
+          for (var y = 0; y < h; ++y, i += w*4) {
             var r = bits.data[i + 0];
             var g = bits.data[i + 1];
             var b = bits.data[i + 2];
             var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-            ++hist[histOff[x] + my];
+            hist[off + my] += 1;
           }
         }
       }
