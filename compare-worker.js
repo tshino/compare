@@ -1,14 +1,21 @@
 ﻿self.addEventListener('message', function(e) {
-  var result = null;
-  switch (e.data.cmd) {
+  var data = e.data;
+  var result = {};
+  result.cmd    = data.cmd;
+  result.index  = data.index;
+  result.type   = data.type;
+  switch (data.cmd) {
   case 'calcHistogram':
-    result = calcHistogram(e.data.imageData, e.data.type);
+    result.result   = calcHistogram(data.imageData, data.type);
     break;
   case 'calcWaveform':
-    result = calcWaveform(e.data.imageData, e.data.histW, e.data.type);
+    result.result = calcWaveform(data.imageData, data.histW, data.type);
+    result.w = data.imageData.width;
+    result.h = data.imageData.height;
+    result.histW = data.histW;
     break;
   }
-  self.postMessage({ result: result });
+  self.postMessage( result );
 }, false);
 
 function calcHistogram( imageData, type )

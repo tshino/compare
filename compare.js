@@ -547,24 +547,42 @@ $( function()
       updateHistogramTable();
     }
   }
-  function makeHistogramAsync(img)
-  {
-    var type = histogramType;
-    var bits = getImageData(img);
-    var worker = newWorker('compare-worker.js');
-    worker.addEventListener('message', function(e) {
-      if (type == histogramType) {
-        img.histogram = makeFigure(e.data.result);
-        updateHistogramTable();
+  
+  var worker = newWorker('compare-worker.js');
+  worker.addEventListener('message', function(e) {
+    var data = e.data;
+    switch (data.cmd) {
+    case 'calcHistogram':
+      if (data.type == histogramType) {
+        var img = entries[data.index];
+        updateHistogram(data.type, img, data.result);
       }
-    }, false);
+      break;
+    case 'calcWaveform':
+      if (data.type == waveformType) {
+        var img = entries[data.index];
+        updateWaveform(data.type, img, data.histW, data.result);
+      }
+      break;
+    }
+  }, false);
+  
+  function updateHistogramAsync(img)
+  {
+    var bits = getImageData(img);
     worker.postMessage({
       cmd: 'calcHistogram',
-      imageData: bits,
-      type: type,
+      type:         histogramType,
+      index:        img.index,
+      imageData:    bits,
     });
+  }
+  function updateHistogram(type, img, hist)
+  {
+    img.histogram = makeFigure(type, hist);
+    updateHistogramTable();
     
-    function makeFigure(hist)
+    function makeFigure(type, hist)
     {
       var fig = makeBlankFigure(1024, 512);
       var context = fig.context;
@@ -599,7 +617,7 @@ $( function()
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.histogram) {
         img.histogram = makeBlankFigure(8, 8).canvas;
-        makeHistogramAsync(img);
+        updateHistogramAsync(img);
       }
       $('#histoName').append($('<td>').text(img.name));
       $('#histograms').append(
@@ -637,28 +655,27 @@ $( function()
       updateWaveformTable();
     }
   }
-  function makeWaveformAsync(img)
+  function updateWaveformAsync(img)
+  {
+    var w = img.canvasWidth;
+    var histW = Math.min(w, 1024);
+    var bits = getImageData(img);
+    worker.postMessage({
+      cmd: 'calcWaveform',
+      type:         waveformType,
+      index:        img.index,
+      imageData:    bits,
+      histW:        histW,
+    });
+  }
+  function updateWaveform(type, img, histW, hist)
   {
     var w = img.canvasWidth;
     var h = img.canvasHeight;
-    var histW = Math.min(w, 1024);
-    var type = waveformType;
-    var bits = getImageData(img);
-    var worker = newWorker('compare-worker.js');
-    worker.addEventListener('message', function(e) {
-      if (type == waveformType) {
-        img.waveform = makeFigure(e.data.result);
-        updateWaveformTable();
-      }
-    }, false);
-    worker.postMessage({
-      cmd: 'calcWaveform',
-      imageData: bits,
-      histW: histW,
-      type: type,
-    });
+    img.waveform = makeFigure(type, w, h, histW, hist);
+    updateWaveformTable();
     
-    function makeFigure(hist)
+    function makeFigure(type, w, h, histW, hist)
     {
       var histN = new Uint32Array(histW);
       for (var i = 0; i < histW; ++i) {
@@ -712,7 +729,7 @@ $( function()
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.waveform) {
         img.waveform = makeBlankFigure(8, 8).canvas;
-        makeWaveformAsync(img);
+        updateWaveformAsync(img);
       }
       $('#waveName').append($('<td>').text(img.name));
       $('#waveforms').append(
@@ -1045,6 +1062,7 @@ $( function()
     for (var i = 0, f; f = sorted[i]; i++)
     {
       var entry = {
+            index           : entries.length,
             name            : f.name,
             size            : f.size,
             lastModified    : new Date(f.lastModified || f.lastModifiedDate),
