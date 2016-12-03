@@ -187,6 +187,23 @@ $( function()
   var histogramType = 0;
   var waveformType = 0;
 
+  function createObjectURL(blob) {
+    if (window.URL) {
+      return window.URL.createObjectURL(blob);
+    } else {
+      return window.webkitURL.createObjectURL(blob);
+    }
+  }
+  function newWorker(relativePath) {
+    try {
+      return new Worker(relativePath);
+    } catch (e) {
+      var baseURL = window.location.href.replace(/\\/g,'/').replace(/\/[^\/]*$/, '/');
+      var array = [ 'importScripts("' + baseURL + relativePath + '");' ];
+      var blob = new Blob(array, {type: "text/javascript"});
+      return new Worker(createObjectURL(blob));
+    }
+  }
   function escapeHtml(str)
   {
     str = str.replace(/&/g, '&amp;');
@@ -530,40 +547,34 @@ $( function()
       updateHistogramTable();
     }
   }
-  function makeHistogram(img)
+  function makeHistogramAsync(img)
   {
-      var w = img.canvasWidth;
-      var h = img.canvasHeight;
-      var bits = getImageData(img);
-      var hist = new Uint32Array(256 * 3);
-      for (var i = 0; i < 256 * 3; ++i) {
-        hist[i] = 0;
+    var type = histogramType;
+    var bits = getImageData(img);
+    var worker = newWorker('compare-worker.js');
+    worker.addEventListener('message', function(e) {
+      if (type == histogramType) {
+        img.histogram = makeFigure(e.data.result);
+        updateHistogramTable();
       }
-      if (histogramType == 0) { // RGB
-        for (var i = 0, n = 4 * w * h; i < n; i+=4) {
-          hist[bits.data[i + 0]] += 1;
-          hist[bits.data[i + 1] + 256] += 1;
-          hist[bits.data[i + 2] + 512] += 1;
-        }
-      } else { // Luminance
-        for (var i = 0, n = 4 * w * h; i < n; i+=4) {
-          var r = bits.data[i + 0];
-          var g = bits.data[i + 1];
-          var b = bits.data[i + 2];
-          var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-          hist[y] += 1;
-        }
-      }
-      //
+    }, false);
+    worker.postMessage({
+      cmd: 'calcHistogram',
+      imageData: bits,
+      type: type,
+    });
+    
+    function makeFigure(hist)
+    {
       var fig = makeBlankFigure(1024, 512);
       var context = fig.context;
       var max = 0;
-      for (var i = 0; i < 256 * 3; ++i) {
+      for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
       context.fillStyle = '#222';
       context.fillRect(0,0,1024,512);
-      if (histogramType == 0) { // RGB
+      if (type == 0) { // RGB
         context.globalCompositeOperation = 'lighter';
         drawHistogram('#f00', 0);
         drawHistogram('#0f0', 256);
@@ -580,26 +591,20 @@ $( function()
           context.fillRect(i*4, 512-h, 4, h);
         }
       }
+    }
   }
   function updateHistogramTable()
   {
     $('#histoTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.histogram) {
-        window.setTimeout((function(img) {
-          return function() {
-            if (!img.histogram) {
-              img.histogram = makeHistogram(img);
-              updateHistogramTable();
-            }
-          };
-        })(img), 0);
+        img.histogram = makeBlankFigure(8, 8).canvas;
+        makeHistogramAsync(img);
       }
-      var histogram = img.histogram || makeBlankFigure(8, 8).canvas;
       $('#histoName').append($('<td>').text(img.name));
       $('#histograms').append(
         $('<td>').append(
-          $(histogram).css({
+          $(img.histogram).css({
             width: '320px',
             height:'256px',
             background:'#aaa',
@@ -632,61 +637,44 @@ $( function()
       updateWaveformTable();
     }
   }
-  function makeWaveform(img)
+  function makeWaveformAsync(img)
   {
-      var w = img.canvasWidth;
-      var h = img.canvasHeight;
-      var bits = getImageData(img);
-      var histW = Math.min(w, 1024);
-      var hist = new Uint32Array(256 * histW * 3);
-      var histN = new Uint32Array(histW);
-      var histOff = new Uint32Array(w);
-      for (var i = 0; i < 256 * histW * 3; ++i) {
-        hist[i] = 0;
+    var w = img.canvasWidth;
+    var h = img.canvasHeight;
+    var histW = Math.min(w, 1024);
+    var type = waveformType;
+    var bits = getImageData(img);
+    var worker = newWorker('compare-worker.js');
+    worker.addEventListener('message', function(e) {
+      if (type == waveformType) {
+        img.waveform = makeFigure(e.data.result);
+        updateWaveformTable();
       }
+    }, false);
+    worker.postMessage({
+      cmd: 'calcWaveform',
+      imageData: bits,
+      histW: histW,
+      type: type,
+    });
+    
+    function makeFigure(hist)
+    {
+      var histN = new Uint32Array(histW);
       for (var i = 0; i < histW; ++i) {
         histN[i] = 0;
       }
       for (var i = 0; i < w; ++i) {
         var x = Math.round((i + 0.5) / w * histW - 0.5);
-        histOff[i] = x * 256;
         ++histN[x];
-      }
-      if (waveformType == 0) { // RGB
-        for (var x = 0; x < w; ++x) {
-          var i = x * 4;
-          var rOff = histOff[x];
-          var gOff = histOff[x] + 256 * histW;
-          var bOff = histOff[x] + 512 * histW;
-          for (var y = 0; y < h; ++y, i += w*4) {
-            var r = bits.data[i + 0];
-            var g = bits.data[i + 1];
-            var b = bits.data[i + 2];
-            hist[rOff + r] += 1;
-            hist[gOff + g] += 1;
-            hist[bOff + b] += 1;
-          }
-        }
-      } else { // Luminance
-        for (var x = 0; x < w; ++x) {
-          var i = x * 4;
-          var off = histOff[x];
-          for (var y = 0; y < h; ++y, i += w*4) {
-            var r = bits.data[i + 0];
-            var g = bits.data[i + 1];
-            var b = bits.data[i + 2];
-            var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-            hist[off + my] += 1;
-          }
-        }
       }
       //
       var fig = makeBlankFigure(histW, 256);
       var context = fig.context;
-      bits = context.createImageData(histW, 256);
+      var bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
         var max = histN[x] * h;
-        if (waveformType == 0) { // RGB
+        if (type == 0) { // RGB
           var gOff = 256 * histW;
           var bOff = 512 * histW;
           for (var y = 0; y < 256; ++y) {
@@ -716,26 +704,20 @@ $( function()
       }
       context.putImageData(bits, 0, 0);
       return fig.canvas;
+    }
   }
   function updateWaveformTable()
   {
     $('#waveTable td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img.waveform) {
-        window.setTimeout((function(img) {
-          return function() {
-            if (!img.waveform) {
-              img.waveform = makeWaveform(img);
-              updateWaveformTable();
-            }
-          };
-        })(img), 0);
+        img.waveform = makeBlankFigure(8, 8).canvas;
+        makeWaveformAsync(img);
       }
-      var waveform = img.waveform || makeBlankFigure(8, 8).canvas;
       $('#waveName').append($('<td>').text(img.name));
       $('#waveforms').append(
         $('<td>').append(
-          $(waveform).css({
+          $(img.waveform).css({
             width: '320px',
             height:'256px',
             background:'#666',
