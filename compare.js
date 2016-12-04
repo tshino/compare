@@ -452,6 +452,12 @@ $( function()
         rows[j].append(e);
       }
     }
+    if (i == 0) {
+      rows[0].append(
+        $('<td>').attr('rowspan', rows.length).
+            text('no data')
+      );
+    }
   }
   function toggleInfo()
   {
@@ -631,6 +637,11 @@ $( function()
         )
       );
     }
+    if (k == 0) {
+      $('#histoName').append(
+        $('<td rowspan="2">').text('no data')
+      );
+    }
   }
   function toggleHistogram()
   {
@@ -741,6 +752,11 @@ $( function()
             padding:'10px'
           })
         )
+      );
+    }
+    if (k == 0) {
+      $('#waveName').append(
+        $('<td rowspan="2">').text('no data')
       );
     }
   }
