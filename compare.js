@@ -560,6 +560,8 @@ $( function()
   }
   
   var worker = newWorker('compare-worker.js');
+  var taskCount = 0;
+  var taskQueue = [];
   worker.addEventListener('message', function(e) {
     var data = e.data;
     switch (data.cmd) {
@@ -576,16 +578,35 @@ $( function()
       }
       break;
     }
+    --taskCount;
+    window.setTimeout(kickNextTask, 0);
   }, false);
+  function kickNextTask()
+  {
+    if (taskCount == 0 && 0 < taskQueue.length) {
+      var task = taskQueue.shift();
+      switch (task.cmd) {
+      case 'calcHistogram':
+      case 'calcWaveform':
+        task.imageData = getImageData(entries[task.index]);
+        worker.postMessage(task);
+        break;
+      }
+      ++taskCount;
+    }
+  }
+  function addTask(task)
+  {
+    taskQueue.push(task);
+    window.setTimeout(kickNextTask, 0);
+  }
   
   function updateHistogramAsync(img)
   {
-    var bits = getImageData(img);
-    worker.postMessage({
-      cmd: 'calcHistogram',
-      type:         histogramType,
-      index:        img.index,
-      imageData:    bits,
+    addTask({
+      cmd:      'calcHistogram',
+      type:     histogramType,
+      index:    img.index,
     });
   }
   function updateHistogram(type, img, hist)
@@ -673,15 +694,11 @@ $( function()
   }
   function updateWaveformAsync(img)
   {
-    var w = img.canvasWidth;
-    var histW = Math.min(w, 1024);
-    var bits = getImageData(img);
-    worker.postMessage({
-      cmd: 'calcWaveform',
-      type:         waveformType,
-      index:        img.index,
-      imageData:    bits,
-      histW:        histW,
+    addTask({
+      cmd:      'calcWaveform',
+      type:     waveformType,
+      index:    img.index,
+      histW:    Math.min(img.canvasWidth, 1024),
     });
   }
   function updateWaveform(type, img, histW, hist)
