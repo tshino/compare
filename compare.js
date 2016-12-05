@@ -549,6 +549,7 @@ $( function()
   {
     if (histogramType != type) {
       histogramType = type;
+      discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
         img.histogram = null;
       }
@@ -599,6 +600,16 @@ $( function()
   {
     taskQueue.push(task);
     window.setTimeout(kickNextTask, 0);
+  }
+  function discardTasksOfCommand(cmd)
+  {
+    for (var i = 0, task; task = taskQueue[i]; ) {
+      if (task.cmd == cmd) {
+        taskQueue.splice(i, 1);
+      } else {
+        ++i;
+      }
+    }
   }
   
   function updateHistogramAsync(img)
@@ -683,6 +694,7 @@ $( function()
   {
     if (waveformType != type) {
       waveformType = type;
+      discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
         img.waveform = null;
       }
