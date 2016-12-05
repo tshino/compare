@@ -528,7 +528,12 @@ $( function()
       var w = img.canvasWidth;
       var h = img.canvasHeight;
       var context = img.asCanvas.getContext('2d');
-      img.imageData = context.getImageData(0, 0, w, h);
+      var imageData = context.getImageData(0, 0, w, h);
+      // avoid huge memory consumption
+      if (w * h <= 30 * 1024 * 1024) {
+        img.imageData = imageData;
+      }
+      return imageData;
     }
     return img.imageData;
   }
