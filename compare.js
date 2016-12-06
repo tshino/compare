@@ -53,9 +53,16 @@ $( function()
         if ((e.keyCode == 27 || e.keyCode == 13) && !e.shiftKey) {
           hideDialog();
           return false;
-        } else {
-          return true;
+        // '1'
+        } else if ((e.keyCode == 48 + 1 || e.keyCode == 96 + 1) && !e.shiftKey) {
+          $(dialog).find('.mode-sw > button:nth-child(1)').click();
+          return false;
+        // '2'
+        } else if ((e.keyCode == 48 + 2 || e.keyCode == 96 + 2) && !e.shiftKey) {
+          $(dialog).find('.mode-sw > button:nth-child(2)').click();
+          return false;
         }
+        return true;
       }
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
