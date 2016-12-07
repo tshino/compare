@@ -210,7 +210,6 @@ div.dialog table td, div.dialog table th
 }
 .keys > span
 {
-    background      : #eee;
     display         : inline-block;
     box-sizing      : border-box;
     border          : #bbb solid 1px;
@@ -224,6 +223,7 @@ div.dialog table td, div.dialog table th
 }
 .keys:not(.tooltip) > span
 {
+    background      : #eee;
     box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
 }
 tr.num > td:not(.prop), tr.enum > td:not(.prop), tr.date > td:not(.prop)
@@ -319,6 +319,12 @@ div.header > *
 div.header > h3
 {
     flex        : 1 1 auto;
+}
+h3 img
+{
+    vertical-align  : bottom;
+    padding-right   : 5px;
+    transform       : scale(1.5);
 }
 div.mode-sw
 {

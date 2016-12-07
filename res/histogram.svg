@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page10">
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(0,0,0)" stroke="none" d="M 3400,3200 C 3400,3200 3008,3033 2900,2600 2800,2200 2578,2726 2500,2100 2400,1300 2300,1300 2200,1600 2030,2110 2100,2800 1900,3000 1759,3141 1590,3081 1500,2900 1400,2700 1300,1800 1100,2200 939,2522 1100,2900 600,3200 L 3400,3200 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 3400,3200 C 3400,3200 3008,3033 2900,2600 2800,2200 2578,2726 2500,2100 2400,1300 2300,1300 2200,1600 2030,2110 2100,2800 1900,3000 1759,3141 1590,3081 1500,2900 1400,2700 1300,1800 1100,2200 939,2522 1100,2900 600,3200 L 3400,3200 Z"/>
+  </g>
+ </g>
+</svg>

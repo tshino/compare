@@ -40,11 +40,11 @@
 		</div>
 		<div class="bottom">
 			<div class="button" onclick="toggleHistogram()">
-				H
+				<img src="res/histogram.svg" width="100%">
 				<span class="tooltip keys">Show histogram <span>h</span></span>
 			</div>
 			<div class="button" onclick="toggleWaveform()">
-				W
+				<img src="res/waveform.svg" width="100%">
 				<span class="tooltip keys">Show waveform <span>w</span></span>
 			</div>
 			<div class="button" onclick="toggleFullscreen()">
@@ -93,7 +93,9 @@
 	</div>
 	<div id="info" class="dialog">
 		<div>
-			<h3>Image information</h3>
+			<div class="header">
+				<h3><img src="res/info.svg" width="20"> Image information</h3>
+			</div>
 			<table id="infoTable">
 				<tr id="infoName" class="b"><td class="prop">name</tr>
 				<tr id="infoFormat"><td class="prop">format</tr>
@@ -116,7 +118,7 @@
 	<div id="histogram" class="dialog">
 		<div>
 			<div class="header">
-				<h3>Histogram</h3>
+				<h3><img src="res/histogram.svg" width="20"> Histogram</h3>
 				<div id="histogramType" class="mode-sw">
 					<button class="current">1. RGB</button>
 					<button>2. Luminance</button>
@@ -131,7 +133,7 @@
 	<div id="waveform" class="dialog">
 		<div>
 			<div class="header">
-				<h3>Waveform</h3>
+				<h3><img src="res/waveform.svg" width="20"> Waveform</h3>
 				<div id="waveformType" class="mode-sw">
 					<button class="current">1. RGB</button>
 					<button>2. Luminance</button>
