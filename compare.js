@@ -311,7 +311,13 @@ $( function()
   {
     var magic = binary.length < 4 ? 0 : binary.big32(0);
     var magic2 = binary.length < 8 ? 0 : binary.big32(4);
-    if (magic == 0x89504e47) { return 'PNG'; }
+    if (magic == 0x89504e47) {
+      // PNG
+      if (detectPngChunk(binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
+        return 'APNG';
+      }
+      return 'PNG';
+    }
     if (magic == 0x47494638) { return 'GIF'; }
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
     if ((magic - (magic & 255)) == 0xffd8ff00) { return 'JPEG'; }
@@ -332,6 +338,17 @@ $( function()
         }
     }
     //alert(magic);
+    return null;
+  }
+  function detectPngChunk(binary, target, before)
+  {
+    for (var p = 8; p + 8 <= binary.length; ) {
+      var len   = binary.big32(p);
+      var chunk = binary.big32(p + 4);
+      if (chunk == target) { return p; }
+      if (chunk == before) { break; }
+      p += len + 12;
+    }
     return null;
   }
   function detectExifOrientation(binary)
