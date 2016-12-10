@@ -8,103 +8,239 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="compare.js" defer></script>
 </head>
-<body>
+<body class="en">
+	<script>
+		function changeLang(value) {
+			if (value != "") {
+				var newURL = location.href.replace(/\?.*/, '') + '?lang=' + value;
+				window.history.replaceState('','', newURL);
+				$(document.body).attr('class', value);
+			}
+		}
+		(function() {
+			var lang =
+				(window.navigator.languages && window.navigator.languages[0]) ||
+				window.navigator.language ||
+				window.navigator.userLanguage ||
+				window.navigator.browserLanguage;
+			var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
+			if (m) {
+				lang = m[1];
+			}
+			if (lang && lang.match(/^ja/)) {
+				changeLang('ja');
+			}
+		})();
+	</script>
 
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
 <div id="viewroot">
 	<div id="sidebar">
 		<div class="button" id="add" onclick="$('#file').click()">
 			<img src="res/add.svg" width="100%">
-			<span class="tooltip">Add new picture</span>
+			<span class="tooltip en">Add new picture</span>
+			<span class="tooltip ja">画像を追加</span>
 		</div>
 		<div class="space"></div>
 		<div class="button" id="infobtn" onclick="toggleInfo()">
 			<img src="res/info.svg" width="100%">
-			<span class="tooltip keys">Show image information <span>i</span></span>
+			<span class="tooltip keys en">Show image information <span>i</span></span>
+			<span class="tooltip keys ja">画像情報を表示 <span>i</span></span>
 		</div>
 		<div class="button" onclick="zoomIn()">
 			<img src="res/zoomin.svg" width="100%">
-			<span class="tooltip keys">Zoom in <span>+</span></span>
+			<span class="tooltip keys en">Zoom in <span>+</span></span>
+			<span class="tooltip keys ja">拡大 <span>+</span></span>
 		</div>
 		<div class="button" onclick="zoomOut()">
 			<img src="res/zoomout.svg" width="100%">
-			<span class="tooltip keys">Zoom out <span>-</span></span>
+			<span class="tooltip keys en">Zoom out <span>-</span></span>
+			<span class="tooltip keys ja">縮小 <span>-</span></span>
 		</div>
 		<div class="button" id="arrange" onclick="arrangeLayout()">
 			<img src="res/layout_x.svg" width="100%">
-			<span class="tooltip keys">Arrange layout <span>a</span></span>
+			<span class="tooltip keys en">Arrange layout <span>a</span></span>
+			<span class="tooltip keys ja">レイアウト変更 <span>a</span></span>
 		</div>
 		<div class="button" id="overlay" onclick="toggleOverlay()" style="display:none">
 			<img src="res/overlay.svg" width="100%">
-			<span class="tooltip keys">Overlay mode <span>o</span></span>
+			<span class="tooltip keys en">Overlay mode <span>o</span></span>
+			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
 		</div>
 		<div class="bottom">
 			<div class="button" onclick="toggleHistogram()">
 				<img src="res/histogram.svg" width="100%">
-				<span class="tooltip keys">Show histogram <span>h</span></span>
+				<span class="tooltip keys en">Show histogram <span>h</span></span>
+				<span class="tooltip keys ja">ヒストグラムを表示 <span>h</span></span>
 			</div>
 			<div class="button" onclick="toggleWaveform()">
 				<img src="res/waveform.svg" width="100%">
-				<span class="tooltip keys">Show waveform <span>w</span></span>
+				<span class="tooltip keys en">Show waveform <span>w</span></span>
+				<span class="tooltip keys ja">波形を表示 <span>w</span></span>
 			</div>
 			<div class="button" onclick="toggleFullscreen()">
 				<img src="res/full.svg" width="100%">
-				<span class="tooltip keys">Fullscreen <span>f</span></span>
+				<span class="tooltip keys en">Fullscreen <span>f</span></span>
+				<span class="tooltip keys ja">フルスクリーン表示 <span>f</span></span>
 			</div>
 			<div class="space"></div>
 			<div class="button" id="help" onclick="toggleHelp()">
 				<img src="res/help.svg" width="100%">
-				<span class="tooltip keys">Show help <span>?</span></span>
+				<span class="tooltip keys en">Show help <span>?</span></span>
+				<span class="tooltip keys ja">ヘルプを表示 <span>?</span></span>
 			</div>
 		</div>
 	</div>
 	<div id="view">
 		<div class="emptyBox" id="drop">
-			<div class="dropHere"></div>
+			<div class="dropHere">
+				<span class="en">Drop image files here</span>
+				<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+			</div>
 		</div>
 		<div class="emptyBox">
-			<div class="dropHere"></div>
+			<div class="dropHere">
+				<span class="en">Drop image files here</span>
+				<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+			</div>
 		</div>
 		<div id="mode" class="indicator">
 		</div>
 	</div>
 	<div id="shortcuts" class="dialog">
 		<div>
-			<div>
-				<h3>Compare -image comparison tool-</h3>
-				<p><a href="https://github.com/tshino/compare" target="_blank">https://github.com/tshino/compare</a></p>
+			<div class="header">
+				<div>
+					<h3>
+						<span class="en">Compare -image comparison tool-</span>
+						<span class="ja">Compare -画像比較ツール-</span>
+					</h3>
+					<p><a href="https://github.com/tshino/compare" target="_blank">https://github.com/tshino/compare</a></p>
+				</div>
+				<div>
+					<select onchange="changeLang(this.options[this.selectedIndex].value)">
+						<option value="">(Select language)</option>
+						<option value="ja">日本語</option>
+						<option value="en">English</option>
+					</select>
+				</div>
 			</div>
 			<table>
-				<tr><th>Keyboard shortcuts<th></tr>
-				<tr><td class="keys"><span>+</span> / <span>-</span> / <span>PgUp</span> / <span>PgDn</span><td>zoom in/out</tr>
-				<tr><td class="keys"><span>←</span> / <span>→</span> / <span>↑</span> / <span>↓</span><td>scroll</tr>
-				<tr><td class="keys"><span>1</span> / <span>2</span> / ... <td>show single picture</tr>
-				<tr><td class="keys"><span>0</span><td>show all pictures</tr>
-				<tr><td class="keys"><span>a</span><td>arrange layout</tr>
-				<tr><td class="keys"><span>o</span><td>overlay mode</tr>
-				<tr><td class="keys"><span>Esc</span><td>reset zoom</tr>
-				<tr><td class="keys"><span>i</span><td>image information</tr>
-				<tr><td class="keys"><span>h</span><td>histogram</tr>
-				<tr><td class="keys"><span>w</span><td>waveform</tr>
-				<tr><td class="keys"><span>f</span><td>full screen</tr>
-				<tr><td class="keys"><span>?</span><td>help</tr>
+				<tr>
+					<th>
+						<span class="en">Keyboard shortcuts</span>
+						<span class="ja">キーボードショートカット</span>
+					<th>
+				</tr>
+				<tr>
+					<td class="keys"><span>+</span> / <span>-</span> / <span>PgUp</span> / <span>PgDn</span></td>
+					<td><span class="en">zoom in/out</span><span class="ja">拡大/縮小</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>←</span> / <span>→</span> / <span>↑</span> / <span>↓</span></td>
+					<td><span class="en">scroll</span><span class="ja">スクロール</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>1</span> / <span>2</span> / ... </td>
+					<td><span class="en">select single picture</span><span class="ja">1枚の画像を選択</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>0</span></td>
+					<td><span class="en">show all pictures</span><span class="ja">すべての画像を表示</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>a</span></td>
+					<td><span class="en">arrange layout</span><span class="ja">レイアウト変更</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>o</span></td>
+					<td><span class="en">overlay mode</span><span class="ja">オーバーレイモード</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>Esc</span></td>
+					<td><span class="en">reset zoom</span><span class="ja">拡大状態をリセット</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>i</span></td>
+					<td><span class="en">image information</span><span class="ja">画像情報</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>h</span></td>
+					<td><span class="en">histogram</span><span class="ja">ヒストグラム</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>w</span></td>
+					<td><span class="en">waveform</span><span class="ja">波形</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>f</span></td>
+					<td><span class="en">full screen</span><span class="ja">フルスクリーン表示</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>?</span></td>
+					<td><span class="en">show help</span><span class="ja">ヘルプ</span></td>
+				</tr>
 			</table>
 		</div>
 	</div>
 	<div id="info" class="dialog">
 		<div>
 			<div class="header">
-				<h3><img src="res/info.svg" width="20"> Image information</h3>
+				<h3>
+					<img src="res/info.svg" width="20">
+					<span class="en">Image information</span>
+					<span class="ja">画像情報</span>
+				</h3>
 			</div>
 			<table id="infoTable">
-				<tr id="infoName" class="b"><td class="prop">name</tr>
-				<tr id="infoFormat"><td class="prop">format</tr>
-				<tr id="infoWidth" class="num"><td class="prop">width [px]</tr>
-				<tr id="infoHeight" class="num"><td class="prop">height [px]</tr>
-				<tr id="infoAspect" class="num"><td class="prop">aspect ratio</tr>
-				<tr id="infoOrientation" class="enum"><td class="prop">orientation (Exif)</tr>
-				<tr id="infoFileSize" class="num"><td class="prop">file size [bytes]</tr>
-				<tr id="infoLastModified" class="date"><td class="prop">last modified</tr>
+				<tr id="infoName" class="b">
+					<td class="prop">
+						<span class="en">name</span>
+						<span class="ja">名前</span>
+					</td>
+				</tr>
+				<tr id="infoFormat">
+					<td class="prop">
+						<span class="en">format</span>
+						<span class="ja">ファイル形式</span>
+					</td>
+				</tr>
+				<tr id="infoWidth" class="num">
+					<td class="prop">
+						<span class="en">width [px]</span>
+						<span class="ja">幅 [px]</span>
+					</td>
+				</tr>
+				<tr id="infoHeight" class="num">
+					<td class="prop">
+						<span class="en">height [px]</span>
+						<span class="ja">高さ [px]</span>
+					</td>
+				</tr>
+				<tr id="infoAspect" class="num">
+					<td class="prop">
+						<span class="en">aspect ratio</span>
+						<span class="ja">アスペクト比</span>
+					</td>
+				</tr>
+				<tr id="infoOrientation" class="enum">
+					<td class="prop">
+						<span class="en">orientation (Exif)</span>
+						<span class="ja">回転方向 (Exif)</span>
+					</td>
+				</tr>
+				<tr id="infoFileSize" class="num">
+					<td class="prop">
+						<span class="en">file size [bytes]</span>
+						<span class="ja">ファイルサイズ [バイト]</span>
+					</td>
+				</tr>
+				<tr id="infoLastModified" class="date">
+					<td class="prop">
+						<span class="en">last modified</span>
+						<span class="ja">更新日時</span>
+					</td>
+				</tr>
 			</table>
 		</div>
 	</div>
@@ -118,10 +254,14 @@
 	<div id="histogram" class="dialog">
 		<div>
 			<div class="header">
-				<h3><img src="res/histogram.svg" width="20"> Histogram</h3>
+				<h3>
+					<img src="res/histogram.svg" width="20">
+					<span class="en">Histogram</span>
+					<span class="ja">ヒストグラム</span>
+				</h3>
 				<div id="histogramType" class="mode-sw">
 					<button class="current">1. RGB</button>
-					<button>2. Luminance</button>
+					<button>2. <span class="en">Luminance</span><span class="ja">輝度</span></button>
 				</div>
 			</div>
 			<table id="histoTable">
@@ -133,10 +273,14 @@
 	<div id="waveform" class="dialog">
 		<div>
 			<div class="header">
-				<h3><img src="res/waveform.svg" width="20"> Waveform</h3>
+				<h3>
+					<img src="res/waveform.svg" width="20">
+					<span class="en">Waveform</span>
+					<span class="ja">波形</span>
+				</h3>
 				<div id="waveformType" class="mode-sw">
 					<button class="current">1. RGB</button>
-					<button>2. Luminance</button>
+					<button>2. <span class="en">Luminance</span><span class="ja">輝度</span></button>
 				</div>
 			</div>
 			<table id="waveTable">

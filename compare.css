@@ -5,6 +5,10 @@
     height          : 100%;
     min-height      : 100%;
 }
+body:not(.ja) *.ja, body:not(.en) *.en
+{
+    display         : none !IMPORTANT;
+}
 #viewroot
 {
     display         : flex;
@@ -316,7 +320,7 @@ div.header > *
     margin      : 0px;
     padding     : 5px;
 }
-div.header > h3
+div.header > *:nth-child(1)
 {
     flex        : 1 1 auto;
 }

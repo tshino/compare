@@ -25,7 +25,6 @@ $( function()
     e.target.value = null;
   });
   $('#view .dropHere').
-    text("Drop image files here").
     click(function() {
       $('#file').click();
     });
