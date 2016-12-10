@@ -10,25 +10,22 @@
 </head>
 <body class="en">
 	<script>
-		function changeLang(value) {
-			if (value != "") {
-				var newURL = location.href.replace(/\?.*/, '') + '?lang=' + value;
+		function changeLang(lang) {
+			if (lang != "") {
+				var newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
 				window.history.replaceState('','', newURL);
-				$(document.body).attr('class', value);
+				document.body.setAttribute('class', lang);
 			}
 		}
 		(function() {
-			var lang =
+			var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
+			var lang = m ? m[1] : (
 				(window.navigator.languages && window.navigator.languages[0]) ||
 				window.navigator.language ||
 				window.navigator.userLanguage ||
-				window.navigator.browserLanguage;
-			var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
-			if (m) {
-				lang = m[1];
-			}
+				window.navigator.browserLanguage);
 			if (lang && lang.match(/^ja/)) {
-				changeLang('ja');
+				document.body.setAttribute('class', 'ja');
 			}
 		})();
 	</script>
