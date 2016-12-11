@@ -413,13 +413,17 @@ $( function()
       if (finished) {
         loading = [];
         if (0 < errors) {
-          $('#loadingStatus').text(
+          $('#loadingStatus .en').text(
             1 == errors ? 'An error occurred.' : 'Some errors occured.');
+          $('#loadingStatus .ja').text(
+            errors + '個のエラー');
         } else {
-          $('#loadingStatus').text('Finished!');
+          $('#loadingStatus .en').text('Finished!');
+          $('#loadingStatus .ja').text('完了！');
         }
       } else {
-        $('#loadingStatus').text('Now loading...');
+        $('#loadingStatus .en').text('Now loading...');
+        $('#loadingStatus .ja').text('ロード中...');
       }
       toggleDialog($('#loading'));
       if (finished && 0 == errors) {
@@ -779,9 +783,11 @@ $( function()
           ent.button = $('<div/>').addClass('button selector').
             text(''+(i + 1)).
             append(
-              $('<span/>').addClass('tooltip').
-                text('Select picture ')
-              ).
+              $('<span/>').addClass('tooltip en').text('Select picture ')
+            ).
+            append(
+              $('<span/>').addClass('tooltip ja').text('画像を選択 ')
+            ).
             click({index : i}, function(e)
             {
               currentImageIndex = e.data.index + 1;
@@ -971,13 +977,15 @@ $( function()
       }
     });
     if (overlayMode) {
-      $('#mode').
-        text( 'OVERLAY MODE : ' +
+      var modeDesc =
           ((isSingleView && 1 < currentImageIndex)
-            ? '1 + ' + currentImageIndex : '1 only' )).
-        css({ display : 'inline-block' });
+            ? '1 + ' + currentImageIndex : '1 only');
+      $('#mode .en').text( 'OVERLAY MODE : ' + modeDesc);
+      $('#mode .ja').text( 'オーバーレイモード : ' + modeDesc);
+      $('#mode').css({ display : 'inline-block' });
     } else {
-      $('#mode').text('').css({ display : '' });
+      $('#mode *').text('');
+      $('#mode').css({ display : '' });
     }
     if (isSingleView) {
       $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
