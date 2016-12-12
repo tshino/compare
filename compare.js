@@ -116,6 +116,17 @@ $( function()
     if (e.altKey || e.metaKey) {
       return true;
     }
+    // '@' (64)
+    if (e.which == 64) {
+      if ($(document.body).attr('class') == 'ja') {
+        $('#selectLang').val('en');
+        changeLang('en');
+      } else {
+        $('#selectLang').val('ja');
+        changeLang('ja');
+      }
+      return false;
+    }
     // '?' (63)
     if (e.which == 63) {
       toggleHelp();
