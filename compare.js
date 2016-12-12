@@ -1092,7 +1092,9 @@ $( function()
             {
                 var binary = compareUtil.binaryFromDataURI(e.target.result)
                 var format = compareUtil.detectImageFormat(binary);
-                if (format == 'JPEG') {
+                var isPNG  = format && 0 <= format.indexOf('PNG');
+                var isJPEG = format && 0 <= format.indexOf('JPEG');
+                if (isJPEG) {
                   theEntry.orientation = compareUtil.detectExifOrientation(binary);
                 }
                 var img = new Image;
@@ -1108,7 +1110,7 @@ $( function()
                     var fig = makeBlankFigure(w, h);
                     fig.context.drawImage(img, 0, 0, w, h);
                     //
-                    if (NEEDS_IOS_EXIF_WORKAROUND && format == 'JPEG') {
+                    if (NEEDS_IOS_EXIF_WORKAROUND && isJPEG) {
                       theEntry.element    = fig.canvas;
                     } else {
                       theEntry.element    = img;
@@ -1133,7 +1135,7 @@ $( function()
                     theEntry.error = 'Failed.';
                     if (!theFile.type || !(/^image\/.+$/.test(theFile.type))) {
                       theEntry.error += ' Maybe not an image file.';
-                    } else if (format != 'PNG' && format != 'JPEG' && format != 'GIF' && format != 'BMP') {
+                    } else if (!isPNG && !isJPEG && format != 'GIF' && format != 'BMP') {
                       theEntry.error += ' Maybe unsupported format for the browser.';
                     }
                     

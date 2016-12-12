@@ -68,6 +68,20 @@
     return null;
   };
   
+  var detectMPFIdentifier = function(binary) {
+    for (var p = 0; p + 4 <= binary.length; ) {
+      var m = binary.big16(p);
+      if (m == 0xffda /* SOS */) { break; }
+      if (m == 0xffe2 /* APP2 */) {
+        if (binary.big32(p + 4) == 0x4d504600 /* 'MPF\0' */) {
+          return p;
+        }
+      }
+      p += 2 + (m == 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
+    }
+    return null;
+  };
+  
   var detectExifOrientation = function(binary) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
@@ -97,13 +111,18 @@
     if (magic == 0x89504e47) {
       // PNG
       if (detectPNGChunk(binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
-        return 'APNG';
+        return 'PNG (APNG)';
       }
       return 'PNG';
     }
     if (magic == 0x47494638) { return 'GIF'; }
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
-    if ((magic - (magic & 255)) == 0xffd8ff00) { return 'JPEG'; }
+    if ((magic - (magic & 255)) == 0xffd8ff00) {
+      if (detectMPFIdentifier(binary)) {
+        return 'JPEG (MPO)';
+      }
+      return 'JPEG';
+    }
     if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
     if ((magic  == 0xefbbbf3c /* BOM + '<' */ && magic2 == 0x3f786d6c /* '?xml' */) ||
         (magic == 0x3c3f786d /* '<?xm' */ && (magic2 & 0xff000000) == 0x6c000000 /* 'l' */)) {
@@ -127,6 +146,7 @@
   return {
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
+    detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
   };
