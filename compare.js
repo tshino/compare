@@ -166,6 +166,11 @@ $( function()
       toggleOverlay();
       return false;
     }
+    // 'm'
+    if (e.which == 109) {
+      toggleMap();
+      return false;
+    }
     //alert(e.which);
   });
   
@@ -198,6 +203,7 @@ $( function()
   var viewOffset = { x : 0.5, y : 0.5 };
   var layoutMode = 'x';
   var overlayMode = false;
+  var enableMap = false;
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
@@ -338,6 +344,18 @@ $( function()
     } else if (overlayMode) {
       currentImageIndex = 1;
       overlayMode = false;
+      updateLayout();
+    }
+  }
+  function toggleMap()
+  {
+    if (!enableMap) {
+      if (0 < images.length) {
+        enableMap = true;
+        updateLayout();
+      }
+    } else {
+      enableMap = false;
       updateLayout();
     }
   }
@@ -958,6 +976,8 @@ $( function()
         var img = entries[index];
         var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
         if (img.element) {
+          img.boxW = boxW;
+          img.boxH = boxH;
           img.isLetterBox = boxW * img.height < boxH * img.width;
           img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
           img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
@@ -993,10 +1013,15 @@ $( function()
             ? '1 + ' + currentImageIndex : '1 only');
       $('#mode .en').text( 'OVERLAY MODE : ' + modeDesc);
       $('#mode .ja').text( 'オーバーレイモード : ' + modeDesc);
-      $('#mode').css({ display : 'inline-block' });
+      $('#mode').css({ display : 'block' });
     } else {
       $('#mode *').text('');
       $('#mode').css({ display : '' });
+    }
+    if (enableMap && images.length) {
+      $('#map').css({ display : 'block' });
+    } else {
+      $('#map').css({ display : '' });
     }
     if (isSingleView) {
       $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
@@ -1008,7 +1033,9 @@ $( function()
   }
   
   function updateTransform() {
-    
+    var isSingleView =
+            currentImageIndex != 0 &&
+            currentImageIndex <= entries.length;
     var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
     scale = scalePercent / 100;
     var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / scale);
@@ -1026,6 +1053,23 @@ $( function()
                         ent.orientationAsCSS,
         });
       }
+    }
+    if (enableMap && images.length) {
+      var index = isSingleView ? currentImageIndex - 1 : 0;
+      var img = entries[index].ready() ? entries[index] : images[0];
+      var roiW = img.boxW / img.baseWidth / scale;
+      var roiH = img.boxH / img.baseHeight / scale;
+      $('#mapROI').attr({
+        x : 100 * (0.5 + (viewOffset.x - 0.5) * (1-1/scale) - 0.5 * roiW) + '%',
+        y : 100 * (0.5 + (viewOffset.y - 0.5) * (1-1/scale) - 0.5 * roiH) + '%',
+        width : (100 * roiW)+'%',
+        height : (100 * roiH)+'%',
+      });
+      var s = 120 / Math.max(img.width, img.height);
+      var w = img.width * s;
+      var h = img.height * s;
+      $('#map svg').width(w).height(h);
+      $('#map').width(w).height(h);
     }
   }
 

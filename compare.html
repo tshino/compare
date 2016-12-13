@@ -90,6 +90,20 @@
 		</div>
 	</div>
 	<div id="view">
+		<div class="hudContainer">
+			<div id="mode" class="light hud">
+				<span class="en"></span>
+				<span class="ja"></span>
+			</div>
+			<div id="map" class="dark hud">
+				<svg>
+					<g stroke="none" fill="none" stroke-width="0.5" opacity="0.4">
+						<rect id="mapROI" fill="gray"/>
+						<rect id="mapFrame" stroke="white" x="0" y="0" width="100%" height="100%"/>
+					</g>
+				</svg>
+			</div>
+		</div>
 		<div class="emptyBox" id="drop">
 			<div class="dropHere">
 				<span class="en">Drop image files here</span>
@@ -101,10 +115,6 @@
 				<span class="en">Drop image files here</span>
 				<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
 			</div>
-		</div>
-		<div id="mode" class="indicator">
-			<span class="en"></span>
-			<span class="ja"></span>
 		</div>
 	</div>
 	<div id="shortcuts" class="dialog">

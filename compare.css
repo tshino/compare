@@ -153,17 +153,30 @@ body:not(.ja) *.ja, body:not(.en) *.en
     padding         : 1.5em;
     color           : #888;
 }
-#view .indicator
+#view .hudContainer
 {
-    display         : none;
     position        : absolute;
     z-index         : 50;
+    bottom          : 0px;
+}
+#view .hudContainer > *
+{
+    display         : none;
+    font-size       : 1.2em;
+    margin          : 15px;
+}
+#view .hudContainer .light.hud
+{
     background      : rgba(238,238,238, 0.8);
     color           : #444;
-    font-size       : 1.2em;
-    bottom          : 0px;
-    margin          : 15px;
     padding         : 5px 8px;
+    box-shadow      : 1px 2px 5px #000;
+}
+#view .hudContainer .dark.hud
+{
+    background      : rgba(32,32,32, 0.8);
+    color           : #ccc;
+    padding         : 8px 8px;
     box-shadow      : 1px 2px 5px #000;
 }
 div.dialog
