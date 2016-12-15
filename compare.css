@@ -156,6 +156,7 @@ body:not(.ja) *.ja, body:not(.en) *.en
 #view .hudContainer
 {
     position        : absolute;
+    pointer-events  : none;
     z-index         : 50;
     bottom          : 0px;
 }

@@ -840,9 +840,9 @@ $( function()
 
   function makeMouseDraggable()
   {
-    $('#view > div').off('mousedown').on('mousedown', function(e)
+    $('#view > div.imageBox').off('mousedown').on('mousedown', function(e)
     {
-      var index = $('#view > div').index(this);
+      var index = $('#view > div.imageBox').index(this);
       if (index >= entries.length)
       {
         return true;
@@ -853,13 +853,13 @@ $( function()
         return false;
       }
     });
-    $('#view > div').off('mousemove').on('mousemove', function(e)
+    $('#view > div.imageBox').off('mousemove').on('mousemove', function(e)
     {
       if (entries.length == 0)
       {
         return true;
       }
-      var index = Math.min(entries.length - 1, $('#view > div').index(this));
+      var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
       if (dragLastPoint && e.buttons != 1)
       {
         dragLastPoint = null;
@@ -874,7 +874,7 @@ $( function()
         return false;
       }
     });
-    $('#view > div').off('mouseup').on('mouseup', function(e)
+    $('#view > div.imageBox').off('mouseup').on('mouseup', function(e)
     {
       dragLastPoint = null;
     });
@@ -885,12 +885,12 @@ $( function()
   }
   function makeTouchDraggable()
   {
-    $('#view > div').off('touchmove').on('touchmove', function(e)
+    $('#view > div.imageBox').off('touchmove').on('touchmove', function(e)
     {
       if (entries.length == 0) {
         return true;
       }
-      var index = Math.min(entries.length - 1, $('#view > div').index(this));
+      var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
       var event = e.originalEvent;
       if (event.targetTouches.length == 1) {
         var touch = event.targetTouches[0];
@@ -906,7 +906,7 @@ $( function()
         return false;
       }
     });
-    $('#view > div').off('touchend').on('touchend', function(e)
+    $('#view > div.imageBox').off('touchend').on('touchend', function(e)
     {
       touchState = null;
     });
@@ -915,7 +915,7 @@ $( function()
   {
     $('#view > div.imageBox .image').off('dblclick').on('dblclick', function(e)
     {
-      var index = $('#view > div').index($(this).parent());
+      var index = $('#view > div.imageBox').index($(this).parent());
       if (index >= entries.length || !entries[index].ready()) {
         return true;
       }
