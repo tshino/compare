@@ -119,7 +119,7 @@
     if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
     if ((magic - (magic & 255)) == 0xffd8ff00) {
       if (detectMPFIdentifier(binary)) {
-        return 'JPEG (MPO)';
+        return 'JPEG (MPF)';
       }
       return 'JPEG';
     }
