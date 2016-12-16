@@ -48,9 +48,9 @@ $( function()
       }
       if (dialog)
       {
-        // ESC (27), ENTER (13)
-        if ((e.keyCode == 27 || e.keyCode == 13) && !e.shiftKey) {
-          hideDialog();
+        // ESC (27), BS (8)
+        if ((e.keyCode == 27 || e.keyCode == 8) && !e.shiftKey) {
+          closeDialog();
           return false;
         // '1'
         } else if ((e.keyCode == 48 + 1 || e.keyCode == 96 + 1) && !e.shiftKey) {
@@ -136,6 +136,11 @@ $( function()
     if (e.which == 102) {
       resetMouseDrag();
       toggleFullscreen();
+      return false;
+    }
+    // 'c' (99)
+    if (e.which == 99) {
+      toggleAnalysis();
       return false;
     }
     // 'h' (104)
@@ -630,6 +635,15 @@ $( function()
       );
     }
   }
+  function toggleAnalysis()
+  {
+    if ($('#analysis').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    toggleDialog($('#analysis'));
+  }
   function toggleHistogram()
   {
     if ($('#histogram').is(':visible')) {
@@ -765,10 +779,20 @@ $( function()
     }
     dialog = target;
     dialog.css({ display: 'block' }).
-        off('click').on('click', function() { hideDialog(); });
+        off('click').on('click', function() { closeDialog(); });
     dialog.children().
         focus().
         off('click').on('click', function(e) { e.stopPropagation(); return true; });
+  }
+  function closeDialog()
+  {
+    if (dialog) {
+      if ($('#waveform').is(':visible') || $('#histogram').is(':visible')) {
+        toggleAnalysis();
+        return;
+      }
+      hideDialog();
+    }
   }
   function hideDialog()
   {

@@ -66,15 +66,10 @@
 			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
 		</div>
 		<div class="bottom">
-			<div class="button" onclick="toggleHistogram()">
+			<div class="button" onclick="toggleAnalysis()">
 				<img src="res/histogram.svg" width="100%">
-				<span class="tooltip keys en">Show histogram <span>h</span></span>
-				<span class="tooltip keys ja">ヒストグラムを表示 <span>h</span></span>
-			</div>
-			<div class="button" onclick="toggleWaveform()">
-				<img src="res/waveform.svg" width="100%">
-				<span class="tooltip keys en">Show waveform <span>w</span></span>
-				<span class="tooltip keys ja">波形を表示 <span>w</span></span>
+				<span class="tooltip keys en">Show analysis tools <span>c</span></span>
+				<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
 			</div>
 			<div class="button" onclick="toggleFullscreen()">
 				<img src="res/full.svg" width="100%">
@@ -178,6 +173,10 @@
 					<td><span class="en">image information</span><span class="ja">画像情報</span></td>
 				</tr>
 				<tr>
+					<td class="keys"><span>c</span></td>
+					<td><span class="en">analysis tools</span><span class="ja">分析ツール</span></td>
+				</tr>
+				<tr>
 					<td class="keys"><span>h</span></td>
 					<td><span class="en">histogram</span><span class="ja">ヒストグラム</span></td>
 				</tr>
@@ -265,6 +264,31 @@
 			</h3>
 			<table id="loadingList">
 			</table>
+		</div>
+	</div>
+	<div id="analysis" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/histogram.svg" width="20">
+					<span class="en">Analysis Tools</span>
+					<span class="ja">分析ツール</span>
+				</h3>
+			</div>
+			<div class="menu">
+				<button onclick="toggleHistogram()">
+					<img src="res/histogram.svg" width="20">
+					<span class="en">Histogram</span>
+					<span class="ja">ヒストグラム</span>
+					<span class="flat keys"><span>h</span></span>
+				</button>
+				<button onclick="toggleWaveform()">
+					<img src="res/waveform.svg" width="20">
+					<span class="en">Waveform</span>
+					<span class="ja">波形</span>
+					<span class="flat keys"><span>w</span></span>
+				</button>
+			</div>
 		</div>
 	</div>
 	<div id="histogram" class="dialog">

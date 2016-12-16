@@ -239,7 +239,7 @@ div.dialog table td, div.dialog table th
     text-align      : center;
     min-width       : 1.5em;
 }
-.keys:not(.tooltip) > span
+.keys:not(.tooltip):not(.flat) > span
 {
     background      : #eee;
     box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
@@ -338,6 +338,20 @@ div.header > *:nth-child(1)
 {
     flex        : 1 1 auto;
 }
+div.menu > button
+{
+    display     : block;
+    margin      : 5px;
+    padding     : 10px 15px;
+    width       : 100%;
+    line-height : 20px;
+    font-size   : 16px;
+    text-align  : left;
+}
+button > span.keys
+{
+    float       : right;
+}
 h3 img
 {
     vertical-align  : bottom;
@@ -383,4 +397,10 @@ button:hover
 .mode-sw button:not(.current):hover
 {
     background  : #eee;
+}
+button img
+{
+    vertical-align  : bottom;
+    padding-right   : 5px;
+    transform       : scale(1.5);
 }
