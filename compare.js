@@ -215,32 +215,6 @@ $( function()
   var histogramType = 0;
   var waveformType = 0;
 
-  function createObjectURL(blob) {
-    if (window.URL) {
-      return window.URL.createObjectURL(blob);
-    } else {
-      return window.webkitURL.createObjectURL(blob);
-    }
-  }
-  function newWorker(relativePath) {
-    try {
-      return new Worker(relativePath);
-    } catch (e) {
-      var baseURL = window.location.href.replace(/\\/g,'/').replace(/\/[^\/]*$/, '/');
-      var array = [ 'importScripts("' + baseURL + relativePath + '");' ];
-      var blob = new Blob(array, {type: "text/javascript"});
-      return new Worker(createObjectURL(blob));
-    }
-  }
-  function escapeHtml(str)
-  {
-    str = str.replace(/&/g, '&amp;');
-    str = str.replace(/</g, '&lt;');
-    str = str.replace(/>/g, '&gt;');
-    str = str.replace(/"/g, '&quot;');
-    str = str.replace(/'/g, '&#39;');
-    return str;
-  }
   function addComma(num)
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
@@ -515,7 +489,7 @@ $( function()
     }
   }
   
-  var worker = newWorker('compare-worker.js');
+  var worker = compareUtil.newWorker('compare-worker.js');
   var taskCount = 0;
   var taskQueue = [];
   worker.addEventListener('message', function(e) {
@@ -1239,33 +1213,5 @@ $( function()
 
   function toggleFullscreen()
   {
-    var fullscreen = document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-    if (!fullscreen)
-    {
-      var view = document.getElementById('viewroot');
-      if (view.webkitRequestFullscreen) {
-        view.webkitRequestFullscreen();
-      } else if (view.mozRequestFullScreen) {
-        view.mozRequestFullScreen();
-      } else if (view.msRequestFullscreen) {
-        view.msRequestFullscreen();
-      } else {
-        view.requestFullscreen();
-      }
-    }
-    else
-    {
-      if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
+    compareUtil.toggleFullscreen($('#viewroot').get(0));
   }

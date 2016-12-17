@@ -1,5 +1,53 @@
 ﻿var compareUtil = (function() {
   
+  var createObjectURL = function(blob) {
+    if (window.URL) {
+      return window.URL.createObjectURL(blob);
+    } else {
+      return window.webkitURL.createObjectURL(blob);
+    }
+  };
+  
+  var newWorker = function(relativePath) {
+    try {
+      return new Worker(relativePath);
+    } catch (e) {
+      var baseURL = window.location.href.replace(/\\/g,'/').replace(/\/[^\/]*$/, '/');
+      var array = [ 'importScripts("' + baseURL + relativePath + '");' ];
+      var blob = new Blob(array, {type: "text/javascript"});
+      return new Worker(createObjectURL(blob));
+    }
+  };
+  
+  var toggleFullscreen = function(element) {
+    var fullscreen = document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
+    if (!fullscreen) {
+      var view = element;
+      if (view.webkitRequestFullscreen) {
+        view.webkitRequestFullscreen();
+      } else if (view.mozRequestFullScreen) {
+        view.mozRequestFullScreen();
+      } else if (view.msRequestFullscreen) {
+        view.msRequestFullscreen();
+      } else {
+        view.requestFullscreen();
+      }
+    } else {
+      if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  };
+  
   //
   // Make a binary view of a DataURI string
   //
@@ -144,6 +192,9 @@
   };
   
   return {
+    createObjectURL:        createObjectURL,
+    newWorker:              newWorker,
+    toggleFullscreen:       toggleFullscreen,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
