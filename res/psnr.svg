@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page12">
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 900,1900 L 900,1100 C 900,1100 1233,1100 1500,1100 1600,1100 1700,1206 1700,1300 1700,1394 1600,1500 1500,1500 1333,1500 900,1500 900,1500"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1200,2900 L 1200,2200 1300,2200 1900,2900 2000,2900 2000,2200"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_4_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2000,1900 C 2000,1900 2333,1900 2600,1900 2700,1900 2800,1794 2800,1700 2800,1606 2700,1500 2600,1500 2400,1500 2400,1500 2200,1500 2100,1500 2000,1394 2000,1300 2000,1206 2100,1100 2200,1100 2467,1100 2800,1100 2800,1100"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2300,2900 L 2300,2200 C 2300,2200 2633,2200 2900,2200 3000,2200 3100,2306 3100,2400 3100,2494 3000,2600 2900,2600 2733,2600 2300,2600 2300,2600"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_6_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 3100,2900 C 3100,2700 2900,2600 2800,2600"/>
+  </g>
+ </g>
+</svg>

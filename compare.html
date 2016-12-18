@@ -185,6 +185,10 @@
 					<td><span class="en">waveform</span><span class="ja">波形</span></td>
 				</tr>
 				<tr>
+					<td class="keys"><span>p</span></td>
+					<td><span class="en">PSNR</span><span class="ja">PSNR</span></td>
+				</tr>
+				<tr>
 					<td class="keys"><span>f</span></td>
 					<td><span class="en">full screen</span><span class="ja">フルスクリーン表示</span></td>
 				</tr>
@@ -289,6 +293,7 @@
 					<span class="flat keys"><span>w</span></span>
 				</button>
 				<button onclick="togglePSNR()">
+					<img src="res/psnr.svg" width="20">
 					<span class="en">PSNR (Peak signal-to-noise ratio)</span>
 					<span class="ja">PSNR (ピーク信号対雑音比)</span>
 					<span class="flat keys"><span>p</span></span>
@@ -338,7 +343,9 @@
 		<div>
 			<div class="header">
 				<h3>
-					<span>PSNR</span>
+					<img src="res/psnr.svg" width="20">
+					<span class="en">PSNR (Peak signal-to-noise ratio)</span>
+					<span class="ja">PSNR (ピーク信号対雑音比)</span>
 				</h3>
 			</div>
 			<table id="psnrTable">
