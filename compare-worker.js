@@ -3,16 +3,20 @@
   var result = {};
   result.cmd    = data.cmd;
   result.index  = data.index;
-  result.type   = data.type;
   switch (data.cmd) {
   case 'calcHistogram':
+    result.type   = data.type;
     result.result   = calcHistogram(data.imageData, data.type);
     break;
   case 'calcWaveform':
+    result.type   = data.type;
     result.result = calcWaveform(data.imageData, data.histW, data.type);
     result.w = data.imageData.width;
     result.h = data.imageData.height;
     result.histW = data.histW;
+    break;
+  case 'calcPSNR':
+    result.result = calcPSNR(data.imageData1, data.imageData2);
     break;
   }
   self.postMessage( result );
@@ -85,4 +89,38 @@ function calcWaveform( imageData, histW, type )
     }
   }
   return hist;
+}
+
+function calcPSNR( a, b )
+{
+  if (a.width != b.width || a.height != b.height) {
+    // error
+    return NaN;
+  }
+  if (a.width == 0 || a.height == 0) {
+    // error
+    return NaN;
+  }
+  var w = a.width;
+  var h = a.height;
+  var sum = 0, i = 0;
+  for (var y = 0; y < h; ++y) {
+    var lineSum = 0;
+    for (var x= 0; x < w; ++x, i += 4) {
+      var d0 = a.data[i + 0] - b.data[i + 0];
+      var d1 = a.data[i + 1] - b.data[i + 1];
+      var d2 = a.data[i + 2] - b.data[i + 2];
+      var e = d0 * d0 + d1 * d1 + d2 * d2;
+      lineSum += e;
+    }
+    sum += lineSum;
+  }
+  if (sum == 0) {
+    // a == b;
+    return Infinity;
+  }
+  var mse = sum / (w * h * 3);
+  var max = 255 * 255;
+  var psnr = 10 * Math.log(max / mse) / Math.LN10;
+  return psnr;
 }

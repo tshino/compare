@@ -153,6 +153,11 @@ $( function()
       toggleWaveform();
       return false;
     }
+    // 'p' (112)
+    if (e.which == 112) {
+      togglePSNR();
+      return false;
+    }
     // 'i' (105)
     if (e.which == 105) {
       toggleInfo();
@@ -507,6 +512,11 @@ $( function()
         updateWaveform(data.type, img, data.histW, data.result);
       }
       break;
+    case 'calcPSNR':
+      entries[data.index[0]].psnr[data.index[1]] = data.result;
+      entries[data.index[1]].psnr[data.index[0]] = data.result;
+      updatePSNRTable();
+      break;
     }
     --taskCount;
     window.setTimeout(kickNextTask, 0);
@@ -519,6 +529,11 @@ $( function()
       case 'calcHistogram':
       case 'calcWaveform':
         task.imageData = getImageData(entries[task.index]);
+        worker.postMessage(task);
+        break;
+      case 'calcPSNR':
+        task.imageData1 = getImageData(entries[task.index[0]]);
+        task.imageData2 = getImageData(entries[task.index[1]]);
         worker.postMessage(task);
         break;
       }
@@ -742,6 +757,49 @@ $( function()
     updateWaveformTable();
     toggleDialog($('#waveform'));
   }
+  function updatePSNRTable()
+  {
+    $('#psnrTable td:not(.prop)').remove();
+    for (var k = 1; images[k]; k++) {
+      var a = images[0];
+      var b = images[k];
+      if (a.psnr[b.index] == null) {
+        a.psnr[b.index] = 'calculating...';
+        b.psnr[a.index] = 'calculating...';
+        addTask({
+          cmd:      'calcPSNR',
+          index:    [a.index, b.index],
+        });
+      }
+      var psnr = a.psnr[b.index];
+      $('#psnrName2').append($('<td>').text(b.name));
+      $('#psnrValue').append($('<td>').text(
+        typeof(psnr) == 'string' ? psnr :
+        psnr == Infinity ? 'same image' :
+        isNaN(psnr) ? '‐' :
+        Math.round(100 * psnr) / 100 + ' dB'
+      ));
+    }
+    if (k == 1) {
+      $('#psnrName1').append(
+        $('<td rowspan="3">').text('no data')
+      );
+    } else {
+      $('#psnrName1').append(
+        $('<td colspan="' + (k - 1) + '">').text(images[0].name)
+      );
+    }
+  }
+  function togglePSNR()
+  {
+    if ($('#psnr').is(':visible')) {
+      hideDialog();
+      return;
+    }
+    hideDialog();
+    updatePSNRTable();
+    toggleDialog($('#psnr'));
+  }
   function toggleDialog(target)
   {
     if (dialog) {
@@ -761,7 +819,9 @@ $( function()
   function closeDialog()
   {
     if (dialog) {
-      if ($('#waveform').is(':visible') || $('#histogram').is(':visible')) {
+      if ($('#waveform').is(':visible') ||
+          $('#histogram').is(':visible') ||
+          $('#psnr').is(':visible')) {
         toggleAnalysis();
         return;
       }
@@ -1109,6 +1169,7 @@ $( function()
             imageData   : null,
             histogram   : null,
             waveform    : null,
+            psnr        : [],
             loading     : true,
             progress    : 0,
             error       : null,

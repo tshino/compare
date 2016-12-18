@@ -288,6 +288,11 @@
 					<span class="ja">波形</span>
 					<span class="flat keys"><span>w</span></span>
 				</button>
+				<button onclick="togglePSNR()">
+					<span class="en">PSNR (Peak signal-to-noise ratio)</span>
+					<span class="ja">PSNR (ピーク信号対雑音比)</span>
+					<span class="flat keys"><span>p</span></span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -326,6 +331,35 @@
 			<table id="waveTable">
 				<tr id="waveName" class="b"></tr>
 				<tr id="waveforms"></tr>
+			</table>
+		</div>
+	</div>
+	<div id="psnr" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<span>PSNR</span>
+				</h3>
+			</div>
+			<table id="psnrTable">
+				<tr id="psnrName1" class="b">
+					<td class="prop">
+						<span class="en">Base Image</span>
+						<span class="ja">基準画像</span>
+					</td>
+				</tr>
+				<tr id="psnrName2" class="b">
+					<td class="prop">
+						<span class="en">Target Image</span>
+						<span class="ja">対象画像</span>
+					</td>
+				</tr>
+				<tr id="psnrValue">
+					<td class="prop">
+						<span class="en">PSNR</span>
+						<span class="ja">PSNR</span>
+					</td>
+				</tr>
 			</table>
 		</div>
 	</div>
