@@ -777,7 +777,7 @@ $( function()
         typeof(psnr) == 'string' ? psnr :
         psnr == Infinity ? 'same image' :
         isNaN(psnr) ? '‐' :
-        Math.round(100 * psnr) / 100 + ' dB'
+        psnr.toFixed(2) + ' dB'
       ));
     }
     if (k == 1) {
