@@ -50,15 +50,15 @@ $( function()
       {
         // ESC (27), BS (8)
         if ((e.keyCode == 27 || e.keyCode == 8) && !e.shiftKey) {
-          closeDialog();
+          dialog.close();
           return false;
         // '1'
         } else if ((e.keyCode == 48 + 1 || e.keyCode == 96 + 1) && !e.shiftKey) {
-          $(dialog).find('.mode-sw > button:nth-child(1)').click();
+          $(dialog.element).find('.mode-sw > button:nth-child(1)').click();
           return false;
         // '2'
         } else if ((e.keyCode == 48 + 2 || e.keyCode == 96 + 2) && !e.shiftKey) {
-          $(dialog).find('.mode-sw > button:nth-child(2)').click();
+          $(dialog.element).find('.mode-sw > button:nth-child(2)').click();
           return false;
         }
         return true;
@@ -343,10 +343,41 @@ $( function()
       updateLayout();
     }
   }
-  function toggleHelp()
-  {
-    toggleDialog($('#shortcuts'));
-  }
+  var showDialog = function(target, update, parent) {
+    if (update) {
+      update();
+    }
+    var hide = function() {
+      target.hide();
+      dialog = null;
+    };
+    var close = function() {
+      if (parent) {
+        parent();
+      } else {
+        hide();
+      }
+    };
+    dialog = { element: target, hide: hide, close: close };
+    target.css({ display: 'block' }).
+        off('click').on('click', function() { close(); });
+    target.children().
+        focus().
+        off('click').on('click', function(e) { e.stopPropagation(); return true; });
+  };
+  var defineDialog = function(target, update, parent) {
+    return function() {
+      if (dialog) {
+        if (target.is(':visible')) {
+          dialog.hide();
+          return;
+        }
+        dialog.hide();
+      }
+      showDialog(target, update, parent);
+    };
+  };
+  var toggleHelp = defineDialog($('#shortcuts'));
   function updateInfoTable()
   {
     $('#infoTable td:not(.prop)').remove();
@@ -389,14 +420,10 @@ $( function()
       );
     }
   }
-  function toggleInfo()
-  {
-    updateInfoTable();
-    toggleDialog($('#info'));
-  }
+  var toggleInfo = defineDialog($('#info'), updateInfoTable);
   function updateNowLoading()
   {
-    hideDialog();
+    if (dialog) { dialog.hide(); }
     $('#loadingList > tr').remove();
     if (0 < loading.length) {
       var finished = true, errors = 0;
@@ -438,14 +465,14 @@ $( function()
         $('#loadingStatus .en').text('Now loading...');
         $('#loadingStatus .ja').text('ロード中...');
       }
-      toggleDialog($('#loading'));
+      showDialog($('#loading'));
       if (finished && 0 == errors) {
         window.setTimeout(
           function() {
             window.setTimeout(
               function() {
                 if ($('#loading').is(':visible')) {
-                  hideDialog();
+                  if (dialog) { dialog.hide(); }
                 }
               },
               500
@@ -624,25 +651,8 @@ $( function()
       );
     }
   }
-  function toggleAnalysis()
-  {
-    if ($('#analysis').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    toggleDialog($('#analysis'));
-  }
-  function toggleHistogram()
-  {
-    if ($('#histogram').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    updateHistogramTable();
-    toggleDialog($('#histogram'));
-  }
+  var toggleAnalysis = defineDialog($('#analysis'));
+  var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis);
   function changeWaveformType(type)
   {
     if (waveformType != type) {
@@ -747,16 +757,7 @@ $( function()
       );
     }
   }
-  function toggleWaveform()
-  {
-    if ($('#waveform').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    updateWaveformTable();
-    toggleDialog($('#waveform'));
-  }
+  var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
   function updatePSNRTable()
   {
     $('#psnrTable td:not(.prop)').remove();
@@ -790,51 +791,7 @@ $( function()
       );
     }
   }
-  function togglePSNR()
-  {
-    if ($('#psnr').is(':visible')) {
-      hideDialog();
-      return;
-    }
-    hideDialog();
-    updatePSNRTable();
-    toggleDialog($('#psnr'));
-  }
-  function toggleDialog(target)
-  {
-    if (dialog) {
-      if (target.is(':visible')) {
-        hideDialog();
-        return;
-      }
-      hideDialog();
-    }
-    dialog = target;
-    dialog.css({ display: 'block' }).
-        off('click').on('click', function() { closeDialog(); });
-    dialog.children().
-        focus().
-        off('click').on('click', function(e) { e.stopPropagation(); return true; });
-  }
-  function closeDialog()
-  {
-    if (dialog) {
-      if ($('#waveform').is(':visible') ||
-          $('#histogram').is(':visible') ||
-          $('#psnr').is(':visible')) {
-        toggleAnalysis();
-        return;
-      }
-      hideDialog();
-    }
-  }
-  function hideDialog()
-  {
-    if (dialog) {
-      dialog.hide();
-      dialog = null;
-    }
-  }
+  var togglePSNR = defineDialog($('#psnr'), updatePSNRTable, toggleAnalysis);
 
   function updateDOM()
   {
