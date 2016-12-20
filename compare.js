@@ -351,16 +351,10 @@ $( function()
       target.hide();
       dialog = null;
     };
-    var close = function() {
-      if (parent) {
-        parent();
-      } else {
-        hide();
-      }
-    };
+    var close = parent || hide;
     dialog = { element: target, hide: hide, close: close };
     target.css({ display: 'block' }).
-        off('click').on('click', function() { close(); });
+        off('click').on('click', close);
     target.children().
         focus().
         off('click').on('click', function(e) { e.stopPropagation(); return true; });
@@ -889,10 +883,7 @@ $( function()
         return false;
       }
     });
-    $('#view > div.imageBox').off('mouseup').on('mouseup', function(e)
-    {
-      dragLastPoint = null;
-    });
+    $('#view > div.imageBox').off('mouseup').on('mouseup', resetMouseDrag);
   }
   function resetMouseDrag()
   {
