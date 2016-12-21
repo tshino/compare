@@ -17,8 +17,16 @@ $( function()
   
   // Setup the dnd listeners.
   var dropZone = document.body;
-  dropZone.addEventListener('dragover', handleDragOver, false);
-  dropZone.addEventListener('drop', handleFileSelect, false);
+  dropZone.addEventListener('dragover', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  }, false);
+  dropZone.addEventListener('drop', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    addFiles(e.dataTransfer.files);
+  }, false);
   
   $('#file').on('change', function(e) {
     addFiles(e.target.files);
@@ -1079,29 +1087,13 @@ $( function()
     }
   }
 
-  function handleFileSelect(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    addFiles(evt.dataTransfer.files);
-  }
-  function addFiles(files)
+  function addFile(file)
   {
-    // files is a FileList of File objects.
-    var sorted = [];
-    for (var i = 0, f; f = files[i]; i++) {
-      sorted.push(f);
-    }
-    sorted.sort(
-      function(a, b) {
-        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
-      });
-    for (var i = 0, f; f = sorted[i]; i++)
-    {
       var entry = {
             index           : entries.length,
-            name            : f.name,
-            size            : f.size,
-            lastModified    : new Date(f.lastModified || f.lastModifiedDate),
+            name            : file.name,
+            size            : file.size,
+            lastModified    : new Date(file.lastModified || file.lastModifiedDate),
             format          : '',
             width           : 0,
             height          : 0,
@@ -1195,7 +1187,7 @@ $( function()
                   });
                 img.src = e.target.result;
             };
-        })(entry, f);
+        })(entry, file);
         reader.onerror = (function(theEntry, theFile, theReader)
         {
           return function(e) {
@@ -1205,19 +1197,22 @@ $( function()
             updateDOM();
             updateNowLoading();
           };
-        })(entry, f, reader);
-        reader.readAsDataURL(f);
+        })(entry, file, reader);
+        reader.readAsDataURL(file);
       }
+  }
+  function addFiles(files)
+  {
+    var sorted = Array.prototype.slice.call(files);
+    sorted.sort(function(a, b) {
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+    for (var i = 0, f; f = sorted[i]; i++) {
+      addFile(f);
     }
     currentImageIndex = 0;
     updateDOM();
     updateNowLoading();
-  }
-
-  function handleDragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy';
   }
 
   function toggleFullscreen()
