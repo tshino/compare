@@ -576,13 +576,7 @@ $( function()
   }
   function discardTasksOfCommand(cmd)
   {
-    for (var i = 0, task; task = taskQueue[i]; ) {
-      if (task.cmd == cmd) {
-        taskQueue.splice(i, 1);
-      } else {
-        ++i;
-      }
-    }
+    taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd != cmd; });
   }
   
   function updateHistogramAsync(img)
@@ -794,13 +788,7 @@ $( function()
 
   function updateDOM()
   {
-    var view = document.getElementById('view');
-    images = [];
-    for (var i = 0, ent; ent = entries[i]; i++) {
-        if (ent.ready()) {
-          images.push(ent);
-        }
-    }
+    images = entries.filter(function(ent,i,a) { return ent.ready(); });
     for (var i = 0, ent; ent = entries[i]; i++)
     {
         if (!ent.view) {
@@ -976,14 +964,11 @@ $( function()
     var numRows    = layoutMode != 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
-    $('#view > div.imageBox').each(function(index)
-    {
-      if (isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode))
-      {
+    $('#view > div.imageBox').each(function(index) {
+      var hide = isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode);
+      if (hide) {
         $(this).css({ display : 'none' });
-      }
-      else
-      {
+      } else {
         var img = entries[index];
         var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
         if (img.element) {
@@ -998,8 +983,8 @@ $( function()
           }
           $(img.element).css({ width: w+'px', height: h+'px' });
         }
-        $(this).css({ display : '' });
         $(this).css({
+          display   : '',
           position  : overlayMode ? 'absolute' : '',
           width     : overlayMode ? $('#view').width() + 'px' : '',
           opacity   : isOverlay ? '0.5' : '',
@@ -1007,16 +992,9 @@ $( function()
         });
       }
     });
-    $('#view > div.emptyBox').each(function(index)
-    {
-      if (index >= (isSingleView ? 0 : numSlots - entries.length))
-      {
-        $(this).css({ display : 'none' });
-      }
-      else
-      {
-        $(this).css({ display : '' });
-      }
+    $('#view > div.emptyBox').each(function(index) {
+      var hide = index >= (isSingleView ? 0 : numSlots - entries.length);
+      $(this).css({ display : (hide ? 'none' : '') });
     });
     if (overlayMode) {
       var modeDesc =
