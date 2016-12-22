@@ -760,6 +760,13 @@ $( function()
     }
   }
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
+  function metricPSNRToString(psnr)
+  {
+    return typeof(psnr) == 'string' ? psnr :
+        psnr == Infinity ? 'same image' :
+        isNaN(psnr) ? '‐' :
+        psnr.toFixed(2) + ' dB';
+  }
   function updatePSNRTable()
   {
     $('#psnrTable td:not(.prop)').remove();
@@ -774,24 +781,14 @@ $( function()
           index:    [a.index, b.index],
         });
       }
-      var psnr = a.psnr[b.index];
       $('#psnrName2').append($('<td>').text(b.name));
-      $('#psnrValue').append($('<td>').text(
-        typeof(psnr) == 'string' ? psnr :
-        psnr == Infinity ? 'same image' :
-        isNaN(psnr) ? '‐' :
-        psnr.toFixed(2) + ' dB'
-      ));
+      $('#psnrValue').append($('<td>').text(metricPSNRToString(a.psnr[b.index])));
     }
-    if (k == 1) {
-      $('#psnrName1').append(
-        $('<td rowspan="3">').text('no data')
-      );
-    } else {
-      $('#psnrName1').append(
-        $('<td colspan="' + (k - 1) + '">').text(images[0].name)
-      );
-    }
+    $('#psnrName1').append(
+      k == 1
+        ? $('<td rowspan="3">').text('no data')
+        : $('<td colspan="' + (k - 1) + '">').text(images[0].name)
+    );
   }
   var togglePSNR = defineDialog($('#psnr'), updatePSNRTable, toggleAnalysis);
 
