@@ -130,6 +130,37 @@ body:not(.ja) *.ja, body:not(.en) *.en
 {
     color           : #69f;
 }
+.imageIndex
+{
+    display         : inline-block;
+    width           : 1em;
+    height          : 1em;
+    margin-right    : 0.3em;
+    font-size       : 0.9em;
+    text-align      : center;
+    border-radius   : 0.15em;
+    box-shadow      : -1px 0px 2px currentColor, 0px -1px 2px currentColor,
+                      1px 0px 2px currentColor, 0px 1px 2px currentColor;
+    text-shadow     : none;
+}
+.imageName .imageIndex
+{
+    background-color: #fff;
+    color           : #444;
+}
+.dialog .imageIndex
+{
+    background-color: #000;
+    color           : white;
+}
+.error .imageName .imageIndex
+{
+    background-color: red;
+}
+.imageName:hover .imageIndex
+{
+    background-color: #69f;
+}
 #view .imageBox .image
 {
     display         : block;

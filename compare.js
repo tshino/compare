@@ -264,6 +264,12 @@ $( function()
     entry.transposed = temp[2];
     entry.orientationAsCSS = temp[3];
   }
+  var makeImageNameWithIndex = function(tag, img) {
+    return $(tag).
+        css({ wordBreak : 'break-all' }).
+        append($('<span class="imageIndex"/>').text(img.index + 1)).
+        append($('<span/>').text(img.name));
+  }
 
   var zoomRelative = function(delta) {
     viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom + delta));
@@ -368,7 +374,7 @@ $( function()
     for (var i = 0, img; img = images[i]; i++)
     {
       val[i] = [
-        [null, img.name ],
+        [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format ],
         img.sizeUnknown ? unknown : [img.width, addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, addComma(img.height) ],
@@ -377,7 +383,8 @@ $( function()
         [img.size, addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()] ];
       for (var j = 0, v; v = val[i][j]; ++j) {
-        var e = $('<td>').text(val[i][j][1]);
+        var expr = val[i][j][1];
+        var e = (typeof expr == 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
         if (0 < i && val[i][j][0]) {
           e.addClass(
               val[0][j][0] < val[i][j][0] ? 'sign lt' :
@@ -417,10 +424,7 @@ $( function()
           td.addClass('ok').text('OK!');
         }
         $('#loadingList').append(
-          $('<tr>').append(
-            $('<td>').addClass('b').text(ent.name),
-            td
-          )
+          $('<tr>').append(makeImageNameWithIndex('<td class="b">', ent), td)
         );
       }
       if (finished) {
@@ -600,7 +604,7 @@ $( function()
         img.histogram = makeBlankFigure(8, 8).canvas;
         updateHistogramAsync(img);
       }
-      $('#histoName').append($('<td>').text(img.name));
+      $('#histoName').append(makeImageNameWithIndex('<td>', img));
       $('#histograms').append(
         $('<td>').append(
           $(img.histogram).css({
@@ -706,7 +710,7 @@ $( function()
         img.waveform = makeBlankFigure(8, 8).canvas;
         updateWaveformAsync(img);
       }
-      $('#waveName').append($('<td>').text(img.name));
+      $('#waveName').append(makeImageNameWithIndex('<td>', img));
       $('#waveforms').append(
         $('<td>').append(
           $(img.waveform).css({
@@ -746,13 +750,13 @@ $( function()
           index:    [a.index, b.index],
         });
       }
-      $('#psnrName2').append($('<td>').text(b.name));
+      $('#psnrName2').append(makeImageNameWithIndex('<td>', b));
       $('#psnrValue').append($('<td>').text(metricPSNRToString(a.psnr[b.index])));
     }
     $('#psnrName1').append(
       k == 1
         ? $('<td rowspan="3">').text('no data')
-        : $('<td colspan="' + (k - 1) + '">').text(images[0].name)
+        : makeImageNameWithIndex('<td colspan="' + (k - 1) + '">', images[0])
     );
   }
   var togglePSNR = defineDialog($('#psnr'), updatePSNRTable, toggleAnalysis);
@@ -763,16 +767,13 @@ $( function()
     for (var i = 0, ent; ent = entries[i]; i++)
     {
         if (!ent.view) {
-          ent.view = $('<div/>').addClass('imageBox').
-              append(
-                $('<span/>').addClass('imageName').
-                    text(''+(i + 1) + ': ' + ent.name).
-                    click({index : i}, function(e)
-                    {
-                      currentImageIndex = currentImageIndex == 0 ? e.data.index + 1 : 0;
-                      updateLayout();
-                    })
-              );
+          ent.view = $('<div class="imageBox"/>').append(
+            makeImageNameWithIndex('<span class="imageName">', ent).
+              click({index : i}, function(e) {
+                currentImageIndex = currentImageIndex == 0 ? e.data.index + 1 : 0;
+                updateLayout();
+              })
+          );
           $('#drop').before(ent.view);
         }
         if (ent.element && 0 == ent.view.find('.image').length) {
