@@ -168,10 +168,8 @@ $( function()
     }
     var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
     var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
-    if (steps != 0)
-    {
-        viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom - steps * ZOOM_STEP_WHEEL));
-        updateTransform();
+    if (steps != 0) {
+        zoomRelative(-steps * ZOOM_STEP_WHEEL);
         return false;
     }
   });
@@ -267,16 +265,16 @@ $( function()
     entry.orientationAsCSS = temp[3];
   }
 
-  function zoomIn()
-  {
-    viewZoom = Math.min(viewZoom + ZOOM_STEP_KEY, MAX_ZOOM_LEVEL);
+  var zoomRelative = function(delta) {
+    viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom + delta));
     updateTransform();
-  }
-  function zoomOut()
-  {
-    viewZoom = Math.max(viewZoom - ZOOM_STEP_KEY, 0);
-    updateTransform();
-  }
+  };
+  var zoomIn = function() {
+    zoomRelative(+ZOOM_STEP_KEY);
+  };
+  var zoomOut = function() {
+    zoomRelative(-ZOOM_STEP_KEY);
+  };
   function arrangeLayout()
   {
     var isSingleView =
@@ -915,13 +913,13 @@ $( function()
   function zoomWithTarget(index, x, y)
   {
     if (viewZoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
-      viewZoom = Math.min(viewZoom + ZOOM_STEP_DBLCLK, MAX_ZOOM_LEVEL);
       viewOffset.x = Math.min(1, Math.max(0, x));
       viewOffset.y = Math.min(1, Math.max(0, y));
+      zoomRelative(+ZOOM_STEP_DBLCLK);
     } else {
       viewZoom = 0;
+      updateTransform();
     }
-    updateTransform();
   }
 
   function updateLayout()
