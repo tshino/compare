@@ -119,74 +119,41 @@ $( function()
       }
       //alert(e.keyCode);
     });
-  $(window).keypress(function(e)
-  {
+  
+  var keypressMap = {
+    // '@' (64)
+    64 : { global: true, func: toggleLang },
+    // '?' (63)
+    63 : { global: true, func: toggleHelp },
+    // 'f' (102)
+    102 : { global: true, func: function() { resetMouseDrag(); toggleFullscreen(); } },
+    // 'c' (99)
+    99 : { global: true, func: toggleAnalysis },
+    // 'h' (104)
+    104 : { global: true, func: toggleHistogram },
+    // 'w' (119)
+    119 : { global: true, func: toggleWaveform },
+    // 'p' (112)
+    112 : { global: true, func: togglePSNR },
+    // 'i' (105)
+    105 : { global: true, func: toggleInfo },
+    // 'a' (97)
+    97 : { global: false, func: arrangeLayout },
+    // 'o' (111)
+    111: { global: false, func: toggleOverlay },
+    // 'm' (109)
+    109 : { global: false, func: toggleMap },
+  };
+  $(window).keypress(function(e) {
     if (e.altKey || e.metaKey) {
       return true;
     }
-    // '@' (64)
-    if (e.which == 64) {
-      if ($(document.body).attr('class') == 'ja') {
-        $('#selectLang').val('en');
-        changeLang('en');
-      } else {
-        $('#selectLang').val('ja');
-        changeLang('ja');
-      }
-      return false;
-    }
-    // '?' (63)
-    if (e.which == 63) {
-      toggleHelp();
-      return false;
-    }
-    // 'f' (102)
-    if (e.which == 102) {
-      resetMouseDrag();
-      toggleFullscreen();
-      return false;
-    }
-    // 'c' (99)
-    if (e.which == 99) {
-      toggleAnalysis();
-      return false;
-    }
-    // 'h' (104)
-    if (e.which == 104) {
-      toggleHistogram();
-      return false;
-    }
-    // 'w' (119)
-    if (e.which == 119) {
-      toggleWaveform();
-      return false;
-    }
-    // 'p' (112)
-    if (e.which == 112) {
-      togglePSNR();
-      return false;
-    }
-    // 'i' (105)
-    if (e.which == 105) {
-      toggleInfo();
-      return false;
-    }
-    if (dialog) {
+    var m = keypressMap[e.which];
+    if (dialog && (!m || !m.global)) {
       return true;
     }
-    // 'a' (97)
-    if (e.which == 97) {
-      arrangeLayout();
-      return false;
-    }
-    // 'o' (111)
-    if (e.which == 111) {
-      toggleOverlay();
-      return false;
-    }
-    // 'm'
-    if (e.which == 109) {
-      toggleMap();
+    if (m) {
+      m.func();
       return false;
     }
     //alert(e.which);
@@ -228,6 +195,12 @@ $( function()
   var histogramType = 0;
   var waveformType = 0;
 
+  function toggleLang()
+  {
+    var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
+    $('#selectLang').val(lang);
+    changeLang(lang);
+  }
   function addComma(num)
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
