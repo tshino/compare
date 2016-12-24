@@ -252,12 +252,15 @@ $( function()
   var histogramType = 0;
   var waveformType = 0;
 
-  function toggleLang()
-  {
+  var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
     $('#selectLang').val(lang);
     changeLang(lang);
-  }
+  };
+  var setText = function(target, text) {
+    $(target).find('.en').text(text.en);
+    $(target).find('.ja').text(text.ja);
+  };
   function addComma(num)
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
@@ -292,18 +295,11 @@ $( function()
     }
   }
   function orientationToString(orientation) {
-    return (
-      !orientation ? '‐' :
-      orientation == 0 ? 'Undefined' :
-      orientation == 1 ? 'TopLeft' :
-      orientation == 2 ? 'TopRight' :
-      orientation == 3 ? 'BottomRight' :
-      orientation == 4 ? 'BottomLeft' :
-      orientation == 5 ? 'LeftTop' :
-      orientation == 6 ? 'RightTop' :
-      orientation == 7 ? 'RightBottom' :
-      orientation == 8 ? 'LeftBottom' : 'Invalid'
-    );
+    var table = [
+      'Undefined',
+      'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
+      'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
+    return orientation ? (table[orientation] || 'Invalid') : '‐';
   }
   function applyExifOrientation(entry)
   {
@@ -352,13 +348,8 @@ $( function()
     } else {
       layoutMode = 'x';
     }
-    if (layoutMode == 'x') {
-      $('#view').css({ flexDirection : 'row' });
-      $('#arrange img').get(0).src = 'res/layout_x.svg';
-    } else {
-      $('#view').css({ flexDirection : 'column' });
-      $('#arrange img').get(0).src = 'res/layout_y.svg';
-    }
+    $('#view').css({ flexDirection : layoutMode == 'x' ? 'row' : 'column' });
+    $('#arrange img').attr('src', layoutMode == 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     updateLayout();
   }
   function toggleOverlay()
@@ -487,34 +478,25 @@ $( function()
       }
       if (finished) {
         loading = [];
-        if (0 < errors) {
-          $('#loadingStatus .en').text(
-            1 == errors ? 'An error occurred.' : 'Some errors occured.');
-          $('#loadingStatus .ja').text(
-            errors + '個のエラー');
-        } else {
-          $('#loadingStatus .en').text('Finished!');
-          $('#loadingStatus .ja').text('完了！');
-        }
-      } else {
-        $('#loadingStatus .en').text('Now loading...');
-        $('#loadingStatus .ja').text('ロード中...');
       }
+      setText('#loadingStatus',
+        !finished ? {
+          en: 'Now loading...',
+          ja: 'ロード中...'
+        } : 0 == errors ? {
+          en: 'Finished!',
+          ja: '完了！'
+        } : {
+          en: 1 == errors ? 'An error occurred.' : 'Some errors occured.',
+          ja: errors + '個のエラー'
+        });
       toggleNowLoading();
       if (finished && 0 == errors) {
-        window.setTimeout(
-          function() {
-            window.setTimeout(
-              function() {
-                if ($('#loading').is(':visible')) {
-                  hideDialog();
-                }
-              },
-              500
-            );
-          },
-          0
-        );
+        window.setTimeout( function() {
+          if ($('#loading').is(':visible')) {
+            hideDialog();
+          }
+        }, 500);
       }
     }
   }
@@ -947,18 +929,15 @@ $( function()
       var modeDesc =
           ((isSingleView && 1 < currentImageIndex)
             ? '1 + ' + currentImageIndex : '1 only');
-      $('#mode .en').text( 'OVERLAY MODE : ' + modeDesc);
-      $('#mode .ja').text( 'オーバーレイモード : ' + modeDesc);
+      setText('#mode', {
+        en: 'OVERLAY MODE : ' + modeDesc,
+        ja: 'オーバーレイモード : ' + modeDesc });
       $('#mode').css({ display : 'block' });
     } else {
       $('#mode *').text('');
       $('#mode').css({ display : '' });
     }
-    if (enableMap && images.length) {
-      $('#map').css({ display : 'block' });
-    } else {
-      $('#map').css({ display : '' });
-    }
+    $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     if (isSingleView) {
       $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
     } else {
