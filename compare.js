@@ -126,7 +126,7 @@ $( function()
     // '?' (63)
     63 : { global: true, func: toggleHelp },
     // 'f' (102)
-    102 : { global: true, func: function() { resetMouseDrag(); toggleFullscreen(); } },
+    102 : { global: true, func: toggleFullscreen },
     // 'c' (99)
     99 : { global: true, func: toggleAnalysis },
     // 'h' (104)
@@ -159,11 +159,47 @@ $( function()
     //alert(e.which);
   });
   
-  $('#view').on("wheel", function(e)
-  {
+  $('#view').on('mousedown', 'div.imageBox', function(e) {
+    var index = $('#view > div.imageBox').index(this);
+    if (index >= entries.length) {
+      return true;
+    }
+    if (e.which == 1) {
+      dragLastPoint = { x : e.clientX, y : e.clientY };
+      return false;
+    }
+  });
+  $('#view').on('mousemove', 'div.imageBox', function(e) {
+    if (entries.length == 0) {
+      return true;
+    }
+    var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
+    if (dragLastPoint && e.buttons != 1) {
+      dragLastPoint = null;
+    }
+    if (dragLastPoint) {
+      var dx = e.clientX - dragLastPoint.x;
+      var dy = e.clientY - dragLastPoint.y;
+      dragLastPoint = { x : e.clientX, y : e.clientY };
+      moveImageByPx(index, dx, dy);
+      updateTransform();
+      return false;
+    }
+  });
+  $('#view').on('mouseup', 'div.imageBox', resetMouseDrag);
+  $('#view').on('dblclick', 'div.imageBox .image', function(e) {
+    var index = $('#view > div.imageBox').index($(this).parent());
+    if (index >= entries.length || !entries[index].ready()) {
+      return true;
+    }
+    var img = entries[index];
+    var x = (e.pageX - $(this).offset().left) / (img.baseWidth * scale);
+    var y = (e.pageY - $(this).offset().top) / (img.baseHeight * scale);
+    zoomWithTarget(index, x, y);
+  });
+  $('#view').on("wheel", function(e) {
     var event = e.originalEvent;
-    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey)
-    {
+    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
         return true;
     }
     var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
@@ -173,7 +209,30 @@ $( function()
         return false;
     }
   });
-  
+  $('#view').on('touchmove', 'div.imageBox', function(e) {
+    if (entries.length == 0) {
+      return true;
+    }
+    var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
+    var event = e.originalEvent;
+    if (event.targetTouches.length == 1) {
+      var touch = event.targetTouches[0];
+      if (!touchState || touchState.identifier != touch.identifier) {
+        touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
+      }
+      var dx = touch.clientX - touchState.x;
+      var dy = touch.clientY - touchState.y;
+      touchState.x = touch.clientX;
+      touchState.y = touch.clientY;
+      moveImageByPx(index, dx, dy);
+      updateTransform();
+      return false;
+    }
+  });
+  $('#view').on('touchend', 'div.imageBox', function(e) {
+    touchState = null;
+  });
+
   updateDOM();
 });
 
@@ -804,96 +863,13 @@ $( function()
           $('#overlay').before(ent.button);
         }
     }
-    makeMouseDraggable();
-    makeTouchDraggable();
-    makeDoubleClickable();
     resetMouseDrag();
     updateLayout();
   }
 
-  function makeMouseDraggable()
-  {
-    $('#view > div.imageBox').off('mousedown').on('mousedown', function(e)
-    {
-      var index = $('#view > div.imageBox').index(this);
-      if (index >= entries.length)
-      {
-        return true;
-      }
-      if (e.which == 1)
-      {
-        dragLastPoint = { x : e.clientX, y : e.clientY };
-        return false;
-      }
-    });
-    $('#view > div.imageBox').off('mousemove').on('mousemove', function(e)
-    {
-      if (entries.length == 0)
-      {
-        return true;
-      }
-      var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
-      if (dragLastPoint && e.buttons != 1)
-      {
-        dragLastPoint = null;
-      }
-      if (dragLastPoint)
-      {
-        var dx = e.clientX - dragLastPoint.x;
-        var dy = e.clientY - dragLastPoint.y;
-        dragLastPoint = { x : e.clientX, y : e.clientY };
-        moveImageByPx(index, dx, dy);
-        updateTransform();
-        return false;
-      }
-    });
-    $('#view > div.imageBox').off('mouseup').on('mouseup', resetMouseDrag);
-  }
   function resetMouseDrag()
   {
     dragLastPoint = null;
-  }
-  function makeTouchDraggable()
-  {
-    $('#view > div.imageBox').off('touchmove').on('touchmove', function(e)
-    {
-      if (entries.length == 0) {
-        return true;
-      }
-      var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
-      var event = e.originalEvent;
-      if (event.targetTouches.length == 1) {
-        var touch = event.targetTouches[0];
-        if (!touchState || touchState.identifier != touch.identifier) {
-          touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
-        }
-        var dx = touch.clientX - touchState.x;
-        var dy = touch.clientY - touchState.y;
-        touchState.x = touch.clientX;
-        touchState.y = touch.clientY;
-        moveImageByPx(index, dx, dy);
-        updateTransform();
-        return false;
-      }
-    });
-    $('#view > div.imageBox').off('touchend').on('touchend', function(e)
-    {
-      touchState = null;
-    });
-  }
-  function makeDoubleClickable()
-  {
-    $('#view > div.imageBox .image').off('dblclick').on('dblclick', function(e)
-    {
-      var index = $('#view > div.imageBox').index($(this).parent());
-      if (index >= entries.length || !entries[index].ready()) {
-        return true;
-      }
-      var img = entries[index];
-      var x = (e.pageX - $(this).offset().left) / (img.baseWidth * scale);
-      var y = (e.pageY - $(this).offset().top) / (img.baseHeight * scale);
-      zoomWithTarget(index, x, y);
-    });
   }
   function moveImageByPx(index, dx, dy)
   {
@@ -1163,5 +1139,6 @@ $( function()
 
   function toggleFullscreen()
   {
+    resetMouseDrag();
     compareUtil.toggleFullscreen($('#viewroot').get(0));
   }
