@@ -328,32 +328,30 @@ $( function()
       updateLayout();
     }
   }
-  var showDialog = function(target, update, parent) {
-    if (update) {
-      update();
-    }
-    var hide = function() {
-      target.hide();
+  var hideDialog = function() {
+    if (dialog) {
+      dialog.element.hide();
       dialog = null;
-    };
-    var close = parent || hide;
-    dialog = { element: target, hide: hide, close: close };
-    target.css({ display: 'block' }).
-        off('click').on('click', close);
-    target.children().
-        focus().
-        off('click').on('click', function(e) { e.stopPropagation(); return true; });
+    }
+  };
+  var showDialog = function(target, parent) {
+    dialog = { element: target, close: parent || hideDialog };
+    target.css({ display: 'block' });
+    target.children().focus();
   };
   var defineDialog = function(target, update, parent) {
+    target.on('click', parent || hideDialog);
+    target.children().on('click', function(e) { e.stopPropagation(); return true; });
     return function() {
-      if (dialog) {
-        if (target.is(':visible')) {
-          dialog.hide();
-          return;
+      if (dialog && target.is(':visible')) {
+        hideDialog();
+      } else {
+        hideDialog();
+        if (update) {
+          update();
         }
-        dialog.hide();
+        showDialog(target, parent);
       }
-      showDialog(target, update, parent);
     };
   };
   var toggleHelp = defineDialog($('#shortcuts'));
@@ -401,9 +399,10 @@ $( function()
     }
   }
   var toggleInfo = defineDialog($('#info'), updateInfoTable);
+  var toggleNowLoading = defineDialog($('#loading'));
   function updateNowLoading()
   {
-    if (dialog) { dialog.hide(); }
+    hideDialog();
     $('#loadingList > tr').remove();
     if (0 < loading.length) {
       var finished = true, errors = 0;
@@ -442,14 +441,14 @@ $( function()
         $('#loadingStatus .en').text('Now loading...');
         $('#loadingStatus .ja').text('ロード中...');
       }
-      showDialog($('#loading'));
+      toggleNowLoading();
       if (finished && 0 == errors) {
         window.setTimeout(
           function() {
             window.setTimeout(
               function() {
                 if ($('#loading').is(':visible')) {
-                  if (dialog) { dialog.hide(); }
+                  hideDialog();
                 }
               },
               500
