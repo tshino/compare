@@ -14,35 +14,27 @@ $( function()
   {
     alert('The File APIs are not fully supported in this browser.');
   }
-  
-  // Setup the dnd listeners.
-  var dropZone = document.body;
-  dropZone.addEventListener('dragover', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-  }, false);
-  dropZone.addEventListener('drop', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    addFiles(e.dataTransfer.files);
-  }, false);
-  
+
+  $(document.body).on('dragover', function(e) {
+    e.originalEvent.dataTransfer.dropEffect = 'copy';
+    return false;
+  });
+  $(document.body).on('drop', function(e) {
+    addFiles(e.originalEvent.dataTransfer.files);
+    return false;
+  });
   $('#file').on('change', function(e) {
     addFiles(e.target.files);
     e.target.value = null;
   });
-  $('#view .dropHere').
-    click(function() {
-      $('#file').click();
-    });
-  $('#histogramType > *').click(function()
-  {
+  $('#view .dropHere').click(function() {
+    $('#file').click();
+  });
+  $('#histogramType > *').click(function() {
     var index = $('#histogramType > *').index(this);
     changeHistogramType(index);
   });
-  $('#waveformType > *').click(function()
-  {
+  $('#waveformType > *').click(function() {
     var index = $('#waveformType > *').index(this);
     changeWaveformType(index);
   });
