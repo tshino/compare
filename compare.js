@@ -243,6 +243,7 @@ $( function()
   var dialog = null;
   var histogramType = 0;
   var waveformType = 0;
+  var baseImageIndex = 0;
 
   var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
@@ -771,8 +772,32 @@ $( function()
   function updatePSNRTable()
   {
     $('#psnrTable td:not(.prop)').remove();
-    for (var k = 1; images[k]; k++) {
-      var a = images[0];
+    var select = $('<select>').on('change', function(e) {
+      baseImageIndex = parseInt(this.options[this.selectedIndex].value);
+      updatePSNRTable();
+      return false;
+    });
+    if (images.length == 0) {
+      $('#psnrName1').append($('<td rowspan="3">').text('no data'));
+      return;
+    }
+    if (images.length == 1) {
+      $('#psnrName2').append($('<td rowspan="2">').text('no data'));
+    }
+    $('#psnrName1').append(
+      $('<td>').attr('colspan', images.length - 1).append(
+        $('<span class="imageIndex"/>').text(images[baseImageIndex].index + 1),
+        select
+      )
+    );
+    for (var k = 0; k < images.length; k++) {
+      var baseOption = $('<option>').text(images[k].name).attr('value', k);
+      select.append(baseOption);
+      if (k == baseImageIndex) {
+        baseOption.attr('selected','');
+        continue;
+      }
+      var a = images[baseImageIndex];
       var b = images[k];
       if (a.psnr[b.index] == null) {
         a.psnr[b.index] = 'calculating...';
@@ -785,11 +810,6 @@ $( function()
       $('#psnrName2').append(makeImageNameWithIndex('<td>', b));
       $('#psnrValue').append($('<td>').text(metricPSNRToString(a.psnr[b.index])));
     }
-    $('#psnrName1').append(
-      k == 1
-        ? $('<td rowspan="3">').text('no data')
-        : makeImageNameWithIndex('<td colspan="' + (k - 1) + '">', images[0])
-    );
   }
   var togglePSNR = defineDialog($('#psnr'), updatePSNRTable, toggleAnalysis);
 
