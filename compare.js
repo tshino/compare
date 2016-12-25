@@ -380,11 +380,13 @@ $( function()
   var showDialog = function(target, parent) {
     dialog = { element: target, close: parent || hideDialog };
     target.css({ display: 'block' });
-    target.children().focus();
+    target.children().find('.dummyFocusTarget').focus();
   };
   var defineDialog = function(target, update, parent) {
     target.on('click', parent || hideDialog);
     target.children().on('click', function(e) { e.stopPropagation(); return true; });
+    target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
+      css({display:'inline',margin:'0px',padding:'0px',border:'0px'}));
     return function() {
       if (dialog && target.is(':visible')) {
         hideDialog();
