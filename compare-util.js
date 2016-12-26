@@ -48,6 +48,16 @@
     }
   };
   
+  var calcGCD = function(a, b) {
+    var m = Math.max(a, b), n = Math.min(a, b);
+    while (n > 0) {
+      var r = m % n;
+      m = n;
+      n = r;
+    }
+    return m;
+  };
+  
   //
   // Make a binary view of a DataURI string
   //
@@ -195,6 +205,7 @@
     createObjectURL:        createObjectURL,
     newWorker:              newWorker,
     toggleFullscreen:       toggleFullscreen,
+    calcGCD:                calcGCD,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,

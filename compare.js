@@ -258,30 +258,22 @@ $( function()
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   }
-  function calcAspectRatio(w, h)
-  {
-    var m = w > h ? w : h, n = w > h ? h : w;
-    while (n > 0) {
-      var r = m % n;
-      m = n;
-      n = r;
-    }
-    var gcd = m;
-    var ratio = (w/gcd) / (h/gcd);  // use gcd to avoid comparison error
-    var result = addComma(w / gcd) + ':' + addComma(h / gcd);
-    if (w / gcd <= 50 || h / gcd <= 50) {
+  function calcAspectRatio(w, h) {
+    var gcd = compareUtil.calcGCD(w, h);
+    var w0 = w / gcd, h0 = h / gcd;
+    var ratio = w0 / h0;  // use gcd to avoid comparison error
+    var result = addComma(w0) + ':' + addComma(h0);
+    if (w0 <= 50 || h0 <= 50) {
       return [ratio, result];
     } else {
       for (var i = 1; i <= 10; ++i) {
-        var a = w / h * i;
-        var b = Math.floor(a + 0.5);
-        if (Math.max(b - a, a - b) < Math.min(i,b) * 0.004) {
-          return [ratio, result + '\n(approx. ' + addComma(b) + ':' + i + ')'];
+        var a = w / h * i, b = h / w * i;
+        var aa = Math.round(a), bb = Math.round(b);
+        if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
+          return [ratio, result + '\n(approx. ' + addComma(aa) + ':' + i + ')'];
         }
-        var c = h / w * i;
-        var d = Math.floor(c + 0.5);
-        if (Math.max(d - c, c - d) < Math.min(i,d) * 0.004) {
-          return [ratio, result + '\n(approx. ' + i + ':' + addComma(d) + ')'];
+        if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
+          return [ratio, result + '\n(approx. ' + i + ':' + addComma(bb) + ')'];
         }
       }
       return [ratio, result];
@@ -294,23 +286,22 @@ $( function()
       'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
     return orientation ? (table[orientation] || 'Invalid') : '‐';
   }
-  function applyExifOrientation(entry)
-  {
-    var o = entry.orientation;
+  function applyExifOrientation(entry) {
+    var table = {
+      2: { transposed: false, transform: ' scale(-1,1)' },
+      3: { transposed: false, transform: ' rotate(180deg)' },
+      4: { transposed: false, transform: ' scale(-1,1) rotate(180deg)' },
+      5: { transposed: true,  transform: ' scale(-1,1) rotate(90deg)' },
+      6: { transposed: true,  transform: ' rotate(90deg)' },
+      7: { transposed: true,  transform: ' scale(-1,1) rotate(-90deg)' },
+      8: { transposed: true,  transform: ' rotate(-90deg)' }
+    };
+    var o = table[entry.orientation] || { transposed: false, transform: '' };
     var w = entry.width, h = entry.height;
-    var temp =
-      o == 2 ? [ w, h, false, ' scale(-1,1)' ] :
-      o == 3 ? [ w, h, false, ' rotate(180deg)' ] :
-      o == 4 ? [ w, h, false, ' scale(-1,1) rotate(180deg)' ] :
-      o == 5 ? [ h, w, true,  ' scale(-1,1) rotate(90deg)' ] :
-      o == 6 ? [ h, w, true,  ' rotate(90deg)' ] :
-      o == 7 ? [ h, w, true,  ' scale(-1,1) rotate(-90deg)' ] :
-      o == 8 ? [ h, w, true,  ' rotate(-90deg)' ] :
-               [ w, h, false, '' ];
-    entry.width = temp[0];
-    entry.height = temp[1];
-    entry.transposed = temp[2];
-    entry.orientationAsCSS = temp[3];
+    entry.width = o.transposed ? h : w;
+    entry.height = o.transposed ? w : h;
+    entry.transposed = o.transposed;
+    entry.orientationAsCSS = o.transform;
   }
   var makeImageNameWithIndex = function(tag, img) {
     return $(tag).
