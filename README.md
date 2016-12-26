@@ -1,6 +1,6 @@
-﻿# Compare
+﻿# Compare.html
 
-Compare is a simple web application that helps visual comparison of pictures.
+Compare.html is a simple web application that helps visual comparison of pictures.
 Zooming and scrolling are performed for each picture simultaneously.
 
 See the [demo page](https://tshino.github.io/compare/compare.html).
@@ -15,7 +15,7 @@ so that it can never happen to upload to somewhere or write to your files.
 You can simply bookmark the demo page,
 or download zip of this repository to use it as a local application.
 
-# Compare
+# Compare.html
 
 これは画像を目視で比較することに特化した画像表示ツールです。ブラウザ上で動きます。
 拡大縮小とスクロールが複数の画像に対して同時にできるので、
