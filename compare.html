@@ -185,8 +185,8 @@
 					<td><span class="en">waveform</span><span class="ja">波形</span></td>
 				</tr>
 				<tr>
-					<td class="keys"><span>p</span></td>
-					<td><span class="en">PSNR</span><span class="ja">PSNR</span></td>
+					<td class="keys"><span>m</span></td>
+					<td><span class="en">Image quality metrics</span><span class="ja">画質メトリクス</span></td>
 				</tr>
 				<tr>
 					<td class="keys"><span>f</span></td>
@@ -292,11 +292,11 @@
 					<span class="ja">波形</span>
 					<span class="flat keys"><span>w</span></span>
 				</button>
-				<button onclick="togglePSNR()">
+				<button onclick="toggleMetrics()">
 					<img src="res/psnr.svg" width="20">
-					<span class="en">PSNR (Peak signal-to-noise ratio)</span>
-					<span class="ja">PSNR (ピーク信号対雑音比)</span>
-					<span class="flat keys"><span>p</span></span>
+					<span class="en">Image quality metrics (PSNR,MSE)</span>
+					<span class="ja">画質メトリクス (PSNR,MSE)</span>
+					<span class="flat keys"><span>m</span></span>
 				</button>
 			</div>
 		</div>
@@ -339,13 +339,13 @@
 			</table>
 		</div>
 	</div>
-	<div id="psnr" class="dialog">
+	<div id="metrics" class="dialog">
 		<div>
 			<div class="header">
 				<h3>
 					<img src="res/psnr.svg" width="20">
-					<span class="en">PSNR (Peak signal-to-noise ratio)</span>
-					<span class="ja">PSNR (ピーク信号対雑音比)</span>
+					<span class="en">Image quality metrics</span>
+					<span class="ja">画質メトリクス</span>
 				</h3>
 			</div>
 			<table id="psnrTable">
@@ -363,8 +363,27 @@
 				</tr>
 				<tr id="psnrValue">
 					<td class="prop">
-						<span class="en">PSNR</span>
-						<span class="ja">PSNR</span>
+						<span class="en">PSNR (*)</span>
+						<span class="ja">PSNR (※)</span>
+					</td>
+				</tr>
+				<tr id="mseValue">
+					<td class="prop">
+						<span class="en">MSE (*)</span>
+						<span class="ja">MSE (※)</span>
+					</td>
+				</tr>
+				<tr id="metricFootnote">
+					<td colspan="99" class="footnote prop">
+						<span>
+							<span class="en">* PSNR = Peak signal-to-noise ratio</span>
+							<span class="ja">※PSNR = ピーク信号対雑音比</span>
+						</span>
+						<br>
+						<span>
+							<span class="en">* MSE = Mean squared error</span>
+							<span class="ja">※MSE = 平均二乗誤差</span>
+						</span>
 					</td>
 				</tr>
 			</table>

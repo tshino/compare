@@ -257,6 +257,11 @@ div.dialog table td, div.dialog table th
     padding         : 0.2em 0.5em;
     border          : #bbb solid 1px;
 }
+div.dialog table td.footnote
+{
+    border:         0px;
+    font-size:      0.8em;
+}
 .keys > span
 {
     display         : inline-block;

@@ -15,8 +15,8 @@
     result.h = data.imageData.height;
     result.histW = data.histW;
     break;
-  case 'calcPSNR':
-    result.result = calcPSNR(data.imageData1, data.imageData2);
+  case 'calcMetrics':
+    result.result = calcMetrics(data.imageData1, data.imageData2);
     break;
   }
   self.postMessage( result );
@@ -91,15 +91,15 @@ function calcWaveform( imageData, histW, type )
   return hist;
 }
 
-function calcPSNR( a, b )
+function calcMetrics( a, b )
 {
   if (a.width != b.width || a.height != b.height) {
     // error
-    return NaN;
+    return { psnr: NaN, mse: NaN };
   }
   if (a.width == 0 || a.height == 0) {
     // error
-    return NaN;
+    return { psnr: NaN, mse: NaN };
   }
   var w = a.width;
   var h = a.height;
@@ -117,10 +117,10 @@ function calcPSNR( a, b )
   }
   if (sum == 0) {
     // a == b;
-    return Infinity;
+    return { psnr: Infinity, mse: 0 };
   }
   var mse = sum / (w * h * 3);
   var max = 255 * 255;
   var psnr = 10 * Math.log(max / mse) / Math.LN10;
-  return psnr;
+  return { psnr: psnr, mse: mse };
 }

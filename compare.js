@@ -125,16 +125,16 @@ $( function()
     104 : { global: true, func: toggleHistogram },
     // 'w' (119)
     119 : { global: true, func: toggleWaveform },
-    // 'p' (112)
-    112 : { global: true, func: togglePSNR },
+    // 'm' (109)
+    109 : { global: true, func: toggleMetrics },
     // 'i' (105)
     105 : { global: true, func: toggleInfo },
     // 'a' (97)
     97 : { global: false, func: arrangeLayout },
     // 'o' (111)
     111: { global: false, func: toggleOverlay },
-    // 'm' (109)
-    109 : { global: false, func: toggleMap },
+    // 'n' (110)
+    110 : { global: false, func: toggleMap },
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey) {
@@ -542,9 +542,9 @@ $( function()
         updateWaveform(data.type, img, data.histW, data.result);
       }
       break;
-    case 'calcPSNR':
-      entries[data.index[0]].psnr[data.index[1]] = data.result;
-      entries[data.index[1]].psnr[data.index[0]] = data.result;
+    case 'calcMetrics':
+      entries[data.index[0]].metrics[data.index[1]] = data.result;
+      entries[data.index[1]].metrics[data.index[0]] = data.result;
       updatePSNRTable();
       break;
     }
@@ -561,7 +561,7 @@ $( function()
         task.imageData = getImageData(entries[task.index]);
         worker.postMessage(task);
         break;
-      case 'calcPSNR':
+      case 'calcMetrics':
         task.imageData1 = getImageData(entries[task.index[0]]);
         task.imageData2 = getImageData(entries[task.index[1]]);
         worker.postMessage(task);
@@ -755,13 +755,21 @@ $( function()
     }
   }
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
-  function metricPSNRToString(psnr)
-  {
-    return typeof(psnr) == 'string' ? psnr :
-        psnr == Infinity ? 'same image' :
-        isNaN(psnr) ? '‐' :
-        psnr.toFixed(2) + ' dB';
-  }
+  var metricsToString = function(metrics) {
+    if (typeof metrics == 'string') {
+      return { psnr: metrics, mse: metrics };
+    } else {
+      return {
+        psnr:
+            isNaN(metrics.psnr) ? '‐' :
+            metrics.psnr == Infinity ? 'infinity' :
+            metrics.psnr.toFixed(2) + ' dB',
+        mse:
+            isNaN(metrics.mse) ? '‐' :
+            metrics.mse.toPrecision(6)
+      };
+    }
+  };
   function updatePSNRTable()
   {
     $('#psnrTable td:not(.prop)').remove();
@@ -771,11 +779,11 @@ $( function()
       return false;
     });
     if (images.length == 0) {
-      $('#psnrName1').append($('<td rowspan="3">').text('no data'));
+      $('#psnrName1').append($('<td rowspan="4">').text('no data'));
       return;
     }
     if (images.length == 1) {
-      $('#psnrName2').append($('<td rowspan="2">').text('no data'));
+      $('#psnrName2').append($('<td rowspan="3">').text('no data'));
     }
     $('#psnrName1').append(
       $('<td>').attr('colspan', images.length - 1).append(
@@ -792,19 +800,21 @@ $( function()
       }
       var a = images[baseImageIndex];
       var b = images[k];
-      if (a.psnr[b.index] == null) {
-        a.psnr[b.index] = 'calculating...';
-        b.psnr[a.index] = 'calculating...';
+      if (a.metrics[b.index] == null) {
+        a.metrics[b.index] = 'calculating...';
+        b.metrics[a.index] = 'calculating...';
         addTask({
-          cmd:      'calcPSNR',
+          cmd:      'calcMetrics',
           index:    [a.index, b.index],
         });
       }
       $('#psnrName2').append(makeImageNameWithIndex('<td>', b));
-      $('#psnrValue').append($('<td>').text(metricPSNRToString(a.psnr[b.index])));
+      var values = metricsToString(a.metrics[b.index]);
+      $('#psnrValue').append($('<td>').text(values.psnr));
+      $('#mseValue').append($('<td>').text(values.mse));
     }
   }
-  var togglePSNR = defineDialog($('#psnr'), updatePSNRTable, toggleAnalysis);
+  var toggleMetrics = defineDialog($('#metrics'), updatePSNRTable, toggleAnalysis);
 
   function updateDOM()
   {
@@ -1015,7 +1025,7 @@ $( function()
             imageData   : null,
             histogram   : null,
             waveform    : null,
-            psnr        : [],
+            metrics     : [],
             loading     : true,
             progress    : 0,
             error       : null,
