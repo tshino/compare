@@ -95,32 +95,69 @@ function calcMetrics( a, b )
 {
   if (a.width != b.width || a.height != b.height) {
     // error
-    return { psnr: NaN, mse: NaN };
+    return { psnr: NaN, mse: NaN, ncc: NaN };
   }
   if (a.width == 0 || a.height == 0) {
     // error
-    return { psnr: NaN, mse: NaN };
+    return { psnr: NaN, mse: NaN, ncc: NaN };
   }
   var w = a.width;
   var h = a.height;
-  var sum = 0, i = 0;
-  for (var y = 0; y < h; ++y) {
-    var lineSum = 0;
-    for (var x= 0; x < w; ++x, i += 4) {
-      var d0 = a.data[i + 0] - b.data[i + 0];
-      var d1 = a.data[i + 1] - b.data[i + 1];
-      var d2 = a.data[i + 2] - b.data[i + 2];
-      var e = d0 * d0 + d1 * d1 + d2 * d2;
-      lineSum += e;
+  var average12 = function(data) {
+    var sum1 = 0, sum2 = 0;
+    for (var i = 0, y = 0; y < h; ++y) {
+      var lineSum1 = 0, lineSum2 = 0;
+      for (var x= 0; x < w; ++x, i += 4) {
+        var r= data[i + 0], g = data[i + 1], b = data[i + 2];
+        lineSum1 += r + g + b;
+        lineSum2 += r * r + g * g + b * b;
+      }
+      sum1 += lineSum1;
+      sum2 += lineSum2;
     }
-    sum += lineSum;
-  }
-  if (sum == 0) {
+    return [ sum1 / (w * h * 3), sum2 / (w * h * 3) ];
+  };
+  var sd = function(ave12) {
+    return Math.sqrt(ave12[1] - ave12[0] * ave12[0]);
+  };
+  var calcNCC = function(dataA, dataB) {
+    var ave12A = average12(dataA), ave12B = average12(dataB);
+    var sdA = sd(ave12A), sdB = sd(ave12B);
+    var sum = 0;
+    for (var i = 0, y = 0; y < h; ++y) {
+      var lineSum = 0;
+      for (var x= 0; x < w; ++x, i += 4) {
+        var r = dataA[i + 0] * dataB[i + 0];
+        var g = dataA[i + 1] * dataB[i + 1];
+        var b = dataA[i + 2] * dataB[i + 2];
+        lineSum += r + g + b;
+      }
+      sum += lineSum;
+    }
+    return (sum / (w * h * 3) - ave12A[0] * ave12B[0]) / (sdA * sdB);
+  };
+  var ncc = calcNCC(a.data, b.data);
+  var calcMSE = function(dataA, dataB) {
+    var sum = 0;
+    for (var i = 0, y = 0; y < h; ++y) {
+      var lineSum = 0;
+      for (var x= 0; x < w; ++x, i += 4) {
+        var r = dataA[i + 0] - dataB[i + 0];
+        var g = dataA[i + 1] - dataB[i + 1];
+        var b = dataA[i + 2] - dataB[i + 2];
+        var se = r * r + g * g + b * b;
+        lineSum += se;
+      }
+      sum += lineSum;
+    }
+    return sum / (w * h * 3);
+  };
+  var mse = calcMSE(a.data, b.data);
+  if (mse == 0) {
     // a == b;
-    return { psnr: Infinity, mse: 0 };
+    return { psnr: Infinity, mse: 0, ncc: ncc };
   }
-  var mse = sum / (w * h * 3);
   var max = 255 * 255;
   var psnr = 10 * Math.log(max / mse) / Math.LN10;
-  return { psnr: psnr, mse: mse };
+  return { psnr: psnr, mse: mse, ncc: ncc };
 }

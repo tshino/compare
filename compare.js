@@ -757,7 +757,7 @@ $( function()
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
   var metricsToString = function(metrics) {
     if (typeof metrics == 'string') {
-      return { psnr: metrics, mse: metrics };
+      return { psnr: metrics, mse: metrics, ncc: metrics };
     } else {
       return {
         psnr:
@@ -766,7 +766,10 @@ $( function()
             metrics.psnr.toFixed(2) + ' dB',
         mse:
             isNaN(metrics.mse) ? '‐' :
-            metrics.mse.toPrecision(6)
+            metrics.mse.toPrecision(6),
+        ncc:
+            isNaN(metrics.ncc) ? '‐' :
+            metrics.ncc.toFixed(6),
       };
     }
   };
@@ -779,11 +782,11 @@ $( function()
       return false;
     });
     if (images.length == 0) {
-      $('#psnrName1').append($('<td rowspan="4">').text('no data'));
+      $('#psnrName1').append($('<td rowspan="5">').text('no data'));
       return;
     }
     if (images.length == 1) {
-      $('#psnrName2').append($('<td rowspan="3">').text('no data'));
+      $('#psnrName2').append($('<td rowspan="4">').text('no data'));
     }
     $('#psnrName1').append(
       $('<td>').attr('colspan', images.length - 1).append(
@@ -812,6 +815,7 @@ $( function()
       var values = metricsToString(a.metrics[b.index]);
       $('#psnrValue').append($('<td>').text(values.psnr));
       $('#mseValue').append($('<td>').text(values.mse));
+      $('#nccValue').append($('<td>').text(values.ncc));
     }
   }
   var toggleMetrics = defineDialog($('#metrics'), updatePSNRTable, toggleAnalysis);

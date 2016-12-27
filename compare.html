@@ -294,8 +294,8 @@
 				</button>
 				<button onclick="toggleMetrics()">
 					<img src="res/psnr.svg" width="20">
-					<span class="en">Image quality metrics (PSNR,MSE)</span>
-					<span class="ja">画質メトリクス (PSNR,MSE)</span>
+					<span class="en">Image quality metrics (PSNR,MSE, etc)</span>
+					<span class="ja">画質メトリクス (PSNR,MSE, etc)</span>
 					<span class="flat keys"><span>m</span></span>
 				</button>
 			</div>
@@ -373,6 +373,12 @@
 						<span class="ja">MSE (※)</span>
 					</td>
 				</tr>
+				<tr id="nccValue">
+					<td class="prop">
+						<span class="en">NCC (*)</span>
+						<span class="ja">NCC (※)</span>
+					</td>
+				</tr>
 				<tr id="metricFootnote">
 					<td colspan="99" class="footnote prop">
 						<span>
@@ -383,6 +389,11 @@
 						<span>
 							<span class="en">* MSE = Mean squared error</span>
 							<span class="ja">※MSE = 平均二乗誤差</span>
+						</span>
+						<br>
+						<span>
+							<span class="en">* NCC = Normalized cross-correlation</span>
+							<span class="ja">※NCC = 正規化相互相関</span>
 						</span>
 					</td>
 				</tr>
