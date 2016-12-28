@@ -252,6 +252,10 @@ div.dialog a
     color           : #44e;
     text-decoration : none;
 }
+div.dialog select
+{
+    font-size       : inherit;
+}
 div.dialog table td, div.dialog table th
 {
     padding         : 0.2em 0.5em;

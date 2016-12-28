@@ -545,7 +545,7 @@ $( function()
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
       entries[data.index[1]].metrics[data.index[0]] = data.result;
-      updatePSNRTable();
+      updateMetricsTable();
       break;
     }
     --taskCount;
@@ -773,22 +773,22 @@ $( function()
       };
     }
   };
-  function updatePSNRTable()
+  function updateMetricsTable()
   {
-    $('#psnrTable td:not(.prop)').remove();
+    $('#metricsTable td:not(.prop)').remove();
     var select = $('<select>').on('change', function(e) {
       baseImageIndex = parseInt(this.options[this.selectedIndex].value);
-      updatePSNRTable();
+      updateMetricsTable();
       return false;
     });
     if (images.length == 0) {
-      $('#psnrName1').append($('<td rowspan="5">').text('no data'));
+      $('#metricsBaseName').append($('<td rowspan="5">').text('no data'));
       return;
     }
     if (images.length == 1) {
-      $('#psnrName2').append($('<td rowspan="4">').text('no data'));
+      $('#metricsTargetName').append($('<td rowspan="4">').text('no data'));
     }
-    $('#psnrName1').append(
+    $('#metricsBaseName').append(
       $('<td>').attr('colspan', images.length - 1).append(
         $('<span class="imageIndex"/>').text(images[baseImageIndex].index + 1),
         select
@@ -811,14 +811,14 @@ $( function()
           index:    [a.index, b.index],
         });
       }
-      $('#psnrName2').append(makeImageNameWithIndex('<td>', b));
+      $('#metricsTargetName').append(makeImageNameWithIndex('<td>', b));
       var values = metricsToString(a.metrics[b.index]);
       $('#psnrValue').append($('<td>').text(values.psnr));
       $('#mseValue').append($('<td>').text(values.mse));
       $('#nccValue').append($('<td>').text(values.ncc));
     }
   }
-  var toggleMetrics = defineDialog($('#metrics'), updatePSNRTable, toggleAnalysis);
+  var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
 
   function updateDOM()
   {
