@@ -762,7 +762,7 @@ $( function()
       return {
         psnr:
             isNaN(metrics.psnr) ? '‐' :
-            metrics.psnr == Infinity ? 'infinity' :
+            metrics.psnr == Infinity ? '∞ dB' :
             metrics.psnr.toFixed(2) + ' dB',
         mse:
             isNaN(metrics.mse) ? '‐' :
