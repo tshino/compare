@@ -139,14 +139,14 @@ body:not(.ja) *.ja, body:not(.en) *.en
     font-size       : 0.9em;
     text-align      : center;
     border-radius   : 0.15em;
-    box-shadow      : -1px 0px 2px currentColor, 0px -1px 2px currentColor,
-                      1px 0px 2px currentColor, 0px 1px 2px currentColor;
     text-shadow     : none;
 }
 .imageName .imageIndex
 {
     background-color: #fff;
     color           : #444;
+    box-shadow      : -1px 0px 2px currentColor, 0px -1px 2px currentColor,
+                      1px 0px 2px currentColor, 0px 1px 2px currentColor;
 }
 .dialog .imageIndex
 {
@@ -260,6 +260,7 @@ div.dialog table td, div.dialog table th
 {
     padding         : 0.2em 0.5em;
     border          : #bbb solid 1px;
+    min-width       : 96px;
 }
 div.dialog table td.footnote
 {
@@ -310,6 +311,7 @@ div.dialog td:not(.prop):not(.keys)
 {
     font-size       : 1.1em;
     white-space     : pre-wrap;
+    vertical-align  : top;
 }
 div.dialog td.sign:not(.prop):before
 {
