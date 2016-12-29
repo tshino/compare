@@ -288,10 +288,6 @@ tr.num > td:not(.prop), tr.enum > td:not(.prop), tr.date > td:not(.prop)
 {
     text-align    : right;
 }
-tr.b > td:not(.prop)
-{
-    font-weight : bold;
-}
 td.error
 {
     color       : red;
@@ -312,7 +308,7 @@ div.dialog tr:nth-of-type(even)
 }
 div.dialog td:not(.prop):not(.keys)
 {
-    font-size       : 1.2em;
+    font-size       : 1.1em;
     white-space     : pre-wrap;
 }
 div.dialog td.sign:not(.prop):before
