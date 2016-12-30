@@ -33,39 +33,34 @@ body:not(.ja) *.ja, body:not(.en) *.en
     height  : 5px;
     margin  : 5px;
 }
-.button
+#sidebar button
 {
+    display : block;
     width   : 35px;
     height  : 35px;
     margin  : 5px;
+    padding : 0px;
     background  : #ccc;
-    box-shadow  : 1px 2px 5px #000;
     color       : #444;
     line-height : 35px;
     font-size   : 18px;
     text-align  : center;
-    cursor      : pointer;
     overflow    : hidden;
     white-space : nowrap;
 }
-.button img
+#sidebar button img
 {
-    width       : 100%;
+    width       : 35px;
 }
-.button.disabled
+button.disabled
 {
     color       : #a8a8a8;
 }
-.button:not(.disabled):hover
+#sidebar button:not(.disabled):hover
 {
     background  : #7af;
 }
-.button:active
-{
-    box-shadow  : 1px 1px 1px #000;
-    transform   : translate(0px, 2px);
-}
-.button span.tooltip
+button span.tooltip
 {
     display     : inline;
     position    : absolute;
@@ -85,7 +80,7 @@ body:not(.ja) *.ja, body:not(.en) *.en
     transition      : 200ms;
     opacity         : 0.0;
 }
-.button:hover span.tooltip
+button:hover span.tooltip
 {
     transition-delay    : 300ms;
     opacity             : 1.0;
@@ -386,7 +381,7 @@ div.menu > button
     font-size   : 16px;
     text-align  : left;
 }
-button > span.keys
+button > span.keys:not(.tooltip)
 {
     float       : right;
 }
@@ -418,7 +413,7 @@ div.mode-sw > *.current
 button
 {
     border      : 0px;
-    background  : #fff;
+    background  : #f8f8f8;
     box-shadow  : 1px 2px 5px rgba(0,0,0, 0.5);
     cursor      : pointer;
 }
@@ -436,7 +431,7 @@ button:hover
 {
     background  : #eee;
 }
-button img
+.menu button img
 {
     vertical-align  : bottom;
     padding-right   : 5px;

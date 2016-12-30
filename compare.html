@@ -34,54 +34,54 @@
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
 <div id="viewroot">
 	<div id="sidebar">
-		<div class="button" id="add" onclick="$('#file').click()">
+		<button id="add" onclick="$('#file').click()">
 			<img src="res/add.svg" width="100%">
 			<span class="tooltip en">Add new picture</span>
 			<span class="tooltip ja">画像を追加</span>
-		</div>
+		</button>
 		<div class="space"></div>
-		<div class="button" id="infobtn" onclick="toggleInfo()">
+		<button id="infobtn" onclick="toggleInfo()">
 			<img src="res/info.svg" width="100%">
 			<span class="tooltip keys en">Show image information <span>i</span></span>
 			<span class="tooltip keys ja">画像情報を表示 <span>i</span></span>
-		</div>
-		<div class="button" onclick="zoomIn()">
+		</button>
+		<button onclick="zoomIn()">
 			<img src="res/zoomin.svg" width="100%">
 			<span class="tooltip keys en">Zoom in <span>+</span></span>
 			<span class="tooltip keys ja">拡大 <span>+</span></span>
-		</div>
-		<div class="button" onclick="zoomOut()">
+		</button>
+		<button onclick="zoomOut()">
 			<img src="res/zoomout.svg" width="100%">
 			<span class="tooltip keys en">Zoom out <span>-</span></span>
 			<span class="tooltip keys ja">縮小 <span>-</span></span>
-		</div>
-		<div class="button" id="arrange" onclick="arrangeLayout()">
+		</button>
+		<button id="arrange" onclick="arrangeLayout()">
 			<img src="res/layout_x.svg" width="100%">
 			<span class="tooltip keys en">Arrange layout <span>a</span></span>
 			<span class="tooltip keys ja">レイアウト変更 <span>a</span></span>
-		</div>
-		<div class="button" id="overlay" onclick="toggleOverlay()" style="display:none">
+		</button>
+		<button id="overlay" onclick="toggleOverlay()" style="display:none">
 			<img src="res/overlay.svg" width="100%">
 			<span class="tooltip keys en">Overlay mode <span>o</span></span>
 			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
-		</div>
+		</button>
 		<div class="bottom">
-			<div class="button" onclick="toggleAnalysis()">
+			<button onclick="toggleAnalysis()">
 				<img src="res/histogram.svg" width="100%">
 				<span class="tooltip keys en">Show analysis tools <span>c</span></span>
 				<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
-			</div>
-			<div class="button" onclick="toggleFullscreen()">
+			</button>
+			<button onclick="toggleFullscreen()">
 				<img src="res/full.svg" width="100%">
 				<span class="tooltip keys en">Fullscreen <span>f</span></span>
 				<span class="tooltip keys ja">フルスクリーン表示 <span>f</span></span>
-			</div>
+			</button>
 			<div class="space"></div>
-			<div class="button" id="help" onclick="toggleHelp()">
+			<button id="help" onclick="toggleHelp()">
 				<img src="res/help.svg" width="100%">
 				<span class="tooltip keys en">Show help <span>?</span></span>
 				<span class="tooltip keys ja">ヘルプを表示 <span>?</span></span>
-			</div>
+			</button>
 		</div>
 	</div>
 	<div id="view">
