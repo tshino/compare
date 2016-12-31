@@ -842,7 +842,7 @@ $( function()
           ent.view.addClass('error');
         }
         if (!ent.button) {
-          ent.button = $('<div/>').addClass('button selector').
+          ent.button = $('<button/>').addClass('selector').
             text(''+(i + 1)).
             append(
               $('<span/>').addClass('tooltip en').text('Select picture ')
