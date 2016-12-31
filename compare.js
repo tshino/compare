@@ -380,10 +380,7 @@ $( function()
     var draggingPoint = null;
     var moveDialog = function(dx, dy) {
       var offset = dlg.offset();
-      var border = 10;
-      offset.left = Math.max(0, Math.min(target.width() - dlg.width() - border, offset.left + dx));
-      offset.top  = Math.max(0, Math.min(target.height() - dlg.height() - border, offset.top + dy));
-      dlg.offset(offset);
+      dlg.offset({ left: offset.left + dx, top: offset.top + dy });
     };
     target.on('mousedown', '.header', function(e) {
       if (e.which == 1 && !$(e.target).is('a, select')) {
@@ -412,7 +409,7 @@ $( function()
           update();
         }
         showDialog(target, parent);
-        moveDialog(0,0);
+        dlg.css({position:'',left:'',top:''});
       }
     };
   };
