@@ -376,6 +376,31 @@ $( function()
   var defineDialog = function(target, update, parent) {
     target.on('click', parent || hideDialog);
     target.children().on('click', function(e) { e.stopPropagation(); return true; });
+    var dlg = target.children();
+    var draggingPoint = null;
+    var moveDialog = function(dx, dy) {
+      var offset = dlg.offset();
+      var border = 10;
+      offset.left = Math.max(0, Math.min(target.width() - dlg.width() - border, offset.left + dx));
+      offset.top  = Math.max(0, Math.min(target.height() - dlg.height() - border, offset.top + dy));
+      dlg.offset(offset);
+    };
+    target.on('mousedown', '.header', function(e) {
+      if (e.which == 1 && !$(e.target).is('a, select')) {
+        draggingPoint = { x: e.clientX, y: e.clientY };
+        return false;
+      }
+    }).on('mousemove', function(e) {
+      if (!draggingPoint || e.buttons != 1) {
+        draggingPoint = null;
+      } else {
+        var dx = e.clientX - draggingPoint.x;
+        var dy = e.clientY - draggingPoint.y;
+        draggingPoint = { x: e.clientX, y: e.clientY };
+        moveDialog(dx, dy);
+        return false;
+      }
+    });
     target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
       css({display:'inline',margin:'0px',padding:'0px',border:'0px'}));
     return function() {
@@ -387,6 +412,7 @@ $( function()
           update();
         }
         showDialog(target, parent);
+        moveDialog(0,0);
       }
     };
   };
