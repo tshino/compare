@@ -524,14 +524,33 @@ $( function()
     }
     return img.imageData;
   }
-  function makeBlankFigure(w, h)
-  {
+  var makeBlankFigure = function(w, h) {
     var canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
     var context = canvas.getContext('2d');
     return { canvas: canvas, context: context };
-  }
+  };
+  var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
+    var dLen = Math.sqrt(dx * dx + dy * dy);
+    var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
+    ctx.font = "24px sans-serif";
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 3;
+    for (var i = 0, label; label = labels[i]; ++i) {
+      var pos = { x: label.pos * dx, y: label.pos * dy };
+      var x1 = x + pos.x;
+      var y1 = y + pos.y;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 + lineDx, y1 + lineDy);
+      ctx.stroke();
+      ctx.fillText(label.label,
+        x + pos.x * 0.95 + lineDx,
+        y + pos.y * 0.95 + lineDy + 20);
+    }
+  };
   function changeHistogramType(type)
   {
     if (histogramType != type) {
@@ -618,14 +637,15 @@ $( function()
     
     function makeFigure(type, hist)
     {
-      var fig = makeBlankFigure(1024, 512);
+      var margin = 32;
+      var fig = makeBlankFigure(768, 512 + margin);
       var context = fig.context;
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
       context.fillStyle = '#222';
-      context.fillRect(0,0,1024,512);
+      context.fillRect(0,0,768,512);
       if (type == 0) { // RGB
         context.globalCompositeOperation = 'lighter';
         drawHistogram('#f00', 0);
@@ -634,13 +654,19 @@ $( function()
       } else { // Luminance
         drawHistogram('#fff', 0);
       }
+      drawAxes(fig.context, 0, 512, 768, 0, 10, [
+        { pos: (0.5 + 0  ) / 256, label: '0' },
+        { pos: (0.5 + 64 ) / 256, label: '64' },
+        { pos: (0.5 + 128) / 256, label: '128' },
+        { pos: (0.5 + 192) / 256, label: '192' },
+        { pos: (0.5 + 255) / 256, label: '255' }]);
       return fig.canvas;
       
       function drawHistogram(color, offset) {
         context.fillStyle = color;
         for (var i = 0; i < 256; ++i) {
           var h = 512 * hist[i + offset] / max;
-          context.fillRect(i*4, 512-h, 4, h);
+          context.fillRect(i*3, 512-h, 3, h);
         }
       }
     }
@@ -657,10 +683,10 @@ $( function()
       $('#histograms').append(
         $('<td>').append(
           $(img.histogram).css({
-            width: '320px',
-            height:'256px',
-            background:'#aaa',
-            padding:'10px'
+            width: '384px',
+            height:'272px',
+            background:'#bbb',
+            padding:'8px'
           })
         )
       );
