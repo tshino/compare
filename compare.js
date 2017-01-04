@@ -373,6 +373,18 @@ $( function()
     target.css({ display: 'block' });
     target.children().find('.dummyFocusTarget').focus();
   };
+  var adjustDialogPosition = function() {
+    if (dialog) {
+      var target = dialog.element, dlg = dialog.element.children();
+      var offset = dlg.offset();
+      var border = 10;
+      var left = Math.max(0, Math.min(target.width() - dlg.width() - border, offset.left));
+      var top  = Math.max(0, Math.min(target.height() - dlg.height() - border, offset.top));
+      if (left != offset.left || top != offset.top) {
+        dlg.offset({ left: left, top: top });
+      }
+    }
+  };
   var defineDialog = function(target, update, parent) {
     target.on('click', parent || hideDialog);
     target.children().on('click', function(e) { e.stopPropagation(); return true; });
@@ -1013,6 +1025,7 @@ $( function()
     }
     $('#overlay').css({ display : 2 <= entries.length ? '' : 'none' });
     updateTransform();
+    adjustDialogPosition();
   }
   
   function updateTransform() {
