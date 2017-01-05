@@ -251,8 +251,15 @@ $( function()
     changeLang(lang);
   };
   var setText = function(target, text) {
-    $(target).find('.en').text(text.en);
-    $(target).find('.ja').text(text.ja);
+    for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
+      var e = target.find('.' + lang);
+      if (0 == e.length) {
+        e = $('<span>').addClass(lang);
+        target.append(e);
+      }
+      e.text(text[lang]);
+    }
+    return target;
   };
   function addComma(num)
   {
@@ -500,7 +507,7 @@ $( function()
       if (finished) {
         loading = [];
       }
-      setText('#loadingStatus',
+      setText($('#loadingStatus'),
         !finished ? {
           en: 'Now loading...',
           ja: 'ロード中...'
@@ -906,18 +913,17 @@ $( function()
           ent.button = $('<button/>').addClass('selector').
             text(''+(i + 1)).
             append(
-              $('<span/>').addClass('tooltip en').text('Select picture ')
-            ).
-            append(
-              $('<span/>').addClass('tooltip ja').text('画像を選択 ')
-            ).
+              setText($('<span class="tooltip"/>'), {
+                en: 'Select picture ',
+                ja: '画像を選択 '
+              })).
             click({index : i}, function(e)
             {
               currentImageIndex = e.data.index + 1;
               updateLayout();
             });
           if (i < 9) {
-            $(ent.button).find('span.tooltip').addClass('keys').
+            $(ent.button).find('span.tooltip span').addClass('keys flat').
               append(
                 $('<span/>').text(i + 1)
                 );
@@ -1009,7 +1015,7 @@ $( function()
       var modeDesc =
           ((isSingleView && 1 < currentImageIndex)
             ? '1 + ' + currentImageIndex : '1 only');
-      setText('#mode', {
+      setText($('#mode'), {
         en: 'OVERLAY MODE : ' + modeDesc,
         ja: 'オーバーレイモード : ' + modeDesc });
       $('#mode').css({ display : 'block' });
