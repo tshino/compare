@@ -585,7 +585,7 @@ $( function()
     }
   }
   
-  var worker = compareUtil.newWorker('compare-worker.js');
+  var worker = compareUtil.newWorker('modules/compare-worker.js');
   var taskCount = 0;
   var taskQueue = [];
   worker.addEventListener('message', function(e) {
