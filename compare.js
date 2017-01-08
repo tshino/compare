@@ -39,7 +39,7 @@ $( function()
     changeWaveformType(index);
   });
   
-  $(window).resize(updateLayout);
+  $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
     {
       if (e.ctrlKey || e.altKey || e.metaKey)
@@ -235,7 +235,7 @@ $( function()
   var viewZoom = 0;
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
-  var layoutMode = 'x';
+  var layoutMode = null;
   var overlayMode = false;
   var enableMap = false;
   var dragLastPoint = null;
@@ -339,8 +339,6 @@ $( function()
     } else {
       layoutMode = 'x';
     }
-    $('#view').css({ flexDirection : layoutMode == 'x' ? 'row' : 'column' });
-    $('#arrange img').attr('src', layoutMode == 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     updateLayout();
   }
   function toggleOverlay()
@@ -974,6 +972,11 @@ $( function()
     if (!isSingleView && overlayMode) {
       overlayMode = false;
     }
+    if (layoutMode == null) {
+      layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
+    }
+    $('#view').css({ flexDirection : layoutMode == 'x' ? 'row' : 'column' });
+    $('#arrange img').attr('src', layoutMode == 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     var numSlots = isSingleView ? 1 : Math.max(entries.length, 2);
     var numColumns = layoutMode == 'x' ? numSlots : 1;
     var numRows    = layoutMode != 'x' ? numSlots : 1;
