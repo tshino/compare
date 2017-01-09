@@ -67,8 +67,7 @@ $( function()
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
           (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey))
       {
-        currentImageIndex = e.keyCode % 48;
-        updateLayout();
+        toggleSingleView(e.keyCode % 48);
         return false;
       }
       // '+;' (59, 187 or 107 for numpad) / PageUp (33)
@@ -326,6 +325,10 @@ $( function()
   };
   var zoomOut = function() {
     zoomRelative(-ZOOM_STEP_KEY);
+  };
+  var toggleSingleView = function(targetImageIndex) {
+    currentImageIndex = targetImageIndex == currentImageIndex ? 0 : targetImageIndex;
+    updateLayout();
   };
   function arrangeLayout()
   {
@@ -894,10 +897,7 @@ $( function()
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>').append(
             makeImageNameWithIndex('<span class="imageName">', ent).
-              click({index : i}, function(e) {
-                currentImageIndex = currentImageIndex == 0 ? e.data.index + 1 : 0;
-                updateLayout();
-              })
+              click({index : i}, function(e) { toggleSingleView(e.data.index + 1); })
           );
           $('#drop').before(ent.view);
         }
@@ -915,11 +915,7 @@ $( function()
                 en: 'Select picture ',
                 ja: '画像を選択 '
               })).
-            click({index : i}, function(e)
-            {
-              currentImageIndex = e.data.index + 1;
-              updateLayout();
-            });
+            click({index : i}, function(e) { toggleSingleView(e.data.index + 1); });
           if (i < 9) {
             $(ent.button).find('span.tooltip span').addClass('keys flat').
               append(
