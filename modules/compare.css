@@ -242,6 +242,9 @@ div.dialog > div > *
     margin          : 0.3em;
     padding         : 0.5em 1.0em;
     border          : #bbb solid 1px;
+    min-width       : -webkit-max-content;
+    min-width       : -moz-max-content;
+    min-width       : max-content;
     line-height     : 1.2em;
 }
 div.dialog a
@@ -259,9 +262,8 @@ div.dialog table td, div.dialog table th
     border          : #bbb solid 1px;
     min-width       : 96px;
 }
-div.dialog table td.footnote
+div.footnote
 {
-    border:         0px;
     font-size:      0.8em;
 }
 .keys > span

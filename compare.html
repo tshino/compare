@@ -208,66 +208,66 @@
 					<span class="ja">画像情報</span>
 				</h3>
 			</div>
-			<table id="infoTable">
-				<tr id="infoName">
-					<td class="prop">
-						<span class="en">name</span>
-						<span class="ja">名前</span>
-					</td>
-				</tr>
-				<tr id="infoFormat">
-					<td class="prop">
-						<span class="en">format (*)</span>
-						<span class="ja">ファイル形式 (※)</span>
-					</td>
-				</tr>
-				<tr id="infoWidth" class="num">
-					<td class="prop">
-						<span class="en">width [px]</span>
-						<span class="ja">幅 [px]</span>
-					</td>
-				</tr>
-				<tr id="infoHeight" class="num">
-					<td class="prop">
-						<span class="en">height [px]</span>
-						<span class="ja">高さ [px]</span>
-					</td>
-				</tr>
-				<tr id="infoAspect" class="num">
-					<td class="prop">
-						<span class="en">aspect ratio</span>
-						<span class="ja">アスペクト比</span>
-					</td>
-				</tr>
-				<tr id="infoOrientation" class="enum">
-					<td class="prop">
-						<span class="en">orientation (Exif)</span>
-						<span class="ja">回転方向 (Exif)</span>
-					</td>
-				</tr>
-				<tr id="infoFileSize" class="num">
-					<td class="prop">
-						<span class="en">file size [bytes]</span>
-						<span class="ja">ファイルサイズ [バイト]</span>
-					</td>
-				</tr>
-				<tr id="infoLastModified" class="date">
-					<td class="prop">
-						<span class="en">file last modified date</span>
-						<span class="ja">ファイル更新日時</span>
-					</td>
-				</tr>
-				<tr id="infoFootnote">
-					<td colspan="99" class="footnote prop">
-						<span class="en">
-							* File format is determined from the contents of the file.
-						</span>
-						<span class="ja">
-							※ ファイル形式はファイルの内容に基づいて判定しています
-						</span>
-					</td>
-				</tr>
-			</table>
+			<div>
+				<table id="infoTable">
+					<tr id="infoName">
+						<td class="prop">
+							<span class="en">name</span>
+							<span class="ja">名前</span>
+						</td>
+					</tr>
+					<tr id="infoFormat">
+						<td class="prop">
+							<span class="en">format (*)</span>
+							<span class="ja">ファイル形式 (※)</span>
+						</td>
+					</tr>
+					<tr id="infoWidth" class="num">
+						<td class="prop">
+							<span class="en">width [px]</span>
+							<span class="ja">幅 [px]</span>
+						</td>
+					</tr>
+					<tr id="infoHeight" class="num">
+						<td class="prop">
+							<span class="en">height [px]</span>
+							<span class="ja">高さ [px]</span>
+						</td>
+					</tr>
+					<tr id="infoAspect" class="num">
+						<td class="prop">
+							<span class="en">aspect ratio</span>
+							<span class="ja">アスペクト比</span>
+						</td>
+					</tr>
+					<tr id="infoOrientation" class="enum">
+						<td class="prop">
+							<span class="en">orientation (Exif)</span>
+							<span class="ja">回転方向 (Exif)</span>
+						</td>
+					</tr>
+					<tr id="infoFileSize" class="num">
+						<td class="prop">
+							<span class="en">file size [bytes]</span>
+							<span class="ja">ファイルサイズ [バイト]</span>
+						</td>
+					</tr>
+					<tr id="infoLastModified" class="date">
+						<td class="prop">
+							<span class="en">file last modified date</span>
+							<span class="ja">ファイル更新日時</span>
+						</td>
+					</tr>
+				</table>
+				<div class="footnote">
+					<span class="en">
+						* File format is determined from the contents of the file.
+					</span>
+					<span class="ja">
+						※ ファイル形式はファイルの内容に基づいて判定しています
+					</span>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div id="loading" class="dialog">
@@ -358,52 +358,52 @@
 					<span class="ja">画質メトリクス</span>
 				</h3>
 			</div>
-			<table id="metricsTable">
-				<tr id="metricsBaseName">
-					<td class="prop">
-						<span class="en">Base Image</span>
-						<span class="ja">基準画像</span>
-					</td>
-				</tr>
-				<tr id="metricsTargetName">
-					<td class="prop">
-						<span class="en">Target Image</span>
-						<span class="ja">対象画像</span>
-					</td>
-				</tr>
-				<tr id="psnrValue" class="num">
-					<td class="prop">
-						<span class="en">PSNR (*)</span>
-						<span class="ja">PSNR (※)</span>
-					</td>
-				</tr>
-				<tr id="mseValue" class="num">
-					<td class="prop">
-						<span class="en">MSE (*)</span>
-						<span class="ja">MSE (※)</span>
-					</td>
-				</tr>
-				<tr id="nccValue" class="num">
-					<td class="prop">
-						<span class="en">NCC (*)</span>
-						<span class="ja">NCC (※)</span>
-					</td>
-				</tr>
-				<tr id="metricFootnote">
-					<td colspan="99" class="footnote prop">
-						<span class="en">
-							* PSNR = Peak signal-to-noise ratio<br>
-							* MSE = Mean squared error<br>
-							* NCC = Normalized cross-correlation
-						</span>
-						<span class="ja">
-							※PSNR = ピーク信号対雑音比<br>
-							※MSE = 平均二乗誤差<br>
-							※NCC = 正規化相互相関
-						</span>
-					</td>
-				</tr>
-			</table>
+			<div>
+				<table id="metricsTable">
+					<tr id="metricsBaseName">
+						<td class="prop">
+							<span class="en">Base Image</span>
+							<span class="ja">基準画像</span>
+						</td>
+					</tr>
+					<tr id="metricsTargetName">
+						<td class="prop">
+							<span class="en">Target Image</span>
+							<span class="ja">対象画像</span>
+						</td>
+					</tr>
+					<tr id="psnrValue" class="num">
+						<td class="prop">
+							<span class="en">PSNR (*)</span>
+							<span class="ja">PSNR (※)</span>
+						</td>
+					</tr>
+					<tr id="mseValue" class="num">
+						<td class="prop">
+							<span class="en">MSE (*)</span>
+							<span class="ja">MSE (※)</span>
+						</td>
+					</tr>
+					<tr id="nccValue" class="num">
+						<td class="prop">
+							<span class="en">NCC (*)</span>
+							<span class="ja">NCC (※)</span>
+						</td>
+					</tr>
+				</table>
+				<div class="footnote">
+					<span class="en">
+						* PSNR = Peak signal-to-noise ratio<br>
+						* MSE = Mean squared error<br>
+						* NCC = Normalized cross-correlation
+					</span>
+					<span class="ja">
+						※PSNR = ピーク信号対雑音比<br>
+						※MSE = 平均二乗誤差<br>
+						※NCC = 正規化相互相関
+					</span>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
