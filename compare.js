@@ -824,9 +824,9 @@ $( function()
     }
   }
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
-  var metricsToString = function(metrics) {
+  var metricsToString = function(metrics, imgA) {
     if (typeof metrics == 'string') {
-      return { psnr: metrics, mse: metrics, ncc: metrics };
+      return { psnr: metrics, mse: metrics, ncc: metrics, ae: metrics };
     } else {
       return {
         psnr:
@@ -839,6 +839,10 @@ $( function()
         ncc:
             isNaN(metrics.ncc) ? '‐' :
             metrics.ncc.toFixed(6),
+        ae:
+            isNaN(metrics.ae) ? '‐' :
+            addComma(metrics.ae) +
+                ' ('+(metrics.ae*100/imgA.width/imgA.height).toFixed(4)+'%)',
       };
     }
   };
@@ -881,10 +885,11 @@ $( function()
         });
       }
       $('#metricsTargetName').append(makeImageNameWithIndex('<td>', b));
-      var values = metricsToString(a.metrics[b.index]);
+      var values = metricsToString(a.metrics[b.index], a);
       $('#psnrValue').append($('<td>').text(values.psnr));
       $('#mseValue').append($('<td>').text(values.mse));
       $('#nccValue').append($('<td>').text(values.ncc));
+      $('#aeValue').append($('<td>').text(values.ae));
     }
   }
   var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);

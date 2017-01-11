@@ -17,6 +17,7 @@
     break;
   case 'calcMetrics':
     result.result = calcMetrics(data.imageData1, data.imageData2);
+    result.result.ae = calcAE(data.imageData1, data.imageData2);
     break;
   }
   self.postMessage( result );
@@ -89,6 +90,28 @@ function calcWaveform( imageData, histW, type )
     }
   }
   return hist;
+}
+
+function calcAE( a, b )
+{
+  if (a.width != b.width || a.height != b.height) {
+    // error
+    return NaN;
+  }
+  if (a.width == 0 || a.height == 0) {
+    // error
+    return NaN;
+  }
+  var count = 0;
+  for (var i = 0, n = a.width * a.height * 4; i != n; i += 4) {
+    if (a.data[i + 0] != b.data[i + 0] ||
+        a.data[i + 1] != b.data[i + 1] ||
+        a.data[i + 2] != b.data[i + 2] ||
+        a.data[i + 3] != b.data[i + 3]) {
+      ++count;
+    }
+  }
+  return count;
 }
 
 function calcMetrics( a, b )
