@@ -854,12 +854,13 @@ $( function()
       updateMetricsTable();
       return false;
     });
+    var rowCount = $('#metricsTable tr').length;
     if (images.length == 0) {
-      $('#metricsBaseName').append($('<td rowspan="5">').text('no data'));
+      $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
       return;
     }
     if (images.length == 1) {
-      $('#metricsTargetName').append($('<td rowspan="4">').text('no data'));
+      $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
     }
     $('#metricsBaseName').append(
       $('<td>').attr('colspan', images.length - 1).append(
