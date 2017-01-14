@@ -159,7 +159,7 @@ button:hover span.tooltip
 {
     background-color: #69f;
 }
-#view .imageBox .image
+#view .imageBox .image, #view .imageBox .grid
 {
     display         : block;
     position        : absolute;
@@ -167,6 +167,10 @@ button:hover span.tooltip
     margin          : 0px;
     border          : rgba(0,0,0,0) solid 3px;
     padding         : 0px;
+}
+#view .imageOverlay
+{
+    pointer-events  : none;
 }
 .dropHere
 {

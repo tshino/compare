@@ -134,6 +134,8 @@ $( function()
     111: { global: false, func: toggleOverlay },
     // 'n' (110)
     110 : { global: false, func: toggleMap },
+    // 'g' (103)
+    103 : { global: false, func: toggleGrid },
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey) {
@@ -237,6 +239,7 @@ $( function()
   var layoutMode = null;
   var overlayMode = false;
   var enableMap = false;
+  var enableGrid = false;
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
@@ -370,6 +373,38 @@ $( function()
       updateLayout();
     }
   }
+  var toggleGrid = function() {
+    enableGrid = 0 == images.length ? false : !enableGrid;
+    for (var i = 0, img; img = images[i]; ++i) {
+      if (enableGrid) {
+        if (img.element && 0 == img.view.find('.grid').length) {
+          var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
+          var grid = '';
+          var GRID_STEP = 100;
+          for (var k = GRID_STEP; k < img.canvasWidth; k += GRID_STEP) {
+            grid += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
+          }
+          for (var k = GRID_STEP; k < img.canvasHeight; k += GRID_STEP) {
+            grid += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
+          }
+          img.grid = $(
+            '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
+              '<path stroke="white" fill="none" stroke-width="0.5" '+
+                'd="' + grid + '"></path>' +
+            '</svg>').
+            width(img.canvasWidth).
+            height(img.canvasHeight);
+          img.view.append(img.grid);
+        }
+      } else {
+        if (img.grid) {
+          $(img.grid).remove();
+          img.grid = null;
+        }
+      }
+    }
+    updateLayout();
+  };
   var hideDialog = function() {
     if (dialog) {
       dialog.element.hide();
@@ -1002,6 +1037,9 @@ $( function()
             var temp = w; w = h; h = temp;
           }
           $(img.element).css({ width: w+'px', height: h+'px' });
+          if (img.grid) {
+            $(img.grid).css({ width: w+'px', height: h+'px' });
+          }
         }
         $(this).css({
           display   : '',
@@ -1051,14 +1089,18 @@ $( function()
       if (ent.element) {
         var offsetX = commonOffsetX * ent.baseWidth;
         var offsetY = commonOffsetY * ent.baseHeight;
-        $(ent.element).css({
+        style = {
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
                         'scale(' + scale + ') ' +
                         'translate(' + offsetX + 'px, ' + offsetY + 'px)' +
                         ent.orientationAsCSS,
-        });
+        };
+        $(ent.element).css(style);
+        if (ent.grid) {
+          $(ent.grid).css(style);
+        }
       }
     }
     if (enableMap && images.length) {
