@@ -89,10 +89,7 @@ $( function()
       {
         var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
         var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-        viewOffset.x += x * 0.4 / scale;
-        viewOffset.y += y * 0.4 / scale;
-        viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
-        viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
+        addViewOffset(x * 0.4 / scale, y * 0.4 / scale);
         updateTransform();
         return false;
       }
@@ -101,8 +98,7 @@ $( function()
       {
         currentImageIndex = 0;
         viewZoom = 0;
-        viewOffset.x = 0.5;
-        viewOffset.y = 0.5;
+        setViewOffset(0.5, 0.5);
         overlayMode = false;
         resetMouseDrag();
         updateLayout();
@@ -974,26 +970,28 @@ $( function()
   {
     dragLastPoint = null;
   }
+  var setViewOffset = function(x, y) {
+    viewOffset.x = Math.min(1, Math.max(0, x));
+    viewOffset.y = Math.min(1, Math.max(0, y));
+  };
+  var addViewOffset = function(dx, dy) {
+    setViewOffset(viewOffset.x + dx, viewOffset.y + dy);
+  };
   function moveImageByPx(index, dx, dy)
   {
     if (!entries[index].ready()) {
       return;
     }
-    var x = dx / (entries[index].baseWidth * scale);
-    var y = dy / (entries[index].baseHeight * scale);
-    if (1.0 < scale)
-    {
-      viewOffset.x -= x / (1.0 - 1.0 / scale);
-      viewOffset.y -= y / (1.0 - 1.0 / scale);
+    if (1.0 < scale) {
+      var x = dx / (entries[index].baseWidth * scale);
+      var y = dy / (entries[index].baseHeight * scale);
+      addViewOffset(-x / (1.0 - 1.0 / scale), -y / (1.0 - 1.0 / scale));
     }
-    viewOffset.x = Math.min(1, Math.max(0, viewOffset.x));
-    viewOffset.y = Math.min(1, Math.max(0, viewOffset.y));
   }
   function zoomWithTarget(index, x, y)
   {
     if (viewZoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
-      viewOffset.x = Math.min(1, Math.max(0, x));
-      viewOffset.y = Math.min(1, Math.max(0, y));
+      setViewOffset(x, y);
       zoomRelative(+ZOOM_STEP_DBLCLK);
     } else {
       viewZoom = 0;
