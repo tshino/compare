@@ -602,6 +602,26 @@ $( function()
         y + pos.y * 0.95 + lineDy + 20);
     }
   };
+  var updateFigureTable = function(target, propName, update, style) {
+    $(target).find('td').remove();
+    for (var k = 0, img; img = images[k]; k++) {
+      if (!img[propName]) {
+        img[propName] = makeBlankFigure(8, 8).canvas;
+        update(img);
+      }
+      $(target).find('tr').eq(0).append(
+        makeImageNameWithIndex('<td>', img)
+      );
+      $(target).find('tr').eq(1).append(
+        $('<td>').append($(img[propName]).css(style))
+      );
+    }
+    if (k == 0) {
+      $(target).find('tr').eq(0).append(
+        $('<td rowspan="2">').text('no data')
+      );
+    }
+  };
   function changeHistogramType(type)
   {
     if (histogramType != type) {
@@ -722,32 +742,14 @@ $( function()
       }
     }
   }
-  function updateHistogramTable()
-  {
-    $('#histoTable td').remove();
-    for (var k = 0, img; img = images[k]; k++) {
-      if (!img.histogram) {
-        img.histogram = makeBlankFigure(8, 8).canvas;
-        updateHistogramAsync(img);
-      }
-      $('#histoName').append(makeImageNameWithIndex('<td>', img));
-      $('#histograms').append(
-        $('<td>').append(
-          $(img.histogram).css({
+  var updateHistogramTable = function() {
+    var style = {
             width: '384px',
             height:'272px',
             background:'#bbb',
-            padding:'8px'
-          })
-        )
-      );
-    }
-    if (k == 0) {
-      $('#histoName').append(
-        $('<td rowspan="2">').text('no data')
-      );
-    }
-  }
+            padding:'8px' };
+    updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
+  };
   var toggleAnalysis = defineDialog($('#analysis'));
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis);
   function changeWaveformType(type)
@@ -828,32 +830,14 @@ $( function()
       return fig.canvas;
     }
   }
-  function updateWaveformTable()
-  {
-    $('#waveTable td').remove();
-    for (var k = 0, img; img = images[k]; k++) {
-      if (!img.waveform) {
-        img.waveform = makeBlankFigure(8, 8).canvas;
-        updateWaveformAsync(img);
-      }
-      $('#waveName').append(makeImageNameWithIndex('<td>', img));
-      $('#waveforms').append(
-        $('<td>').append(
-          $(img.waveform).css({
+  var updateWaveformTable = function() {
+    var style = {
             width: '320px',
             height:'256px',
             background:'#666',
-            padding:'10px'
-          })
-        )
-      );
-    }
-    if (k == 0) {
-      $('#waveName').append(
-        $('<td rowspan="2">').text('no data')
-      );
-    }
-  }
+            padding:'10px' };
+    updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
+  };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics == 'string') {
