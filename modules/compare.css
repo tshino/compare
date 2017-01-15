@@ -422,6 +422,7 @@ div.mode-sw > *.current
 button
 {
     border      : 0px;
+    border-radius : 3px;
     background  : #f8f8f8;
     box-shadow  : 1px 2px 5px rgba(0,0,0, 0.5);
     cursor      : pointer;
