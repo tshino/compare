@@ -316,8 +316,10 @@ $( function()
   }
 
   var zoomRelative = function(delta) {
-    viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom + delta));
-    updateTransform();
+    if (0 < images.length) {
+      viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom + delta));
+      updateTransform();
+    }
   };
   var zoomIn = function() {
     zoomRelative(+ZOOM_STEP_KEY);
