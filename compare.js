@@ -387,7 +387,7 @@ $( function()
           }
           img.grid = $(
             '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
-              '<path stroke="white" fill="none" stroke-width="0.5" '+
+              '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" '+
                 'd="' + grid + '"></path>' +
             '</svg>').
             width(img.canvasWidth).
@@ -1084,6 +1084,8 @@ $( function()
         $(ent.element).css(style);
         if (ent.grid) {
           $(ent.grid).css(style);
+          var strokeWidth = 0.5 * ent.width / ent.baseWidth / scale;
+          $(ent.grid).find('path').attr('stroke-width', strokeWidth);
         }
       }
     }
