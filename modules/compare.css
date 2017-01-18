@@ -163,9 +163,7 @@ button:hover span.tooltip
 {
     display         : block;
     position        : absolute;
-    box-sizing      : border-box;
     margin          : 0px;
-    border          : rgba(0,0,0,0) solid 3px;
     padding         : 0px;
 }
 #view .imageOverlay

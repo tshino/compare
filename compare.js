@@ -1003,6 +1003,9 @@ $( function()
     var numRows    = layoutMode != 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
+    var MARGIN = 6, MIN_SIZE = 32;
+    boxW = Math.max(boxW - MARGIN, Math.min(boxW, MIN_SIZE));
+    boxH = Math.max(boxH - MARGIN, Math.min(boxH, MIN_SIZE));
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode);
       if (hide) {
