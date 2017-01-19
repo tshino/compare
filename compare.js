@@ -371,36 +371,35 @@ $( function()
       updateLayout();
     }
   }
+  var addGrid = function(img) {
+    if (img.element && 0 == img.view.find('.grid').length) {
+      var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
+      var grid = '';
+      var GRID_STEP = 100;
+      for (var k = GRID_STEP; k < img.canvasWidth; k += GRID_STEP) {
+        grid += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
+      }
+      for (var k = GRID_STEP; k < img.canvasHeight; k += GRID_STEP) {
+        grid += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
+      }
+      img.grid = $(
+        '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
+          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" '+
+            'd="' + grid + '"></path>' +
+        '</svg>').
+        width(img.canvasWidth).
+        height(img.canvasHeight);
+      img.view.append(img.grid);
+    }
+  };
+  var removeGrid = function(img) {
+    if (img.grid) {
+      $(img.grid).remove();
+      img.grid = null;
+    }
+  };
   var toggleGrid = function() {
     enableGrid = 0 == images.length ? false : !enableGrid;
-    for (var i = 0, img; img = images[i]; ++i) {
-      if (enableGrid) {
-        if (img.element && 0 == img.view.find('.grid').length) {
-          var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
-          var grid = '';
-          var GRID_STEP = 100;
-          for (var k = GRID_STEP; k < img.canvasWidth; k += GRID_STEP) {
-            grid += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
-          }
-          for (var k = GRID_STEP; k < img.canvasHeight; k += GRID_STEP) {
-            grid += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
-          }
-          img.grid = $(
-            '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
-              '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" '+
-                'd="' + grid + '"></path>' +
-            '</svg>').
-            width(img.canvasWidth).
-            height(img.canvasHeight);
-          img.view.append(img.grid);
-        }
-      } else {
-        if (img.grid) {
-          $(img.grid).remove();
-          img.grid = null;
-        }
-      }
-    }
     updateLayout();
   };
   var hideDialog = function() {
@@ -1024,6 +1023,11 @@ $( function()
             var temp = w; w = h; h = temp;
           }
           $(img.element).css({ width: w+'px', height: h+'px' });
+          if (enableGrid) {
+            addGrid(img);
+          } else {
+            removeGrid(img);
+          }
           if (img.grid) {
             $(img.grid).css({ width: w+'px', height: h+'px' });
           }
