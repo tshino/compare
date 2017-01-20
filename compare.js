@@ -598,9 +598,10 @@ $( function()
       ctx.moveTo(x1, y1);
       ctx.lineTo(x1 + lineDx, y1 + lineDy);
       ctx.stroke();
+      ctx.textAlign = label.align;
       ctx.fillText(label.label,
-        x + pos.x * 0.95 + lineDx,
-        y + pos.y * 0.95 + lineDy + 20);
+        x + pos.x + lineDx,
+        y + pos.y + lineDy + 20);
     }
   };
   var updateFigureTable = function(target, propName, update, style) {
@@ -727,11 +728,11 @@ $( function()
         drawHistogram('#fff', 0);
       }
       drawAxes(fig.context, 0, 512, 768, 0, 10, [
-        { pos: (0.5 + 0  ) / 256, label: '0' },
-        { pos: (0.5 + 64 ) / 256, label: '64' },
-        { pos: (0.5 + 128) / 256, label: '128' },
-        { pos: (0.5 + 192) / 256, label: '192' },
-        { pos: (0.5 + 255) / 256, label: '255' }]);
+        { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
+        { pos: (0.5 + 64 ) / 256, align: 'center', label: '64' },
+        { pos: (0.5 + 128) / 256, align: 'center', label: '128' },
+        { pos: (0.5 + 192) / 256, align: 'center', label: '192' },
+        { pos: (0.5 + 255) / 256, align: 'right',  label: '255' }]);
       return fig.canvas;
       
       function drawHistogram(color, offset) {
