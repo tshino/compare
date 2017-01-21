@@ -229,6 +229,7 @@ $( function()
   var entries = [];
   var images = [];
   var currentImageIndex = 0;
+  var isSingleView = false;
   var viewZoom = 0;
   var scale = 1.0;
   var viewOffset = { x : 0.5, y : 0.5 };
@@ -333,9 +334,6 @@ $( function()
   };
   function arrangeLayout()
   {
-    var isSingleView =
-            currentImageIndex != 0 &&
-            currentImageIndex <= entries.length;
     if (isSingleView) {
       currentImageIndex = 0;
     } else if (layoutMode == 'x') {
@@ -987,7 +985,7 @@ $( function()
 
   function updateLayout()
   {
-    var isSingleView =
+    isSingleView =
             currentImageIndex != 0 &&
             currentImageIndex <= entries.length;
     if (!isSingleView && overlayMode) {
@@ -1070,9 +1068,6 @@ $( function()
   }
   
   function updateTransform() {
-    var isSingleView =
-            currentImageIndex != 0 &&
-            currentImageIndex <= entries.length;
     var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
     scale = scalePercent / 100;
     var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / scale);
