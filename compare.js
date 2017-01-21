@@ -242,7 +242,7 @@ $( function()
   var dialog = null;
   var histogramType = 0;
   var waveformType = 0;
-  var baseImageIndex = 0;
+  var baseImageIndex = null;
 
   var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
@@ -877,20 +877,23 @@ $( function()
     if (images.length == 1) {
       $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
     }
+    if (!baseImageIndex || !entries[baseImageIndex].ready()) {
+      baseImageIndex = images[0].index;
+    }
     $('#metricsBaseName').append(
       $('<td>').attr('colspan', images.length - 1).append(
-        $('<span class="imageIndex"/>').text(images[baseImageIndex].index + 1),
+        $('<span class="imageIndex"/>').text(baseImageIndex + 1),
         select
       )
     );
     for (var k = 0; k < images.length; k++) {
-      var baseOption = $('<option>').text(images[k].name).attr('value', k);
+      var baseOption = $('<option>').text(images[k].name).attr('value', images[k].index);
       select.append(baseOption);
-      if (k == baseImageIndex) {
+      if (images[k].index == baseImageIndex) {
         baseOption.attr('selected','');
         continue;
       }
-      var a = images[baseImageIndex];
+      var a = entries[baseImageIndex];
       var b = images[k];
       if (a.metrics[b.index] == null) {
         a.metrics[b.index] = 'calculating...';
