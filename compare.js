@@ -886,15 +886,15 @@ $( function()
         select
       )
     );
-    for (var k = 0; k < images.length; k++) {
-      var baseOption = $('<option>').text(images[k].name).attr('value', images[k].index);
+    for (var i = 0, img; img = images[i]; i++) {
+      var baseOption = $('<option>').text(img.name).attr('value', img.index);
       select.append(baseOption);
-      if (images[k].index == baseImageIndex) {
+      if (img.index == baseImageIndex) {
         baseOption.attr('selected','');
         continue;
       }
       var a = entries[baseImageIndex];
-      var b = images[k];
+      var b = img;
       if (a.metrics[b.index] == null) {
         a.metrics[b.index] = 'calculating...';
         b.metrics[a.index] = 'calculating...';
