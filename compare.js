@@ -933,7 +933,7 @@ $( function()
         }
         if (!ent.button) {
           ent.button = $('<button/>').addClass('selector').
-            text(''+(i + 1)).
+            text(i + 1).
             append(
               setText($('<span class="tooltip"/>'), {
                 en: 'Select picture ',
@@ -1044,7 +1044,7 @@ $( function()
       }
     });
     $('#view > div.emptyBox').each(function(index) {
-      var hide = index >= (isSingleView ? 0 : numSlots - entries.length);
+      var hide = isSingleView || entries.length + index >= numSlots;
       $(this).css({ display : (hide ? 'none' : '') });
     });
     if (overlayMode) {
