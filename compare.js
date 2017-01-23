@@ -328,8 +328,15 @@ $( function()
   var zoomOut = function() {
     zoomRelative(-ZOOM_STEP_KEY);
   };
-  var toggleSingleView = function(targetImageIndex) {
-    currentImageIndex = targetImageIndex == currentImageIndex ? 0 : targetImageIndex;
+  var toggleSingleView = function(targetIndex) {
+    if (targetIndex == 0 ||
+        targetIndex == currentImageIndex ||
+        targetIndex > entries.length ||
+        !entries[targetIndex - 1].visible) {
+      currentImageIndex = 0;
+    } else {
+      currentImageIndex = targetIndex;
+    }
     updateLayout();
   };
   function arrangeLayout()
@@ -345,14 +352,14 @@ $( function()
   }
   function toggleOverlay()
   {
-    if (!overlayMode && 2 <= entries.length) {
-      if (currentImageIndex <= 1 || entries.length < currentImageIndex) {
-        currentImageIndex = Math.min(2, entries.length);
+    if (!overlayMode && 2 <= images.length) {
+      if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
+        currentImageIndex = images[1].index + 1;
       }
       overlayMode = true;
       updateLayout();
     } else if (overlayMode) {
-      currentImageIndex = 1;
+      currentImageIndex = 0 < images.length ? images[0].index + 1 : 0;
       overlayMode = false;
       updateLayout();
     }
@@ -930,6 +937,7 @@ $( function()
         }
         if (ent.error) {
           ent.view.addClass('error');
+          ent.visible = false;
         }
         if (!ent.button) {
           ent.button = $('<button/>').addClass('selector').
@@ -999,7 +1007,8 @@ $( function()
     }
     $('#view').css({ flexDirection : layoutMode == 'x' ? 'row' : 'column' });
     $('#arrange img').attr('src', layoutMode == 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
-    var numSlots = isSingleView ? 1 : Math.max(entries.length, 2);
+    var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
+    var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
     var numColumns = layoutMode == 'x' ? numSlots : 1;
     var numRows    = layoutMode != 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
@@ -1008,12 +1017,12 @@ $( function()
     boxW = Math.max(boxW - MARGIN, Math.min(boxW, MIN_SIZE));
     boxH = Math.max(boxH - MARGIN, Math.min(boxH, MIN_SIZE));
     $('#view > div.imageBox').each(function(index) {
-      var hide = isSingleView && index + 1 != currentImageIndex && (index != 0 || !overlayMode);
-      if (hide) {
+      var hide = isSingleView && index + 1 != currentImageIndex && (!overlayMode || index != images[0].index);
+      var img = entries[index];
+      if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        var img = entries[index];
-        var isOverlay = isSingleView && index + 1 == currentImageIndex && index != 0 && overlayMode;
+        var isOverlay = isSingleView && index + 1 == currentImageIndex && overlayMode && index != images[0].index;
         if (img.element) {
           img.boxW = boxW;
           img.boxH = boxH;
@@ -1044,13 +1053,14 @@ $( function()
       }
     });
     $('#view > div.emptyBox').each(function(index) {
-      var hide = isSingleView || entries.length + index >= numSlots;
+      var hide = isSingleView || numVisibleEntries + index >= numSlots;
       $(this).css({ display : (hide ? 'none' : '') });
     });
     if (overlayMode) {
+      var baseIndex = images[0].index + 1;
       var modeDesc =
-          ((isSingleView && 1 < currentImageIndex)
-            ? '1 + ' + currentImageIndex : '1 only');
+          ((isSingleView && baseIndex < currentImageIndex)
+            ? baseIndex + ' + ' + currentImageIndex : baseIndex + ' only');
       setText($('#mode'), {
         en: 'OVERLAY MODE : ' + modeDesc,
         ja: 'オーバーレイモード : ' + modeDesc });
@@ -1065,7 +1075,12 @@ $( function()
     } else {
       $('.selector').removeClass('disabled');
     }
-    $('#overlay').css({ display : 2 <= entries.length ? '' : 'none' });
+    $('.selector').each(function(index) {
+      if (index < entries.length && !entries[index].visible) {
+        $(this).css({ display : 'none' });
+      }
+    });
+    $('#overlay').css({ display : 2 <= images.length ? '' : 'none' });
     updateTransform();
     adjustDialogPosition();
   }
@@ -1140,6 +1155,7 @@ $( function()
             loading     : true,
             progress    : 0,
             error       : null,
+            visible     : true,
             
             ready   : function() { return null != this.element; },
       };
