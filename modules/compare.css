@@ -53,13 +53,14 @@ body:not(.ja) *.ja, body:not(.en) *.en
 {
     width       : 35px;
 }
-button.disabled
-{
-    color       : #a8a8a8;
-}
-#sidebar button:not(.disabled):hover
+#sidebar button.current
 {
     background  : #7af;
+    color       : white;
+}
+#sidebar button:not(.current):hover
+{
+    background  : #9bf;
 }
 button span.tooltip
 {

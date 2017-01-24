@@ -1071,9 +1071,9 @@ $( function()
     }
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     if (isSingleView) {
-      $('.selector').removeClass('disabled').eq(currentImageIndex - 1).addClass('disabled');
+      $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
     } else {
-      $('.selector').removeClass('disabled');
+      $('.selector').removeClass('current');
     }
     $('.selector').each(function(index) {
       if (index < entries.length && !entries[index].visible) {
