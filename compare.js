@@ -104,7 +104,7 @@ $( function()
         updateLayout();
         return false;
       }
-      //alert(e.keyCode);
+      //alert('keydown: '+e.keyCode);
     });
   
   var keypressMap = {
@@ -145,7 +145,7 @@ $( function()
       m.func();
       return false;
     }
-    //alert(e.which);
+    //alert('keypress: '+e.which);
   });
   
   $('#view').on('mousedown', 'div.imageBox', function(e) {
