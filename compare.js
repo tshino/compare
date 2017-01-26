@@ -868,14 +868,27 @@ $( function()
       };
     }
   };
+  var makeImageNameSelector = function(selectedIndex, onchange) {
+    var select = $('<select>').on('change', function(e) {
+      var index = parseInt(this.options[this.selectedIndex].value);
+      onchange(index);
+      return false;
+    });
+    for (var i = 0, img; img = images[i]; i++) {
+      var option = $('<option>').text(img.name).attr('value', img.index);
+      select.append(option);
+      if (img.index == selectedIndex) {
+        option.attr('selected','');
+      }
+    }
+    return $('<span>').append(
+      $('<span class="imageIndex"/>').text(selectedIndex + 1),
+      select
+    );
+  };
   function updateMetricsTable()
   {
     $('#metricsTable td:not(.prop)').remove();
-    var select = $('<select>').on('change', function(e) {
-      baseImageIndex = parseInt(this.options[this.selectedIndex].value);
-      updateMetricsTable();
-      return false;
-    });
     var rowCount = $('#metricsTable tr').length;
     if (images.length == 0) {
       $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
@@ -889,15 +902,14 @@ $( function()
     }
     $('#metricsBaseName').append(
       $('<td>').attr('colspan', images.length - 1).append(
-        $('<span class="imageIndex"/>').text(baseImageIndex + 1),
-        select
+        makeImageNameSelector(baseImageIndex, function(index) {
+          baseImageIndex = index;
+          updateMetricsTable();
+        })
       )
     );
     for (var i = 0, img; img = images[i]; i++) {
-      var baseOption = $('<option>').text(img.name).attr('value', img.index);
-      select.append(baseOption);
       if (img.index == baseImageIndex) {
-        baseOption.attr('selected','');
         continue;
       }
       var a = entries[baseImageIndex];
