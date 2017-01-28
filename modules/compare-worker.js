@@ -19,6 +19,9 @@
     result.result = calcMetrics(data.imageData1, data.imageData2);
     result.result.ae = calcAE(data.imageData1, data.imageData2);
     break;
+  case 'calcDiff':
+    result.result = calcDiff(data.imageData1, data.imageData2);
+    break;
   }
   self.postMessage( result );
 }, false);
@@ -183,4 +186,106 @@ function calcMetrics( a, b )
   var max = 255 * 255;
   var psnr = 10 * Math.log(max / mse) / Math.LN10;
   return { psnr: psnr, mse: mse, ncc: ncc };
+}
+
+var imageUtil = (function() {
+  var makeImage = function(a, b) {
+    if (b === undefined) {
+      return {
+        width:  a.width,
+        height: a.height,
+        data:   a.data,
+        pitch:  (a.pitch !== undefined ? a.pitch : a.width),
+        offset: (a.offset !== undefined ? a.offset : 0)
+      };
+    } else {
+      return {
+        width:    a,
+        height:   b,
+        data:     new Uint8Array(a * b * 4),
+        pitch:    a,
+        offset:   0
+      };
+    }
+  };
+  var makeRegion = function(image, left, top, width, height) {
+    var pitch = image.pitch !== undefined ? image.pitch : image.width;
+    var offset = image.offset !== undefined ? image.offset : 0;
+    left   = left   !== undefined ? left   : 0;
+    top    = top    !== undefined ? top    : 0;
+    width  = width  !== undefined ? width  : image.width;
+    height = height !== undefined ? height : image.height;
+    left   = Math.min(image.width,  left);
+    top    = Math.min(image.height, top);
+    width  = Math.min(image.width  - left, width);
+    height = Math.min(image.height - top,  height);
+    return {
+      width: width,
+      height: height,
+      data: image.data,
+      pitch: pitch,
+      offset: offset + left + pitch * top
+    };
+  };
+  var fill = function(image, r, g, b, a) {
+    var w = image.width, h = image.height;
+    var i = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4) {
+        image.data[i    ] = r;
+        image.data[i + 1] = g;
+        image.data[i + 2] = b;
+        image.data[i + 3] = a;
+      }
+      i += (image.pitch - w) * 4;
+    }
+  };
+  return {
+    makeImage:      makeImage,
+    makeRegion:     makeRegion,
+    fill:           fill,
+  };
+})();
+
+function calcDiff( a, b )
+{
+  var w = Math.max(a.width, b.width);
+  var h = Math.max(a.height, b.height);
+  var diff = imageUtil.makeImage(w, h);
+  a = imageUtil.makeImage(a);
+  b = imageUtil.makeImage(b);
+  var makeDiff = function(a, b, out) {
+    var w = a.width, h = a.height;
+    var i = 0, j = 0, k = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
+        var r0 = a.data[i + 0], g0 = a.data[i + 1], b0 = a.data[i + 2], a0 = a.data[i + 3];
+        var r1 = b.data[j + 0], g1 = b.data[j + 1], b1 = b.data[j + 2], a1 = b.data[j + 3];
+        var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
+        var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
+        var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
+        if (r0 == r1 && g0 == g1 && b0 == b1 && a0 == a1) {
+          out.data[k    ] = mean;
+          out.data[k + 1] = mean;
+          out.data[k + 2] = mean;
+          out.data[k + 3] = 255;
+        } else {
+          out.data[k    ] = y0 >= y1 ? 255 : mean;
+          out.data[k + 1] = mean;
+          out.data[k + 2] = y0 <= y1 ? 255 : mean;
+          out.data[k + 3] = 255;
+        }
+      }
+      i += (a.pitch - w) * 4;
+      j += (b.pitch - w) * 4;
+      k += (out.pitch - w) * 4;
+    }
+  };
+  var minW = Math.min(a.width, b.width);
+  var minH = Math.min(a.height, b.height);
+  makeDiff(
+      imageUtil.makeRegion(a, 0, 0, minW, minH),
+      imageUtil.makeRegion(b, 0, 0, minW, minH),
+      imageUtil.makeRegion(diff, 0, 0, minW, minH));
+  return diff;
 }

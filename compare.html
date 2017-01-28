@@ -193,6 +193,10 @@
 					<td><span class="en">Image quality metrics</span><span class="ja">画質メトリクス</span></td>
 				</tr>
 				<tr>
+					<td class="keys"><span>d</span></td>
+					<td><span class="en">Image diff</span><span class="ja">画像の差分</span></td>
+				</tr>
+				<tr>
 					<td class="keys"><span>f</span></td>
 					<td><span class="en">full screen</span><span class="ja">フルスクリーン表示</span></td>
 				</tr>
@@ -312,6 +316,11 @@
 					<span class="ja">画質メトリクス (PSNR,MSE, etc)</span>
 					<span class="flat keys"><span>m</span></span>
 				</button>
+				<button onclick="toggleDiff()">
+					<span class="en">Image diff</span>
+					<span class="ja">画像の差分</span>
+					<span class="flat keys"><span>d</span></span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -413,6 +422,38 @@
 						※NCC = 正規化相互相関 (<strong>大きい</strong>方が似ている)
 					</span>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div id="diff" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/histogram.svg" width="20">
+					<span class="en">Image diff</span>
+					<span class="ja">画像の差分</span>
+				</h3>
+			</div>
+			<div>
+				<table id="diffTable">
+					<tr>
+						<th>
+							<span class="en">Base Image</span>
+							<span class="ja">基準画像</span>
+						</th>
+						<th>
+							<span class="en">Target Image</span>
+							<span class="ja">対象画像</span>
+						</th>
+					</tr>
+					<tr>
+						<td id="diffBaseName"></td>
+						<td id="diffTargetName"></td>
+					</tr>
+					<tr>
+						<td id="diffResult" colspan="2"></td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>

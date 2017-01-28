@@ -122,6 +122,8 @@ $( function()
     119 : { global: true, func: toggleWaveform },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
+    // 'd' (100)
+    100 : { global: true, func: toggleDiff },
     // 'i' (105)
     105 : { global: true, func: toggleInfo },
     // 'a' (97)
@@ -243,6 +245,8 @@ $( function()
   var histogramType = 0;
   var waveformType = 0;
   var baseImageIndex = null;
+  var targetImageIndex = null;
+  var diffResult = {};
 
   var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
@@ -588,6 +592,11 @@ $( function()
     var context = canvas.getContext('2d');
     return { canvas: canvas, context: context };
   };
+  var copyImageBits = function(src, dest) {
+    for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
+      dest.data[i] = src.data[i];
+    }
+  };
   var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
     var dLen = Math.sqrt(dx * dx + dy * dy);
     var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
@@ -667,6 +676,12 @@ $( function()
       entries[data.index[1]].metrics[data.index[0]] = data.result;
       updateMetricsTable();
       break;
+    case 'calcDiff':
+      if (diffResult.base == data.index[0] && diffResult.target == data.index[1]) {
+        diffResult.image = data.result;
+      }
+      updateDiffTable();
+      break;
     }
     --taskCount;
     window.setTimeout(kickNextTask, 0);
@@ -682,6 +697,7 @@ $( function()
         worker.postMessage(task);
         break;
       case 'calcMetrics':
+      case 'calcDiff':
         task.imageData1 = getImageData(entries[task.index[0]]);
         task.imageData2 = getImageData(entries[task.index[1]]);
         worker.postMessage(task);
@@ -897,9 +913,7 @@ $( function()
     if (images.length == 1) {
       $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
     }
-    if (!baseImageIndex || !entries[baseImageIndex].ready()) {
-      baseImageIndex = images[0].index;
-    }
+    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
     $('#metricsBaseName').append(
       $('<td>').attr('colspan', images.length - 1).append(
         makeImageNameSelector(baseImageIndex, function(index) {
@@ -931,6 +945,81 @@ $( function()
     }
   }
   var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
+
+  var updateDiffTable = function() {
+    $('#diffTable td *').remove();
+    if (images.length < 2) {
+      $('#diffBaseName').append($('<span>').text('no data'));
+      $('#diffTargetName').append($('<span>').text('no data'));
+      return;
+    }
+    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+    var findImageIndexOtherThan = function(index) {
+      for (var i = 0, img; img = images[i]; ++i) {
+        if (img.index != index) {
+          return img.index;
+        }
+      }
+      return null;
+    };
+    if (targetImageIndex === null) {
+      targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+    }
+    $('#diffBaseName').append(
+      makeImageNameSelector(baseImageIndex, function(index) {
+        baseImageIndex = index;
+        if (baseImageIndex == targetImageIndex) {
+          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+        }
+        updateDiffTable();
+      })
+    );
+    $('#diffTargetName').append(
+      makeImageNameSelector(targetImageIndex, function(index) {
+        targetImageIndex = index;
+        if (targetImageIndex == baseImageIndex) {
+          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
+        }
+        updateDiffTable();
+      })
+    );
+    var a = entries[baseImageIndex];
+    var b = entries[targetImageIndex];
+    if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex) {
+      diffResult.base   = baseImageIndex;
+      diffResult.target = targetImageIndex;
+      diffResult.image  = null;
+      discardTasksOfCommand('calcDiff');
+      if (baseImageIndex != targetImageIndex) {
+        addTask({
+          cmd:      'calcDiff',
+          index:    [a.index, b.index],
+        });
+      }
+    }
+    var cellStyle = {
+        width: '790px',
+        height: '422px',
+        textAlign: 'center',
+    };
+    var style = {
+        maxWidth: '768px',
+        maxHeight: '400px',
+        background:'#000',
+        padding:'8px'
+    };
+    if (diffResult.image == null) {
+      $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
+    } else {
+      var w = diffResult.image.width, h = diffResult.image.height;
+      var fig = makeBlankFigure(w, h);
+      var bits = fig.context.createImageData(w, h);
+      copyImageBits(diffResult.image, bits);
+      fig.context.putImageData(bits, 0, 0);
+      $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
+    }
+  };
+  var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis);
 
   function updateDOM()
   {
