@@ -229,7 +229,7 @@ var imageUtil = (function() {
   };
   var fill = function(image, r, g, b, a) {
     var w = image.width, h = image.height;
-    var i = 0;
+    var i = image.offset * 4;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += 4) {
         image.data[i    ] = r;
@@ -249,14 +249,9 @@ var imageUtil = (function() {
 
 function calcDiff( a, b )
 {
-  var w = Math.max(a.width, b.width);
-  var h = Math.max(a.height, b.height);
-  var diff = imageUtil.makeImage(w, h);
-  a = imageUtil.makeImage(a);
-  b = imageUtil.makeImage(b);
   var makeDiff = function(a, b, out) {
     var w = a.width, h = a.height;
-    var i = 0, j = 0, k = 0;
+    var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
         var r0 = a.data[i + 0], g0 = a.data[i + 1], b0 = a.data[i + 2], a0 = a.data[i + 3];
@@ -283,9 +278,38 @@ function calcDiff( a, b )
   };
   var minW = Math.min(a.width, b.width);
   var minH = Math.min(a.height, b.height);
+  var maxW = Math.max(a.width, b.width);
+  var maxH = Math.max(a.height, b.height);
+  var diff = imageUtil.makeImage(maxW, maxH);
+  a = imageUtil.makeImage(a);
+  b = imageUtil.makeImage(b);
   makeDiff(
       imageUtil.makeRegion(a, 0, 0, minW, minH),
       imageUtil.makeRegion(b, 0, 0, minW, minH),
       imageUtil.makeRegion(diff, 0, 0, minW, minH));
+  makeDiff(
+      minW < a.width
+        ? imageUtil.makeRegion(a, minW, 0, maxW - minW, minH)
+        : imageUtil.makeImage(maxW - minW, minH),
+      minW < b.width
+        ? imageUtil.makeRegion(b, minW, 0, maxW - minW, minH)
+        : imageUtil.makeImage(maxW - minW, minH),
+      imageUtil.makeRegion(diff, minW, 0, maxW - minW, minH));
+  makeDiff(
+      minH < a.height
+        ? imageUtil.makeRegion(a, 0, minH, minW, maxH - minH)
+        : imageUtil.makeImage(minW, maxH - minH),
+      minH < b.height
+        ? imageUtil.makeRegion(b, 0, minH, minW, maxH - minH)
+        : imageUtil.makeImage(minW, maxH - minH),
+      imageUtil.makeRegion(diff, 0, minH, minW, maxH - minH));
+  makeDiff(
+      (minW < a.width && minH < a.height)
+        ? imageUtil.makeRegion(a, minW, minH, maxW - minW, maxH - minH)
+        : imageUtil.makeImage(maxW - minW, maxH - minH),
+      (minW < b.width && minH < b.height)
+        ? imageUtil.makeRegion(b, minW, minH, maxW - minW, maxH - minH)
+        : imageUtil.makeImage(maxW - minW, maxH - minH),
+      imageUtil.makeRegion(diff, minW, minH, maxW - minW, maxH - minH));
   return diff;
 }
