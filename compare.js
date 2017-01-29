@@ -38,11 +38,16 @@ $( function()
     var index = $('#waveformType > *').index(this);
     changeWaveformType(index);
   });
+  $('#diffIgnoreAE').on('change', function(e) {
+    diffOptions.ignoreAE = this.value;
+    updateDiffTable();
+    return false;
+  });
   
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
     {
-      if (e.ctrlKey || e.altKey || e.metaKey)
+      if (e.ctrlKey || e.altKey || e.metaKey || e.target.localName == 'input')
       {
         return true;
       }
@@ -136,7 +141,7 @@ $( function()
     103 : { global: false, func: toggleGrid },
   };
   $(window).keypress(function(e) {
-    if (e.altKey || e.metaKey) {
+    if (e.altKey || e.metaKey || e.target.localName == 'input') {
       return true;
     }
     var m = keypressMap[e.which];
@@ -247,6 +252,7 @@ $( function()
   var baseImageIndex = null;
   var targetImageIndex = null;
   var diffResult = {};
+  var diffOptions = { ignoreAE: 0 };
 
   var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
@@ -677,7 +683,8 @@ $( function()
       updateMetricsTable();
       break;
     case 'calcDiff':
-      if (diffResult.base == data.index[0] && diffResult.target == data.index[1]) {
+      if (diffResult.base == data.index[0] && diffResult.target == data.index[1] &&
+          diffResult.ignoreAE == data.options.ignoreAE) {
         diffResult.image = data.result;
       }
       updateDiffTable();
@@ -947,7 +954,9 @@ $( function()
   var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
 
   var updateDiffTable = function() {
-    $('#diffTable td *').remove();
+    $('#diffBaseName *').remove();
+    $('#diffTargetName *').remove();
+    $('#diffResult *').remove();
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
       $('#diffTargetName').append($('<span>').text('no data'));
@@ -983,17 +992,23 @@ $( function()
         updateDiffTable();
       })
     );
+    $('#diffIgnoreAE').attr({ value: diffOptions.ignoreAE });
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
-    if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex) {
+    if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
+        diffResult.ignoreAE != diffOptions.ignoreAE) {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
+      diffResult.ignoreAE = diffOptions.ignoreAE;
       diffResult.image  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex != targetImageIndex) {
         addTask({
           cmd:      'calcDiff',
           index:    [a.index, b.index],
+          options:  {
+            ignoreAE:   diffOptions.ignoreAE,
+          },
         });
       }
     }

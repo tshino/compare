@@ -256,9 +256,13 @@ div.dialog a
     color           : #44e;
     text-decoration : none;
 }
-div.dialog select
+div.dialog select, div.dialog input
 {
     font-size       : inherit;
+}
+input:invalid
+{
+    border          : 2px solid red;
 }
 div.dialog table td, div.dialog table th
 {
@@ -310,7 +314,7 @@ div.dialog tr:nth-of-type(even)
 {
     background      : #e8e8e8;
 }
-div.dialog td:not(.prop):not(.keys)
+div.dialog td:not(.input):not(.prop):not(.keys)
 {
     font-size       : 1.1em;
     white-space     : pre-wrap;

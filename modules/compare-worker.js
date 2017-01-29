@@ -20,7 +20,8 @@
     result.result.ae = calcAE(data.imageData1, data.imageData2);
     break;
   case 'calcDiff':
-    result.result = calcDiff(data.imageData1, data.imageData2);
+    result.result = calcDiff(data.imageData1, data.imageData2, data.options);
+    result.options = data.options;
     break;
   }
   self.postMessage( result );
@@ -247,8 +248,10 @@ var imageUtil = (function() {
   };
 })();
 
-function calcDiff( a, b )
+function calcDiff( a, b, options )
 {
+  var ignoreAE = options.ignoreAE;
+
   var makeDiff = function(a, b, out) {
     var w = a.width, h = a.height;
     var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
@@ -259,7 +262,8 @@ function calcDiff( a, b )
         var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
-        if (r0 == r1 && g0 == g1 && b0 == b1 && a0 == a1) {
+        var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
+        if (ae <= ignoreAE) {
           out.data[k    ] = mean;
           out.data[k + 1] = mean;
           out.data[k + 2] = mean;
