@@ -685,7 +685,7 @@ $( function()
     case 'calcDiff':
       if (diffResult.base == data.index[0] && diffResult.target == data.index[1] &&
           diffResult.ignoreAE == data.options.ignoreAE) {
-        diffResult.image = data.result;
+        diffResult.result = data.result;
       }
       updateDiffTable();
       break;
@@ -957,6 +957,7 @@ $( function()
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
     $('#diffResult *').remove();
+    $('#diffSummary *').remove();
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
       $('#diffTargetName').append($('<span>').text('no data'));
@@ -1000,7 +1001,7 @@ $( function()
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
-      diffResult.image  = null;
+      diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex != targetImageIndex) {
         addTask({
@@ -1023,15 +1024,38 @@ $( function()
         background:'#000',
         padding:'8px'
     };
-    if (diffResult.image == null) {
+    if (diffResult.result == null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
+      setText($('#diffSummary'), {
+        en: 'calculating...',
+        ja: '計算中...'
+      });
     } else {
-      var w = diffResult.image.width, h = diffResult.image.height;
+      var w = diffResult.result.image.width;
+      var h = diffResult.result.image.height;
       var fig = makeBlankFigure(w, h);
       var bits = fig.context.createImageData(w, h);
-      copyImageBits(diffResult.image, bits);
+      copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
       $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
+      if (diffResult.result.sammary.unmatch == 0) {
+        setText($('#diffSummary'), {
+          en: 'Perfect match',
+          ja: '完全に一致しました'
+        });
+      } else {
+        var matchRate = diffResult.result.sammary.match /
+            (diffResult.result.sammary.match + diffResult.result.sammary.unmatch);
+        var digits =
+            matchRate < 0.99 ? 1 :
+            matchRate < 0.9999 ? 3 :
+            matchRate < 0.999999 ? 5 : 7;
+        var percent = (matchRate * 100).toFixed(digits);
+        setText($('#diffSummary'), {
+          en: percent + '% pixels are match',
+          ja: percent + '% のピクセルが一致しました'
+        });
+      }
     }
   };
   var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis);
