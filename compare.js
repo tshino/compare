@@ -274,6 +274,18 @@ $( function()
   {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   }
+  function toPercent(num) {
+    if (num == 0) return '0%';
+    if (num == 1) return '100%';
+    var digits =
+            num < 0.000001 ? 7 :
+            num < 0.0001 ? 5 :
+            num < 0.01 ? 3 :
+            num < 0.99 ? 1 :
+            num < 0.9999 ? 3 :
+            num < 0.999999 ? 5 : 7;
+    return (num * 100).toFixed(digits) + '%';
+  }
   function calcAspectRatio(w, h) {
     var gcd = compareUtil.calcGCD(w, h);
     var w0 = w / gcd, h0 = h / gcd;
@@ -887,7 +899,7 @@ $( function()
         ae:
             isNaN(metrics.ae) ? '‐' :
             addComma(metrics.ae) +
-                ' ('+(metrics.ae*100/imgA.width/imgA.height).toFixed(4)+'%)',
+                ' (' + toPercent(metrics.ae/imgA.width/imgA.height) + ')',
       };
     }
   };
@@ -1045,14 +1057,10 @@ $( function()
         });
       } else {
         var matchRate = diffResult.result.sammary.match / diffResult.result.sammary.total;
-        var digits =
-            matchRate < 0.99 ? 1 :
-            matchRate < 0.9999 ? 3 :
-            matchRate < 0.999999 ? 5 : 7;
-        var percent = (matchRate * 100).toFixed(digits);
+        var percent = toPercent(matchRate);
         setText($('#diffSummary'), {
-          en: percent + '% pixels are match',
-          ja: percent + '% のピクセルが一致しました'
+          en: percent + ' pixels are match',
+          ja: percent + ' のピクセルが一致しました'
         });
       }
     }
