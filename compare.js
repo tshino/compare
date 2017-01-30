@@ -1044,8 +1044,7 @@ $( function()
           ja: '完全に一致しました'
         });
       } else {
-        var matchRate = diffResult.result.sammary.match /
-            (diffResult.result.sammary.match + diffResult.result.sammary.unmatch);
+        var matchRate = diffResult.result.sammary.match / diffResult.result.sammary.total;
         var digits =
             matchRate < 0.99 ? 1 :
             matchRate < 0.9999 ? 3 :

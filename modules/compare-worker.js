@@ -282,7 +282,7 @@ function calcDiff( a, b, options )
       k += (out.pitch - w) * 4;
     }
     sammary.unmatch += unmatch;
-    sammary.match += w * h - unmatch;
+    sammary.total += w * h;
   };
   var minW = Math.min(a.width, b.width);
   var minH = Math.min(a.height, b.height);
@@ -291,7 +291,7 @@ function calcDiff( a, b, options )
   var diff = imageUtil.makeImage(maxW, maxH);
   a = imageUtil.makeImage(a);
   b = imageUtil.makeImage(b);
-  var sammary = { match: 0, unmatch: 0 };
+  var sammary = { total: 0, unmatch: 0 };
   makeDiff(
       imageUtil.makeRegion(a, 0, 0, minW, minH),
       imageUtil.makeRegion(b, 0, 0, minW, minH),
@@ -324,6 +324,7 @@ function calcDiff( a, b, options )
         : imageUtil.makeImage(maxW - minW, maxH - minH),
       imageUtil.makeRegion(diff, minW, minH, maxW - minW, maxH - minH),
       sammary);
+  sammary.match = sammary.total - sammary.unmatch;
   return {
     image:      diff,
     sammary:    sammary,
