@@ -314,7 +314,11 @@ div.dialog tr:nth-of-type(even)
 {
     background      : #e8e8e8;
 }
-div.dialog td:not(.input):not(.prop):not(.keys)
+div.dialog td.output
+{
+    background      : rgba(51,136,238,0.2);
+}
+div.dialog td:not(.input):not(.output):not(.prop):not(.keys)
 {
     font-size       : 1.1em;
     white-space     : pre-wrap;

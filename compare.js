@@ -968,6 +968,7 @@ $( function()
   var updateDiffTable = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
+    $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
     if (images.length < 2) {
@@ -1043,6 +1044,14 @@ $( function()
         ja: '計算中...'
       });
     } else {
+      if (diffOptions.ignoreAE != 0) {
+        var rate = diffResult.result.sammary.countIgnoreAE / diffResult.result.sammary.total;
+        var percent = toPercent(rate);
+        setText($('#diffIgnoreAEResult'), {
+          en: percent + ' pixels ignored',
+          ja: percent + ' を無視しました'
+        });
+      }
       var w = diffResult.result.image.width;
       var h = diffResult.result.image.height;
       var fig = makeBlankFigure(w, h);

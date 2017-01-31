@@ -254,6 +254,7 @@ function calcDiff( a, b, options )
 
   var makeDiff = function(a, b, out, sammary) {
     var unmatch = 0;
+    var countIgnoreAE = 0;
     var w = a.width, h = a.height;
     var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
     for (var y = 0; y < h; y++) {
@@ -265,6 +266,7 @@ function calcDiff( a, b, options )
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
         var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
         if (ae <= ignoreAE) {
+          if (0 < ae) ++countIgnoreAE;
           out.data[k    ] = mean;
           out.data[k + 1] = mean;
           out.data[k + 2] = mean;
@@ -282,6 +284,7 @@ function calcDiff( a, b, options )
       k += (out.pitch - w) * 4;
     }
     sammary.unmatch += unmatch;
+    sammary.countIgnoreAE += countIgnoreAE;
     sammary.total += w * h;
   };
   var minW = Math.min(a.width, b.width);
@@ -291,7 +294,11 @@ function calcDiff( a, b, options )
   var diff = imageUtil.makeImage(maxW, maxH);
   a = imageUtil.makeImage(a);
   b = imageUtil.makeImage(b);
-  var sammary = { total: 0, unmatch: 0 };
+  var sammary = {
+    total: 0,
+    countIgnoreAE: 0,
+    unmatch: 0,
+  };
   makeDiff(
       imageUtil.makeRegion(a, 0, 0, minW, minH),
       imageUtil.makeRegion(b, 0, 0, minW, minH),

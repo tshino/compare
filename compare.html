@@ -438,26 +438,35 @@
 				<table id="diffTable">
 					<tr>
 						<td class="prop">
-							<span class="en">Images to be compared</span>
-							<span class="ja">比較する画像</span>
+							<span class="en">Base Image</span>
+							<span class="ja">基準画像</span>
 						</td>
-						<td id="diffBaseName"></td>
+						<td id="diffBaseName" style="min-width: 256px"></td>
+						<td style="min-width: 256px"></td>
+					</tr>
+					<tr>
+						<td class="prop">
+							<span class="en">Target Image</span>
+							<span class="ja">対象画像</span>
+						</td>
 						<td id="diffTargetName"></td>
+						<td></td>
 					</tr>
 					<tr class="num">
 						<td class="prop">
 							<span class="en">Absolute error to ignore</span>
 							<span class="ja">無視する誤差の大きさ</span>
 						</td>
-						<td colspan="2" class="input">
+						<td class="input">
 							(0 - 255) <input id="diffIgnoreAE" type="number" min="0" max="255" value="0">
 						</td>
+						<td id="diffIgnoreAEResult" class="output"></td>
 					</tr>
 					<tr>
 						<td id="diffResult" colspan="3"></td>
 					</tr>
 					<tr>
-						<td id="diffSummary" colspan="3" style="text-align:center"></td>
+						<td id="diffSummary" class="output" colspan="3" style="text-align:center"></td>
 					</tr>
 				</table>
 				<div class="footnote">
