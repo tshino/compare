@@ -47,14 +47,21 @@ $( function()
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
     {
-      if (e.ctrlKey || e.altKey || e.metaKey || e.target.localName == 'input')
-      {
+      if (e.ctrlKey || e.altKey || e.metaKey) {
+        return true;
+      }
+      // ESC (27)
+      if (dialog && e.keyCode == 27 && !e.shiftKey) {
+        dialog.close();
+        return false;
+      }
+      if (e.target.localName == 'input') {
         return true;
       }
       if (dialog)
       {
-        // ESC (27), BS (8)
-        if ((e.keyCode == 27 || e.keyCode == 8) && !e.shiftKey) {
+        // BS (8)
+        if (e.keyCode == 8 && !e.shiftKey) {
           dialog.close();
           return false;
         // '1'
