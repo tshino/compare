@@ -241,10 +241,25 @@ var imageUtil = (function() {
       i += (image.pitch - w) * 4;
     }
   };
+  var copy = function(dest, src) {
+    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    var i = dest.offset * 4, j = src.offset * 4;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4, j += 4) {
+        dest.data[i    ] = src.data[j    ];
+        dest.data[i + 1] = src.data[j + 1];
+        dest.data[i + 2] = src.data[j + 2];
+        dest.data[i + 3] = src.data[j + 3];
+      }
+      i += (dest.pitch - w) * 4;
+      j += (src.pitch - w) * 4;
+    }
+  };
   return {
     makeImage:      makeImage,
     makeRegion:     makeRegion,
     fill:           fill,
+    copy:           copy,
   };
 })();
 
@@ -294,43 +309,22 @@ function calcDiff( a, b, options )
   var diff = imageUtil.makeImage(maxW, maxH);
   a = imageUtil.makeImage(a);
   b = imageUtil.makeImage(b);
+  if (a.width < maxW || a.height < maxH) {
+    var new_a = imageUtil.makeImage(maxW, maxH);
+    imageUtil.copy(new_a, a);
+    a = new_a;
+  }
+  if (b.width < maxW || b.height < maxH) {
+    var new_b = imageUtil.makeImage(maxW, maxH);
+    imageUtil.copy(new_b, b);
+    b = new_b;
+  }
   var sammary = {
     total: 0,
     countIgnoreAE: 0,
     unmatch: 0,
   };
-  makeDiff(
-      imageUtil.makeRegion(a, 0, 0, minW, minH),
-      imageUtil.makeRegion(b, 0, 0, minW, minH),
-      imageUtil.makeRegion(diff, 0, 0, minW, minH),
-      sammary);
-  makeDiff(
-      minW < a.width
-        ? imageUtil.makeRegion(a, minW, 0, maxW - minW, minH)
-        : imageUtil.makeImage(maxW - minW, minH),
-      minW < b.width
-        ? imageUtil.makeRegion(b, minW, 0, maxW - minW, minH)
-        : imageUtil.makeImage(maxW - minW, minH),
-      imageUtil.makeRegion(diff, minW, 0, maxW - minW, minH),
-      sammary);
-  makeDiff(
-      minH < a.height
-        ? imageUtil.makeRegion(a, 0, minH, minW, maxH - minH)
-        : imageUtil.makeImage(minW, maxH - minH),
-      minH < b.height
-        ? imageUtil.makeRegion(b, 0, minH, minW, maxH - minH)
-        : imageUtil.makeImage(minW, maxH - minH),
-      imageUtil.makeRegion(diff, 0, minH, minW, maxH - minH),
-      sammary);
-  makeDiff(
-      (minW < a.width && minH < a.height)
-        ? imageUtil.makeRegion(a, minW, minH, maxW - minW, maxH - minH)
-        : imageUtil.makeImage(maxW - minW, maxH - minH),
-      (minW < b.width && minH < b.height)
-        ? imageUtil.makeRegion(b, minW, minH, maxW - minW, maxH - minH)
-        : imageUtil.makeImage(maxW - minW, maxH - minH),
-      imageUtil.makeRegion(diff, minW, minH, maxW - minW, maxH - minH),
-      sammary);
+  makeDiff(a, b, diff, sammary);
   sammary.match = sammary.total - sammary.unmatch;
   return {
     image:      diff,
