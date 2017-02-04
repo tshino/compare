@@ -978,6 +978,7 @@ $( function()
     $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
+    $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
       $('#diffTargetName').append($('<span>').text('no data'));
@@ -1013,7 +1014,6 @@ $( function()
         updateDiffTable();
       })
     );
-    $('#diffIgnoreAE').attr({ value: diffOptions.ignoreAE });
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
     if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
