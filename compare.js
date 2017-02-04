@@ -785,7 +785,7 @@ $( function()
       function drawHistogram(color, offset) {
         context.fillStyle = color;
         for (var i = 0; i < 256; ++i) {
-          var h = 512 * hist[i + offset] / max;
+          var h = 512 * Math.pow(hist[i + offset] / max, 0.5);
           context.fillRect(i*3, 512-h, 3, h);
         }
       }
