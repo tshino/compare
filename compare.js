@@ -116,6 +116,13 @@ $( function()
         updateLayout();
         return false;
       }
+      // Delete (46)
+      if (e.keyCode == 46 && !e.shiftKey && 0 < images.length)
+      {
+        var index = isSingleView ? currentImageIndex - 1 : images[0].index;
+        removeEntry(index);
+        return false;
+      }
       //alert('keydown: '+e.keyCode);
     });
   
@@ -293,6 +300,36 @@ $( function()
             num < 0.999999 ? 5 : 7;
     return (num * 100).toFixed(digits) + '%';
   }
+  var removeEntry = function(index) {
+    var ent = entries[index];
+    if (ent && !ent.loading && ent.visible) {
+      ent.visible = false;
+      if (ent.element) {
+        $(ent.view).remove('.image');
+        ent.element = null;
+      }
+      if (baseImageIndex == index) {
+        baseImageIndex = null;
+      }
+      if (targetImageIndex == index) {
+        targetImageIndex = null;
+      }
+      if (diffResult.base == index || diffResult.target == index) {
+        $('#diffResult *').remove();
+        diffResult.result = null;
+      }
+      ent.asCanvas = null;
+      ent.imageData = null;
+      ent.histogram = null;
+      ent.waveform = null;
+      currentImageIndex = 0;
+      viewZoom = 0;
+      setViewOffset(0.5, 0.5);
+      overlayMode = false;
+      discardTasksOfEntryByIndex(index);
+      updateDOM();
+    }
+  };
   function calcAspectRatio(w, h) {
     var gcd = compareUtil.calcGCD(w, h);
     var w0 = w / gcd, h0 = h / gcd;
@@ -686,13 +723,13 @@ $( function()
     switch (data.cmd) {
     case 'calcHistogram':
       if (data.type == histogramType) {
-        var img = entries[data.index];
+        var img = entries[data.index[0]];
         updateHistogram(data.type, img, data.result);
       }
       break;
     case 'calcWaveform':
       if (data.type == waveformType) {
-        var img = entries[data.index];
+        var img = entries[data.index[0]];
         updateWaveform(data.type, img, data.histW, data.result);
       }
       break;
@@ -719,7 +756,7 @@ $( function()
       switch (task.cmd) {
       case 'calcHistogram':
       case 'calcWaveform':
-        task.imageData = getImageData(entries[task.index]);
+        task.imageData = getImageData(entries[task.index[0]]);
         worker.postMessage(task);
         break;
       case 'calcMetrics':
@@ -737,17 +774,19 @@ $( function()
     taskQueue.push(task);
     window.setTimeout(kickNextTask, 0);
   }
-  function discardTasksOfCommand(cmd)
-  {
+  var discardTasksOfCommand = function(cmd) {
     taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd != cmd; });
-  }
+  };
+  var discardTasksOfEntryByIndex = function(index) {
+    taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) == -1; });
+  };
   
   function updateHistogramAsync(img)
   {
     addTask({
       cmd:      'calcHistogram',
       type:     histogramType,
-      index:    img.index,
+      index:    [img.index],
     });
   }
   function updateHistogram(type, img, hist)
@@ -820,7 +859,7 @@ $( function()
     addTask({
       cmd:      'calcWaveform',
       type:     waveformType,
-      index:    img.index,
+      index:    [img.index],
       histW:    Math.min(img.canvasWidth, 1024),
     });
   }
@@ -993,7 +1032,7 @@ $( function()
       }
       return null;
     };
-    if (targetImageIndex === null) {
+    if (targetImageIndex === null || baseImageIndex == targetImageIndex) {
       targetImageIndex = findImageIndexOtherThan(baseImageIndex);
     }
     $('#diffBaseName').append(
