@@ -1130,7 +1130,10 @@ $( function()
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>').append(
             makeImageNameWithIndex('<span class="imageName">', ent).
-              click({index : i}, function(e) { toggleSingleView(e.data.index + 1); })
+              click({index : i}, function(e) { toggleSingleView(e.data.index + 1); }).
+              append(
+                $('<button>').addClass('remove').text('×').
+                  click({index : i}, function(e) { removeEntry(e.data.index); }))
           );
           $('#drop').before(ent.view);
         }

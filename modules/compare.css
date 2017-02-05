@@ -127,6 +127,18 @@ button:hover span.tooltip
 {
     color           : #69f;
 }
+#view .imageName button.remove
+{
+    display         : none;
+    position        : absolute;
+    font-size       : 12px;
+    right           : 10px;
+    top             : 10px;
+}
+#view .imageName:hover button.remove
+{
+    display         : inline-block;
+}
 .imageIndex
 {
     display         : inline-block;
