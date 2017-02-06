@@ -269,6 +269,7 @@ function calcDiff( a, b, options )
 
   var makeDiff = function(a, b, out, sammary) {
     var unmatch = 0;
+    var maxAE = 0;
     var countIgnoreAE = 0;
     var d0 = a.data, d1 = b.data, o = out.data;
     var w = a.width, h = a.height;
@@ -281,6 +282,7 @@ function calcDiff( a, b, options )
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
         var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
+        maxAE = Math.max(maxAE, ae);
         if (ae <= ignoreAE) {
           if (0 < ae) ++countIgnoreAE;
           o[k    ] = mean;
@@ -298,6 +300,7 @@ function calcDiff( a, b, options )
       k += (out.pitch - w) * 4;
     }
     sammary.unmatch += unmatch;
+    sammary.maxAE = Math.max(sammary.maxAE, maxAE);
     sammary.countIgnoreAE += countIgnoreAE;
     sammary.total += w * h;
   };
@@ -322,6 +325,7 @@ function calcDiff( a, b, options )
     total: 0,
     countIgnoreAE: 0,
     unmatch: 0,
+    maxAE: 0,
   };
   makeDiff(a, b, diff, sammary);
   sammary.match = sammary.total - sammary.unmatch;

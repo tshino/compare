@@ -453,14 +453,23 @@
 						<td></td>
 					</tr>
 					<tr class="num">
-						<td class="prop">
-							<span class="en">Absolute error to ignore</span>
-							<span class="ja">無視する誤差の大きさ</span>
+						<td class="prop" rowspan="2">
+							<span class="en">RGBA error</span>
+							<span class="ja">RGBA誤差</span>
 						</td>
+						<td class="output" colspan="2">
+							&nbsp;<span id="diffDetectedMaxAE"></span>
+						</td>
+					</tr>
+					<tr class="num">
 						<td class="input">
+							<span class="en">maximum error to ignore</span>
+							<span class="ja">無視する誤差の大きさ</span>
 							(0 - 255) <input id="diffIgnoreAE" type="number" min="0" max="255" value="0">
 						</td>
-						<td id="diffIgnoreAEResult" class="output"></td>
+						<td class="output">
+							<span id="diffIgnoreAEResult"></span>
+						</td>
 					</tr>
 					<tr>
 						<td id="diffResult" colspan="3"></td>

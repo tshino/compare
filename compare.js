@@ -1014,6 +1014,7 @@ $( function()
   var updateDiffTable = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
+    $('#diffDetectedMaxAE *').remove();
     $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
@@ -1090,12 +1091,19 @@ $( function()
         ja: '計算中...'
       });
     } else {
+      if (diffResult.result.sammary.maxAE != 0) {
+        var e = diffResult.result.sammary.maxAE;
+        setText($('#diffDetectedMaxAE'), {
+          en: 'detected maximum error value: ' + e,
+          ja: '検出した最大誤差: ' + e
+        });
+      }
       if (diffOptions.ignoreAE != 0) {
         var rate = diffResult.result.sammary.countIgnoreAE / diffResult.result.sammary.total;
         var percent = toPercent(rate);
         setText($('#diffIgnoreAEResult'), {
-          en: percent + ' pixels ignored',
-          ja: percent + ' を無視しました'
+          en: percent + ' unmatched pixels ignored',
+          ja: percent + ' の不一致を無視しました'
         });
       }
       var w = diffResult.result.image.width;
