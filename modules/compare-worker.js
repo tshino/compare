@@ -270,29 +270,28 @@ function calcDiff( a, b, options )
   var makeDiff = function(a, b, out, sammary) {
     var unmatch = 0;
     var countIgnoreAE = 0;
+    var d0 = a.data, d1 = b.data, o = out.data;
     var w = a.width, h = a.height;
     var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
-        var r0 = a.data[i + 0], g0 = a.data[i + 1], b0 = a.data[i + 2], a0 = a.data[i + 3];
-        var r1 = b.data[j + 0], g1 = b.data[j + 1], b1 = b.data[j + 2], a1 = b.data[j + 3];
+        var r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
+        var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
         var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
         var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
         if (ae <= ignoreAE) {
           if (0 < ae) ++countIgnoreAE;
-          out.data[k    ] = mean;
-          out.data[k + 1] = mean;
-          out.data[k + 2] = mean;
-          out.data[k + 3] = 255;
+          o[k    ] = mean;
+          o[k + 2] = mean;
         } else {
-          out.data[k    ] = y0 >= y1 ? 255 : mean;
-          out.data[k + 1] = mean;
-          out.data[k + 2] = y0 <= y1 ? 255 : mean;
-          out.data[k + 3] = 255;
           ++unmatch;
+          o[k    ] = y0 >= y1 ? 255 : mean;
+          o[k + 2] = y0 <= y1 ? 255 : mean;
         }
+        o[k + 1] = mean;
+        o[k + 3] = 255;
       }
       i += (a.pitch - w) * 4;
       j += (b.pitch - w) * 4;
