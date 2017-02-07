@@ -445,18 +445,24 @@ $( function()
   var addGrid = function(img) {
     if (img.element && 0 == img.view.find('.grid').length) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
-      var grid = '';
-      var GRID_STEP = 100;
-      for (var k = GRID_STEP; k < img.canvasWidth; k += GRID_STEP) {
-        grid += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
-      }
-      for (var k = GRID_STEP; k < img.canvasHeight; k += GRID_STEP) {
-        grid += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
-      }
+      var makeGridDesc = function(step, skip) {
+        var desc = '';
+        for (var k = step; k < img.canvasWidth; k += step) {
+          if (skip && (k % skip) == 0) continue;
+          desc += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
+        }
+        for (var k = step; k < img.canvasHeight; k += step) {
+          if (skip && (k % skip) == 0) continue;
+          desc += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
+        }
+        return desc;
+      };
+      var grid100 = makeGridDesc(100);
+      var grid10 = makeGridDesc(10, 100);
       img.grid = $(
         '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
-          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" '+
-            'd="' + grid + '"></path>' +
+          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid100 + '"></path>' +
+          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid10 + '"></path>' +
         '</svg>').
         width(img.canvasWidth).
         height(img.canvasHeight);
@@ -1318,8 +1324,18 @@ $( function()
         $(ent.element).css(style);
         if (ent.grid) {
           $(ent.grid).css(style);
-          var strokeWidth = 0.5 * ent.width / ent.baseWidth / scale;
-          $(ent.grid).find('path').attr('stroke-width', strokeWidth);
+          var base = 0.5 * ent.width / ent.baseWidth / scale;
+          var strokeWidth = [
+              (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
+              (base > 0.5 ? 0 : 1) * base];
+          var opacity = [
+              0.6,
+              base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
+          $(ent.grid).find('path').each(function(index) {
+            $(this).
+                attr('stroke-width', strokeWidth[index]).
+                attr('opacity', opacity[index]);
+          });
         }
       }
     }
