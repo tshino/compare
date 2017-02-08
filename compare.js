@@ -1020,6 +1020,8 @@ $( function()
   var updateDiffTable = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
+    $('#diffDimension').css({display:'none'});
+    $('#diffDimensionReport *').remove();
     $('#diffDetectedMaxAE *').remove();
     $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
@@ -1062,6 +1064,15 @@ $( function()
     );
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
+    if (a.width == b.width && a.height == b.height) {
+      $('#diffDimension').css({display:'none'});
+    } else {
+      $('#diffDimension').css({display:''});
+      setText($('#diffDimensionReport'), {
+        en: 'dimensions are different',
+        ja: '画像サイズが異なっています'
+      });
+    }
     if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
         diffResult.ignoreAE != diffOptions.ignoreAE) {
       diffResult.base   = baseImageIndex;
