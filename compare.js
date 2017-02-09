@@ -43,6 +43,11 @@ $( function()
     updateDiffTable();
     return false;
   });
+  $('#diffIgnoreRemainder').on('change', function(e) {
+    diffOptions.ignoreRemainder = this.checked;
+    updateDiffTable();
+    return false;
+  });
   
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
@@ -266,7 +271,10 @@ $( function()
   var baseImageIndex = null;
   var targetImageIndex = null;
   var diffResult = {};
-  var diffOptions = { ignoreAE: 0 };
+  var diffOptions = {
+    ignoreAE: 0,
+    ignoreRemainder: true,
+  };
 
   var toggleLang = function() {
     var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
@@ -746,7 +754,8 @@ $( function()
       break;
     case 'calcDiff':
       if (diffResult.base == data.index[0] && diffResult.target == data.index[1] &&
-          diffResult.ignoreAE == data.options.ignoreAE) {
+          diffResult.ignoreAE == data.options.ignoreAE &&
+          diffResult.ignoreRemainder == data.options.ignoreRemainder) {
         diffResult.result = data.result;
       }
       updateDiffTable();
@@ -1026,6 +1035,7 @@ $( function()
     $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
+    $('#diffIgnoreRemainder').prop('checked', diffOptions.ignoreRemainder);
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
@@ -1070,14 +1080,16 @@ $( function()
       $('#diffDimension').css({display:''});
       setText($('#diffDimensionReport'), {
         en: 'dimensions are different',
-        ja: '画像サイズが異なっています'
+        ja: '画像サイズが異なります'
       });
     }
     if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
-        diffResult.ignoreAE != diffOptions.ignoreAE) {
+        diffResult.ignoreAE != diffOptions.ignoreAE ||
+        diffResult.ignoreRemainder != diffOptions.ignoreRemainder) {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
+      diffResult.ignoreRemainder = diffOptions.ignoreRemainder;
       diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex != targetImageIndex) {
@@ -1086,6 +1098,7 @@ $( function()
           index:    [a.index, b.index],
           options:  {
             ignoreAE:   diffOptions.ignoreAE,
+            ignoreRemainder: diffOptions.ignoreRemainder,
           },
         });
       }

@@ -457,8 +457,15 @@
 							<span class="en">Dimension</span>
 							<span class="ja">画像サイズ</span>
 						</td>
-						<td class="output" colspan="2">
+						<td class="output">
 							&nbsp;<span id="diffDimensionReport"></span>
+						</td>
+						<td class="input">
+							<label>
+								<input type="checkbox" checked id="diffIgnoreRemainder">
+								<span class="en">ignore the remainder due to size difference</span>
+								<span class="ja">画像サイズの違いで余る部分を無視する</span>
+							</label>
 						</td>
 					</tr>
 					<tr class="num">
@@ -466,18 +473,18 @@
 							<span class="en">RGBA error</span>
 							<span class="ja">RGBA誤差</span>
 						</td>
-						<td class="output" colspan="2">
+						<td class="output" rowspan="2">
 							&nbsp;<span id="diffDetectedMaxAE"></span>
 						</td>
-					</tr>
-					<tr class="num">
 						<td class="input">
 							<span class="en">maximum error to ignore</span>
 							<span class="ja">無視する誤差の大きさ</span>
 							(0 - 255) <input id="diffIgnoreAE" type="number" min="0" max="255" value="0">
 						</td>
+					</tr>
+					<tr class="num">
 						<td class="output">
-							<span id="diffIgnoreAEResult"></span>
+							&nbsp;<span id="diffIgnoreAEResult"></span>
 						</td>
 					</tr>
 					<tr>

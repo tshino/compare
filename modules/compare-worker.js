@@ -308,16 +308,18 @@ function calcDiff( a, b, options )
   var minH = Math.min(a.height, b.height);
   var maxW = Math.max(a.width, b.width);
   var maxH = Math.max(a.height, b.height);
-  var diff = imageUtil.makeImage(maxW, maxH);
-  a = imageUtil.makeImage(a);
-  b = imageUtil.makeImage(b);
-  if (a.width < maxW || a.height < maxH) {
-    var new_a = imageUtil.makeImage(maxW, maxH);
+  var regionW = options.ignoreRemainder ? minW : maxW;
+  var regionH = options.ignoreRemainder ? minH : maxH;
+  var diff = imageUtil.makeImage(regionW, regionH);
+  a = imageUtil.makeRegion(a, 0, 0, regionW, regionH);
+  b = imageUtil.makeRegion(b, 0, 0, regionW, regionH);
+  if (a.width < regionW || a.height < regionH) {
+    var new_a = imageUtil.makeImage(regionW, regionH);
     imageUtil.copy(new_a, a);
     a = new_a;
   }
-  if (b.width < maxW || b.height < maxH) {
-    var new_b = imageUtil.makeImage(maxW, maxH);
+  if (b.width < regionW || b.height < regionH) {
+    var new_b = imageUtil.makeImage(regionW, regionH);
     imageUtil.copy(new_b, b);
     b = new_b;
   }
