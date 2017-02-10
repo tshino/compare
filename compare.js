@@ -48,6 +48,11 @@ $( function()
     updateDiffTable();
     return false;
   });
+  $('#diffResizeToLarger').on('change', function(e) {
+    diffOptions.resizeToLarger = this.checked;
+    updateDiffTable();
+    return false;
+  });
   
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
@@ -273,7 +278,8 @@ $( function()
   var diffResult = {};
   var diffOptions = {
     ignoreAE: 0,
-    ignoreRemainder: true,
+    resizeToLarger: true,
+    ignoreRemainder: false,
   };
 
   var toggleLang = function() {
@@ -755,7 +761,8 @@ $( function()
     case 'calcDiff':
       if (diffResult.base == data.index[0] && diffResult.target == data.index[1] &&
           diffResult.ignoreAE == data.options.ignoreAE &&
-          diffResult.ignoreRemainder == data.options.ignoreRemainder) {
+          diffResult.ignoreRemainder == data.options.ignoreRemainder &&
+          diffResult.resizeToLarger == data.options.resizeToLarger) {
         diffResult.result = data.result;
       }
       updateDiffTable();
@@ -1035,7 +1042,11 @@ $( function()
     $('#diffIgnoreAEResult *').remove();
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
-    $('#diffIgnoreRemainder').prop('checked', diffOptions.ignoreRemainder);
+    $('#diffResizeToLarger').prop('checked', diffOptions.resizeToLarger);
+    $('#diffIgnoreRemainder').
+      prop('checked', diffOptions.ignoreRemainder).
+      prop('disabled', diffOptions.resizeToLarger).
+      parent().css({opacity: diffOptions.resizeToLarger ? '0.5' : ''});
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
@@ -1085,11 +1096,13 @@ $( function()
     }
     if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
         diffResult.ignoreAE != diffOptions.ignoreAE ||
-        diffResult.ignoreRemainder != diffOptions.ignoreRemainder) {
+        diffResult.ignoreRemainder != diffOptions.ignoreRemainder ||
+        diffResult.resizeToLarger != diffOptions.resizeToLarger) {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
       diffResult.ignoreRemainder = diffOptions.ignoreRemainder;
+      diffResult.resizeToLarger = diffOptions.resizeToLarger;
       diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex != targetImageIndex) {
@@ -1099,6 +1112,7 @@ $( function()
           options:  {
             ignoreAE:   diffOptions.ignoreAE,
             ignoreRemainder: diffOptions.ignoreRemainder,
+            resizeToLarger: diffOptions.resizeToLarger,
           },
         });
       }

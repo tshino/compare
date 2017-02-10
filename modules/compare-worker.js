@@ -255,11 +255,30 @@ var imageUtil = (function() {
       j += (src.pitch - w) * 4;
     }
   };
+  var resize = function(dest, src) {
+    var w = dest.width, h = dest.height;
+    var sw = src.width, sh = src.height;
+    var i = dest.offset * 4;
+    for (var y = 0; y < h; y++) {
+      var sy = Math.floor((y + 0.5) * sh / h);
+      var j0 = (src.offset + src.pitch * sy) * 4
+      for (var x = 0; x < w; x++, i += 4) {
+        var sx = Math.floor((x + 0.5) * sw / w);
+        var j = j0 + sx * 4;
+        dest.data[i    ] = src.data[j    ];
+        dest.data[i + 1] = src.data[j + 1];
+        dest.data[i + 2] = src.data[j + 2];
+        dest.data[i + 3] = src.data[j + 3];
+      }
+      i += (dest.pitch - w) * 4;
+    }
+  };
   return {
     makeImage:      makeImage,
     makeRegion:     makeRegion,
     fill:           fill,
     copy:           copy,
+    resize:         resize,
   };
 })();
 
@@ -308,19 +327,28 @@ function calcDiff( a, b, options )
   var minH = Math.min(a.height, b.height);
   var maxW = Math.max(a.width, b.width);
   var maxH = Math.max(a.height, b.height);
-  var regionW = options.ignoreRemainder ? minW : maxW;
-  var regionH = options.ignoreRemainder ? minH : maxH;
+  var useLargerSize = options.resizeToLarger || !options.ignoreRemainder;
+  var regionW = useLargerSize ? maxW : minW;
+  var regionH = useLargerSize ? maxH : minH;
   var diff = imageUtil.makeImage(regionW, regionH);
   a = imageUtil.makeRegion(a, 0, 0, regionW, regionH);
   b = imageUtil.makeRegion(b, 0, 0, regionW, regionH);
   if (a.width < regionW || a.height < regionH) {
     var new_a = imageUtil.makeImage(regionW, regionH);
-    imageUtil.copy(new_a, a);
+    if (options.resizeToLarger) {
+      imageUtil.resize(new_a, a);
+    } else {
+      imageUtil.copy(new_a, a);
+    }
     a = new_a;
   }
   if (b.width < regionW || b.height < regionH) {
     var new_b = imageUtil.makeImage(regionW, regionH);
-    imageUtil.copy(new_b, b);
+    if (options.resizeToLarger) {
+      imageUtil.resize(new_b, b);
+    } else {
+      imageUtil.copy(new_b, b);
+    }
     b = new_b;
   }
   var sammary = {
