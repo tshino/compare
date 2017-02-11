@@ -286,7 +286,7 @@ function calcDiff( a, b, options )
 {
   var ignoreAE = options.ignoreAE;
 
-  var makeDiff = function(a, b, out, sammary) {
+  var makeDiff = function(a, b, out, summary) {
     var unmatch = 0;
     var maxAE = 0;
     var countIgnoreAE = 0;
@@ -318,10 +318,10 @@ function calcDiff( a, b, options )
       j += (b.pitch - w) * 4;
       k += (out.pitch - w) * 4;
     }
-    sammary.unmatch += unmatch;
-    sammary.maxAE = Math.max(sammary.maxAE, maxAE);
-    sammary.countIgnoreAE += countIgnoreAE;
-    sammary.total += w * h;
+    summary.unmatch += unmatch;
+    summary.maxAE = Math.max(summary.maxAE, maxAE);
+    summary.countIgnoreAE += countIgnoreAE;
+    summary.total += w * h;
   };
   var minW = Math.min(a.width, b.width);
   var minH = Math.min(a.height, b.height);
@@ -351,16 +351,16 @@ function calcDiff( a, b, options )
     }
     b = new_b;
   }
-  var sammary = {
+  var summary = {
     total: 0,
     countIgnoreAE: 0,
     unmatch: 0,
     maxAE: 0,
   };
-  makeDiff(a, b, diff, sammary);
-  sammary.match = sammary.total - sammary.unmatch;
+  makeDiff(a, b, diff, summary);
+  summary.match = summary.total - summary.unmatch;
   return {
     image:      diff,
-    sammary:    sammary,
+    summary:    summary,
   };
 }

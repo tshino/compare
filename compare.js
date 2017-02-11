@@ -1135,15 +1135,15 @@ $( function()
         ja: '計算中...'
       });
     } else {
-      if (diffResult.result.sammary.maxAE != 0) {
-        var e = diffResult.result.sammary.maxAE;
+      if (diffResult.result.summary.maxAE != 0) {
+        var e = diffResult.result.summary.maxAE;
         setText($('#diffDetectedMaxAE'), {
           en: 'detected maximum error value: ' + e,
           ja: '検出した最大誤差: ' + e
         });
       }
       if (diffOptions.ignoreAE != 0) {
-        var rate = diffResult.result.sammary.countIgnoreAE / diffResult.result.sammary.total;
+        var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
         var percent = toPercent(rate);
         setText($('#diffIgnoreAEResult'), {
           en: percent + ' unmatched pixels ignored',
@@ -1157,13 +1157,13 @@ $( function()
       copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
       $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
-      if (diffResult.result.sammary.unmatch == 0) {
+      if (diffResult.result.summary.unmatch == 0) {
         setText($('#diffSummary'), {
           en: 'Perfect match',
           ja: '完全に一致しました'
         });
       } else {
-        var matchRate = diffResult.result.sammary.match / diffResult.result.sammary.total;
+        var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
         var percent = toPercent(matchRate);
         setText($('#diffSummary'), {
           en: percent + ' pixels are match',
