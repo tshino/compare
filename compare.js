@@ -1343,6 +1343,9 @@ $( function()
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     if (isSingleView) {
       $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
+      if (overlayMode) {
+        $('.selector').eq(images[0].index).addClass('current');
+      }
     } else {
       $('.selector').removeClass('current');
     }
