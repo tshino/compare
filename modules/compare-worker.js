@@ -257,18 +257,24 @@ var imageUtil = (function() {
   };
   var resizeNN = function(dest, src) {
     var w = dest.width, h = dest.height;
-    var sw = src.width, sh = src.height;
+    var mw = src.width / w, mh = src.height / h;
     var i = dest.offset * 4;
+    var ddata = dest.data, sdata = src.data;
+    var floor = Math.floor;
     for (var y = 0; y < h; y++) {
-      var sy = Math.floor((y + 0.5) * sh / h);
+      var sy = floor((y + 0.5) * mh);
       var j0 = (src.offset + src.pitch * sy) * 4
       for (var x = 0; x < w; x++, i += 4) {
-        var sx = Math.floor((x + 0.5) * sw / w);
+        var sx = floor((x + 0.5) * mw);
         var j = j0 + sx * 4;
-        dest.data[i    ] = src.data[j    ];
-        dest.data[i + 1] = src.data[j + 1];
-        dest.data[i + 2] = src.data[j + 2];
-        dest.data[i + 3] = src.data[j + 3];
+        var r = sdata[j    ];
+        var g = sdata[j + 1];
+        var b = sdata[j + 2];
+        var a = sdata[j + 3];
+        ddata[i    ] = r;
+        ddata[i + 1] = g;
+        ddata[i + 2] = b;
+        ddata[i + 3] = a;
       }
       i += (dest.pitch - w) * 4;
     }
@@ -276,10 +282,14 @@ var imageUtil = (function() {
   var resizeBilinear = function(dest, src) {
     var w = dest.width, h = dest.height;
     var sw = src.width, sh = src.height;
+    var mw = sw / w, mh = sh / h;
     var i = dest.offset * 4;
+    var ddata = dest.data, sdata = src.data;
+    var round = Math.round;
+    var floor = Math.floor;
     for (var y = 0; y < h; y++) {
-      var ry = (y + 0.5) * sh / h - 0.5;
-      var sy0 = Math.floor(ry);
+      var ry = (y + 0.5) * mh - 0.5;
+      var sy0 = floor(ry);
       var sy1 = sy0 + 1;
       var fy1 = ry - sy0;
       if (sy0 < 0) { sy0 = sy1 = 0; fy1 = 0; }
@@ -288,8 +298,8 @@ var imageUtil = (function() {
       var j0 = (src.offset + src.pitch * sy0) * 4;
       var j1 = (src.offset + src.pitch * sy1) * 4;
       for (var x = 0; x < w; x++, i += 4) {
-        var rx = (x + 0.5) * sw / w - 0.5;
-        var sx0 = Math.floor(rx);
+        var rx = (x + 0.5) * mw - 0.5;
+        var sx0 = floor(rx);
         var sx1 = sx0 + 1;
         var fx1 = rx - sx0;
         if (sx0 < 0) { sx0 = sx1 = 0; fx1 = 0; }
@@ -303,14 +313,14 @@ var imageUtil = (function() {
         var f01 = fy0 * fx1;
         var f10 = fy1 * fx0;
         var f11 = fy1 * fx1;
-        var r = src.data[j00    ] * f00 + src.data[j01    ] * f01 + src.data[j10    ] * f10 + src.data[j11    ] * f11;
-        var g = src.data[j00 + 1] * f00 + src.data[j01 + 1] * f01 + src.data[j10 + 1] * f10 + src.data[j11 + 1] * f11;
-        var b = src.data[j00 + 2] * f00 + src.data[j01 + 2] * f01 + src.data[j10 + 2] * f10 + src.data[j11 + 2] * f11;
-        var a = src.data[j00 + 3] * f00 + src.data[j01 + 3] * f01 + src.data[j10 + 3] * f10 + src.data[j11 + 3] * f11;
-        dest.data[i    ] = Math.round(r);
-        dest.data[i + 1] = Math.round(g);
-        dest.data[i + 2] = Math.round(b);
-        dest.data[i + 3] = Math.round(a);
+        var r = sdata[j00    ] * f00 + sdata[j01    ] * f01 + sdata[j10    ] * f10 + sdata[j11    ] * f11;
+        var g = sdata[j00 + 1] * f00 + sdata[j01 + 1] * f01 + sdata[j10 + 1] * f10 + sdata[j11 + 1] * f11;
+        var b = sdata[j00 + 2] * f00 + sdata[j01 + 2] * f01 + sdata[j10 + 2] * f10 + sdata[j11 + 2] * f11;
+        var a = sdata[j00 + 3] * f00 + sdata[j01 + 3] * f01 + sdata[j10 + 3] * f10 + sdata[j11 + 3] * f11;
+        ddata[i    ] = round(r);
+        ddata[i + 1] = round(g);
+        ddata[i + 2] = round(b);
+        ddata[i + 3] = round(a);
       }
       i += (dest.pitch - w) * 4;
     }
