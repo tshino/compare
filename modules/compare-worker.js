@@ -286,11 +286,10 @@ var imageUtil = (function() {
     var w = dest.width, h = dest.height;
     var sw = src.width, sh = src.height;
     var mw = sw / w, mh = sh / h;
-    var i = dest.offset * 4;
     var ddata = dest.data, sdata = src.data;
     var round = Math.round;
     var floor = Math.floor;
-    var so = new Uint32Array(w * 2);
+    var sxo = new Uint32Array(w * 2);
     var fx = new Float32Array(w * 2);
     for (var x = 0; x < w; x++) {
       var rx = (x + 0.5) * mw - 0.5;
@@ -300,11 +299,13 @@ var imageUtil = (function() {
       if (sx0 < 0) { sx0 = sx1 = 0; fx1 = 0; }
       if (sx1 >= sw) { sx0 = sx1 = sw - 1; fx1 = 0; }
       var fx0 = 1 - fx1;
-      so[x * 2    ] = sx0 * 4;
-      so[x * 2 + 1] = sx1 * 4;
+      sxo[x * 2    ] = sx0 * 4;
+      sxo[x * 2 + 1] = sx1 * 4;
       fx[x * 2    ] = fx0;
       fx[x * 2 + 1] = fx1;
     }
+    var syo = new Uint32Array(h * 2);
+    var fy = new Float32Array(h * 2);
     for (var y = 0; y < h; y++) {
       var ry = (y + 0.5) * mh - 0.5;
       var sy0 = floor(ry);
@@ -313,17 +314,26 @@ var imageUtil = (function() {
       if (sy0 < 0) { sy0 = sy1 = 0; fy1 = 0; }
       if (sy1 >= sh) { sy0 = sy1 = sh - 1; fy1 = 0; }
       var fy0 = 1 - fy1;
-      var j0 = (src.offset + src.pitch * sy0) * 4;
-      var j1 = (src.offset + src.pitch * sy1) * 4;
+      syo[y * 2    ] = (src.offset + src.pitch * sy0) * 4;
+      syo[y * 2 + 1] = (src.offset + src.pitch * sy1) * 4;
+      fy[y * 2    ] = fy0;
+      fy[y * 2 + 1] = fy1;
+    }
+    var i = dest.offset * 4;
+    for (var y = 0; y < h; y++) {
+      var j0 = syo[y * 2    ];
+      var j1 = syo[y * 2 + 1];
+      var fy0 = fy[y * 2    ];
+      var fy1 = fy[y * 2 + 1];
       for (var x = 0; x < w; x++, i += 4) {
-        var so0 = so[x * 2    ];
-        var so1 = so[x * 2 + 1];
+        var sxo0 = sxo[x * 2    ];
+        var sxo1 = sxo[x * 2 + 1];
         var fx0 = fx[x * 2    ];
         var fx1 = fx[x * 2 + 1];
-        var j00 = j0 + so0;
-        var j01 = j0 + so1;
-        var j10 = j1 + so0;
-        var j11 = j1 + so1;
+        var j00 = j0 + sxo0;
+        var j01 = j0 + sxo1;
+        var j10 = j1 + sxo0;
+        var j11 = j1 + sxo1;
         var f00 = fy0 * fx0;
         var f01 = fy0 * fx1;
         var f10 = fy1 * fx0;
@@ -342,13 +352,15 @@ var imageUtil = (function() {
   };
   var resize = function(dest, src, method) {
     method = method !== undefined ? method : 'bilinear';
+    //console.time(method); for (var i = 0; i < 100; ++i) {
     if (method == 'nn') {
-      return resizeNN(dest, src);
+      resizeNN(dest, src);
     } else if (method == 'bilinear') {
-      return resizeBilinear(dest, src);
+      resizeBilinear(dest, src);
     } else {
       console.log('unexpected argument: ' + method);
     }
+    //} console.timeEnd(method);
   };
   return {
     makeImage:      makeImage,
