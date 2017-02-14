@@ -314,40 +314,50 @@ var imageUtil = (function() {
       if (sy0 < 0) { sy0 = sy1 = 0; fy1 = 0; }
       if (sy1 >= sh) { sy0 = sy1 = sh - 1; fy1 = 0; }
       var fy0 = 1 - fy1;
-      syo[y * 2    ] = (src.offset + src.pitch * sy0) * 4;
-      syo[y * 2 + 1] = (src.offset + src.pitch * sy1) * 4;
+      syo[y * 2    ] = w * sy0 * 4;
+      syo[y * 2 + 1] = w * sy1 * 4;
       fy[y * 2    ] = fy0;
       fy[y * 2 + 1] = fy1;
     }
-    var i = dest.offset * 4;
-    for (var y = 0; y < h; y++) {
-      var j0 = syo[y * 2    ];
-      var j1 = syo[y * 2 + 1];
-      var fy0 = fy[y * 2    ];
-      var fy1 = fy[y * 2 + 1];
-      for (var x = 0; x < w; x++, i += 4) {
-        var sxo0 = sxo[x * 2    ];
-        var sxo1 = sxo[x * 2 + 1];
+    var kdata = new Float32Array(w * sh * 4);
+    var k = 0;
+    var j = src.offset * 4;
+    for (var sy = 0; sy < sh; sy++) {
+      for (var x = 0; x < w; x++, k += 4) {
+        var j0 = j + sxo[x * 2    ];
+        var j1 = j + sxo[x * 2 + 1];
         var fx0 = fx[x * 2    ];
         var fx1 = fx[x * 2 + 1];
-        var j00 = j0 + sxo0;
-        var j01 = j0 + sxo1;
-        var j10 = j1 + sxo0;
-        var j11 = j1 + sxo1;
-        var f00 = fy0 * fx0;
-        var f01 = fy0 * fx1;
-        var f10 = fy1 * fx0;
-        var f11 = fy1 * fx1;
-        var r = sdata[j00    ] * f00 + sdata[j01    ] * f01 + sdata[j10    ] * f10 + sdata[j11    ] * f11;
-        var g = sdata[j00 + 1] * f00 + sdata[j01 + 1] * f01 + sdata[j10 + 1] * f10 + sdata[j11 + 1] * f11;
-        var b = sdata[j00 + 2] * f00 + sdata[j01 + 2] * f01 + sdata[j10 + 2] * f10 + sdata[j11 + 2] * f11;
-        var a = sdata[j00 + 3] * f00 + sdata[j01 + 3] * f01 + sdata[j10 + 3] * f10 + sdata[j11 + 3] * f11;
+        var r = sdata[j0    ] * fx0 + sdata[j1    ] * fx1;
+        var g = sdata[j0 + 1] * fx0 + sdata[j1 + 1] * fx1;
+        var b = sdata[j0 + 2] * fx0 + sdata[j1 + 2] * fx1;
+        var a = sdata[j0 + 3] * fx0 + sdata[j1 + 3] * fx1;
+        kdata[k    ] = r;
+        kdata[k + 1] = g;
+        kdata[k + 2] = b;
+        kdata[k + 3] = a;
+      }
+      j += src.pitch * 4;
+    }
+    var i = dest.offset * 4;
+    var igap = (dest.pitch - w) * 4;
+    k = 0;
+    for (var y = 0; y < h; y++, k += sw * 4) {
+      var k0 = syo[y * 2    ];
+      var k1 = syo[y * 2 + 1];
+      var fy0 = fy[y * 2    ];
+      var fy1 = fy[y * 2 + 1];
+      for (var x = 0; x < w; x++, i += 4, k0 += 4, k1 += 4) {
+        var r = kdata[k0    ] * fy0 + kdata[k1    ] * fy1;
+        var g = kdata[k0 + 1] * fy0 + kdata[k1 + 1] * fy1;
+        var b = kdata[k0 + 2] * fy0 + kdata[k1 + 2] * fy1;
+        var a = kdata[k0 + 3] * fy0 + kdata[k1 + 3] * fy1;
         ddata[i    ] = round(r);
         ddata[i + 1] = round(g);
         ddata[i + 2] = round(b);
         ddata[i + 3] = round(a);
       }
-      i += (dest.pitch - w) * 4;
+      i += igap;
     }
   };
   var resize = function(dest, src, method) {
