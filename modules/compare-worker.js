@@ -322,12 +322,15 @@ var imageUtil = (function() {
     var kdata = new Float32Array(w * sh * 4);
     var k = 0;
     var j = src.offset * 4;
-    for (var sy = 0; sy < sh; sy++) {
-      for (var x = 0; x < w; x++, k += 4) {
-        var j0 = j + sxo[x * 2    ];
-        var j1 = j + sxo[x * 2 + 1];
-        var fx0 = fx[x * 2    ];
-        var fx1 = fx[x * 2 + 1];
+    for (var jh = j + src.pitch * 4 * sh; j < jh; ) {
+      var f = 0;
+      for (var fw = w * 2; f < fw; k += 4) {
+        var j0  = j + sxo[f];
+        var fx0 = fx[f];
+        f++;
+        var j1  = j + sxo[f];
+        var fx1 = fx[f];
+        f++;
         var r = sdata[j0    ] * fx0 + sdata[j1    ] * fx1;
         var g = sdata[j0 + 1] * fx0 + sdata[j1 + 1] * fx1;
         var b = sdata[j0 + 2] * fx0 + sdata[j1 + 2] * fx1;
@@ -341,13 +344,15 @@ var imageUtil = (function() {
     }
     var i = dest.offset * 4;
     var igap = (dest.pitch - w) * 4;
-    k = 0;
-    for (var y = 0; y < h; y++, k += sw * 4) {
-      var k0 = syo[y * 2    ];
-      var k1 = syo[y * 2 + 1];
-      var fy0 = fy[y * 2    ];
-      var fy1 = fy[y * 2 + 1];
-      for (var x = 0; x < w; x++, i += 4, k0 += 4, k1 += 4) {
+    f = 0;
+    for (var fh = h * 2; f < fh; ) {
+      var k0 = syo[f];
+      var fy0 = fy[f];
+      f++;
+      var k1 = syo[f];
+      var fy1 = fy[f];
+      f++;
+      for (var iw = i + w * 4; i < iw; i += 4, k0 += 4, k1 += 4) {
         var r = kdata[k0    ] * fy0 + kdata[k1    ] * fy1;
         var g = kdata[k0 + 1] * fy0 + kdata[k1 + 1] * fy1;
         var b = kdata[k0 + 2] * fy0 + kdata[k1 + 2] * fy1;
