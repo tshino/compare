@@ -304,7 +304,7 @@ div.footnote
     background      : #eee;
     box-shadow      : 1px 1px 3px rgba(0,0,0, 0.2);
 }
-tr.num > td:not(.prop), tr.enum > td:not(.prop), tr.date > td:not(.prop)
+tr.num > td:not(.prop):not(.input), tr.enum > td:not(.prop), tr.date > td:not(.prop)
 {
     text-align    : right;
 }
