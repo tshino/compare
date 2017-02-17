@@ -365,6 +365,111 @@ var imageUtil = (function() {
       i += igap;
     }
   };
+  var resizeGeneral = function(dest, src, filterSize, filterFunc) {
+    var w = dest.width, h = dest.height;
+    var sw = src.width, sh = src.height;
+    var mw = sw / w, mh = sh / h;
+    var ddata = dest.data, sdata = src.data;
+    var round = Math.round;
+    var floor = Math.floor;
+    var sxo = new Uint32Array(w * filterSize);
+    var fx = new Float32Array(w * filterSize);
+    for (var x = 0; x < w; x++) {
+      var rx = (x + 0.5) * mw - 0.5;
+      var sx = floor(rx) - filterSize / 2 + 1;
+      var sum = 0;
+      for (var f = 0; f < filterSize; ++f) {
+        var val = filterFunc(rx - sx);
+        sum += val;
+        sxo[x * filterSize + f] = 4 * Math.min(sw - 1, Math.max(0, sx));
+        fx[x * filterSize + f] = val;
+        ++sx;
+      }
+      for (var f = 0; f < filterSize; ++f) {
+        fx[x * filterSize + f] /= sum;
+      }
+    }
+    var syo = new Uint32Array(h * filterSize);
+    var fy = new Float32Array(h * filterSize);
+    for (var y = 0; y < h; y++) {
+      var ry = (y + 0.5) * mh - 0.5;
+      var sy = floor(ry) - filterSize / 2 + 1;
+      var sum = 0;
+      for (var f = 0; f < filterSize; ++f) {
+        var val = filterFunc(ry - sy);
+        sum += val;
+        syo[y * filterSize + f] = 4 * w * Math.min(sh - 1, Math.max(0, sy));
+        fy[y * filterSize + f] = val;
+        ++sy;
+      }
+      for (var f = 0; f < filterSize; ++f) {
+        fy[y * filterSize + f] /= sum;
+      }
+    }
+    var kdata = new Float32Array(w * sh * 4);
+    var k = 0;
+    var j = src.offset * 4;
+    for (var jh = j + src.pitch * 4 * sh; j < jh; ) {
+      var f = 0;
+      for (var fw = w * filterSize; f < fw; k += 4) {
+        var r = 0, g = 0, b = 0, a = 0;
+        for (var fi = f + filterSize; f < fi; f++) {
+          var j0  = j + sxo[f];
+          var fx0 = fx[f];
+          r += sdata[j0    ] * fx0;
+          g += sdata[j0 + 1] * fx0;
+          b += sdata[j0 + 2] * fx0;
+          a += sdata[j0 + 3] * fx0;
+        }
+        kdata[k    ] = r;
+        kdata[k + 1] = g;
+        kdata[k + 2] = b;
+        kdata[k + 3] = a;
+      }
+      j += src.pitch * 4;
+    }
+    var i = dest.offset * 4;
+    var igap = (dest.pitch - w) * 4;
+    f = 0;
+    for (var fh = h * filterSize; f < fh; ) {
+      var k0a = [];
+      var fy0a = [];
+      for (var fi = 0; fi < filterSize; fi++, f++) {
+        k0a[fi] = syo[f];
+        fy0a[fi] = fy[f];
+      }
+      var k = 0;
+      for (var iw = i + w * 4; i < iw; i += 4, k += 4) {
+        var r = 0, g = 0, b = 0, a = 0;
+        for (var fi = 0; fi < filterSize; fi++) {
+          var k0 = k0a[fi] + k;
+          var fy0 = fy0a[fi];
+          r += kdata[k0    ] * fy0;
+          g += kdata[k0 + 1] * fy0;
+          b += kdata[k0 + 2] * fy0;
+          a += kdata[k0 + 3] * fy0;
+        }
+        ddata[i    ] = round(Math.min(255, Math.max(0, r)));
+        ddata[i + 1] = round(Math.min(255, Math.max(0, g)));
+        ddata[i + 2] = round(Math.min(255, Math.max(0, b)));
+        ddata[i + 3] = round(Math.min(255, Math.max(0, a)));
+      }
+      i += igap;
+    }
+  };
+  var resizeLanczos3 = function(dest, src) {
+    var sinc = function(x) {
+      x = x * Math.PI;
+      if (-0.01 < x && x < 0.01) {
+        return 1 + x * x * (-1/6 + x * x * (1/120));
+      } else {
+        return Math.sin(x) / x;
+      }
+    };
+    return resizeGeneral(dest, src, 6, function(x) {
+      return sinc(x) * sinc(x / 3);
+    });
+  };
   var resize = function(dest, src, method) {
     method = method !== undefined ? method : 'bilinear';
     //console.time(method); for (var i = 0; i < 100; ++i) {
@@ -372,6 +477,8 @@ var imageUtil = (function() {
       resizeNN(dest, src);
     } else if (method == 'bilinear') {
       resizeBilinear(dest, src);
+    } else if (method == 'lanczos3') {
+      resizeLanczos3(dest, src);
     } else {
       console.log('unexpected argument: ' + method);
     }
