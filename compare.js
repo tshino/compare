@@ -284,7 +284,7 @@ $( function()
   var diffOptions = {
     ignoreAE: 0,
     resizeToLarger: true,
-    resizeMethod: 'bilinear',
+    resizeMethod: 'lanczos3',
     ignoreRemainder: false,
   };
 
