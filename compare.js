@@ -1456,6 +1456,14 @@ $( function()
             updateNowLoading();
           };
         })(entry);
+        var onError = function(entry, message) {
+          entry.loading = false;
+          entry.error = message;
+          
+          updateDOM();
+          updateNowLoading();
+        };
+        
         reader.onload = (function(theEntry, theFile)
         {
             return function(e)
@@ -1501,16 +1509,13 @@ $( function()
                   }).
                   on('error', function()
                   {
-                    theEntry.loading = false;
-                    theEntry.error = 'Failed.';
+                    var message = 'Failed.';
                     if (!theFile.type || !(/^image\/.+$/.test(theFile.type))) {
-                      theEntry.error += ' Maybe not an image file.';
+                      message += ' Maybe not an image file.';
                     } else if (!isPNG && !isJPEG && format != 'GIF' && format != 'BMP') {
-                      theEntry.error += ' Maybe unsupported format for the browser.';
+                      message += ' Maybe unsupported format for the browser.';
                     }
-                    
-                    updateDOM();
-                    updateNowLoading();
+                    onError(theEntry, message);
                   });
                 img.src = e.target.result;
             };
@@ -1518,11 +1523,8 @@ $( function()
         reader.onerror = (function(theEntry, theFile, theReader)
         {
           return function(e) {
-            theEntry.loading = false;
-            theEntry.error = 'Failed. File could not be read. (' + theReader.error.name + ')';
-            
-            updateDOM();
-            updateNowLoading();
+            onError(theEntry,
+                'Failed. File could not be read. (' + theReader.error.name + ')');
           };
         })(entry, file, reader);
         reader.readAsDataURL(file);
