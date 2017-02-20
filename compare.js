@@ -663,13 +663,17 @@ $( function()
     if (!img.imageData) {
       var w = img.canvasWidth;
       var h = img.canvasHeight;
-      var context = img.asCanvas.getContext('2d');
-      var imageData = context.getImageData(0, 0, w, h);
-      // avoid huge memory consumption
-      if (w * h <= 30 * 1024 * 1024) {
-        img.imageData = imageData;
+      try {
+        var context = img.asCanvas.getContext('2d');
+        var imageData = context.getImageData(0, 0, w, h);
+        // avoid huge memory consumption
+        if (w * h <= 30 * 1024 * 1024) {
+          img.imageData = imageData;
+        }
+        return imageData;
+      } catch (e) {
+        return null;
       }
-      return imageData;
     }
     return img.imageData;
   }
@@ -744,7 +748,7 @@ $( function()
   var worker = compareUtil.newWorker('modules/compare-worker.js');
   var taskCount = 0;
   var taskQueue = [];
-  worker.addEventListener('message', function(e) {
+  var processTaskResult = function(e) {
     var data = e.data;
     switch (data.cmd) {
     case 'calcHistogram':
@@ -777,7 +781,8 @@ $( function()
     }
     --taskCount;
     window.setTimeout(kickNextTask, 0);
-  }, false);
+  };
+  worker.addEventListener('message', processTaskResult, false);
   function kickNextTask()
   {
     if (taskCount == 0 && 0 < taskQueue.length) {
@@ -786,12 +791,20 @@ $( function()
       case 'calcHistogram':
       case 'calcWaveform':
         task.imageData = getImageData(entries[task.index[0]]);
+        if (!task.imageData) {
+          alert('out of memory');
+          return;
+        }
         worker.postMessage(task);
         break;
       case 'calcMetrics':
       case 'calcDiff':
         task.imageData1 = getImageData(entries[task.index[0]]);
         task.imageData2 = getImageData(entries[task.index[1]]);
+        if (!task.imageData1 || !task.imageData2) {
+          alert('out of memory');
+          return;
+        }
         worker.postMessage(task);
         break;
       }
