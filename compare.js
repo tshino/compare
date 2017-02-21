@@ -606,7 +606,8 @@ $( function()
       );
     }
   }
-  var toggleInfo = defineDialog($('#info'), updateInfoTable);
+  var toggleAnalysis = defineDialog($('#analysis'));
+  var toggleInfo = defineDialog($('#info'), updateInfoTable, toggleAnalysis);
   var toggleNowLoading = defineDialog($('#loading'));
   function updateNowLoading()
   {
@@ -880,7 +881,6 @@ $( function()
             padding:'8px' };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
-  var toggleAnalysis = defineDialog($('#analysis'));
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis);
   function changeWaveformType(type)
   {

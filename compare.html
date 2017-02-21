@@ -40,10 +40,10 @@
 			<span class="tooltip ja">画像を追加</span>
 		</button>
 		<div class="space"></div>
-		<button id="infobtn" onclick="toggleInfo()">
-			<img src="res/info.svg" width="100%">
-			<span class="tooltip keys en">Show image information <span>i</span></span>
-			<span class="tooltip keys ja">画像情報を表示 <span>i</span></span>
+		<button onclick="toggleAnalysis()">
+			<img src="res/histogram.svg" width="100%">
+			<span class="tooltip keys en">Show analysis tools <span>c</span></span>
+			<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
 		</button>
 		<button onclick="zoomIn()">
 			<img src="res/zoomin.svg" width="100%">
@@ -66,11 +66,6 @@
 			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
 		</button>
 		<div class="bottom">
-			<button onclick="toggleAnalysis()">
-				<img src="res/histogram.svg" width="100%">
-				<span class="tooltip keys en">Show analysis tools <span>c</span></span>
-				<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
-			</button>
 			<button onclick="toggleFullscreen()">
 				<img src="res/full.svg" width="100%">
 				<span class="tooltip keys en">Fullscreen <span>f</span></span>
@@ -298,6 +293,12 @@
 				</h3>
 			</div>
 			<div class="menu">
+				<button onclick="toggleInfo()">
+					<img src="res/info.svg" width="20">
+					<span class="en">Image information</span>
+					<span class="ja">画像情報</span>
+					<span class="flat keys"><span>i</span></span>
+				</button>
 				<button onclick="toggleHistogram()">
 					<img src="res/histogram.svg" width="20">
 					<span class="en">Histogram</span>
