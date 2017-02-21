@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page13">
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2000,3200 L 500,3200 500,800 3500,800 3500,3200 2000,3200 Z"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1500,2500 C 1371,2500 1262,2471 1150,2406 1038,2342 958,2262 894,2150 829,2038 800,1929 800,1800 800,1671 829,1562 894,1450 958,1338 1038,1258 1150,1194 1262,1129 1371,1100 1500,1100 1629,1100 1738,1129 1850,1194 1962,1258 2042,1338 2106,1450 2171,1562 2200,1671 2200,1800 2200,1929 2171,2038 2106,2150 2042,2262 1962,2342 1850,2406 1738,2471 1629,2500 1500,2500 L 1500,2500 Z"/>
+  </g>
+  <g>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2350,2800 L 1500,2800 1500,1600 3200,1600 3200,2800 2350,2800 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(0,0,0)" stroke="none" d="M 2274,1593 C 2291,1658 2300,1726 2300,1800 2300,1874 2291,1942 2274,2007 2256,2073 2230,2136 2193,2200 2156,2264 2115,2318 2067,2367 2018,2415 1964,2456 1900,2493 1836,2530 1773,2556 1707,2574 1642,2591 1574,2600 1500,2600 1466,2600 1432,2598 1400,2594 L 1400,1600 C 1400,1582 1404,1566 1413,1550 1423,1534 1434,1523 1450,1513 1466,1504 1482,1500 1500,1500 L 2242,1500 C 2255,1531 2265,1561 2274,1593 Z"/>
+   <rect fill="none" stroke="none" x="1400" y="1500" width="901" height="1101"/>
+  </g>
+ </g>
+</svg>
