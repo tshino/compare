@@ -497,6 +497,7 @@ $( function()
   };
   var toggleGrid = function() {
     enableGrid = 0 == images.length ? false : !enableGrid;
+    enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
   var hideDialog = function() {
