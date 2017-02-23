@@ -79,14 +79,25 @@ $( function()
         if (e.keyCode == 8 && !e.shiftKey) {
           dialog.close();
           return false;
-        // '1'
-        } else if ((e.keyCode == 48 + 1 || e.keyCode == 96 + 1) && !e.shiftKey) {
-          $(dialog.element).find('.mode-sw > button:nth-child(1)').click();
-          return false;
-        // '2'
-        } else if ((e.keyCode == 48 + 2 || e.keyCode == 96 + 2) && !e.shiftKey) {
-          $(dialog.element).find('.mode-sw > button:nth-child(2)').click();
-          return false;
+        }
+        // '1' - '9' (48-57 or 96-105 for numpad)
+        if ((49 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
+            (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
+          var num = e.keyCode % 48;
+          var sw = $(dialog.element).find('.mode-sw > button:nth-child('+num+')');
+          if (sw.length == 1) {
+            sw.click();
+            return false;
+          }
+          if ($('#diff').is(':visible') &&
+              entries[num - 1].ready() &&
+              baseImageIndex !== null && targetImageIndex !== null &&
+              targetImageIndex != num - 1) {
+            baseImageIndex = targetImageIndex;
+            targetImageIndex = num - 1;
+            updateDiffTable();
+            return false;
+          }
         }
         return true;
       }
@@ -1054,6 +1065,14 @@ $( function()
   }
   var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
 
+  var findImageIndexOtherThan = function(index) {
+    for (var i = 0, img; img = images[i]; ++i) {
+      if (img.index != index) {
+        return img.index;
+      }
+    }
+    return null;
+  };
   var updateDiffTable = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
@@ -1079,14 +1098,6 @@ $( function()
       return;
     }
     baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-    var findImageIndexOtherThan = function(index) {
-      for (var i = 0, img; img = images[i]; ++i) {
-        if (img.index != index) {
-          return img.index;
-        }
-      }
-      return null;
-    };
     if (targetImageIndex === null || baseImageIndex == targetImageIndex) {
       targetImageIndex = findImageIndexOtherThan(baseImageIndex);
     }
