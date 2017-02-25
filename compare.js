@@ -98,6 +98,14 @@ $( function()
             updateDiffTable();
             return false;
           }
+          if ($('#metrics').is(':visible') &&
+              entries[num - 1].ready() &&
+              baseImageIndex !== null &&
+              baseImageIndex !== num - 1) {
+            baseImageIndex = num - 1;
+            updateMetricsTable();
+            return false;
+          }
         }
         return true;
       }
