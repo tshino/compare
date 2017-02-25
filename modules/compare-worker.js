@@ -457,6 +457,19 @@ var imageUtil = (function() {
       i += igap;
     }
   };
+  var resizeLanczos2 = function(dest, src) {
+    var sinc = function(x) {
+      x = x * Math.PI;
+      if (-0.01 < x && x < 0.01) {
+        return 1 + x * x * (-1/6 + x * x * (1/120));
+      } else {
+        return Math.sin(x) / x;
+      }
+    };
+    return resizeGeneral(dest, src, 4, function(x) {
+      return sinc(x) * sinc(x / 2);
+    });
+  };
   var resizeLanczos3 = function(dest, src) {
     var sinc = function(x) {
       x = x * Math.PI;
@@ -477,6 +490,8 @@ var imageUtil = (function() {
       resizeNN(dest, src);
     } else if (method == 'bilinear') {
       resizeBilinear(dest, src);
+    } else if (method == 'lanczos2') {
+      resizeLanczos2(dest, src);
     } else if (method == 'lanczos3') {
       resizeLanczos3(dest, src);
     } else {
