@@ -1388,6 +1388,7 @@ $( function()
       }
     });
     $('#overlay').css({ display : 2 <= images.length ? '' : 'none' });
+    overlayMode ? $('#overlay').addClass('current') : $('#overlay').removeClass('current');
     updateTransform();
     adjustDialogPosition();
   }
