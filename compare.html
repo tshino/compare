@@ -448,7 +448,8 @@
 							<span class="en">Base Image</span>
 							<span class="ja">基準画像</span>
 						</td>
-						<td id="diffBaseName" style="min-width: 256px"></td>
+						<td id="diffBaseName" style="min-width: 216px"></td>
+						<td rowspan="2" style="width=40px; max-width: 40px"><button onclick="swapBaseAndTargetImage();" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" width="100%"></button></td>
 						<td style="min-width: 256px"></td>
 					</tr>
 					<tr>
@@ -464,7 +465,7 @@
 							<span class="en">Dimension</span>
 							<span class="ja">画像サイズ</span>
 						</td>
-						<td class="output">
+						<td class="output" colspan="2">
 							&nbsp;<span id="diffDimensionReport"></span>
 						</td>
 						<td class="input">
@@ -495,7 +496,7 @@
 							<span class="en">RGBA error</span>
 							<span class="ja">RGBA誤差</span>
 						</td>
-						<td class="output" rowspan="2">
+						<td class="output" rowspan="2" colspan="2">
 							&nbsp;<span id="diffDetectedMaxAE"></span>
 						</td>
 						<td class="input">
@@ -510,10 +511,10 @@
 						</td>
 					</tr>
 					<tr>
-						<td id="diffResult" colspan="3"></td>
+						<td id="diffResult" colspan="4"></td>
 					</tr>
 					<tr>
-						<td id="diffSummary" class="output" colspan="3" style="text-align:center"></td>
+						<td id="diffSummary" class="output" colspan="4" style="text-align:center"></td>
 					</tr>
 				</table>
 				<div class="footnote">

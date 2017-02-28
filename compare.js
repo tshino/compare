@@ -519,6 +519,14 @@ $( function()
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
+  var swapBaseAndTargetImage = function() {
+    if (baseImageIndex !== null && targetImageIndex !== null) {
+      var temp = targetImageIndex;
+      targetImageIndex = baseImageIndex;
+      baseImageIndex = temp;
+      updateDiffTable();
+    }
+  };
   var hideDialog = function() {
     if (dialog) {
       dialog.element.hide();
