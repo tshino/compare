@@ -1071,7 +1071,16 @@ $( function()
           index:    [a.index, b.index],
         });
       }
-      $('#metricsTargetName').append(makeImageNameWithIndex('<td>', b));
+      $('#metricsTargetName').append(
+        $('<td>').append(
+          makeImageNameWithIndex('<span>', b),
+          '&nbsp;',
+          $('<button>').text('↑').click(b.index, function(e) {
+            baseImageIndex = e.data;
+            updateMetricsTable();
+          })
+        )
+      );
       var values = metricsToString(a.metrics[b.index], a);
       $('#psnrValue').append($('<td>').text(values.psnr));
       $('#mseValue').append($('<td>').text(values.mse));
