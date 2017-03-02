@@ -15,6 +15,11 @@
     result.h = data.imageData.height;
     result.histW = data.histW;
     break;
+  case 'calcVectorscope':
+    result.result = calcVectorscope(data.imageData);
+    result.w = data.imageData.width;
+    result.h = data.imageData.height;
+    break;
   case 'calcMetrics':
     result.result = calcMetrics(data.imageData1, data.imageData2);
     result.result.ae = calcAE(data.imageData1, data.imageData2);
@@ -94,6 +99,34 @@ function calcWaveform( imageData, histW, type )
     }
   }
   return hist;
+}
+
+function calcVectorscope( imageData )
+{
+  var w = imageData.width;
+  var h = imageData.height;
+  var dist = new Uint32Array(256 * 256);
+  for (var i = 0; i < dist.length; ++i) {
+    dist[i] = 0;
+  }
+  var k = 0;
+  for (var y = 0; y < h; ++y) {
+    for (var x = 0; x < w; ++x, k += 4) {
+      var r = imageData.data[k + 0];
+      var g = imageData.data[k + 1];
+      var b = imageData.data[k + 2];
+      var a = imageData.data[k + 3] / 255;
+      r = r * a;
+      g = g * a;
+      b = b * a;
+      var cb = 127.5 - 0.14713 * r - 0.28886 * g + 0.436 * b;
+      var cr = 127.5 + 0.615 * r - 0.51499 * g - 0.10001 * b;
+      var plotx = Math.round(cb);
+      var ploty = 255 - Math.round(cr);
+      dist[ploty * 256 + plotx] += 1;
+    }
+  }
+  return dist;
 }
 
 function calcAE( a, b )

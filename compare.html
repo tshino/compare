@@ -189,6 +189,10 @@
 					<td><span class="en">waveform</span><span class="ja">波形</span></td>
 				</tr>
 				<tr>
+					<td class="keys"><span>v</span></td>
+					<td><span class="en">vectorscope</span><span class="ja">ベクトルスコープ</span></td>
+				</tr>
+				<tr>
 					<td class="keys"><span>m</span></td>
 					<td><span class="en">Image quality metrics</span><span class="ja">画質メトリクス</span></td>
 				</tr>
@@ -316,6 +320,12 @@
 					<span class="ja">波形</span>
 					<span class="flat keys"><span>w</span></span>
 				</button>
+				<button onclick="toggleVectorscope()">
+					<img src="res/waveform.svg" width="20">
+					<span class="en">Vectorscope</span>
+					<span class="ja">ベクトルスコープ</span>
+					<span class="flat keys"><span>v</span></span>
+				</button>
 				<button onclick="toggleMetrics()">
 					<img src="res/psnr.svg" width="20">
 					<span class="en">Image quality metrics (PSNR,MSE, etc)</span>
@@ -364,6 +374,21 @@
 				</div>
 			</div>
 			<table id="waveTable">
+				<tr></tr>
+				<tr></tr>
+			</table>
+		</div>
+	</div>
+	<div id="vectorscope" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/waveform.svg" width="20">
+					<span class="en">Vectorscope</span>
+					<span class="ja">ベクトルスコープ</span>
+				</h3>
+			</div>
+			<table id="vectorscopeTable">
 				<tr></tr>
 				<tr></tr>
 			</table>

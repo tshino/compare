@@ -173,6 +173,8 @@ $( function()
     104 : { global: true, func: toggleHistogram },
     // 'w' (119)
     119 : { global: true, func: toggleWaveform },
+    // 'v' (118)
+    118 : { global: true, func: toggleVectorscope },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
     // 'd' (100)
@@ -361,6 +363,7 @@ $( function()
       ent.imageData = null;
       ent.histogram = null;
       ent.waveform = null;
+      ent.vectorscope = null;
       currentImageIndex = 0;
       viewZoom = 0;
       setViewOffset(0.5, 0.5);
@@ -792,6 +795,9 @@ $( function()
         updateWaveform(data.type, img, data.histW, data.result);
       }
       break;
+    case 'calcVectorscope':
+      updateVectorscope(entries[data.index[0]], data.result);
+      break;
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
       entries[data.index[1]].metrics[data.index[0]] = data.result;
@@ -819,6 +825,7 @@ $( function()
       switch (task.cmd) {
       case 'calcHistogram':
       case 'calcWaveform':
+      case 'calcVectorscope':
         task.imageData = getImageData(entries[task.index[0]]);
         if (!task.imageData) {
           alert('out of memory');
@@ -997,6 +1004,47 @@ $( function()
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
+  var updateVectorscopeAsync = function(img) {
+    addTask({
+      cmd:      'calcVectorscope',
+      index:    [img.index]
+    });
+  };
+  var updateVectorscope = function(img, dist) {
+    var w = img.canvasWidth;
+    var h = img.canvasHeight;
+    img.vectorscope = makeFigure(w, h, dist);
+    updateVectorscopeTable();
+    
+    function makeFigure(w, h, dist) {
+      var fig = makeBlankFigure(256, 256);
+      var context = fig.context;
+      var bits = context.createImageData(256, 256);
+      var max = w * h;
+      var i = 0, k = 0;
+      for (var y = 0; y < 256; ++y) {
+        for (var x = 0; x < 256; ++x, i++, k += 4) {
+          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          var c = Math.round(a * 255);
+          bits.data[k + 0] = c;
+          bits.data[k + 1] = c;
+          bits.data[k + 2] = c;
+          bits.data[k + 3] = 255;
+        }
+      }
+      context.putImageData(bits, 0, 0);
+      return fig.canvas;
+    }
+  };
+  var updateVectorscopeTable = function() {
+    var style = {
+            width: '320px',
+            height:'320px',
+            background:'#444',
+            padding:'10px' };
+    updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
+  };
+  var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis);
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics == 'string') {
       return { psnr: metrics, mse: metrics, ncc: metrics, ae: metrics };
@@ -1485,6 +1533,7 @@ $( function()
             imageData   : null,
             histogram   : null,
             waveform    : null,
+            vectorscope : null,
             metrics     : [],
             loading     : true,
             progress    : 0,
