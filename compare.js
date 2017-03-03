@@ -1033,6 +1033,28 @@ $( function()
         }
       }
       context.putImageData(bits, 0, 0);
+      var calcxy = function(r, g, b) {
+        var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
+        var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
+        return [127.5 + cb / 1.3, 127.5 - cr / 1.3];
+      };
+      var points = [
+        { r: 255, g: 0,   b: 0   , color: '#f00' },
+        { r: 0,   g: 255, b: 0   , color: '#0f0' },
+        { r: 0,   g: 0,   b: 255 , color: '#00f' },
+        { r: 0,   g: 255, b: 255 , color: '#0ff' },
+        { r: 255, g: 0,   b: 255 , color: '#f0f' },
+        { r: 255, g: 255, b: 0   , color: '#ff0' }
+      ];
+      context.globalCompositeOperation = 'lighter';
+      context.lineWidth = 2;
+      for (var i = 0, p; p = points[i]; ++i) {
+        var xy = calcxy(p.r, p.g, p.b);
+        context.strokeStyle = p.color;
+        context.beginPath();
+        context.arc(xy[0] - 3, xy[1] - 3, 3, 0, 2 * Math.PI);
+        context.stroke();
+      }
       return fig.canvas;
     }
   };

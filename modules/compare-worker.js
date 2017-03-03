@@ -119,10 +119,10 @@ function calcVectorscope( imageData )
       r = r * a;
       g = g * a;
       b = b * a;
-      var cb = 127.5 - 0.14713 * r - 0.28886 * g + 0.436 * b;
-      var cr = 127.5 + 0.615 * r - 0.51499 * g - 0.10001 * b;
-      var plotx = Math.round(cb);
-      var ploty = 255 - Math.round(cr);
+      var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
+      var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
+      var plotx = Math.round(127.5 + cb / 1.3);
+      var ploty = Math.round(127.5 - cr / 1.3);
       dist[ploty * 256 + plotx] += 1;
     }
   }
