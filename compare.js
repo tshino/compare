@@ -1052,7 +1052,7 @@ $( function()
         var xy = calcxy(p.r, p.g, p.b);
         context.strokeStyle = p.color;
         context.beginPath();
-        context.arc(xy[0] - 3, xy[1] - 3, 3, 0, 2 * Math.PI);
+        context.arc(xy[0], xy[1], 4, 0, 2 * Math.PI);
         context.stroke();
       }
       return fig.canvas;
