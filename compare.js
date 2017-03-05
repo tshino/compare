@@ -1068,12 +1068,19 @@ $( function()
         }
       };
       var points = [
+        { r: 0,   g: 0,   b: 0   , color: '',     types: []        },
         { r: 255, g: 0,   b: 0   , color: '#f00', types: [0,2,3]   },
         { r: 0,   g: 255, b: 0   , color: '#0f0', types: [0,1,2]   },
         { r: 0,   g: 0,   b: 255 , color: '#00f', types: [0,1,3]   },
         { r: 0,   g: 255, b: 255 , color: '#0ff', types: [0,1]   },
         { r: 255, g: 0,   b: 255 , color: '#f0f', types: [0,3]   },
-        { r: 255, g: 255, b: 0   , color: '#ff0', types: [0,2]   }
+        { r: 255, g: 255, b: 0   , color: '#ff0', types: [0,2]   },
+        { r: 255, g: 255, b: 255 , color: '',     types: []      }
+      ];
+      var lines = [
+        { indices: [0, 1, 0, 6, 0, 2, 0, 4, 0, 3, 0, 5], color: '#024', types: [0,1,2,3] },
+        { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
+        { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [1,2,3] }
       ];
       context.globalCompositeOperation = 'lighter';
       context.lineWidth = 2;
@@ -1085,6 +1092,23 @@ $( function()
         context.strokeStyle = p.color;
         context.beginPath();
         context.arc(xy[0] + 0.5, xy[1] + 0.5, 4, 0, 2 * Math.PI);
+        context.stroke();
+      }
+      context.lineWidth = 1;
+      for (var i = 0, l; l = lines[i]; ++i) {
+        if (0 > l.types.indexOf(type)) {
+          continue;
+        }
+        context.strokeStyle = l.color;
+        context.beginPath();
+        for (var k = 0; k < l.indices.length; k += 2) {
+          var v0 = points[l.indices[k]];
+          var v1 = points[l.indices[k + 1]];
+          var xy0 = calcxy(v0.r, v0.g, v0.b);
+          var xy1 = calcxy(v1.r, v1.g, v1.b);
+          context.moveTo(xy0[0] + 0.5, xy0[1] + 0.5);
+          context.lineTo(xy1[0] + 0.5, xy1[1] + 0.5);
+        }
         context.stroke();
       }
       return fig.canvas;
