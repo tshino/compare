@@ -16,7 +16,8 @@
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
-    result.result = calcVectorscope(data.imageData);
+    result.type   = data.type;
+    result.result = calcVectorscope(data.imageData, data.type);
     result.w = data.imageData.width;
     result.h = data.imageData.height;
     break;
@@ -101,29 +102,41 @@ function calcWaveform( imageData, histW, type )
   return hist;
 }
 
-function calcVectorscope( imageData )
+function calcVectorscope( imageData, type )
 {
   var w = imageData.width;
   var h = imageData.height;
-  var dist = new Uint32Array(256 * 256);
+  var dist = new Uint32Array(320 * 320);
   for (var i = 0; i < dist.length; ++i) {
     dist[i] = 0;
   }
   var k = 0;
-  for (var y = 0; y < h; ++y) {
-    for (var x = 0; x < w; ++x, k += 4) {
+  if (type == 0) { // Cb-Cr
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k + 0];
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      var a = imageData.data[k + 3] / 255;
-      r = r * a;
-      g = g * a;
-      b = b * a;
       var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
       var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
-      var plotx = Math.round(127.5 + cb / 1.3);
-      var ploty = Math.round(127.5 - cr / 1.3);
-      dist[ploty * 256 + plotx] += 1;
+      var plotx = Math.round(159.5 + cb);
+      var ploty = Math.round(159.5 - cr);
+      dist[ploty * 320 + plotx] += 1;
+    }
+  } else if (type == 1) { // G-B
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
+      var g = imageData.data[k + 1];
+      var b = imageData.data[k + 2];
+      var plotx = 32 + g;
+      var ploty = 287 - b;
+      dist[ploty * 320 + plotx] += 1;
+    }
+  } else { // G-R
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
+      var r = imageData.data[k + 0];
+      var g = imageData.data[k + 1];
+      var plotx = 32 + g;
+      var ploty = 287 - r;
+      dist[ploty * 320 + plotx] += 1;
     }
   }
   return dist;

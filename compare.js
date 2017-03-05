@@ -38,6 +38,10 @@ $( function()
     var index = $('#waveformType > *').index(this);
     changeWaveformType(index);
   });
+  $('#vectorscopeType > *').click(function() {
+    var index = $('#vectorscopeType > *').index(this);
+    changeVectorscopeType(index);
+  });
   $('#diffIgnoreAE').on('change', function(e) {
     diffOptions.ignoreAE = this.value;
     updateDiffTable();
@@ -299,6 +303,7 @@ $( function()
   var dialog = null;
   var histogramType = 0;
   var waveformType = 0;
+  var vectorscopeType = 0;
   var baseImageIndex = null;
   var targetImageIndex = null;
   var diffResult = {};
@@ -796,7 +801,9 @@ $( function()
       }
       break;
     case 'calcVectorscope':
-      updateVectorscope(entries[data.index[0]], data.result);
+      if (data.type == vectorscopeType) {
+        updateVectorscope(data.type, entries[data.index[0]], data.result);
+      }
       break;
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
@@ -1004,26 +1011,40 @@ $( function()
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
+  var changeVectorscopeType = function(type) {
+    if (vectorscopeType != type) {
+      vectorscopeType = type;
+      discardTasksOfCommand('calcVectorscope');
+      for (var i = 0, img; img = images[i]; i++) {
+        img.vectorscope = null;
+      }
+      $('#vectorscopeType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      updateVectorscopeTable();
+    }
+  };
   var updateVectorscopeAsync = function(img) {
     addTask({
       cmd:      'calcVectorscope',
+      type:     vectorscopeType,
       index:    [img.index]
     });
   };
-  var updateVectorscope = function(img, dist) {
+  var updateVectorscope = function(type, img, dist) {
     var w = img.canvasWidth;
     var h = img.canvasHeight;
     img.vectorscope = makeFigure(w, h, dist);
     updateVectorscopeTable();
     
     function makeFigure(w, h, dist) {
-      var fig = makeBlankFigure(256, 256);
+      var fig = makeBlankFigure(320, 320);
       var context = fig.context;
-      var bits = context.createImageData(256, 256);
+      var bits = context.createImageData(320, 320);
       var max = w * h;
       var i = 0, k = 0;
-      for (var y = 0; y < 256; ++y) {
-        for (var x = 0; x < 256; ++x, i++, k += 4) {
+      for (var y = 0; y < 320; ++y) {
+        for (var x = 0; x < 320; ++x, i++, k += 4) {
           var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
           var c = Math.round(a * 255);
           bits.data[k + 0] = c;
@@ -1034,25 +1055,34 @@ $( function()
       }
       context.putImageData(bits, 0, 0);
       var calcxy = function(r, g, b) {
-        var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
-        var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
-        return [127.5 + cb / 1.3, 127.5 - cr / 1.3];
+        if (type == 0) { // Cb-Cr
+          var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
+          var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
+          return [159.5 + cb, 159.5 - cr];
+        } else if (type == 1) { // G-B
+          return [32 + g, 287 - b];
+        } else { // G-R
+          return [32 + g, 287 - r];
+        }
       };
       var points = [
-        { r: 255, g: 0,   b: 0   , color: '#f00' },
-        { r: 0,   g: 255, b: 0   , color: '#0f0' },
-        { r: 0,   g: 0,   b: 255 , color: '#00f' },
-        { r: 0,   g: 255, b: 255 , color: '#0ff' },
-        { r: 255, g: 0,   b: 255 , color: '#f0f' },
-        { r: 255, g: 255, b: 0   , color: '#ff0' }
+        { r: 255, g: 0,   b: 0   , color: '#f00', types: [0,2]   },
+        { r: 0,   g: 255, b: 0   , color: '#0f0', types: [0,1,2] },
+        { r: 0,   g: 0,   b: 255 , color: '#00f', types: [0,1]   },
+        { r: 0,   g: 255, b: 255 , color: '#0ff', types: [0,1]   },
+        { r: 255, g: 0,   b: 255 , color: '#f0f', types: [0]     },
+        { r: 255, g: 255, b: 0   , color: '#ff0', types: [0,2]   }
       ];
       context.globalCompositeOperation = 'lighter';
       context.lineWidth = 2;
       for (var i = 0, p; p = points[i]; ++i) {
+        if (0 > p.types.indexOf(type)) {
+          continue;
+        }
         var xy = calcxy(p.r, p.g, p.b);
         context.strokeStyle = p.color;
         context.beginPath();
-        context.arc(xy[0], xy[1], 4, 0, 2 * Math.PI);
+        context.arc(xy[0] + 0.5, xy[1] + 0.5, 4, 0, 2 * Math.PI);
         context.stroke();
       }
       return fig.canvas;
