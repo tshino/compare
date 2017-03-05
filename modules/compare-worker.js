@@ -130,11 +130,19 @@ function calcVectorscope( imageData, type )
       var ploty = 287 - b;
       dist[ploty * 320 + plotx] += 1;
     }
-  } else { // G-R
+  } else if (type == 2) { // G-R
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k + 0];
       var g = imageData.data[k + 1];
       var plotx = 32 + g;
+      var ploty = 287 - r;
+      dist[ploty * 320 + plotx] += 1;
+    }
+  } else { // B-R
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
+      var r = imageData.data[k + 0];
+      var b = imageData.data[k + 2];
+      var plotx = 32 + b;
       var ploty = 287 - r;
       dist[ploty * 320 + plotx] += 1;
     }

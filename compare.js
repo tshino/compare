@@ -1061,16 +1061,18 @@ $( function()
           return [159.5 + cb, 159.5 - cr];
         } else if (type == 1) { // G-B
           return [32 + g, 287 - b];
-        } else { // G-R
+        } else if (type == 2) { // G-R
           return [32 + g, 287 - r];
+        } else { // B-R
+          return [32 + b, 287 - r];
         }
       };
       var points = [
-        { r: 255, g: 0,   b: 0   , color: '#f00', types: [0,2]   },
-        { r: 0,   g: 255, b: 0   , color: '#0f0', types: [0,1,2] },
-        { r: 0,   g: 0,   b: 255 , color: '#00f', types: [0,1]   },
+        { r: 255, g: 0,   b: 0   , color: '#f00', types: [0,2,3]   },
+        { r: 0,   g: 255, b: 0   , color: '#0f0', types: [0,1,2]   },
+        { r: 0,   g: 0,   b: 255 , color: '#00f', types: [0,1,3]   },
         { r: 0,   g: 255, b: 255 , color: '#0ff', types: [0,1]   },
-        { r: 255, g: 0,   b: 255 , color: '#f0f', types: [0]     },
+        { r: 255, g: 0,   b: 255 , color: '#f0f', types: [0,3]   },
         { r: 255, g: 255, b: 0   , color: '#ff0', types: [0,2]   }
       ];
       context.globalCompositeOperation = 'lighter';
