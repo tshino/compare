@@ -1075,9 +1075,14 @@ $( function()
         { pos: calcxy(0,   255, 255) , color: '#0ff', types: [0,1]   },
         { pos: calcxy(255, 0,   255) , color: '#f0f', types: [0,3]   },
         { pos: calcxy(255, 255, 0  ) , color: '#ff0', types: [0,2]   },
-        { pos: calcxy(255, 255, 255) , color: '',     types: []      }
+        { pos: calcxy(255, 255, 255) , color: '',     types: []      },
+        { pos: { x: 159.5, y: 0     } , color: '',     types: [] },
+        { pos: { x: 159.5, y: 320   } , color: '',     types: [] },
+        { pos: { x: 0,     y: 159.5 } , color: '',     types: [] },
+        { pos: { x: 320,   y: 159.5 } , color: '',     types: [] },
       ];
       var lines = [
+        { indices: [8, 9, 10, 11], color: '#046', types: [0] },
         { indices: [0, 1, 0, 6, 0, 2, 0, 4, 0, 3, 0, 5], color: '#024', types: [0,1,2,3] },
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [1,2,3] }
