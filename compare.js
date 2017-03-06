@@ -1087,6 +1087,14 @@ $( function()
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [1,2,3] }
       ];
+      var labels = [
+        { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
+        { pos: { x: 160, y: 0   }, align: ['left',  'top'], color: '#08f', label: 'Cr', types: [0] },
+        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [1] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [1,2] },
+        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#f00', label: 'R', types: [2,3] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [3] },
+      ];
       context.globalCompositeOperation = 'lighter';
       context.lineWidth = 2;
       for (var i = 0, p; p = points[i]; ++i) {
@@ -1112,6 +1120,16 @@ $( function()
           context.lineTo(v1.pos.x + 0.5, v1.pos.y + 0.5);
         }
         context.stroke();
+      }
+      context.font = "16px sans-serif";
+      for (var i = 0, l; l = labels[i]; ++i) {
+        if (0 > l.types.indexOf(type)) {
+          continue;
+        }
+        context.textAlign = l.align[0];
+        context.textBaseline = l.align[1];
+        context.fillStyle = l.color;
+        context.fillText(l.label, l.pos.x, l.pos.y);
       }
       return fig.canvas;
     }
