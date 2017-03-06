@@ -1068,14 +1068,14 @@ $( function()
         }
       };
       var points = [
-        { r: 0,   g: 0,   b: 0   , color: '',     types: []        },
-        { r: 255, g: 0,   b: 0   , color: '#f00', types: [0,2,3]   },
-        { r: 0,   g: 255, b: 0   , color: '#0f0', types: [0,1,2]   },
-        { r: 0,   g: 0,   b: 255 , color: '#00f', types: [0,1,3]   },
-        { r: 0,   g: 255, b: 255 , color: '#0ff', types: [0,1]   },
-        { r: 255, g: 0,   b: 255 , color: '#f0f', types: [0,3]   },
-        { r: 255, g: 255, b: 0   , color: '#ff0', types: [0,2]   },
-        { r: 255, g: 255, b: 255 , color: '',     types: []      }
+        { pos: calcxy(0,   0,   0  ) , color: '',     types: []        },
+        { pos: calcxy(255, 0,   0  ) , color: '#f00', types: [0,2,3]   },
+        { pos: calcxy(0,   255, 0  ) , color: '#0f0', types: [0,1,2]   },
+        { pos: calcxy(0,   0,   255) , color: '#00f', types: [0,1,3]   },
+        { pos: calcxy(0,   255, 255) , color: '#0ff', types: [0,1]   },
+        { pos: calcxy(255, 0,   255) , color: '#f0f', types: [0,3]   },
+        { pos: calcxy(255, 255, 0  ) , color: '#ff0', types: [0,2]   },
+        { pos: calcxy(255, 255, 255) , color: '',     types: []      }
       ];
       var lines = [
         { indices: [0, 1, 0, 6, 0, 2, 0, 4, 0, 3, 0, 5], color: '#024', types: [0,1,2,3] },
@@ -1088,10 +1088,9 @@ $( function()
         if (0 > p.types.indexOf(type)) {
           continue;
         }
-        var pos = calcxy(p.r, p.g, p.b);
         context.strokeStyle = p.color;
         context.beginPath();
-        context.arc(pos.x + 0.5, pos.y + 0.5, 4, 0, 2 * Math.PI);
+        context.arc(p.pos.x + 0.5, p.pos.y + 0.5, 4, 0, 2 * Math.PI);
         context.stroke();
       }
       context.lineWidth = 1;
@@ -1104,10 +1103,8 @@ $( function()
         for (var k = 0; k < l.indices.length; k += 2) {
           var v0 = points[l.indices[k]];
           var v1 = points[l.indices[k + 1]];
-          var pos0 = calcxy(v0.r, v0.g, v0.b);
-          var pos1 = calcxy(v1.r, v1.g, v1.b);
-          context.moveTo(pos0.x + 0.5, pos0.y + 0.5);
-          context.lineTo(pos1.x + 0.5, pos1.y + 0.5);
+          context.moveTo(v0.pos.x + 0.5, v0.pos.y + 0.5);
+          context.lineTo(v1.pos.x + 0.5, v1.pos.y + 0.5);
         }
         context.stroke();
       }
