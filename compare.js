@@ -1058,13 +1058,13 @@ $( function()
         if (type == 0) { // Cb-Cr
           var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
           var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
-          return [159.5 + cb, 159.5 - cr];
+          return { x: 159.5 + cb, y: 159.5 - cr };
         } else if (type == 1) { // G-B
-          return [32 + g, 287 - b];
+          return { x: 32 + g, y: 287 - b };
         } else if (type == 2) { // G-R
-          return [32 + g, 287 - r];
+          return { x: 32 + g, y: 287 - r };
         } else { // B-R
-          return [32 + b, 287 - r];
+          return { x: 32 + b, y: 287 - r };
         }
       };
       var points = [
@@ -1088,10 +1088,10 @@ $( function()
         if (0 > p.types.indexOf(type)) {
           continue;
         }
-        var xy = calcxy(p.r, p.g, p.b);
+        var pos = calcxy(p.r, p.g, p.b);
         context.strokeStyle = p.color;
         context.beginPath();
-        context.arc(xy[0] + 0.5, xy[1] + 0.5, 4, 0, 2 * Math.PI);
+        context.arc(pos.x + 0.5, pos.y + 0.5, 4, 0, 2 * Math.PI);
         context.stroke();
       }
       context.lineWidth = 1;
@@ -1104,10 +1104,10 @@ $( function()
         for (var k = 0; k < l.indices.length; k += 2) {
           var v0 = points[l.indices[k]];
           var v1 = points[l.indices[k + 1]];
-          var xy0 = calcxy(v0.r, v0.g, v0.b);
-          var xy1 = calcxy(v1.r, v1.g, v1.b);
-          context.moveTo(xy0[0] + 0.5, xy0[1] + 0.5);
-          context.lineTo(xy1[0] + 0.5, xy1[1] + 0.5);
+          var pos0 = calcxy(v0.r, v0.g, v0.b);
+          var pos1 = calcxy(v1.r, v1.g, v1.b);
+          context.moveTo(pos0.x + 0.5, pos0.y + 0.5);
+          context.lineTo(pos1.x + 0.5, pos1.y + 0.5);
         }
         context.stroke();
       }
