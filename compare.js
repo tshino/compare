@@ -1609,6 +1609,37 @@ $( function()
     }
   }
 
+  var setEntryImage = function(theEntry, img, useCanvasToDisplay) {
+    var w = img.naturalWidth;
+    var h = img.naturalHeight;
+    if (theEntry.format == 'SVG' && (w == 0 && h == 0)) {
+      w = 150;
+      h = 150;
+      theEntry.sizeUnknown = true;
+    }
+    var fig = makeBlankFigure(w, h);
+    fig.context.drawImage(img, 0, 0, w, h);
+    //
+    theEntry.element    = useCanvasToDisplay ? fig.canvas : img;
+    $(theEntry.element).addClass('image');
+    theEntry.asCanvas   = fig.canvas;
+    theEntry.width      = w;
+    theEntry.height     = h;
+    theEntry.canvasWidth   = w;
+    theEntry.canvasHeight  = h;
+    theEntry.loading    = false;
+    theEntry.progress   = 100;
+    //
+    applyExifOrientation(theEntry);
+    updateDOM();
+    updateNowLoading();
+  };
+  var setEntryError = function(entry, message) {
+    entry.loading = false;
+    entry.error = message;
+    updateDOM();
+    updateNowLoading();
+  };
   function addFile(file)
   {
       var entry = {
@@ -1653,13 +1684,6 @@ $( function()
             updateNowLoading();
           };
         })(entry);
-        var onError = function(entry, message) {
-          entry.loading = false;
-          entry.error = message;
-          
-          updateDOM();
-          updateNowLoading();
-        };
         
         reader.onload = (function(theEntry, theFile)
         {
@@ -1669,50 +1693,25 @@ $( function()
                 var format = compareUtil.detectImageFormat(binary);
                 var isPNG  = format && 0 <= format.indexOf('PNG');
                 var isJPEG = format && 0 <= format.indexOf('JPEG');
+                theEntry.format = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
                 if (isJPEG) {
                   theEntry.orientation = compareUtil.detectExifOrientation(binary);
                 }
+                var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
                 var img = new Image;
                 $(img).on('load', function()
                   {
-                    var w = img.naturalWidth;
-                    var h = img.naturalHeight;
-                    if (format == 'SVG' && (w == 0 && h == 0)) {
-                      w = 150;
-                      h = 150;
-                      theEntry.sizeUnknown = true;
-                    }
-                    var fig = makeBlankFigure(w, h);
-                    fig.context.drawImage(img, 0, 0, w, h);
-                    //
-                    if (NEEDS_IOS_EXIF_WORKAROUND && isJPEG) {
-                      theEntry.element    = fig.canvas;
-                    } else {
-                      theEntry.element    = img;
-                    }
-                    $(theEntry.element).addClass('image');
-                    theEntry.asCanvas   = fig.canvas;
-                    theEntry.width      = w;
-                    theEntry.height     = h;
-                    theEntry.canvasWidth   = w;
-                    theEntry.canvasHeight  = h;
-                    theEntry.format     = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
-                    theEntry.loading    = false;
-                    theEntry.progress   = 100;
-                    
-                    applyExifOrientation(theEntry);
-                    updateDOM();
-                    updateNowLoading();
+                    setEntryImage(theEntry, img, useCanvasToDisplay);
                   }).
                   on('error', function()
                   {
                     var message = 'Failed.';
                     if (!theFile.type || !(/^image\/.+$/.test(theFile.type))) {
                       message += ' Maybe not an image file.';
-                    } else if (!isPNG && !isJPEG && format != 'GIF' && format != 'BMP') {
+                    } else if (!isPNG && !isJPEG && theEntry.format != 'GIF' && theEntry.format != 'BMP') {
                       message += ' Maybe unsupported format for the browser.';
                     }
-                    onError(theEntry, message);
+                    setEntryError(theEntry, message);
                   });
                 img.src = e.target.result;
             };
@@ -1720,7 +1719,7 @@ $( function()
         reader.onerror = (function(theEntry, theFile, theReader)
         {
           return function(e) {
-            onError(theEntry,
+            setEntryError(theEntry,
                 'Failed. File could not be read. (' + theReader.error.name + ')');
           };
         })(entry, file, reader);
