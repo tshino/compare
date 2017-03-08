@@ -1054,14 +1054,29 @@ $( function()
         }
       }
       context.putImageData(bits, 0, 0);
+      var srgbToLinear = function(c) {
+        return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      };
       var calcxy = function(r, g, b) {
         if (type == 0) { // Cb-Cr
           var cb = -0.14713 * r - 0.28886 * g + 0.436 * b;
           var cr = 0.615 * r - 0.51499 * g - 0.10001 * b;
           return { x: 159.5 + cb, y: 159.5 - cr };
-        } else if (type == 1) { // G-B
+        } else if (type == 1) { // x-y
+          r = srgbToLinear(r / 255);
+          g = srgbToLinear(g / 255);
+          b = srgbToLinear(b / 255);
+          var x = 0.412391 * r + 0.357584 * g + 0.180481 * b;
+          var y = 0.212639 * r + 0.715169 * g + 0.072192 * b;
+          var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
+          var xyz = x + y + z;
+          return {
+            x: 32 + (xyz == 0 ? 0 : x / xyz * 255),
+            y: 287 - (xyz == 0 ? 0 : y / xyz * 255)
+          };
+        } else if (type == 2) { // G-B
           return { x: 32 + g, y: 287 - b };
-        } else if (type == 2) { // G-R
+        } else if (type == 3) { // G-R
           return { x: 32 + g, y: 287 - r };
         } else { // B-R
           return { x: 32 + b, y: 287 - r };
@@ -1069,31 +1084,39 @@ $( function()
       };
       var points = [
         { pos: calcxy(0,   0,   0  ) , color: '',     types: []        },
-        { pos: calcxy(255, 0,   0  ) , color: '#f00', types: [0,2,3]   },
-        { pos: calcxy(0,   255, 0  ) , color: '#0f0', types: [0,1,2]   },
-        { pos: calcxy(0,   0,   255) , color: '#00f', types: [0,1,3]   },
-        { pos: calcxy(0,   255, 255) , color: '#0ff', types: [0,1]   },
-        { pos: calcxy(255, 0,   255) , color: '#f0f', types: [0,3]   },
-        { pos: calcxy(255, 255, 0  ) , color: '#ff0', types: [0,2]   },
+        { pos: calcxy(255, 0,   0  ) , color: '#f00', types: [0,1,3,4]   },
+        { pos: calcxy(0,   255, 0  ) , color: '#0f0', types: [0,1,2,3]   },
+        { pos: calcxy(0,   0,   255) , color: '#00f', types: [0,1,2,4]   },
+        { pos: calcxy(0,   255, 255) , color: '#0ff', types: [0,2]   },
+        { pos: calcxy(255, 0,   255) , color: '#f0f', types: [0,4]   },
+        { pos: calcxy(255, 255, 0  ) , color: '#ff0', types: [0,3]   },
         { pos: calcxy(255, 255, 255) , color: '',     types: []      },
         { pos: { x: 159.5, y: 0     } , color: '',     types: [] },
         { pos: { x: 159.5, y: 320   } , color: '',     types: [] },
         { pos: { x: 0,     y: 159.5 } , color: '',     types: [] },
         { pos: { x: 320,   y: 159.5 } , color: '',     types: [] },
+        { pos: { x: 32,    y: 32    } , color: '',     types: [] },
+        { pos: { x: 32,    y: 287   } , color: '',     types: [] },
+        { pos: { x: 287,   y: 287   } , color: '',     types: [] },
       ];
       var lines = [
         { indices: [8, 9, 10, 11], color: '#046', types: [0] },
-        { indices: [0, 1, 0, 6, 0, 2, 0, 4, 0, 3, 0, 5], color: '#024', types: [0,1,2,3] },
+        { indices: [0, 1, 0, 2, 0, 3], color: '#024', types: [0,2,3,4] },
+        { indices: [0, 4, 0, 5, 0, 6], color: '#024', types: [0] },
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
-        { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [1,2,3] }
+        { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [2,3,4] },
+        { indices: [1, 2, 2, 3, 3, 1], color: '#024', types: [1] },
+        { indices: [12, 13, 13, 14, 14, 12], color: '#046', types: [1] },
       ];
       var labels = [
         { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
         { pos: { x: 160, y: 0   }, align: ['left',  'top'], color: '#08f', label: 'Cr', types: [0] },
-        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [1] },
-        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [1,2] },
-        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#f00', label: 'R', types: [2,3] },
-        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [3] },
+        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [2] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [2,3] },
+        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#f00', label: 'R', types: [3,4] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [4] },
+        { pos: { x: 32,  y: 32  }, align: ['right', 'bottom'], color: '#08f', label: 'y', types: [1] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'top'], color: '#08f', label: 'x', types: [1] },
       ];
       context.globalCompositeOperation = 'lighter';
       context.lineWidth = 2;
