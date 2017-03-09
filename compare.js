@@ -1111,10 +1111,9 @@ $( function()
       var labels = [
         { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
         { pos: { x: 160, y: 0   }, align: ['left',  'top'], color: '#08f', label: 'Cr', types: [0] },
-        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [2] },
-        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [2,3] },
-        { pos: { x: 32,  y: 32  }, align: ['left',  'bottom'], color: '#f00', label: 'R', types: [3,4] },
-        { pos: { x: 288, y: 288 }, align: ['left',  'bottom'], color: '#08f', label: 'B', types: [4] },
+        { pos: calcxy(255, 0, 0), align: ['left',  'bottom'], color: '#f00', label: 'R', types: [3,4] },
+        { pos: calcxy(0, 255, 0), align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [2,3] },
+        { pos: calcxy(0, 0, 255), align: ['left',  'bottom'], color: '#00f', label: 'B', types: [2,4] },
         { pos: { x: 32,  y: 32  }, align: ['right', 'bottom'], color: '#08f', label: 'y', types: [1] },
         { pos: { x: 288, y: 288 }, align: ['left',  'top'], color: '#08f', label: 'x', types: [1] },
       ];
