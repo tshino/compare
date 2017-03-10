@@ -1662,12 +1662,40 @@ $( function()
     updateDOM();
     updateNowLoading();
   };
+  var setEntryDataURI = function(entry, dataURI) {
+    var binary = compareUtil.binaryFromDataURI(dataURI);
+    var format = compareUtil.detectImageFormat(binary);
+    var isPNG  = format && 0 <= format.indexOf('PNG');
+    var isJPEG = format && 0 <= format.indexOf('JPEG');
+    entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
+    if (isJPEG) {
+      entry.orientation = compareUtil.detectExifOrientation(binary);
+    }
+    var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
+    var img = new Image;
+    $(img).on('load', function()
+      {
+        setEntryImage(entry, img, useCanvasToDisplay);
+      }).
+      on('error', function()
+      {
+        var message = 'Failed.';
+        if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
+          message += ' Maybe not an image file.';
+        } else if (!isPNG && !isJPEG && entry.format != 'GIF' && entry.format != 'BMP') {
+          message += ' Maybe unsupported format for the browser.';
+        }
+        setEntryError(entry, message);
+      });
+    img.src = dataURI;
+  };
   function addFile(file)
   {
       var entry = {
             index           : entries.length,
             name            : file.name,
             size            : file.size,
+            fileType        : file.type,
             lastModified    : new Date(file.lastModified || file.lastModifiedDate),
             format          : '',
             width           : 0,
@@ -1695,58 +1723,21 @@ $( function()
       };
       entries.push(entry);
       loading.push(entry);
-      {
-        var reader = new FileReader();
-        reader.onprogress = (function(theEntry)
-        {
-          return function(e) {
-            if (e.lengthComputable && 0 < e.total) {
-              theEntry.progress = Math.round(e.loaded * 100 / e.total);
-            }
-            updateNowLoading();
-          };
-        })(entry);
-        
-        reader.onload = (function(theEntry, theFile)
-        {
-            return function(e)
-            {
-                var binary = compareUtil.binaryFromDataURI(e.target.result)
-                var format = compareUtil.detectImageFormat(binary);
-                var isPNG  = format && 0 <= format.indexOf('PNG');
-                var isJPEG = format && 0 <= format.indexOf('JPEG');
-                theEntry.format = format || (theFile.type ? '('+theFile.type+')' : '(unknown)');
-                if (isJPEG) {
-                  theEntry.orientation = compareUtil.detectExifOrientation(binary);
-                }
-                var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
-                var img = new Image;
-                $(img).on('load', function()
-                  {
-                    setEntryImage(theEntry, img, useCanvasToDisplay);
-                  }).
-                  on('error', function()
-                  {
-                    var message = 'Failed.';
-                    if (!theFile.type || !(/^image\/.+$/.test(theFile.type))) {
-                      message += ' Maybe not an image file.';
-                    } else if (!isPNG && !isJPEG && theEntry.format != 'GIF' && theEntry.format != 'BMP') {
-                      message += ' Maybe unsupported format for the browser.';
-                    }
-                    setEntryError(theEntry, message);
-                  });
-                img.src = e.target.result;
-            };
-        })(entry, file);
-        reader.onerror = (function(theEntry, theFile, theReader)
-        {
-          return function(e) {
-            setEntryError(theEntry,
-                'Failed. File could not be read. (' + theReader.error.name + ')');
-          };
-        })(entry, file, reader);
-        reader.readAsDataURL(file);
-      }
+      
+      var reader = new FileReader();
+      reader.onprogress = function(e) {
+        if (e.lengthComputable && 0 < e.total) {
+          entry.progress = Math.round(e.loaded * 100 / e.total);
+        }
+        updateNowLoading();
+      };
+      reader.onload = function(e) {
+        setEntryDataURI(entry, e.target.result);
+      };
+      reader.onerror = function(e) {
+        setEntryError(entry, 'Failed. File could not be read. (' + reader.error.name + ')');
+      };
+      reader.readAsDataURL(file);
   }
   function addFiles(files)
   {
