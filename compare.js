@@ -1034,11 +1034,27 @@ $( function()
   var updateVectorscope = function(type, img, dist) {
     var w = img.canvasWidth;
     var h = img.canvasHeight;
-    img.vectorscope = makeFigure(w, h, dist);
-    updateVectorscopeTable();
+    var fig = makeBlankFigure(320, 320);
+    function notify() {
+      img.vectorscope = fig.canvas;
+      updateVectorscopeTable();
+    };
+    if (type == 1) { // x-y
+      var bg = new Image;
+      bg.onload = function() {
+        makeFigure(fig, w, h, dist);
+        fig.context.globalAlpha = 0.5;
+        fig.context.globalCompositeOperation = 'lighter';
+        fig.context.drawImage(bg, 0, 0, 320, 320);
+        notify();
+      };
+      bg.src = "res/xy-chromaticity-diagram.png";
+    } else {
+      makeFigure(fig, w, h, dist);
+      notify();
+    }
     
-    function makeFigure(w, h, dist) {
-      var fig = makeBlankFigure(320, 320);
+    function makeFigure(fig, w, h, dist) {
       var context = fig.context;
       var bits = context.createImageData(320, 320);
       var max = w * h;
