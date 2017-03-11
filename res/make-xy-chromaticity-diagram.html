@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>xy chromaticity diagram</title>
+	<script src="../modules/jquery-3.1.1.min.js"></script>
+	<style type="text/css">
+		svg { border: 10px solid gray; background: #000; }
+	</style>
+</head>
+<body>
+	<div id="svg">
+
+<svg version="1.2" baseProfile="tiny" width="200mm" height="200mm" viewBox="-125 -125 1250 1250" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="1" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+	<path stroke="white" fill="none" stroke-width="1"></path>
+	<radialGradient id="grad" cx="0.5" cy="0.5" r="0.5">
+		<stop offset="0%"   stop-color="#bbb" stop-opacity="1"></stop>
+		<stop offset="10%"  stop-color="#bbb" stop-opacity=".99"></stop>
+		<stop offset="20%"  stop-color="#bbb" stop-opacity=".95"></stop>
+		<stop offset="30%"  stop-color="#bbb" stop-opacity=".85"></stop>
+		<stop offset="40%"  stop-color="#bbb" stop-opacity=".65"></stop>
+		<stop offset="50%"  stop-color="#bbb" stop-opacity=".45"></stop>
+		<stop offset="60%"  stop-color="#bbb" stop-opacity=".30"></stop>
+		<stop offset="70%"  stop-color="#bbb" stop-opacity=".20"></stop>
+		<stop offset="80%"  stop-color="#bbb" stop-opacity=".10"></stop>
+		<stop offset="90%"  stop-color="#bbb" stop-opacity=".05"></stop>
+		<stop offset="100%" stop-color="#bbb" stop-opacity="0"></stop>
+	</radialGradient>
+	<circle cx="333.3" cy="666.7" r="200" fill="url(#grad)"></circle>
+</svg>
+
+	</div>
+	<div id="html" style="border: 1px solid gray; white-space: pre-wrap">
+	</div>
+	<script>
+		var newSVG = function(name) {
+			return $(document.createElementNS('http://www.w3.org/2000/svg', name));
+		};
+		var points = [
+			// l: wave length (nm)
+			// x, y: normalized chromaticity coordinates
+			{ l: 360, x: 0.175, y: 0.005 },
+			{ l: 400, x: 0.173, y: 0.005 },
+			{ l: 420, x: 0.171, y: 0.005 },
+			{ l: 430, x: 0.169, y: 0.007 },
+			{ l: 440, x: 0.164, y: 0.011 },
+			{ l: 450, x: 0.157, y: 0.018 },
+			{ l: 455, x: 0.151, y: 0.023 },
+			{ l: 460, x: 0.144, y: 0.030 },
+			{ l: 465, x: 0.136, y: 0.040 },
+			{ l: 470, x: 0.124, y: 0.058 },
+			{ l: 475, x: 0.110, y: 0.087 },
+			{ l: 480, x: 0.091, y: 0.133 },
+			{ l: 485, x: 0.069, y: 0.201 },
+			{ l: 490, x: 0.045, y: 0.295 },
+			{ l: 493, x: 0.032, y: 0.364 },
+			{ l: 495, x: 0.023, y: 0.413 },
+			{ l: 498, x: 0.013, y: 0.488 },
+			{ l: 500, x: 0.008, y: 0.538 },
+			{ l: 505, x: 0.004, y: 0.655 },
+			{ l: 508, x: 0.008, y: 0.715 },
+			{ l: 510, x: 0.014, y: 0.750 },
+			{ l: 513, x: 0.027, y: 0.792 },
+			{ l: 515, x: 0.039, y: 0.812 },
+			{ l: 516, x: 0.045, y: 0.819 },
+			{ l: 518, x: 0.059, y: 0.829 },
+			{ l: 520, x: 0.074, y: 0.834 },
+			{ l: 521, x: 0.082, y: 0.834 },
+			{ l: 523, x: 0.098, y: 0.832 },
+			{ l: 525, x: 0.114, y: 0.826 },
+			{ l: 528, x: 0.139, y: 0.815 },
+			{ l: 530, x: 0.155, y: 0.806 },
+			{ l: 535, x: 0.193, y: 0.782 },
+			{ l: 540, x: 0.230, y: 0.754 },
+			{ l: 545, x: 0.266, y: 0.724 },
+			{ l: 550, x: 0.302, y: 0.692 },
+			{ l: 555, x: 0.337, y: 0.659 },
+			{ l: 560, x: 0.373, y: 0.624 },
+			{ l: 565, x: 0.409, y: 0.590 },
+			{ l: 570, x: 0.444, y: 0.555 },
+			{ l: 575, x: 0.479, y: 0.520 },
+			{ l: 580, x: 0.512, y: 0.487 },
+			{ l: 585, x: 0.545, y: 0.454 },
+			{ l: 590, x: 0.575, y: 0.424 },
+			{ l: 595, x: 0.603, y: 0.397 },
+			{ l: 600, x: 0.627, y: 0.372 },
+			{ l: 610, x: 0.666, y: 0.334 },
+			{ l: 620, x: 0.692, y: 0.308 },
+			{ l: 630, x: 0.708, y: 0.292 },
+			{ l: 640, x: 0.719, y: 0.281 },
+			{ l: 650, x: 0.726, y: 0.274 },
+			{ l: 660, x: 0.730, y: 0.270 },
+			{ l: 670, x: 0.732, y: 0.268 },
+			{ l: 680, x: 0.733, y: 0.267 },
+			{ l: 690, x: 0.734, y: 0.266 },
+			{ l: 770, x: 0.735, y: 0.265 },
+		];
+		var xyToS = function(x, y) {
+			return (x * 1000).toFixed(2) + ' ' + (1000 - y * 1000).toFixed(2);
+		};
+		var linearToSRGB = function(c) {
+			return c <= 0.0031308 ? c * 12.92 : Math.pow(c, 1/2.4) * 1.055 - 0.055;
+		};
+		var toRGB = function(x, y) {
+			var z = 1 - x - y;
+			var r =  3.240970 * x - 1.537383 * y - 0.498611 * z;
+			var g = -0.969244 * x + 1.875968 * y + 0.041555 * z;
+			var b =  0.055630 * x - 0.203977 * y + 1.056972 * z;
+			g *= 2;
+			b *= 3;
+			var rgb = r + g + b;
+			r = r / rgb - 1/3;
+			g = g / rgb - 1/3;
+			b = b / rgb - 1/3;
+			var scale1 = 0.333 / -Math.min(r, Math.min(g, b));
+			var scale2 = 0.666 / Math.sqrt(r * r + g * g + b * b);
+			var scale = Math.min(scale1, scale2);
+			r = Math.max(0, Math.min(1, r * scale + 1/3));
+			g = Math.max(0, Math.min(1, g * scale + 1/3));
+			b = Math.max(0, Math.min(1, b * scale + 1/3));
+			return {
+				r: linearToSRGB(r),
+				g: linearToSRGB(g),
+				b: linearToSRGB(b)
+			};
+		};
+		var rgbToS = function(rgb) {
+			var r = Math.round(rgb.r * 255);
+			var g = Math.round(rgb.g * 255);
+			var b = Math.round(rgb.b * 255);
+			return 'rgb(' + r + ',' + g + ',' + b + ')';
+		};
+		var strokePath = $('svg path');
+		for (var i = 0; i < points.length; i++) {
+			var xa = points[i].x;
+			var ya = points[i].y;
+			var xb = points[(i + 1) % points.length].x;
+			var yb = points[(i + 1) % points.length].y;
+			var n = i + 1 < points.length ? 8 : 64;
+			for (var k = 0; k < n; ++k) {
+				var b0 = k / n, b1 = (k + 1) / n;
+				var a0 = 1 - b0, a1 = 1 - b1;
+				var x0 = xa * a0 + xb * b0;
+				var y0 = ya * a0 + yb * b0;
+				var x1 = xa * a1 + xb * b1;
+				var y1 = ya * a1 + yb * b1;
+				var fillD =
+					'M ' + xyToS(x0, y0) +
+					' L ' + xyToS(x1 , y1) +
+					' ' + xyToS(0.333, 0.333) + ' Z';
+				var rgb = toRGB((x0 + x1) / 2, (y0 + y1) / 2);
+				var fillPath = newSVG('path').attr({
+					stroke: rgbToS(rgb),
+					fill: rgbToS(rgb),
+					d: fillD
+				});
+				strokePath.before(fillPath, '\n\t');
+			}
+		}
+		/*
+		var strokeD = '';
+		for (var i = 0; i < points.length; i++) {
+			if (i == 0) strokeD += 'M';
+			if (i == 1) strokeD += ' L';
+			var x = points[i].x;
+			var y = points[i].y;
+			strokeD += ' ' + xyToS(x, y);
+		}
+		strokeD += ' Z';
+		strokePath.attr('d', strokeD);
+		*/
+		$('#html').text(
+			'<?xml version="1.0" encoding="UTF-8"?>\n' +
+			$('#svg').html().trim()
+		);
+	</script>
+</body>
+</html>
