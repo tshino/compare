@@ -1647,28 +1647,28 @@ $( function()
     }
   }
 
-  var setEntryImage = function(theEntry, img, useCanvasToDisplay) {
+  var setEntryImage = function(entry, img, useCanvasToDisplay) {
     var w = img.naturalWidth;
     var h = img.naturalHeight;
-    if (theEntry.format == 'SVG' && (w == 0 && h == 0)) {
+    if (entry.format == 'SVG' && (w == 0 && h == 0)) {
       w = 150;
       h = 150;
-      theEntry.sizeUnknown = true;
+      entry.sizeUnknown = true;
     }
     var fig = makeBlankFigure(w, h);
     fig.context.drawImage(img, 0, 0, w, h);
     //
-    theEntry.element    = useCanvasToDisplay ? fig.canvas : img;
-    $(theEntry.element).addClass('image');
-    theEntry.asCanvas   = fig.canvas;
-    theEntry.width      = w;
-    theEntry.height     = h;
-    theEntry.canvasWidth   = w;
-    theEntry.canvasHeight  = h;
-    theEntry.loading    = false;
-    theEntry.progress   = 100;
+    entry.element    = useCanvasToDisplay ? fig.canvas : img;
+    $(entry.element).addClass('image');
+    entry.asCanvas   = fig.canvas;
+    entry.width      = w;
+    entry.height     = h;
+    entry.canvasWidth   = w;
+    entry.canvasHeight  = h;
+    entry.loading    = false;
+    entry.progress   = 100;
     //
-    applyExifOrientation(theEntry);
+    applyExifOrientation(entry);
     updateDOM();
     updateNowLoading();
   };
