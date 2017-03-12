@@ -12,8 +12,8 @@ or press numeric keys on the keyboard to switch pictures.
 All image data will be processed on your browser,
 so that it can never happen to upload to somewhere or write to your files.
 
-You can simply bookmark the demo page,
-or download zip of this repository to use it as a local application.
+You can simply bookmark the [demo page](https://tshino.github.io/compare/compare.html),
+or [download zip](https://github.com/tshino/compare/archive/master.zip) of this repository to use it as a local application.
 
 # Compare.html
 
@@ -29,5 +29,5 @@ or download zip of this repository to use it as a local application.
 画像データはすべてブラウザ上で処理するので、
 どこかへアップロードされることもファイルを書き換えてしまうこともありません。
 
-デモページをブックマークしても使えます。
-リポジトリのzipをダウンロードすればローカルアプリのように使うこともできます。
+[デモページ](https://tshino.github.io/compare/compare.html)をブックマークしても使えます。
+リポジトリの[zipをダウンロード](https://github.com/tshino/compare/archive/master.zip)すればローカルアプリのように使うこともできます。
