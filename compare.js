@@ -111,6 +111,22 @@ $( function()
             return false;
           }
         }
+        // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+        if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
+            (e.keyCode == 33 && !e.shiftKey)) {
+          if ($('#histogram').is(':visible')) {
+            zoomFigure(+ZOOM_STEP_KEY);
+            return false;
+          }
+        }
+        // '-' (173, 189 or 109 for numpad) / PageDown (34)
+        if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
+            (e.keyCode == 34 && !e.shiftKey)) {
+          if ($('#histogram').is(':visible')) {
+            zoomFigure(-ZOOM_STEP_KEY);
+            return false;
+          }
+        }
         return true;
       }
       // '0' - '9' (48-57 or 96-105 for numpad)
@@ -301,6 +317,7 @@ $( function()
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
+  var figureZoom = 0;
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
@@ -545,6 +562,7 @@ $( function()
     dialog = { element: target, close: parent || hideDialog };
     target.css({ display: 'block' });
     target.children().find('.dummyFocusTarget').focus();
+    figureZoom = 0;
   };
   var adjustDialogPosition = function() {
     if (dialog) {
@@ -758,13 +776,19 @@ $( function()
         makeImageNameWithIndex('<td>', img)
       );
       $(target).find('tr').eq(1).append(
-        $('<td>').append($(img[propName]).css(style))
+        $('<td class="fig">').append($(img[propName]).css(style))
       );
     }
     if (k == 0) {
       $(target).find('tr').eq(0).append(
         $('<td rowspan="2">').text('no data')
       );
+    }
+  };
+  var zoomFigure = function(delta) {
+    if (0 < images.length) {
+      figureZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, figureZoom + delta));
+      updateHistogramTable();
     }
   };
   function changeHistogramType(type)
@@ -920,7 +944,9 @@ $( function()
             width: '384px',
             height:'272px',
             background:'#bbb',
-            padding:'8px' };
+            padding:'8px',
+            transform: 'scale('+Math.pow(2, figureZoom)+', 1)'
+    };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis);

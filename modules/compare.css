@@ -282,6 +282,10 @@ div.dialog table td, div.dialog table th
     border          : #bbb solid 1px;
     min-width       : 96px;
 }
+div.dialog table td.fig
+{
+    overflow        : hidden;
+}
 div.footnote
 {
     font-size:      0.8em;
