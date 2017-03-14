@@ -114,7 +114,8 @@ $( function()
         // '+;' (59, 187 or 107 for numpad) / PageUp (33)
         if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
             (e.keyCode == 33 && !e.shiftKey)) {
-          if ($('#histogram').is(':visible')) {
+          if ($('#histogram').is(':visible') ||
+              $('#waveform').is(':visible')) {
             zoomFigure(+ZOOM_STEP_KEY);
             return false;
           }
@@ -122,7 +123,8 @@ $( function()
         // '-' (173, 189 or 109 for numpad) / PageDown (34)
         if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
             (e.keyCode == 34 && !e.shiftKey)) {
-          if ($('#histogram').is(':visible')) {
+          if ($('#histogram').is(':visible') ||
+              $('#waveform').is(':visible')) {
             zoomFigure(-ZOOM_STEP_KEY);
             return false;
           }
@@ -558,8 +560,8 @@ $( function()
       dialog = null;
     }
   };
-  var showDialog = function(target, parent) {
-    dialog = { element: target, close: parent || hideDialog };
+  var showDialog = function(target, parent, update) {
+    dialog = { element: target, close: parent || hideDialog, update: update };
     target.css({ display: 'block' });
     target.children().find('.dummyFocusTarget').focus();
     figureZoom = 0;
@@ -611,7 +613,7 @@ $( function()
         if (update) {
           update();
         }
-        showDialog(target, parent);
+        showDialog(target, parent, update);
         dlg.css({position:'',left:'',top:''});
       }
     };
@@ -788,7 +790,9 @@ $( function()
   var zoomFigure = function(delta) {
     if (0 < images.length) {
       figureZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, figureZoom + delta));
-      updateHistogramTable();
+      if (dialog && dialog.update) {
+        dialog.update();
+      }
     }
   };
   function changeHistogramType(type)
@@ -1033,7 +1037,8 @@ $( function()
             width: '320px',
             height:'256px',
             background:'#666',
-            padding:'10px' };
+            padding:'10px',
+            transform: 'scale('+Math.pow(2, figureZoom)+', 1)' };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
