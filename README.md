@@ -1,4 +1,5 @@
-﻿# Compare.html
+﻿
+# Compare.html
 
 Compare.html is a simple web application that helps visual comparison of pictures.
 Zooming and scrolling are performed for each picture simultaneously.
