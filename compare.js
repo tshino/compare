@@ -129,6 +129,14 @@ $( function()
             return false;
           }
         }
+        // cursor key
+        if (37 <= e.keyCode && e.keyCode <= 40) {
+          var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
+          var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
+          if (addFigureOffsetRelative(x * 0.125, y * 0.125)) {
+            return false;
+          }
+        }
         return true;
       }
       // '0' - '9' (48-57 or 96-105 for numpad)
@@ -320,6 +328,7 @@ $( function()
   var touchState = null;
   var dialog = null;
   var figureZoom = 0;
+  var figureOffset = { x: 0.5, y: 0.5 };
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
@@ -564,7 +573,6 @@ $( function()
     dialog = { element: target, close: parent || hideDialog, update: update };
     target.css({ display: 'block' });
     target.children().find('.dummyFocusTarget').focus();
-    figureZoom = 0;
   };
   var adjustDialogPosition = function() {
     if (dialog) {
@@ -610,6 +618,8 @@ $( function()
         hideDialog();
       } else {
         hideDialog();
+        figureZoom = 0;
+        setFigureOffset(0.5, 0.5);
         if (update) {
           update();
         }
@@ -787,9 +797,31 @@ $( function()
       );
     }
   };
+  var setFigureOffset = function(x, y) {
+    x = Math.min(1, Math.max(0, x));
+    y = Math.min(1, Math.max(0, y));
+    if (figureOffset.x !== x || figureOffset.y !== y) {
+      figureOffset.x = x;
+      figureOffset.y = y;
+      return true;
+    }
+  };
+  var addFigureOffsetRelative = function(dx, dy) {
+    var figureScale = Math.pow(2, figureZoom);
+    if (1 < figureScale) {
+      var x = dx / (figureScale - 1);
+      var y = dy / (figureScale - 1);
+      var result = setFigureOffset(figureOffset.x + x, figureOffset.y + y);
+      if (dialog && dialog.update) {
+        dialog.update();
+      }
+      return result;
+    }
+  };
   var zoomFigure = function(delta) {
     if (0 < images.length) {
       figureZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, figureZoom + delta));
+      figureZoom = Math.round(1000 * figureZoom) / 1000;
       if (dialog && dialog.update) {
         dialog.update();
       }
@@ -943,13 +975,22 @@ $( function()
       }
     }
   }
+  var makeFigureTransform = function() {
+    var figureScale = Math.pow(2, figureZoom);
+    var offsetX = (0.5 - figureOffset.x) * (1.0 - 1.0 / figureScale);
+    var offsetY = (0.5 - figureOffset.y) * (1.0 - 1.0 / figureScale);
+    return (
+        'scale(' + figureScale + ',1) ' +
+        'translate(' + (offsetX*100) + '%,' + (offsetY*100) + '%)'
+    );
+  };
   var updateHistogramTable = function() {
     var style = {
             width: '384px',
             height:'272px',
             background:'#bbb',
             padding:'8px',
-            transform: 'scale('+Math.pow(2, figureZoom)+', 1)'
+            transform: makeFigureTransform()
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
@@ -1038,7 +1079,8 @@ $( function()
             height:'256px',
             background:'#666',
             padding:'10px',
-            transform: 'scale('+Math.pow(2, figureZoom)+', 1)' };
+            transform: makeFigureTransform()
+    };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
