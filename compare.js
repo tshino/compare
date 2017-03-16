@@ -308,6 +308,18 @@ $( function()
   $('#view').on('touchend', 'div.imageBox', function(e) {
     touchState = null;
   });
+  $('#histogram,#waveform').on('wheel', function(e) {
+    var event = e.originalEvent;
+    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
+        return true;
+    }
+    var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+    var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
+    if (steps != 0) {
+        zoomFigure(-steps * ZOOM_STEP_WHEEL);
+        return false;
+    }
+  });
 
   updateDOM();
 });
