@@ -340,7 +340,7 @@ $( function()
   var touchState = null;
   var dialog = null;
   var figureZoom = 0;
-  var figureOffset = { x: 0.5, y: 0.5 };
+  var figureOffset = { x: 0.0, y: 0.5 };
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
@@ -631,7 +631,7 @@ $( function()
       } else {
         hideDialog();
         figureZoom = 0;
-        setFigureOffset(0.5, 0.5);
+        setFigureOffset(0.0, 0.5);
         if (update) {
           update();
         }
