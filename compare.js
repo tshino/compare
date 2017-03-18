@@ -133,7 +133,7 @@ $( function()
         if (37 <= e.keyCode && e.keyCode <= 40) {
           var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
           var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-          if (addFigureOffsetRelative(x * 0.125, y * 0.125)) {
+          if (moveFigureRelative(x * 0.125, y * 0.125)) {
             return false;
           }
         }
@@ -165,7 +165,7 @@ $( function()
       {
         var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
         var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-        addViewOffset(x * 0.4 / scale, y * 0.4 / scale);
+        moveViewRelative(x * 0.3, y * 0.3);
         updateTransform();
         return false;
       }
@@ -818,7 +818,7 @@ $( function()
       return true;
     }
   };
-  var addFigureOffsetRelative = function(dx, dy) {
+  var moveFigureRelative = function(dx, dy) {
     var figureScale = Math.pow(2, figureZoom);
     if (1 < figureScale) {
       var x = dx / (figureScale - 1);
@@ -1560,22 +1560,27 @@ $( function()
     dragLastPoint = null;
   }
   var setViewOffset = function(x, y) {
-    viewOffset.x = Math.min(1, Math.max(0, x));
-    viewOffset.y = Math.min(1, Math.max(0, y));
+    x = Math.min(1, Math.max(0, x));
+    y = Math.min(1, Math.max(0, y));
+    if (viewOffset.x !== x || viewOffset.y !== y) {
+      viewOffset.x = x;
+      viewOffset.y = y;
+      return true;
+    }
   };
-  var addViewOffset = function(dx, dy) {
-    setViewOffset(viewOffset.x + dx, viewOffset.y + dy);
+  var moveViewRelative = function(dx, dy) {
+    if (1 < scale) {
+      setViewOffset(viewOffset.x + dx / (scale - 1), viewOffset.y + dy / (scale - 1));
+    }
   };
   function moveImageByPx(index, dx, dy)
   {
     if (!entries[index].ready()) {
       return;
     }
-    if (1.0 < scale) {
-      var x = dx / (entries[index].baseWidth * scale);
-      var y = dy / (entries[index].baseHeight * scale);
-      addViewOffset(-x / (1.0 - 1.0 / scale), -y / (1.0 - 1.0 / scale));
-    }
+    var x = dx / entries[index].baseWidth;
+    var y = dy / entries[index].baseHeight;
+    moveViewRelative(-x, -y);
   }
   function zoomWithTarget(index, x, y)
   {
