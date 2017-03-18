@@ -970,12 +970,16 @@ $( function()
       } else { // Luminance
         drawHistogram('#fff', 0);
       }
-      drawAxes(fig.context, 0, 512, 768, 0, 10, [
+      var axes = [
         { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
-        { pos: (0.5 + 64 ) / 256, align: 'center', label: '64' },
-        { pos: (0.5 + 128) / 256, align: 'center', label: '128' },
-        { pos: (0.5 + 192) / 256, align: 'center', label: '192' },
-        { pos: (0.5 + 255) / 256, align: 'right',  label: '255' }]);
+        { pos: (0.5 + 255) / 256, align: 'right',  label: '255' }
+      ];
+      for (var i = 16; i < 256; i += 16) {
+        axes.push({
+          pos: (0.5 + i) / 256, align: 'center', label: (i%64 == 0) ? ''+i : ''
+        });
+      }
+      drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
       return fig.canvas;
       
       function drawHistogram(color, offset) {
