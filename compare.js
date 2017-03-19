@@ -148,16 +148,14 @@ $( function()
       }
       // '+;' (59, 187 or 107 for numpad) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
-          (e.keyCode == 33 && !e.shiftKey))
-      {
-        zoomIn();
+          (e.keyCode == 33 && !e.shiftKey)) {
+        viewZoom.zoomIn();
         return false;
       }
       // '-' (173, 189 or 109 for numpad) / PageDown (34)
       if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
-          (e.keyCode == 34 && !e.shiftKey))
-      {
-        zoomOut();
+          (e.keyCode == 34 && !e.shiftKey)) {
+        viewZoom.zoomOut();
         return false;
       }
       // cursor key
@@ -173,7 +171,7 @@ $( function()
       if (e.keyCode == 27 && !e.shiftKey)
       {
         currentImageIndex = 0;
-        viewZoom = 0;
+        viewZoom.setZoom(0);
         setViewOffset(0.5, 0.5);
         overlayMode = false;
         resetMouseDrag();
@@ -269,8 +267,8 @@ $( function()
       return true;
     }
     var img = entries[index];
-    var x = (e.pageX - $(this).offset().left) / (img.baseWidth * scale);
-    var y = (e.pageY - $(this).offset().top) / (img.baseHeight * scale);
+    var x = (e.pageX - $(this).offset().left) / (img.baseWidth * viewZoom.scale);
+    var y = (e.pageY - $(this).offset().top) / (img.baseHeight * viewZoom.scale);
     zoomWithTarget(index, x, y);
   });
   $('#view').on("wheel", function(e) {
@@ -281,7 +279,7 @@ $( function()
     var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
     var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
     if (steps != 0) {
-        zoomRelative(-steps * ZOOM_STEP_WHEEL);
+        viewZoom.zoomRelative(-steps * ZOOM_STEP_WHEEL);
         return false;
     }
   });
@@ -329,8 +327,27 @@ $( function()
   var images = [];
   var currentImageIndex = 0;
   var isSingleView = false;
-  var viewZoom = 0;
-  var scale = 1.0;
+  var viewZoom = (function(){
+    var o = {
+      zoom: 0,
+      scale: 1
+    };
+    var setZoom = function(z) {
+      o.zoom = z;
+      o.scale = Math.round(Math.pow(2.0, z) * 100) / 100;
+    };
+    var zoomRelative = function(delta) {
+      if (0 < images.length) {
+        setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
+        updateTransform();
+      }
+    };
+    o.setZoom = setZoom;
+    o.zoomRelative = zoomRelative;
+    o.zoomIn = function() { zoomRelative(+ZOOM_STEP_KEY); };
+    o.zoomOut = function() { zoomRelative(-ZOOM_STEP_KEY); };
+    return o;
+  })();
   var viewOffset = { x : 0.5, y : 0.5 };
   var layoutMode = null;
   var overlayMode = false;
@@ -410,7 +427,7 @@ $( function()
       ent.waveform = null;
       ent.vectorscope = null;
       currentImageIndex = 0;
-      viewZoom = 0;
+      viewZoom.setZoom(0);
       setViewOffset(0.5, 0.5);
       overlayMode = false;
       discardTasksOfEntryByIndex(index);
@@ -469,18 +486,6 @@ $( function()
         append($('<span/>').text(img.name));
   }
 
-  var zoomRelative = function(delta) {
-    if (0 < images.length) {
-      viewZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, viewZoom + delta));
-      updateTransform();
-    }
-  };
-  var zoomIn = function() {
-    zoomRelative(+ZOOM_STEP_KEY);
-  };
-  var zoomOut = function() {
-    zoomRelative(-ZOOM_STEP_KEY);
-  };
   var toggleSingleView = function(targetIndex) {
     if (targetIndex == 0 ||
         targetIndex == currentImageIndex ||
@@ -1569,8 +1574,8 @@ $( function()
     }
   };
   var moveViewRelative = function(dx, dy) {
-    if (1 < scale) {
-      setViewOffset(viewOffset.x + dx / (scale - 1), viewOffset.y + dy / (scale - 1));
+    if (1 < viewZoom.scale) {
+      setViewOffset(viewOffset.x + dx / (viewZoom.scale - 1), viewOffset.y + dy / (viewZoom.scale - 1));
     }
   };
   function moveImageByPx(index, dx, dy)
@@ -1584,11 +1589,11 @@ $( function()
   }
   function zoomWithTarget(index, x, y)
   {
-    if (viewZoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
+    if (viewZoom.zoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
       setViewOffset(x, y);
-      zoomRelative(+ZOOM_STEP_DBLCLK);
+      viewZoom.zoomRelative(+ZOOM_STEP_DBLCLK);
     } else {
-      viewZoom = 0;
+      viewZoom.setZoom(0);
       updateTransform();
     }
   }
@@ -1688,10 +1693,8 @@ $( function()
   }
   
   function updateTransform() {
-    var scalePercent = Math.round(Math.pow(2.0, viewZoom) * 100);
-    scale = scalePercent / 100;
-    var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / scale);
-    var commonOffsetY = (0.5 - viewOffset.y) * (1.0 - 1.0 / scale);
+    var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / viewZoom.scale);
+    var commonOffsetY = (0.5 - viewOffset.y) * (1.0 - 1.0 / viewZoom.scale);
     for (var i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
         var offsetX = commonOffsetX * ent.baseWidth;
@@ -1700,14 +1703,14 @@ $( function()
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
-                        'scale(' + scale + ') ' +
+                        'scale(' + viewZoom.scale + ') ' +
                         'translate(' + offsetX + 'px, ' + offsetY + 'px)' +
                         ent.orientationAsCSS,
         };
         $(ent.element).css(style);
         if (ent.grid) {
           $(ent.grid).css(style);
-          var base = 0.5 * ent.width / ent.baseWidth / scale;
+          var base = 0.5 * ent.width / ent.baseWidth / viewZoom.scale;
           var strokeWidth = [
               (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
               (base > 0.5 ? 0 : 1) * base];
@@ -1725,11 +1728,11 @@ $( function()
     if (enableMap && images.length) {
       var index = isSingleView ? currentImageIndex - 1 : 0;
       var img = entries[index].ready() ? entries[index] : images[0];
-      var roiW = img.boxW / img.baseWidth / scale;
-      var roiH = img.boxH / img.baseHeight / scale;
+      var roiW = img.boxW / img.baseWidth / viewZoom.scale;
+      var roiH = img.boxH / img.baseHeight / viewZoom.scale;
       $('#mapROI').attr({
-        x : 100 * (0.5 + (viewOffset.x - 0.5) * (1-1/scale) - 0.5 * roiW) + '%',
-        y : 100 * (0.5 + (viewOffset.y - 0.5) * (1-1/scale) - 0.5 * roiH) + '%',
+        x : 100 * (0.5 + (viewOffset.x - 0.5) * (1-1/viewZoom.scale) - 0.5 * roiW) + '%',
+        y : 100 * (0.5 + (viewOffset.y - 0.5) * (1-1/viewZoom.scale) - 0.5 * roiH) + '%',
         width : (100 * roiW)+'%',
         height : (100 * roiH)+'%',
       });
