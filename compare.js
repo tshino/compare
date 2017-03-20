@@ -116,7 +116,7 @@ $( function()
             (e.keyCode == 33 && !e.shiftKey)) {
           if ($('#histogram').is(':visible') ||
               $('#waveform').is(':visible')) {
-            zoomFigure(+ZOOM_STEP_KEY);
+            figureZoom.zoomIn();
             return false;
           }
         }
@@ -125,7 +125,7 @@ $( function()
             (e.keyCode == 34 && !e.shiftKey)) {
           if ($('#histogram').is(':visible') ||
               $('#waveform').is(':visible')) {
-            zoomFigure(-ZOOM_STEP_KEY);
+            figureZoom.zoomOut();
             return false;
           }
         }
@@ -133,7 +133,7 @@ $( function()
         if (37 <= e.keyCode && e.keyCode <= 40) {
           var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
           var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-          if (moveFigureRelative(x * 0.125, y * 0.125)) {
+          if (figureZoom.moveRelative(x * 0.125, y * 0.125)) {
             return false;
           }
         }
@@ -311,7 +311,7 @@ $( function()
     var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
     var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
     if (steps != 0) {
-        zoomFigure(-steps * ZOOM_STEP_WHEEL);
+        figureZoom.zoomRelative(-steps * ZOOM_STEP_WHEEL);
         return false;
     }
   });
@@ -324,11 +324,14 @@ $( function()
   var images = [];
   var currentImageIndex = 0;
   var isSingleView = false;
-  var makeZoomController = function(update) {
+  var makeZoomController = function(update, initX, initY) {
     var o = {
       zoom: 0,
       scale: 1,
-      offset: { x : 0.5, y : 0.5 },
+      offset: {
+        x : (initX !== undefined ? initX : 0.5),
+        y : (initY !== undefined ? initY : 0.5),
+      },
     };
     var setZoom = function(z) {
       o.zoom = z;
@@ -357,8 +360,9 @@ $( function()
     };
     var moveRelative = function(dx, dy) {
       if (1 < o.scale) {
-        setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
+        var result = setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
         update();
+        return result;
       }
     };
     var zoomTo = function(x, y) {
@@ -388,7 +392,9 @@ $( function()
   var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
-  var figureZoom = 0;
+  var figureZoom = makeZoomController(function() {
+    if (dialog && dialog.update) { dialog.update(); }
+  }, 0, 0.5);
   var figureOffset = { x: 0.0, y: 0.5 };
   var histogramType = 0;
   var waveformType = 0;
@@ -667,8 +673,8 @@ $( function()
         hideDialog();
       } else {
         hideDialog();
-        figureZoom = 0;
-        setFigureOffset(0.0, 0.5);
+        figureZoom.setZoom(0);
+        figureZoom.setOffset(0, 0.5);
         if (update) {
           update();
         }
@@ -846,36 +852,6 @@ $( function()
       );
     }
   };
-  var setFigureOffset = function(x, y) {
-    x = Math.min(1, Math.max(0, x));
-    y = Math.min(1, Math.max(0, y));
-    if (figureOffset.x !== x || figureOffset.y !== y) {
-      figureOffset.x = x;
-      figureOffset.y = y;
-      return true;
-    }
-  };
-  var moveFigureRelative = function(dx, dy) {
-    var figureScale = Math.pow(2, figureZoom);
-    if (1 < figureScale) {
-      var x = dx / (figureScale - 1);
-      var y = dy / (figureScale - 1);
-      var result = setFigureOffset(figureOffset.x + x, figureOffset.y + y);
-      if (dialog && dialog.update) {
-        dialog.update();
-      }
-      return result;
-    }
-  };
-  var zoomFigure = function(delta) {
-    if (0 < images.length) {
-      figureZoom = Math.max(0, Math.min(MAX_ZOOM_LEVEL, figureZoom + delta));
-      figureZoom = Math.round(1000 * figureZoom) / 1000;
-      if (dialog && dialog.update) {
-        dialog.update();
-      }
-    }
-  };
   function changeHistogramType(type)
   {
     if (histogramType != type) {
@@ -1029,12 +1005,10 @@ $( function()
     }
   }
   var makeFigureTransform = function() {
-    var figureScale = Math.pow(2, figureZoom);
-    var offsetX = (0.5 - figureOffset.x) * (1.0 - 1.0 / figureScale);
-    var offsetY = (0.5 - figureOffset.y) * (1.0 - 1.0 / figureScale);
+    var center = figureZoom.getCenter();
     return (
-        'scale(' + figureScale + ',1) ' +
-        'translate(' + (offsetX*100) + '%,' + (offsetY*100) + '%)'
+        'scale(' + figureZoom.scale + ',1) ' +
+        'translate(' + (-center.x * 100) + '%,' + (-center.y * 100) + '%)'
     );
   };
   var updateHistogramTable = function() {
