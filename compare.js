@@ -163,8 +163,7 @@ $( function()
       {
         var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
         var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-        moveViewRelative(x * 0.3, y * 0.3);
-        updateTransform();
+        viewZoom.moveRelative(x * 0.3, y * 0.3);
         return false;
       }
       // ESC (27)
@@ -172,7 +171,7 @@ $( function()
       {
         currentImageIndex = 0;
         viewZoom.setZoom(0);
-        setViewOffset(0.5, 0.5);
+        viewZoom.setOffset(0.5, 0.5);
         overlayMode = false;
         resetMouseDrag();
         updateLayout();
@@ -256,7 +255,6 @@ $( function()
       var dy = e.clientY - dragLastPoint.y;
       dragLastPoint = { x : e.clientX, y : e.clientY };
       moveImageByPx(index, dx, dy);
-      updateTransform();
       return false;
     }
   });
@@ -269,7 +267,7 @@ $( function()
     var img = entries[index];
     var x = (e.pageX - $(this).offset().left) / (img.baseWidth * viewZoom.scale);
     var y = (e.pageY - $(this).offset().top) / (img.baseHeight * viewZoom.scale);
-    zoomWithTarget(index, x, y);
+    viewZoom.zoomTo(x, y);
   });
   $('#view').on("wheel", function(e) {
     var event = e.originalEvent;
@@ -299,7 +297,6 @@ $( function()
       touchState.x = touch.clientX;
       touchState.y = touch.clientY;
       moveImageByPx(index, dx, dy);
-      updateTransform();
       return false;
     }
   });
@@ -327,10 +324,11 @@ $( function()
   var images = [];
   var currentImageIndex = 0;
   var isSingleView = false;
-  var viewZoom = (function(){
+  var makeZoomController = function(update) {
     var o = {
       zoom: 0,
-      scale: 1
+      scale: 1,
+      offset: { x : 0.5, y : 0.5 },
     };
     var setZoom = function(z) {
       o.zoom = z;
@@ -339,16 +337,50 @@ $( function()
     var zoomRelative = function(delta) {
       if (0 < images.length) {
         setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
-        updateTransform();
+        update();
+      }
+    };
+    var setOffset = function(x, y) {
+      x = Math.min(1, Math.max(0, x));
+      y = Math.min(1, Math.max(0, y));
+      if (o.offset.x !== x || o.offset.y !== y) {
+        o.offset.x = x;
+        o.offset.y = y;
+        return true;
+      }
+    };
+    var getCenter = function() {
+      return {
+        x: (o.offset.x - 0.5) * (1 - 1 / o.scale),
+        y: (o.offset.y - 0.5) * (1 - 1 / o.scale)
+      };
+    };
+    var moveRelative = function(dx, dy) {
+      if (1 < o.scale) {
+        setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
+        update();
+      }
+    };
+    var zoomTo = function(x, y) {
+      if (o.zoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
+        setOffset(x, y);
+        zoomRelative(+ZOOM_STEP_DBLCLK);
+      } else {
+        setZoom(0);
+        update();
       }
     };
     o.setZoom = setZoom;
     o.zoomRelative = zoomRelative;
     o.zoomIn = function() { zoomRelative(+ZOOM_STEP_KEY); };
     o.zoomOut = function() { zoomRelative(-ZOOM_STEP_KEY); };
+    o.setOffset = setOffset;
+    o.getCenter = getCenter;
+    o.moveRelative = moveRelative;
+    o.zoomTo = zoomTo;
     return o;
-  })();
-  var viewOffset = { x : 0.5, y : 0.5 };
+  };
+  var viewZoom = makeZoomController(updateTransform);
   var layoutMode = null;
   var overlayMode = false;
   var enableMap = false;
@@ -428,7 +460,7 @@ $( function()
       ent.vectorscope = null;
       currentImageIndex = 0;
       viewZoom.setZoom(0);
-      setViewOffset(0.5, 0.5);
+      viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
       discardTasksOfEntryByIndex(index);
       updateDOM();
@@ -1564,20 +1596,6 @@ $( function()
   {
     dragLastPoint = null;
   }
-  var setViewOffset = function(x, y) {
-    x = Math.min(1, Math.max(0, x));
-    y = Math.min(1, Math.max(0, y));
-    if (viewOffset.x !== x || viewOffset.y !== y) {
-      viewOffset.x = x;
-      viewOffset.y = y;
-      return true;
-    }
-  };
-  var moveViewRelative = function(dx, dy) {
-    if (1 < viewZoom.scale) {
-      setViewOffset(viewOffset.x + dx / (viewZoom.scale - 1), viewOffset.y + dy / (viewZoom.scale - 1));
-    }
-  };
   function moveImageByPx(index, dx, dy)
   {
     if (!entries[index].ready()) {
@@ -1585,17 +1603,7 @@ $( function()
     }
     var x = dx / entries[index].baseWidth;
     var y = dy / entries[index].baseHeight;
-    moveViewRelative(-x, -y);
-  }
-  function zoomWithTarget(index, x, y)
-  {
-    if (viewZoom.zoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
-      setViewOffset(x, y);
-      viewZoom.zoomRelative(+ZOOM_STEP_DBLCLK);
-    } else {
-      viewZoom.setZoom(0);
-      updateTransform();
-    }
+    viewZoom.moveRelative(-x, -y);
   }
 
   function updateLayout()
@@ -1693,12 +1701,11 @@ $( function()
   }
   
   function updateTransform() {
-    var commonOffsetX = (0.5 - viewOffset.x) * (1.0 - 1.0 / viewZoom.scale);
-    var commonOffsetY = (0.5 - viewOffset.y) * (1.0 - 1.0 / viewZoom.scale);
+    var center = viewZoom.getCenter();
     for (var i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
-        var offsetX = commonOffsetX * ent.baseWidth;
-        var offsetY = commonOffsetY * ent.baseHeight;
+        var offsetX = -center.x * ent.baseWidth;
+        var offsetY = -center.y * ent.baseHeight;
         style = {
           left        : '50%',
           top         : '50%',
@@ -1710,7 +1717,7 @@ $( function()
         $(ent.element).css(style);
         if (ent.grid) {
           $(ent.grid).css(style);
-          var base = 0.5 * ent.width / ent.baseWidth / viewZoom.scale;
+          var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
           var strokeWidth = [
               (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
               (base > 0.5 ? 0 : 1) * base];
@@ -1728,11 +1735,12 @@ $( function()
     if (enableMap && images.length) {
       var index = isSingleView ? currentImageIndex - 1 : 0;
       var img = entries[index].ready() ? entries[index] : images[0];
-      var roiW = img.boxW / img.baseWidth / viewZoom.scale;
-      var roiH = img.boxH / img.baseHeight / viewZoom.scale;
+      var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
+      var roiH = img.boxH / (img.baseHeight * viewZoom.scale);
+      var center = viewZoom.getCenter();
       $('#mapROI').attr({
-        x : 100 * (0.5 + (viewOffset.x - 0.5) * (1-1/viewZoom.scale) - 0.5 * roiW) + '%',
-        y : 100 * (0.5 + (viewOffset.y - 0.5) * (1-1/viewZoom.scale) - 0.5 * roiH) + '%',
+        x : 100 * (0.5 + center.x - 0.5 * roiW) + '%',
+        y : 100 * (0.5 + center.y - 0.5 * roiH) + '%',
         width : (100 * roiW)+'%',
         height : (100 * roiH)+'%',
       });
