@@ -115,7 +115,8 @@ $( function()
         if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
             (e.keyCode == 33 && !e.shiftKey)) {
           if ($('#histogram').is(':visible') ||
-              $('#waveform').is(':visible')) {
+              $('#waveform').is(':visible') ||
+              $('#vectorscope').is(':visible')) {
             figureZoom.zoomIn();
             return false;
           }
@@ -124,7 +125,8 @@ $( function()
         if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
             (e.keyCode == 34 && !e.shiftKey)) {
           if ($('#histogram').is(':visible') ||
-              $('#waveform').is(':visible')) {
+              $('#waveform').is(':visible') ||
+              $('#vectorscope').is(':visible')) {
             figureZoom.zoomOut();
             return false;
           }
@@ -303,7 +305,7 @@ $( function()
   $('#view').on('touchend', 'div.imageBox', function(e) {
     touchState = null;
   });
-  $('#histogram,#waveform').on('wheel', function(e) {
+  $('#histogram,#waveform,#vectorscope').on('wheel', function(e) {
     var event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
         return true;
@@ -325,13 +327,12 @@ $( function()
   var currentImageIndex = 0;
   var isSingleView = false;
   var makeZoomController = function(update, initX, initY) {
+    initX = initX !== undefined ? initX : 0.5;
+    initY = initY !== undefined ? initY : 0.5;
     var o = {
       zoom: 0,
       scale: 1,
-      offset: {
-        x : (initX !== undefined ? initX : 0.5),
-        y : (initY !== undefined ? initY : 0.5),
-      },
+      offset: { x: initX, y: initY },
     };
     var setZoom = function(z) {
       o.zoom = z;
@@ -674,7 +675,12 @@ $( function()
       } else {
         hideDialog();
         figureZoom.setZoom(0);
-        figureZoom.setOffset(0, 0.5);
+        var id = target.attr('id');
+        if (id === 'histogram' || id === 'waveform') {
+          figureZoom.setOffset(0, 0.5);
+        } else { //id == 'vectorscope'
+          figureZoom.setOffset(0.5, 0.5);
+        }
         if (update) {
           update();
         }
@@ -1004,10 +1010,10 @@ $( function()
       }
     }
   }
-  var makeFigureTransform = function() {
+  var makeFigureTransform = function(scaleXOnly) {
     var center = figureZoom.getCenter();
     return (
-        'scale(' + figureZoom.scale + ',1) ' +
+        'scale(' + figureZoom.scale + ',' + (scaleXOnly ? '1' : figureZoom.scale) + ') ' +
         'translate(' + (-center.x * 100) + '%,' + (-center.y * 100) + '%)'
     );
   };
@@ -1017,7 +1023,7 @@ $( function()
             height:'272px',
             background:'#bbb',
             padding:'8px',
-            transform: makeFigureTransform()
+            transform: makeFigureTransform(true)
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
@@ -1106,7 +1112,7 @@ $( function()
             height:'256px',
             background:'#666',
             padding:'10px',
-            transform: makeFigureTransform()
+            transform: makeFigureTransform(true)
     };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
@@ -1277,7 +1283,9 @@ $( function()
             width: '320px',
             height:'320px',
             background:'#444',
-            padding:'10px' };
+            padding:'10px',
+            transform: makeFigureTransform(false)
+    };
     updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis);
