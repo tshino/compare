@@ -326,13 +326,11 @@ $( function()
   var images = [];
   var currentImageIndex = 0;
   var isSingleView = false;
-  var makeZoomController = function(update, initX, initY) {
-    initX = initX !== undefined ? initX : 0.5;
-    initY = initY !== undefined ? initY : 0.5;
+  var makeZoomController = function(update) {
     var o = {
       zoom: 0,
       scale: 1,
-      offset: { x: initX, y: initY },
+      offset: { x: 0.5, y: 0.5 },
     };
     var setZoom = function(z) {
       o.zoom = z;
@@ -395,8 +393,7 @@ $( function()
   var dialog = null;
   var figureZoom = makeZoomController(function() {
     if (dialog && dialog.update) { dialog.update(); }
-  }, 0, 0.5);
-  var figureOffset = { x: 0.0, y: 0.5 };
+  });
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
@@ -642,7 +639,8 @@ $( function()
       }
     }
   };
-  var defineDialog = function(target, update, parent) {
+  var defineDialog = function(target, update, parent, options) {
+    options = options !== undefined ? options : {};
     target.on('click', parent || hideDialog);
     target.children().on('click', function(e) { e.stopPropagation(); return true; });
     var dlg = target.children();
@@ -675,12 +673,9 @@ $( function()
       } else {
         hideDialog();
         figureZoom.setZoom(0);
-        var id = target.attr('id');
-        if (id === 'histogram' || id === 'waveform') {
-          figureZoom.setOffset(0, 0.5);
-        } else { //id == 'vectorscope'
-          figureZoom.setOffset(0.5, 0.5);
-        }
+        var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
+        var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
+        figureZoom.setOffset(initX, initY);
         if (update) {
           update();
         }
@@ -1027,7 +1022,7 @@ $( function()
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
-  var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis);
+  var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis, { zoomInitX: 0 });
   function changeWaveformType(type)
   {
     if (waveformType != type) {
@@ -1116,7 +1111,7 @@ $( function()
     };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
-  var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis);
+  var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis, { zoomInitX: 0 });
   var changeVectorscopeType = function(type) {
     if (vectorscopeType != type) {
       vectorscopeType = type;
