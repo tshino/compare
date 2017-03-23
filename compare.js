@@ -111,27 +111,9 @@ $( function()
             return false;
           }
         }
-        // '+;' (59, 187 or 107 for numpad) / PageUp (33)
-        if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
-            (e.keyCode == 33 && !e.shiftKey)) {
-          if (figureZoom.zoomIn()) {
-            return false;
-          }
-        }
-        // '-' (173, 189 or 109 for numpad) / PageDown (34)
-        if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
-            (e.keyCode == 34 && !e.shiftKey)) {
-          if (figureZoom.zoomOut()) {
-            return false;
-          }
-        }
-        // cursor key
-        if (37 <= e.keyCode && e.keyCode <= 40) {
-          var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
-          var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-          if (figureZoom.moveRelative(x * 0.125, y * 0.125)) {
-            return false;
-          }
+        // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
+        if (!figureZoom.processKeyDown(e)) {
+          return false;
         }
         return true;
       }
@@ -142,24 +124,8 @@ $( function()
         toggleSingleView(e.keyCode % 48);
         return false;
       }
-      // '+;' (59, 187 or 107 for numpad) / PageUp (33)
-      if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
-          (e.keyCode == 33 && !e.shiftKey)) {
-        viewZoom.zoomIn();
-        return false;
-      }
-      // '-' (173, 189 or 109 for numpad) / PageDown (34)
-      if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
-          (e.keyCode == 34 && !e.shiftKey)) {
-        viewZoom.zoomOut();
-        return false;
-      }
-      // cursor key
-      if (37 <= e.keyCode && e.keyCode <= 40)
-      {
-        var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
-        var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
-        viewZoom.moveRelative(x * 0.3, y * 0.3);
+      // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
+      if (!viewZoom.processKeyDown(e)) {
         return false;
       }
       // ESC (27)
@@ -320,7 +286,9 @@ $( function()
   var images = [];
   var currentImageIndex = 0;
   var isSingleView = false;
-  var makeZoomController = function(update) {
+  var makeZoomController = function(update, options) {
+    options = options !== undefined ? options : {};
+    var cursorMoveDelta = options.cursorMoveDelta || 0.3;
     var o = {
       zoom: 0,
       scale: 1,
@@ -340,6 +308,8 @@ $( function()
         return true;
       }
     };
+    var zoomIn = function() { return zoomRelative(+ZOOM_STEP_KEY); };
+    var zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
     var setOffset = function(x, y) {
       x = Math.min(1, Math.max(0, x));
       y = Math.min(1, Math.max(0, y));
@@ -372,14 +342,40 @@ $( function()
         update();
       }
     };
+    var processKeyDown = function(e) {
+      // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+      if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
+          (e.keyCode == 33 && !e.shiftKey)) {
+        if (zoomIn()) {
+          return false;
+        }
+      }
+      // '-' (173, 189 or 109 for numpad) / PageDown (34)
+      if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
+          (e.keyCode == 34 && !e.shiftKey)) {
+        if (zoomOut()) {
+          return false;
+        }
+      }
+      // cursor key
+      if (37 <= e.keyCode && e.keyCode <= 40) {
+        var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
+        var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
+        if (moveRelative(x * cursorMoveDelta, y * cursorMoveDelta)) {
+          return false;
+        }
+      }
+      return true;
+    };
     o.setZoom = setZoom;
     o.zoomRelative = zoomRelative;
-    o.zoomIn = function() { return zoomRelative(+ZOOM_STEP_KEY); };
-    o.zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
+    o.zoomIn = zoomIn;
+    o.zoomOut = zoomOut;
     o.setOffset = setOffset;
     o.getCenter = getCenter;
     o.moveRelative = moveRelative;
     o.zoomTo = zoomTo;
+    o.processKeyDown = processKeyDown;
     return o;
   };
   var viewZoom = makeZoomController(updateTransform);
@@ -392,6 +388,8 @@ $( function()
   var dialog = null;
   var figureZoom = makeZoomController(function() {
     if (dialog && dialog.update) { dialog.update(); }
+  }, {
+    cursorMoveDelta: 0.125
   });
   var histogramType = 0;
   var waveformType = 0;
