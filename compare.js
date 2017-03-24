@@ -231,18 +231,7 @@ $( function()
     var y = (e.pageY - $(this).offset().top) / (img.baseHeight * viewZoom.scale);
     viewZoom.zoomTo(x, y);
   });
-  $('#view').on("wheel", function(e) {
-    var event = e.originalEvent;
-    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
-        return true;
-    }
-    var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-    var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
-    if (steps != 0) {
-        viewZoom.zoomRelative(-steps * ZOOM_STEP_WHEEL);
-        return false;
-    }
-  });
+  $('#view').on("wheel", viewZoom.processWheel);
   $('#view').on('touchmove', 'div.imageBox', function(e) {
     if (entries.length == 0) {
       return true;
@@ -265,18 +254,7 @@ $( function()
   $('#view').on('touchend', 'div.imageBox', function(e) {
     touchState = null;
   });
-  $('#histogram,#waveform,#vectorscope').on('wheel', function(e) {
-    var event = e.originalEvent;
-    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
-        return true;
-    }
-    var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-    var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
-    if (steps != 0) {
-        figureZoom.zoomRelative(-steps * ZOOM_STEP_WHEEL);
-        return false;
-    }
-  });
+  $('#histogram,#waveform,#vectorscope').on('wheel', figureZoom.processWheel);
 
   updateDOM();
 });
@@ -367,6 +345,18 @@ $( function()
       }
       return true;
     };
+    var processWheel = function(e) {
+      var event = e.originalEvent;
+      if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
+        return true;
+      }
+      var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+      var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
+      if (steps != 0) {
+        zoomRelative(-steps * ZOOM_STEP_WHEEL);
+        return false;
+      }
+    };
     o.setZoom = setZoom;
     o.zoomRelative = zoomRelative;
     o.zoomIn = zoomIn;
@@ -376,6 +366,7 @@ $( function()
     o.moveRelative = moveRelative;
     o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
+    o.processWheel = processWheel;
     return o;
   };
   var viewZoom = makeZoomController(updateTransform);
