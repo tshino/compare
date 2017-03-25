@@ -357,6 +357,13 @@ $( function()
         return false;
       }
     };
+    var makeTransform = function(w, h, scaleXOnly) {
+      var center = getCenter();
+      return (
+        'scale(' + o.scale + (scaleXOnly ? ', 1) ' : ') ') +
+        'translate(' + (-center.x * w) + 'px,' + (-center.y * h) + 'px)'
+      );
+    };
     o.setZoom = setZoom;
     o.zoomRelative = zoomRelative;
     o.zoomIn = zoomIn;
@@ -367,6 +374,7 @@ $( function()
     o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
     o.processWheel = processWheel;
+    o.makeTransform = makeTransform;
     return o;
   };
   var viewZoom = makeZoomController(updateTransform);
@@ -999,20 +1007,13 @@ $( function()
       }
     }
   }
-  var makeFigureTransform = function(scaleXOnly) {
-    var center = figureZoom.getCenter();
-    return (
-        'scale(' + figureZoom.scale + ',' + (scaleXOnly ? '1' : figureZoom.scale) + ') ' +
-        'translate(' + (-center.x * 100) + '%,' + (-center.y * 100) + '%)'
-    );
-  };
   var updateHistogramTable = function() {
     var style = {
             width: '384px',
             height:'272px',
             background:'#bbb',
             padding:'8px',
-            transform: makeFigureTransform(true)
+            transform: figureZoom.makeTransform(384, 272, true)
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
@@ -1102,7 +1103,7 @@ $( function()
             height:'256px',
             background:'#666',
             padding:'10px',
-            transform: makeFigureTransform(true)
+            transform: figureZoom.makeTransform(320, 256, true)
     };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
@@ -1275,7 +1276,7 @@ $( function()
             height:'320px',
             background:'#444',
             padding:'10px',
-            transform: makeFigureTransform(false)
+            transform: figureZoom.makeTransform(320, 320, false)
     };
     updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
   };
@@ -1675,17 +1676,13 @@ $( function()
   }
   
   function updateTransform() {
-    var center = viewZoom.getCenter();
     for (var i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
-        var offsetX = -center.x * ent.baseWidth;
-        var offsetY = -center.y * ent.baseHeight;
         style = {
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
-                        'scale(' + viewZoom.scale + ') ' +
-                        'translate(' + offsetX + 'px, ' + offsetY + 'px)' +
+                        viewZoom.makeTransform(ent.baseWidth, ent.baseHeight, false) +
                         ent.orientationAsCSS,
         };
         $(ent.element).css(style);
