@@ -267,13 +267,17 @@ $( function()
   var makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
     var cursorMoveDelta = options.cursorMoveDelta || 0.3;
+    var zoomXOnly = false;
     var o = {
       zoom: 0,
       scale: 1,
       offset: { x: 0.5, y: 0.5 },
     };
     var enabled = true;
-    o.enable = function() { enabled = true; };
+    o.enable = function(options) {
+      enabled = true;
+      zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : false;
+    };
     o.disable = function() { enabled = false; };
     var setZoom = function(z) {
       o.zoom = z;
@@ -290,7 +294,7 @@ $( function()
     var zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
     var setOffset = function(x, y) {
       x = Math.min(1, Math.max(0, x));
-      y = Math.min(1, Math.max(0, y));
+      y = zoomXOnly ? 0.5 : Math.min(1, Math.max(0, y));
       if (o.offset.x !== x || o.offset.y !== y) {
         o.offset.x = x;
         o.offset.y = y;
@@ -357,11 +361,11 @@ $( function()
         return false;
       }
     };
-    var makeTransform = function(w, h, scaleXOnly) {
+    var makeTransform = function(w, h) {
       var center = getCenter();
       return (
-        'scale(' + o.scale + (scaleXOnly ? ', 1) ' : ') ') +
-        'translate(' + (-center.x * w) + 'px,' + (-center.y * h) + 'px)'
+        'scale(' + o.scale + (zoomXOnly ? ', 1) ' : ') ') +
+        'translate(' + (-center.x * w) + 'px,' + (zoomXOnly ? 0 : -center.y * h) + 'px)'
       );
     };
     o.setZoom = setZoom;
@@ -670,7 +674,7 @@ $( function()
       } else {
         hideDialog();
         if (options.enableZoom) {
-          figureZoom.enable();
+          figureZoom.enable({ zoomXOnly: options.zoomXOnly });
           figureZoom.setZoom(0);
           var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
           var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
@@ -1013,12 +1017,12 @@ $( function()
             height:'272px',
             background:'#bbb',
             padding:'8px',
-            transform: figureZoom.makeTransform(384, 272, true)
+            transform: figureZoom.makeTransform(384, 272)
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
-    { enableZoom: true, zoomInitX: 0 });
+    { enableZoom: true, zoomXOnly: true, zoomInitX: 0 });
   function changeWaveformType(type)
   {
     if (waveformType != type) {
@@ -1103,12 +1107,12 @@ $( function()
             height:'256px',
             background:'#666',
             padding:'10px',
-            transform: figureZoom.makeTransform(320, 256, true)
+            transform: figureZoom.makeTransform(320, 256)
     };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
-    { enableZoom: true, zoomInitX: 0 });
+    { enableZoom: true, zoomXOnly: true, zoomInitX: 0 });
   var changeVectorscopeType = function(type) {
     if (vectorscopeType != type) {
       vectorscopeType = type;
@@ -1276,7 +1280,7 @@ $( function()
             height:'320px',
             background:'#444',
             padding:'10px',
-            transform: figureZoom.makeTransform(320, 320, false)
+            transform: figureZoom.makeTransform(320, 320)
     };
     updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
   };
@@ -1682,7 +1686,7 @@ $( function()
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
-                        viewZoom.makeTransform(ent.baseWidth, ent.baseHeight, false) +
+                        viewZoom.makeTransform(ent.baseWidth, ent.baseHeight) +
                         ent.orientationAsCSS,
         };
         $(ent.element).css(style);
