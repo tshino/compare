@@ -216,7 +216,7 @@ $( function()
       var dx = e.clientX - dragLastPoint.x;
       var dy = e.clientY - dragLastPoint.y;
       dragLastPoint = { x : e.clientX, y : e.clientY };
-      moveImageByPx(index, dx, dy);
+      viewZoom.moveRelativePx(index, dx, dy);
       return false;
     }
   });
@@ -247,7 +247,7 @@ $( function()
       var dy = touch.clientY - touchState.y;
       touchState.x = touch.clientX;
       touchState.y = touch.clientY;
-      moveImageByPx(index, dx, dy);
+      viewZoom.moveRelativePx(index, dx, dy);
       return false;
     }
   });
@@ -267,6 +267,7 @@ $( function()
   var makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
     var cursorMoveDelta = options.cursorMoveDelta || 0.3;
+    var getBaseSize = options.getBaseSize || function(index) {};
     var zoomXOnly = false;
     var o = {
       zoom: 0,
@@ -277,6 +278,7 @@ $( function()
     o.enable = function(options) {
       enabled = true;
       zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : false;
+      getBaseSize = options.getBaseSize || getBaseSize;
     };
     o.disable = function() { enabled = false; };
     var setZoom = function(z) {
@@ -312,6 +314,12 @@ $( function()
         var result = setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
         update();
         return result;
+      }
+    };
+    var moveRelativePx = function(index, dx, dy) {
+      var base = getBaseSize(index);
+      if (base) {
+        moveRelative(-dx / base.w, -dy / base.h);
       }
     };
     var zoomTo = function(x, y) {
@@ -361,11 +369,12 @@ $( function()
         return false;
       }
     };
-    var makeTransform = function(w, h) {
+    var makeTransform = function(index) {
+      var base = getBaseSize(index);
       var center = getCenter();
       return (
         'scale(' + o.scale + (zoomXOnly ? ', 1) ' : ') ') +
-        'translate(' + (-center.x * w) + 'px,' + (zoomXOnly ? 0 : -center.y * h) + 'px)'
+        'translate(' + (-center.x * base.w) + 'px,' + (zoomXOnly ? 0 : -center.y * base.h) + 'px)'
       );
     };
     o.setZoom = setZoom;
@@ -375,13 +384,20 @@ $( function()
     o.setOffset = setOffset;
     o.getCenter = getCenter;
     o.moveRelative = moveRelative;
+    o.moveRelativePx = moveRelativePx;
     o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
     o.processWheel = processWheel;
     o.makeTransform = makeTransform;
     return o;
   };
-  var viewZoom = makeZoomController(updateTransform);
+  var viewZoom = makeZoomController(updateTransform, {
+    getBaseSize: function(index) {
+      if (entries[index] && entries[index].ready()) {
+        return { w: entries[index].baseWidth, h: entries[index].baseHeight };
+      }
+    }
+  });
   var layoutMode = null;
   var overlayMode = false;
   var enableMap = false;
@@ -674,7 +690,10 @@ $( function()
       } else {
         hideDialog();
         if (options.enableZoom) {
-          figureZoom.enable({ zoomXOnly: options.zoomXOnly });
+          figureZoom.enable({
+            zoomXOnly: options.zoomXOnly,
+            getBaseSize: options.getBaseSize,
+          });
           figureZoom.setZoom(0);
           var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
           var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
@@ -1017,12 +1036,13 @@ $( function()
             height:'272px',
             background:'#bbb',
             padding:'8px',
-            transform: figureZoom.makeTransform(384, 272)
+            transform: figureZoom.makeTransform()
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
-    { enableZoom: true, zoomXOnly: true, zoomInitX: 0 });
+    { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
+      getBaseSize: function() { return { w: 384, h: 272 }; } });
   function changeWaveformType(type)
   {
     if (waveformType != type) {
@@ -1107,12 +1127,13 @@ $( function()
             height:'256px',
             background:'#666',
             padding:'10px',
-            transform: figureZoom.makeTransform(320, 256)
+            transform: figureZoom.makeTransform()
     };
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
-    { enableZoom: true, zoomXOnly: true, zoomInitX: 0 });
+    { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
+      getBaseSize: function() { return { w: 320, h: 256 }; } });
   var changeVectorscopeType = function(type) {
     if (vectorscopeType != type) {
       vectorscopeType = type;
@@ -1280,12 +1301,12 @@ $( function()
             height:'320px',
             background:'#444',
             padding:'10px',
-            transform: figureZoom.makeTransform(320, 320)
+            transform: figureZoom.makeTransform()
     };
     updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
-    { enableZoom: true });
+    { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics == 'string') {
       return { psnr: metrics, mse: metrics, ncc: metrics, ae: metrics };
@@ -1575,15 +1596,6 @@ $( function()
   {
     dragLastPoint = null;
   }
-  function moveImageByPx(index, dx, dy)
-  {
-    if (!entries[index].ready()) {
-      return;
-    }
-    var x = dx / entries[index].baseWidth;
-    var y = dy / entries[index].baseHeight;
-    viewZoom.moveRelative(-x, -y);
-  }
 
   function updateLayout()
   {
@@ -1686,7 +1698,7 @@ $( function()
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
-                        viewZoom.makeTransform(ent.baseWidth, ent.baseHeight) +
+                        viewZoom.makeTransform(i) +
                         ent.orientationAsCSS,
         };
         $(ent.element).css(style);
