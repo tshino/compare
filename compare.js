@@ -223,13 +223,9 @@ $( function()
   $('#view').on('mouseup', 'div.imageBox', resetMouseDrag);
   $('#view').on('dblclick', 'div.imageBox .image', function(e) {
     var index = $('#view > div.imageBox').index($(this).parent());
-    if (index >= entries.length || !entries[index].ready()) {
-      return true;
-    }
-    var img = entries[index];
-    var x = (e.pageX - $(this).offset().left) / (img.baseWidth * viewZoom.scale);
-    var y = (e.pageY - $(this).offset().top) / (img.baseHeight * viewZoom.scale);
-    viewZoom.zoomTo(x, y);
+    var x = e.pageX - $(this).offset().left;
+    var y = e.pageY - $(this).offset().top;
+    return viewZoom.zoomToPx(index, x, y);
   });
   $('#view').on("wheel", viewZoom.processWheel);
   $('#view').on('touchmove', 'div.imageBox', function(e) {
@@ -332,6 +328,14 @@ $( function()
         update();
       }
     };
+    var zoomToPx = function(index, x, y) {
+      var base = getBaseSize(index);
+      if (base) {
+        zoomTo(x / (base.w * o.scale), y / (base.h * o.scale));
+        return false;
+      }
+      return true;
+    };
     var processKeyDown = function(e) {
       // '+;' (59, 187 or 107 for numpad) / PageUp (33)
       if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
@@ -386,6 +390,7 @@ $( function()
     o.moveRelative = moveRelative;
     o.moveRelativePx = moveRelativePx;
     o.zoomTo = zoomTo;
+    o.zoomToPx = zoomToPx;
     o.processKeyDown = processKeyDown;
     o.processWheel = processWheel;
     o.makeTransform = makeTransform;
