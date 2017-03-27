@@ -250,6 +250,11 @@ $( function()
   $('#view').on('touchend', 'div.imageBox', function(e) {
     touchState = null;
   });
+  $('#histogram,#waveform,#vectorscope').on('dblclick', 'td.fig > *', function(e) {
+    var x = e.pageX - $(this).offset().left;
+    var y = e.pageY - $(this).offset().top;
+    return figureZoom.zoomToPx(0, x, y);
+  });
   $('#histogram,#waveform,#vectorscope').on('wheel', figureZoom.processWheel);
 
   updateDOM();
