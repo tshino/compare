@@ -230,6 +230,13 @@ $( function()
   $('#view').on('touchend', 'div.imageBox', function(e) {
     touchState = null;
   });
+  $('#histogram,#waveform,#vectorscope').on('mousedown', 'td.fig', function(e) {
+    return figureZoom.processMouseDown(e);
+  });
+  $('#histogram,#waveform,#vectorscope').on('mousemove', 'td.fig', function(e) {
+    return figureZoom.processMouseMove(e);
+  });
+  $('#histogram,#waveform,#vectorscope').on('mouseup', 'td.fig', figureZoom.resetDragState);
   $('#histogram,#waveform,#vectorscope').on('dblclick', 'td.fig > *', function(e) {
     var x = e.pageX - $(this).offset().left;
     var y = e.pageY - $(this).offset().top;
@@ -349,7 +356,7 @@ $( function()
     };
     o.resetDragState = function() { dragLastPoint = null; };
     var processMouseDown = function(e, selector, target) {
-      var index = $(selector).index(target);
+      var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
         dragLastPoint = { x : e.clientX, y : e.clientY };
         return false;
@@ -360,7 +367,7 @@ $( function()
         if (e.buttons != 1) {
           dragLastPoint = null;
         } else {
-          var index = $(selector).index(target);
+          var index = selector ? $(selector).index(target) : null;
           var dx = e.clientX - dragLastPoint.x;
           var dy = e.clientY - dragLastPoint.y;
           dragLastPoint = { x : e.clientX, y : e.clientY };
