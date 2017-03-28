@@ -195,32 +195,12 @@ $( function()
   });
   
   $('#view').on('mousedown', 'div.imageBox', function(e) {
-    var index = $('#view > div.imageBox').index(this);
-    if (index >= entries.length) {
-      return true;
-    }
-    if (e.which == 1) {
-      dragLastPoint = { x : e.clientX, y : e.clientY };
-      return false;
-    }
+    return viewZoom.processMouseDown(e, '#view > div.imageBox', this);
   });
   $('#view').on('mousemove', 'div.imageBox', function(e) {
-    if (entries.length == 0) {
-      return true;
-    }
-    var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
-    if (dragLastPoint && e.buttons != 1) {
-      dragLastPoint = null;
-    }
-    if (dragLastPoint) {
-      var dx = e.clientX - dragLastPoint.x;
-      var dy = e.clientY - dragLastPoint.y;
-      dragLastPoint = { x : e.clientX, y : e.clientY };
-      viewZoom.moveRelativePx(index, dx, dy);
-      return false;
-    }
+    return viewZoom.processMouseMove(e, '#view > div.imageBox', this);
   });
-  $('#view').on('mouseup', 'div.imageBox', resetMouseDrag);
+  $('#view').on('mouseup', 'div.imageBox', viewZoom.resetDragState);
   $('#view').on('dblclick', 'div.imageBox .image', function(e) {
     var index = $('#view > div.imageBox').index($(this).parent());
     var x = e.pageX - $(this).offset().left;
@@ -276,6 +256,7 @@ $( function()
       offset: { x: 0.5, y: 0.5 },
     };
     var enabled = true;
+    var dragLastPoint = null;
     o.enable = function(options) {
       enabled = true;
       zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : false;
@@ -366,6 +347,28 @@ $( function()
       }
       return true;
     };
+    o.resetDragState = function() { dragLastPoint = null; };
+    var processMouseDown = function(e, selector, target) {
+      var index = $(selector).index(target);
+      if (getBaseSize(index) && e.which === 1) {
+        dragLastPoint = { x : e.clientX, y : e.clientY };
+        return false;
+      }
+    };
+    var processMouseMove = function(e, selector, target) {
+      if (dragLastPoint) {
+        if (e.buttons != 1) {
+          dragLastPoint = null;
+        } else {
+          var index = $(selector).index(target);
+          var dx = e.clientX - dragLastPoint.x;
+          var dy = e.clientY - dragLastPoint.y;
+          dragLastPoint = { x : e.clientX, y : e.clientY };
+          moveRelativePx(index, dx, dy);
+          return false;
+        }
+      }
+    };
     var processWheel = function(e) {
       var event = e.originalEvent;
       if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
@@ -397,6 +400,8 @@ $( function()
     o.zoomTo = zoomTo;
     o.zoomToPx = zoomToPx;
     o.processKeyDown = processKeyDown;
+    o.processMouseDown = processMouseDown;
+    o.processMouseMove = processMouseMove;
     o.processWheel = processWheel;
     o.makeTransform = makeTransform;
     return o;
@@ -412,7 +417,6 @@ $( function()
   var overlayMode = false;
   var enableMap = false;
   var enableGrid = false;
-  var dragLastPoint = null;
   var touchState = null;
   var dialog = null;
   var figureZoom = makeZoomController(function() {
@@ -1604,7 +1608,7 @@ $( function()
 
   function resetMouseDrag()
   {
-    dragLastPoint = null;
+    viewZoom.resetDragState();
   }
 
   function updateLayout()
