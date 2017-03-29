@@ -202,10 +202,7 @@ $( function()
   });
   $('#view').on('mouseup', 'div.imageBox', viewZoom.resetDragState);
   $('#view').on('dblclick', 'div.imageBox .image', function(e) {
-    var index = $('#view > div.imageBox').index($(this).parent());
-    var x = e.pageX - $(this).offset().left;
-    var y = e.pageY - $(this).offset().top;
-    return viewZoom.zoomToPx(index, x, y);
+    return viewZoom.processDblclick(e, '#view > div.imageBox', this);
   });
   $('#view').on("wheel", viewZoom.processWheel);
   $('#view').on('touchmove', 'div.imageBox', function(e) {
@@ -238,9 +235,7 @@ $( function()
   });
   $('#histogram,#waveform,#vectorscope').on('mouseup', 'td.fig', figureZoom.resetDragState);
   $('#histogram,#waveform,#vectorscope').on('dblclick', 'td.fig > *', function(e) {
-    var x = e.pageX - $(this).offset().left;
-    var y = e.pageY - $(this).offset().top;
-    return figureZoom.zoomToPx(0, x, y);
+    return figureZoom.processDblclick(e, null, this);
   });
   $('#histogram,#waveform,#vectorscope').on('wheel', figureZoom.processWheel);
 
@@ -376,6 +371,12 @@ $( function()
         }
       }
     };
+    var processDblclick = function(e, selector, target) {
+      var index = selector ? $(selector).index($(target).parent()) : null;
+      var x = e.pageX - $(target).offset().left;
+      var y = e.pageY - $(target).offset().top;
+      return zoomToPx(index, x, y);
+    };
     var processWheel = function(e) {
       var event = e.originalEvent;
       if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
@@ -409,6 +410,7 @@ $( function()
     o.processKeyDown = processKeyDown;
     o.processMouseDown = processMouseDown;
     o.processMouseMove = processMouseMove;
+    o.processDblclick = processDblclick;
     o.processWheel = processWheel;
     o.makeTransform = makeTransform;
     return o;
