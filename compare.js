@@ -206,27 +206,9 @@ $( function()
   });
   $('#view').on("wheel", viewZoom.processWheel);
   $('#view').on('touchmove', 'div.imageBox', function(e) {
-    if (entries.length == 0) {
-      return true;
-    }
-    var index = Math.min(entries.length - 1, $('#view > div.imageBox').index(this));
-    var event = e.originalEvent;
-    if (event.targetTouches.length == 1) {
-      var touch = event.targetTouches[0];
-      if (!touchState || touchState.identifier != touch.identifier) {
-        touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
-      }
-      var dx = touch.clientX - touchState.x;
-      var dy = touch.clientY - touchState.y;
-      touchState.x = touch.clientX;
-      touchState.y = touch.clientY;
-      viewZoom.moveRelativePx(index, dx, dy);
-      return false;
-    }
+    return viewZoom.processTouchMove(e, '#view > div.imageBox', this);
   });
-  $('#view').on('touchend', 'div.imageBox', function(e) {
-    touchState = null;
-  });
+  $('#view').on('touchend', 'div.imageBox', viewZoom.resetTouchState);
   $('#histogram,#waveform,#vectorscope').on('mousedown', 'td.fig', function(e) {
     return figureZoom.processMouseDown(e);
   });
@@ -259,6 +241,7 @@ $( function()
     };
     var enabled = true;
     var dragLastPoint = null;
+    var touchState = null;
     o.enable = function(options) {
       enabled = true;
       zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : false;
@@ -389,6 +372,23 @@ $( function()
         return false;
       }
     };
+    o.resetTouchState = function() { touchState = null; };
+    var processTouchMove = function(e, selector, target) {
+      var index = selector ? $(selector).index(target) : null;
+      var event = e.originalEvent;
+      if (event.targetTouches.length == 1) {
+        var touch = event.targetTouches[0];
+        if (!touchState || touchState.identifier != touch.identifier) {
+          touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
+        }
+        var dx = touch.clientX - touchState.x;
+        var dy = touch.clientY - touchState.y;
+        touchState.x = touch.clientX;
+        touchState.y = touch.clientY;
+        moveRelativePx(index, dx, dy);
+        return false;
+      }
+    };
     var makeTransform = function(index) {
       var base = getBaseSize(index);
       var center = getCenter();
@@ -412,6 +412,7 @@ $( function()
     o.processMouseMove = processMouseMove;
     o.processDblclick = processDblclick;
     o.processWheel = processWheel;
+    o.processTouchMove = processTouchMove;
     o.makeTransform = makeTransform;
     return o;
   };
@@ -426,7 +427,6 @@ $( function()
   var overlayMode = false;
   var enableMap = false;
   var enableGrid = false;
-  var touchState = null;
   var dialog = null;
   var figureZoom = makeZoomController(function() {
     if (dialog && dialog.update) { dialog.update(); }
