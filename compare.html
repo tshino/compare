@@ -34,7 +34,7 @@
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
 <div id="viewroot">
 	<div id="sidebar">
-		<button id="add" onclick="$('#file').click()">
+		<button id="add">
 			<img src="res/add.svg" width="100%">
 			<span class="tooltip en">Add new picture</span>
 			<span class="tooltip ja">画像を追加</span>
@@ -45,12 +45,12 @@
 			<span class="tooltip keys en">Show analysis tools <span>c</span></span>
 			<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
 		</button>
-		<button onclick="viewZoom.zoomIn()">
+		<button id="zoomIn">
 			<img src="res/zoomin.svg" width="100%">
 			<span class="tooltip keys en">Zoom in <span>+</span></span>
 			<span class="tooltip keys ja">拡大 <span>+</span></span>
 		</button>
-		<button onclick="viewZoom.zoomOut()">
+		<button id="zoomOut">
 			<img src="res/zoomout.svg" width="100%">
 			<span class="tooltip keys en">Zoom out <span>-</span></span>
 			<span class="tooltip keys ja">縮小 <span>-</span></span>

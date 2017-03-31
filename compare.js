@@ -27,6 +27,11 @@ $( function()
     addFiles(e.target.files);
     e.target.value = null;
   });
+  $('#add').click(function() {
+    $('#file').click();
+  });
+  $('#zoomIn').click(viewZoom.zoomIn);
+  $('#zoomOut').click(viewZoom.zoomOut);
   $('#view .dropHere').click(function() {
     $('#file').click();
   });
