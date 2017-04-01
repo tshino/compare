@@ -201,6 +201,217 @@
     return null;
   };
   
+  var makeZoomController = function(update, options) {
+    options = options !== undefined ? options : {};
+    var cursorMoveDelta = options.cursorMoveDelta || 0.3;
+    var getBaseSize = options.getBaseSize || function(index) {};
+    var zoomXOnly = false;
+    var o = {
+      zoom: 0,
+      scale: 1,
+      offset: { x: 0.5, y: 0.5 },
+    };
+    var enabled = true;
+    var dragLastPoint = null;
+    var touchState = null;
+    o.enable = function(options) {
+      options = options !== undefined ? options : {};
+      enabled = true;
+      zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : zoomXOnly;
+      getBaseSize = options.getBaseSize || getBaseSize;
+    };
+    o.disable = function() { enabled = false; };
+    var setZoom = function(z) {
+      o.zoom = z;
+      o.scale = Math.round(Math.pow(2.0, z) * 100) / 100;
+    };
+    var zoomRelative = function(delta) {
+      if (enabled) {
+        setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
+        update();
+        return true;
+      }
+    };
+    var zoomIn = function() { return zoomRelative(+ZOOM_STEP_KEY); };
+    var zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
+    var setOffset = function(x, y) {
+      x = Math.min(1, Math.max(0, x));
+      y = zoomXOnly ? 0.5 : Math.min(1, Math.max(0, y));
+      if (o.offset.x !== x || o.offset.y !== y) {
+        o.offset.x = x;
+        o.offset.y = y;
+        return true;
+      }
+    };
+    var getCenter = function() {
+      return {
+        x: (o.offset.x - 0.5) * (1 - 1 / o.scale),
+        y: (o.offset.y - 0.5) * (1 - 1 / o.scale)
+      };
+    };
+    var moveRelative = function(dx, dy) {
+      if (1 < o.scale && enabled) {
+        var result = setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
+        update();
+        return result;
+      }
+    };
+    var moveRelativePx = function(index, dx, dy) {
+      var base = getBaseSize(index);
+      if (base) {
+        moveRelative(-dx / base.w, -dy / base.h);
+      }
+    };
+    var zoomTo = function(x, y) {
+      if (!enabled) {
+      } else if (o.zoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
+        setOffset(x, y);
+        zoomRelative(+ZOOM_STEP_DBLCLK);
+      } else {
+        setZoom(0);
+        update();
+      }
+    };
+    var zoomToPx = function(index, x, y) {
+      var base = getBaseSize(index);
+      if (base) {
+        zoomTo(x / (base.w * o.scale), y / (base.h * o.scale));
+        return false;
+      }
+      return true;
+    };
+    var processKeyDown = function(e) {
+      // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+      if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
+          (e.keyCode == 33 && !e.shiftKey)) {
+        if (zoomIn()) {
+          return false;
+        }
+      }
+      // '-' (173, 189 or 109 for numpad) / PageDown (34)
+      if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
+          (e.keyCode == 34 && !e.shiftKey)) {
+        if (zoomOut()) {
+          return false;
+        }
+      }
+      // cursor key
+      if (37 <= e.keyCode && e.keyCode <= 40) {
+        var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
+        var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
+        if (moveRelative(x * cursorMoveDelta, y * cursorMoveDelta)) {
+          return false;
+        }
+      }
+      return true;
+    };
+    var resetDragState = function() { dragLastPoint = null; };
+    var processMouseDown = function(e, selector, target) {
+      var index = selector ? $(selector).index(target) : null;
+      if (getBaseSize(index) && e.which === 1) {
+        dragLastPoint = { x : e.clientX, y : e.clientY };
+        return false;
+      }
+    };
+    var processMouseMove = function(e, selector, target) {
+      if (dragLastPoint) {
+        if (e.buttons != 1) {
+          dragLastPoint = null;
+        } else {
+          var index = selector ? $(selector).index(target) : null;
+          var dx = e.clientX - dragLastPoint.x;
+          var dy = e.clientY - dragLastPoint.y;
+          dragLastPoint = { x : e.clientX, y : e.clientY };
+          moveRelativePx(index, dx, dy);
+          return false;
+        }
+      }
+    };
+    var processDblclick = function(e, selector, target) {
+      var index = selector ? $(selector).index($(target).parent()) : null;
+      var x = e.pageX - $(target).offset().left;
+      var y = e.pageY - $(target).offset().top;
+      return zoomToPx(index, x, y);
+    };
+    var processWheel = function(e) {
+      var event = e.originalEvent;
+      if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
+        return true;
+      }
+      var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+      var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
+      if (steps != 0) {
+        zoomRelative(-steps * ZOOM_STEP_WHEEL);
+        return false;
+      }
+    };
+    var resetTouchState = function() { touchState = null; };
+    var processTouchMove = function(e, selector, target) {
+      var index = selector ? $(selector).index(target) : null;
+      var event = e.originalEvent;
+      if (event.targetTouches.length == 1) {
+        var touch = event.targetTouches[0];
+        if (!touchState || touchState.identifier != touch.identifier) {
+          touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
+        }
+        var dx = touch.clientX - touchState.x;
+        var dy = touch.clientY - touchState.y;
+        touchState.x = touch.clientX;
+        touchState.y = touch.clientY;
+        moveRelativePx(index, dx, dy);
+        return false;
+      }
+    };
+    var enableMouse = function(root, filter, deepFilter, selector) {
+      $(root).on('mousedown', filter, function(e) {
+        return processMouseDown(e, selector, this);
+      });
+      $(root).on('mousemove', filter, function(e) {
+        return processMouseMove(e, selector, this);
+      });
+      $(root).on('mouseup', filter, resetDragState);
+      $(root).on('dblclick', deepFilter, function(e) {
+        return processDblclick(e, selector, this);
+      });
+      $(root).on("wheel", processWheel);
+    };
+    var enableTouch = function(root, filter, deepFilter, selector) {
+      $(root).on('touchmove', filter, function(e) {
+        return processTouchMove(e, selector, this);
+      });
+      $(root).on('touchend', filter, resetTouchState);
+    };
+    var makeTransform = function(index) {
+      var base = getBaseSize(index);
+      var center = getCenter();
+      return (
+        'scale(' + o.scale + (zoomXOnly ? ', 1) ' : ') ') +
+        'translate(' + (-center.x * base.w) + 'px,' + (zoomXOnly ? 0 : -center.y * base.h) + 'px)'
+      );
+    };
+    o.setZoom = setZoom;
+    o.zoomRelative = zoomRelative;
+    o.zoomIn = zoomIn;
+    o.zoomOut = zoomOut;
+    o.setOffset = setOffset;
+    o.getCenter = getCenter;
+    o.moveRelative = moveRelative;
+    o.moveRelativePx = moveRelativePx;
+    o.zoomTo = zoomTo;
+    o.zoomToPx = zoomToPx;
+    o.processKeyDown = processKeyDown;
+    o.resetDragState = resetDragState;
+    o.processMouseDown = processMouseDown;
+    o.processMouseMove = processMouseMove;
+    o.processDblclick = processDblclick;
+    o.processWheel = processWheel;
+    o.resetTouchState = resetTouchState;
+    o.processTouchMove = processTouchMove;
+    o.enableMouse = enableMouse;
+    o.enableTouch = enableTouch;
+    o.makeTransform = makeTransform;
+    return o;
+  };
   return {
     createObjectURL:        createObjectURL,
     newWorker:              newWorker,
@@ -211,5 +422,6 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
+    makeZoomController:     makeZoomController,
   };
 })();
