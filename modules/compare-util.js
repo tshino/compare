@@ -353,16 +353,42 @@
     var processTouchMove = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       var event = e.originalEvent;
-      if (event.targetTouches.length == 1) {
-        var touch = event.targetTouches[0];
-        if (!touchState || touchState.identifier != touch.identifier) {
-          touchState = { x: touch.clientX, y: touch.clientY, identifier: touch.identifier };
+      if (event.touches.length == 1 || event.touches.length == 2) {
+        var touches = Array.prototype.slice.call(event.touches);
+        touches.sort(function(a, b) {
+          return a.identifier < b.identifier ? -1 : a.identifier > b.identifier ? 1 : 0;
+        });
+        if (!touchState || touchState.length !== touches.length) {
+          touchState = [];
         }
-        var dx = touch.clientX - touchState.x;
-        var dy = touch.clientY - touchState.y;
-        touchState.x = touch.clientX;
-        touchState.y = touch.clientY;
-        moveRelativePx(index, dx, dy);
+        var dx = 0, dy = 0;
+        for (var i = 0; i < touches.length; ++i) {
+          if (!touchState[i] || touchState[i].identifier !== touches[i].identifier) {
+            touchState[i] = {
+              x: touches[i].clientX, y: touches[i].clientY, identifier: touches[i].identifier
+            };
+          }
+          dx += touches[i].clientX - touchState[i].x;
+          dy += touches[i].clientY - touchState[i].y;
+        }
+        moveRelativePx(index, dx / touches.length, dy / touches.length);
+        if (touches.length == 2) {
+          var x0 = touchState[0].x - touchState[1].x;
+          var y0 = touchState[0].y - touchState[1].y;
+          var x1 = touches[0].clientX - touches[1].clientX;
+          var y1 = touches[0].clientY - touches[1].clientY;
+          var s0 = Math.sqrt(x0 * x0 + y0 * y0);
+          var s1 = Math.sqrt(x1 * x1 + y1 * y1);
+          if (0 < s0 * s1) {
+            var r = Math.log(s1 / s0) / Math.LN2;
+            r = Math.max(-1, Math.min(1, r));
+            zoomRelative(r);
+          }
+        }
+        for (var i = 0; i < touches.length; ++i) {
+          touchState[i].x = touches[i].clientX;
+          touchState[i].y = touches[i].clientY;
+        }
         return false;
       }
     };
