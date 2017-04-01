@@ -226,8 +226,9 @@ $( function()
     var dragLastPoint = null;
     var touchState = null;
     o.enable = function(options) {
+      options = options !== undefined ? options : {};
       enabled = true;
-      zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : false;
+      zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : zoomXOnly;
       getBaseSize = options.getBaseSize || getBaseSize;
     };
     o.disable = function() { enabled = false; };
@@ -236,7 +237,7 @@ $( function()
       o.scale = Math.round(Math.pow(2.0, z) * 100) / 100;
     };
     var zoomRelative = function(delta) {
-      if (0 < images.length && enabled) {
+      if (enabled) {
         setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
         update();
         return true;
@@ -720,7 +721,7 @@ $( function()
         hideDialog();
         if (options.enableZoom) {
           figureZoom.enable({
-            zoomXOnly: options.zoomXOnly,
+            zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
             getBaseSize: options.getBaseSize,
           });
           figureZoom.setZoom(0);
@@ -1580,6 +1581,11 @@ $( function()
   function updateDOM()
   {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
+    if (images.length == 0) {
+      viewZoom.disable();
+    } else {
+      viewZoom.enable();
+    }
     for (var i = 0, ent; ent = entries[i]; i++)
     {
         if (!ent.view) {
