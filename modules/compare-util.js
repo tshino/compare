@@ -203,6 +203,10 @@
   
   var makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
+    var MAX_ZOOM_LEVEL    = 6.0;
+    var ZOOM_STEP_KEY     = 0.25;
+    var ZOOM_STEP_WHEEL   = 0.0625;
+    var ZOOM_STEP_DBLCLK  = 2.00;
     var cursorMoveDelta = options.cursorMoveDelta || 0.3;
     var getBaseSize = options.getBaseSize || function(index) {};
     var zoomXOnly = false;

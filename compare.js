@@ -1,8 +1,4 @@
-﻿var MAX_ZOOM_LEVEL    = 6.0;
-var ZOOM_STEP_KEY     = 0.25;
-var ZOOM_STEP_WHEEL   = 0.0625;
-var ZOOM_STEP_DBLCLK  = 2.00;
-var NEEDS_IOS_EXIF_WORKAROUND = (function(){
+﻿var NEEDS_IOS_EXIF_WORKAROUND = (function(){
   var ua = window.navigator.userAgent.toLowerCase();
   return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
 })();
