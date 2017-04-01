@@ -199,32 +199,10 @@ $( function()
     //alert('keypress: '+e.which);
   });
   
-  $('#view').on('mousedown', 'div.imageBox', function(e) {
-    return viewZoom.processMouseDown(e, '#view > div.imageBox', this);
-  });
-  $('#view').on('mousemove', 'div.imageBox', function(e) {
-    return viewZoom.processMouseMove(e, '#view > div.imageBox', this);
-  });
-  $('#view').on('mouseup', 'div.imageBox', viewZoom.resetDragState);
-  $('#view').on('dblclick', 'div.imageBox .image', function(e) {
-    return viewZoom.processDblclick(e, '#view > div.imageBox', this);
-  });
-  $('#view').on("wheel", viewZoom.processWheel);
-  $('#view').on('touchmove', 'div.imageBox', function(e) {
-    return viewZoom.processTouchMove(e, '#view > div.imageBox', this);
-  });
-  $('#view').on('touchend', 'div.imageBox', viewZoom.resetTouchState);
-  $('#histogram,#waveform,#vectorscope').on('mousedown', 'td.fig', function(e) {
-    return figureZoom.processMouseDown(e);
-  });
-  $('#histogram,#waveform,#vectorscope').on('mousemove', 'td.fig', function(e) {
-    return figureZoom.processMouseMove(e);
-  });
-  $('#histogram,#waveform,#vectorscope').on('mouseup', 'td.fig', figureZoom.resetDragState);
-  $('#histogram,#waveform,#vectorscope').on('dblclick', 'td.fig > *', function(e) {
-    return figureZoom.processDblclick(e, null, this);
-  });
-  $('#histogram,#waveform,#vectorscope').on('wheel', figureZoom.processWheel);
+  viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
+  viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
+  figureZoom.enableMouse('#histogram,#waveform,#vectorscope', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableTouch('#histogram,#waveform,#vectorscope', 'td.fig', 'td.fig > *', null);
 
   updateDOM();
 });
@@ -337,7 +315,7 @@ $( function()
       }
       return true;
     };
-    o.resetDragState = function() { dragLastPoint = null; };
+    var resetDragState = function() { dragLastPoint = null; };
     var processMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
@@ -377,7 +355,7 @@ $( function()
         return false;
       }
     };
-    o.resetTouchState = function() { touchState = null; };
+    var resetTouchState = function() { touchState = null; };
     var processTouchMove = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       var event = e.originalEvent;
@@ -393,6 +371,25 @@ $( function()
         moveRelativePx(index, dx, dy);
         return false;
       }
+    };
+    var enableMouse = function(root, filter, deepFilter, selector) {
+      $(root).on('mousedown', filter, function(e) {
+        return processMouseDown(e, selector, this);
+      });
+      $(root).on('mousemove', filter, function(e) {
+        return processMouseMove(e, selector, this);
+      });
+      $(root).on('mouseup', filter, resetDragState);
+      $(root).on('dblclick', deepFilter, function(e) {
+        return processDblclick(e, selector, this);
+      });
+      $(root).on("wheel", processWheel);
+    };
+    var enableTouch = function(root, filter, deepFilter, selector) {
+      $(root).on('touchmove', filter, function(e) {
+        return processTouchMove(e, selector, this);
+      });
+      $(root).on('touchend', filter, resetTouchState);
     };
     var makeTransform = function(index) {
       var base = getBaseSize(index);
@@ -413,11 +410,15 @@ $( function()
     o.zoomTo = zoomTo;
     o.zoomToPx = zoomToPx;
     o.processKeyDown = processKeyDown;
+    o.resetDragState = resetDragState;
     o.processMouseDown = processMouseDown;
     o.processMouseMove = processMouseMove;
     o.processDblclick = processDblclick;
     o.processWheel = processWheel;
+    o.resetTouchState = resetTouchState;
     o.processTouchMove = processTouchMove;
+    o.enableMouse = enableMouse;
+    o.enableTouch = enableTouch;
     o.makeTransform = makeTransform;
     return o;
   };
