@@ -254,22 +254,27 @@ $( function()
     }
     return target;
   };
-  function addComma(num)
-  {
+  var addComma = function(num) {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-  }
-  function toPercent(num) {
+  };
+  var toPercent = function(num) {
     if (num == 0) return '0%';
     if (num == 1) return '100%';
     var digits =
             num < 0.000001 ? 7 :
+            num < 0.00001 ? 6 :
             num < 0.0001 ? 5 :
+            num < 0.001 ? 4 :
             num < 0.01 ? 3 :
-            num < 0.99 ? 1 :
-            num < 0.9999 ? 3 :
-            num < 0.999999 ? 5 : 7;
+            num < 0.1 ? 2 :
+            num < 0.9 ? 1 :
+            num < 0.99 ? 2 :
+            num < 0.999 ? 3 :
+            num < 0.9999 ? 4 :
+            num < 0.99999 ? 5 :
+            num < 0.999999 ? 6 : 7;
     return (num * 100).toFixed(digits) + '%';
-  }
+  };
   var removeEntry = function(index) {
     var ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
