@@ -10,26 +10,26 @@
 	<script src="compare.js" defer></script>
 </head>
 <body class="en">
-	<script>
-		function changeLang(lang) {
-			if (lang != "") {
-				var newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
-				window.history.replaceState('','', newURL);
-				document.body.setAttribute('class', lang);
-			}
-		}
-		(function() {
-			var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
-			var lang = m ? m[1] : (
-				(window.navigator.languages && window.navigator.languages[0]) ||
-				window.navigator.language ||
-				window.navigator.userLanguage ||
-				window.navigator.browserLanguage);
-			if (lang && lang.match(/^ja/)) {
-				document.body.setAttribute('class', 'ja');
-			}
-		})();
-	</script>
+<script>
+var changeLang = function(lang) {
+  if (lang !== '') {
+    var newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
+    window.history.replaceState('', '', newURL);
+    document.body.setAttribute('class', lang);
+  }
+};
+(function() {
+  var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
+  var lang = m ? m[1] : (
+    (window.navigator.languages && window.navigator.languages[0]) ||
+    window.navigator.language ||
+    window.navigator.userLanguage ||
+    window.navigator.browserLanguage);
+  if (lang && lang.match(/^ja/)) {
+    document.body.setAttribute('class', 'ja');
+  }
+})();
+</script>
 
 <input type="file" id="file" style="display:none;" accept="image/*" multiple />
 <div id="viewroot">
