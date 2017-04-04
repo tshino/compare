@@ -1,5 +1,5 @@
 ﻿var compareUtil = (function() {
-  
+
   var createObjectURL = function(blob) {
     if (window.URL) {
       return window.URL.createObjectURL(blob);
@@ -7,18 +7,19 @@
       return window.webkitURL.createObjectURL(blob);
     }
   };
-  
+
   var newWorker = function(relativePath) {
     try {
       return new Worker(relativePath);
     } catch (e) {
-      var baseURL = window.location.href.replace(/\\/g,'/').replace(/\/[^\/]*$/, '/');
-      var array = [ 'importScripts("' + baseURL + relativePath + '");' ];
-      var blob = new Blob(array, {type: "text/javascript"});
+      var baseURL = window.location.href.
+                        replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
+      var array = ['importScripts("' + baseURL + relativePath + '");'];
+      var blob = new Blob(array, {type: 'text/javascript'});
       return new Worker(createObjectURL(blob));
     }
   };
-  
+
   var toggleFullscreen = function(element) {
     var fullscreen = document.fullscreenElement ||
                 document.webkitFullscreenElement ||
@@ -47,7 +48,7 @@
       }
     }
   };
-  
+
   var calcGCD = function(a, b) {
     var m = Math.max(a, b), n = Math.min(a, b);
     while (n > 0) {
@@ -57,7 +58,7 @@
     }
     return m;
   };
-  
+
   //
   // Make a binary view of a DataURI string
   //
@@ -70,7 +71,7 @@
     var isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
     var binary = null;
     var len;
-    
+
     if (isBase64) {
       len = (dataURI.length - offset) / 4 * 3;
       if (3 <= len) {
@@ -81,7 +82,7 @@
       binary = decodeURIComponent(dataURI.slice(offset));
       len = binary.length;
     }
-    
+
     var read = function(addr) {
       if (addr >= len) {
         return null;
@@ -105,19 +106,19 @@
     var readBig32 = function(addr) {
       return readBig16(addr) * 65536 + readBig16(addr + 2);
     };
-    
+
     return {
-      length    : len,
-      at        : read,
-      big16     : readBig16,
-      little16  : readLittle16,
-      big32     : readBig32,
+      length:   len,
+      at:       read,
+      big16:    readBig16,
+      little16: readLittle16,
+      big32:    readBig32
     };
   };
-  
+
   var detectPNGChunk = function(binary, target, before) {
     for (var p = 8; p + 8 <= binary.length; ) {
-      var len   = binary.big32(p);
+      var len = binary.big32(p);
       var chunk = binary.big32(p + 4);
       if (chunk == target) { return p; }
       if (chunk == before) { break; }
@@ -125,7 +126,7 @@
     }
     return null;
   };
-  
+
   var detectMPFIdentifier = function(binary) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
@@ -139,7 +140,7 @@
     }
     return null;
   };
-  
+
   var detectExifOrientation = function(binary) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
@@ -151,7 +152,7 @@
         var fields = read16(p + 18);
         if (p + 20 + fields * 12 > binary.length) { break; }
         for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
-          if (read16(f)== 0x0112 /* ORIENTATION */) {
+          if (read16(f) == 0x0112 /* ORIENTATION */) {
             return read16(f + 8);
           }
         }
@@ -161,14 +162,15 @@
     }
     return null;
   };
-  
+
   var detectImageFormat = function(binary) {
     var magic = binary.length < 4 ? 0 : binary.big32(0);
     var magic2 = binary.length < 8 ? 0 : binary.big32(4);
-    
+
     if (magic == 0x89504e47) {
       // PNG
-      if (detectPNGChunk(binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
+      if (detectPNGChunk(
+                binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
         return 'PNG (APNG)';
       }
       return 'PNG';
@@ -182,8 +184,10 @@
       return 'JPEG';
     }
     if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
-    if ((magic  == 0xefbbbf3c /* BOM + '<' */ && magic2 == 0x3f786d6c /* '?xml' */) ||
-        (magic == 0x3c3f786d /* '<?xm' */ && (magic2 & 0xff000000) == 0x6c000000 /* 'l' */)) {
+    if ((magic == 0xefbbbf3c /* BOM + '<' */ &&
+            magic2 == 0x3f786d6c /* '?xml' */) ||
+        (magic == 0x3c3f786d /* '<?xm' */ &&
+            (magic2 & 0xff000000) == 0x6c000000 /* 'l' */)) {
         // XML
         var i = 4;
         for (var x; x = binary.at(i); ++i) {
@@ -200,7 +204,7 @@
     //alert(magic);
     return null;
   };
-  
+
   var makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
     var MAX_ZOOM_LEVEL    = 6.0;
@@ -213,7 +217,7 @@
     var o = {
       zoom: 0,
       scale: 1,
-      offset: { x: 0.5, y: 0.5 },
+      offset: { x: 0.5, y: 0.5 }
     };
     var enabled = true;
     var dragLastPoint = null;
@@ -255,7 +259,9 @@
     };
     var moveRelative = function(dx, dy) {
       if (1 < o.scale && enabled) {
-        var result = setOffset(o.offset.x + dx / (o.scale - 1), o.offset.y + dy / (o.scale - 1));
+        var result = setOffset(
+                        o.offset.x + dx / (o.scale - 1),
+                        o.offset.y + dy / (o.scale - 1));
         update();
         return result;
       }
@@ -313,7 +319,7 @@
     var processMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
-        dragLastPoint = { x : e.clientX, y : e.clientY };
+        dragLastPoint = { x: e.clientX, y: e.clientY };
         return false;
       }
     };
@@ -325,7 +331,7 @@
           var index = selector ? $(selector).index(target) : null;
           var dx = e.clientX - dragLastPoint.x;
           var dy = e.clientY - dragLastPoint.y;
-          dragLastPoint = { x : e.clientX, y : e.clientY };
+          dragLastPoint = { x: e.clientX, y: e.clientY };
           moveRelativePx(index, dx, dy);
           return false;
         }
@@ -356,16 +362,22 @@
       if (event.touches.length == 1 || event.touches.length == 2) {
         var touches = Array.prototype.slice.call(event.touches);
         touches.sort(function(a, b) {
-          return a.identifier < b.identifier ? -1 : a.identifier > b.identifier ? 1 : 0;
+          return (
+              a.identifier < b.identifier ? -1 :
+              a.identifier > b.identifier ? 1 : 0
+          );
         });
         if (!touchState || touchState.length !== touches.length) {
           touchState = [];
         }
         var dx = 0, dy = 0;
         for (var i = 0; i < touches.length; ++i) {
-          if (!touchState[i] || touchState[i].identifier !== touches[i].identifier) {
+          if (!touchState[i] ||
+                touchState[i].identifier !== touches[i].identifier) {
             touchState[i] = {
-              x: touches[i].clientX, y: touches[i].clientY, identifier: touches[i].identifier
+              x: touches[i].clientX,
+              y: touches[i].clientY,
+              identifier: touches[i].identifier
             };
           }
           dx += touches[i].clientX - touchState[i].x;
@@ -403,7 +415,7 @@
       $(root).on('dblclick', deepFilter, function(e) {
         return processDblclick(e, selector, this);
       });
-      $(root).on("wheel", processWheel);
+      $(root).on('wheel', processWheel);
     };
     var enableTouch = function(root, filter, deepFilter, selector) {
       $(root).on('touchmove', filter, function(e) {
@@ -452,6 +464,6 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
-    makeZoomController:     makeZoomController,
+    makeZoomController:     makeZoomController
   };
 })();
