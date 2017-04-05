@@ -197,8 +197,8 @@ $( function()
   
   viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
   viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
-  figureZoom.enableMouse('#histogram,#waveform,#vectorscope', 'td.fig', 'td.fig > *', null);
-  figureZoom.enableTouch('#histogram,#waveform,#vectorscope', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
 
   updateDOM();
 });
@@ -1316,12 +1316,6 @@ $( function()
         height: '422px',
         textAlign: 'center',
     };
-    var style = {
-        maxWidth: '768px',
-        maxHeight: '400px',
-        background:'#000',
-        padding:'8px'
-    };
     if (diffResult.result == null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
       setText($('#diffSummary'), {
@@ -1350,6 +1344,18 @@ $( function()
       var bits = fig.context.createImageData(w, h);
       copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
+      var cellW = 768;
+      var cellH = 400;
+      var isLetterBox = cellW * h < cellH * w;
+      diffResult.baseWidth = isLetterBox ? cellW : cellH * w / h;
+      diffResult.baseHeight = isLetterBox ? cellW * h / w : cellH;
+      var style = {
+          maxWidth: cellW + 'px',
+          maxHeight: cellH + 'px',
+          background:'#000',
+          padding:'8px',
+          transform: figureZoom.makeTransform()
+      };
       $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
       if (diffResult.result.summary.unmatch == 0) {
         setText($('#diffSummary'), {
@@ -1366,7 +1372,12 @@ $( function()
       }
     }
   };
-  var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis);
+  var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
+      enableZoom: true,
+      getBaseSize: function() {
+        return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
+      }
+    });
 
   function updateDOM()
   {
