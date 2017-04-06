@@ -42,13 +42,13 @@ function calcHistogram( imageData, type )
     hist[i] = 0;
   }
   if (type == 0) { // RGB
-    for (var i = 0, n = 4 * w * h; i < n; i+=4) {
+    for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       hist[imageData.data[i + 0]] += 1;
       hist[imageData.data[i + 1] + 256] += 1;
       hist[imageData.data[i + 2] + 512] += 1;
     }
   } else { // Luminance
-    for (var i = 0, n = 4 * w * h; i < n; i+=4) {
+    for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       var r = imageData.data[i + 0];
       var g = imageData.data[i + 1];
       var b = imageData.data[i + 2];
@@ -77,7 +77,7 @@ function calcWaveform( imageData, histW, type )
       var rOff = histOff[x];
       var gOff = histOff[x] + 256 * histW;
       var bOff = histOff[x] + 512 * histW;
-      for (var y = 0; y < h; ++y, i += w*4) {
+      for (var y = 0; y < h; ++y, i += w * 4) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
@@ -90,7 +90,7 @@ function calcWaveform( imageData, histW, type )
     for (var x = 0; x < w; ++x) {
       var i = x * 4;
       var off = histOff[x];
-      for (var y = 0; y < h; ++y, i += w*4) {
+      for (var y = 0; y < h; ++y, i += w * 4) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
@@ -206,8 +206,8 @@ function calcMetrics( a, b )
     var sum1 = 0, sum2 = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum1 = 0, lineSum2 = 0;
-      for (var x= 0; x < w; ++x, i += 4) {
-        var r= data[i + 0], g = data[i + 1], b = data[i + 2];
+      for (var x = 0; x < w; ++x, i += 4) {
+        var r = data[i + 0], g = data[i + 1], b = data[i + 2];
         lineSum1 += r + g + b;
         lineSum2 += r * r + g * g + b * b;
       }
@@ -225,7 +225,7 @@ function calcMetrics( a, b )
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum = 0;
-      for (var x= 0; x < w; ++x, i += 4) {
+      for (var x = 0; x < w; ++x, i += 4) {
         var r = dataA[i + 0] * dataB[i + 0];
         var g = dataA[i + 1] * dataB[i + 1];
         var b = dataA[i + 2] * dataB[i + 2];
@@ -240,7 +240,7 @@ function calcMetrics( a, b )
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum = 0;
-      for (var x= 0; x < w; ++x, i += 4) {
+      for (var x = 0; x < w; ++x, i += 4) {
         var r = dataA[i + 0] - dataB[i + 0];
         var g = dataA[i + 1] - dataB[i + 1];
         var b = dataA[i + 2] - dataB[i + 2];
@@ -339,9 +339,9 @@ var imageUtil = (function() {
     }
     for (var y = 0; y < h; y++) {
       var sy = floor((y + 0.5) * mh);
-      var j0 = (src.offset + src.pitch * sy) * 4
+      var j0 = (src.offset + src.pitch * sy) * 4;
       for (var x = 0; x < w; x++, i += 4) {
-        var j = j0 + so[x]
+        var j = j0 + so[x];
         var r = sdata[j    ];
         var g = sdata[j + 1];
         var b = sdata[j + 2];
@@ -533,7 +533,7 @@ var imageUtil = (function() {
     var sinc = function(x) {
       x = x * Math.PI;
       if (-0.01 < x && x < 0.01) {
-        return 1 + x * x * (-1/6 + x * x * (1/120));
+        return 1 + x * x * (-1 / 6 + x * x * (1 / 120));
       } else {
         return Math.sin(x) / x;
       }
@@ -546,7 +546,7 @@ var imageUtil = (function() {
     var sinc = function(x) {
       x = x * Math.PI;
       if (-0.01 < x && x < 0.01) {
-        return 1 + x * x * (-1/6 + x * x * (1/120));
+        return 1 + x * x * (-1 / 6 + x * x * (1 / 120));
       } else {
         return Math.sin(x) / x;
       }
@@ -578,7 +578,7 @@ var imageUtil = (function() {
     copy:           copy,
     resize:         resize,
     resizeNN:       resizeNN,
-    resizeBilinear: resizeBilinear,
+    resizeBilinear: resizeBilinear
   };
 })();
 
@@ -655,12 +655,12 @@ function calcDiff( a, b, options )
     total: 0,
     countIgnoreAE: 0,
     unmatch: 0,
-    maxAE: 0,
+    maxAE: 0
   };
   makeDiff(a, b, diff, summary);
   summary.match = summary.total - summary.unmatch;
   return {
     image:      diff,
-    summary:    summary,
+    summary:    summary
   };
 }
