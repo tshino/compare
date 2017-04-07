@@ -26,8 +26,21 @@ $( function()
   $('#add').click(function() {
     $('#file').click();
   });
+  $('#analysisbtn').click(toggleAnalysis);
   $('#zoomIn').click(viewZoom.zoomIn);
   $('#zoomOut').click(viewZoom.zoomOut);
+  $('#arrange').click(arrangeLayout);
+  $('#overlay').click(toggleOverlay);
+  $('#gridbtn').click(toggleGrid);
+  $('#fullscreen').click(toggleFullscreen);
+  $('#helpbtn').click(toggleHelp);
+  $('#infobtn').click(toggleInfo);
+  $('#histogrambtn').click(toggleHistogram);
+  $('#waveformbtn').click(toggleWaveform);
+  $('#vectorscopebtn').click(toggleVectorscope);
+  $('#metricsbtn').click(toggleMetrics);
+  $('#diffbtn').click(toggleDiff);
+  $('#swapbtn').click(swapBaseAndTargetImage);
   $('#view .dropHere').click(function() {
     $('#file').click();
   });

@@ -40,7 +40,7 @@ var changeLang = function(lang) {
 			<span class="tooltip ja">画像を追加</span>
 		</button>
 		<div class="space"></div>
-		<button onclick="toggleAnalysis()">
+		<button id="analysisbtn">
 			<img src="res/histogram.svg" width="100%">
 			<span class="tooltip keys en">Show analysis tools <span>c</span></span>
 			<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
@@ -55,29 +55,29 @@ var changeLang = function(lang) {
 			<span class="tooltip keys en">Zoom out <span>-</span></span>
 			<span class="tooltip keys ja">縮小 <span>-</span></span>
 		</button>
-		<button id="arrange" onclick="arrangeLayout()">
+		<button id="arrange">
 			<img src="res/layout_x.svg" width="100%">
 			<span class="tooltip keys en">Arrange layout <span>a</span></span>
 			<span class="tooltip keys ja">レイアウト変更 <span>a</span></span>
 		</button>
-		<button id="overlay" onclick="toggleOverlay()"><!-- style="display:none"-->
+		<button id="overlay">
 			<img src="res/overlay.svg" width="100%">
 			<span class="tooltip keys en">Overlay mode <span>o</span></span>
 			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
 		</button>
-		<button id="gridbtn" onclick="toggleGrid()">
+		<button id="gridbtn">
 			<img src="res/grid.svg" width="100%">
 			<span class="tooltip keys en">Show grid <span>g</span></span>
 			<span class="tooltip keys ja">グリッドを表示 <span>g</span></span>
 		</button>
 		<div class="bottom">
-			<button onclick="toggleFullscreen()">
+			<button id="fullscreen">
 				<img src="res/full.svg" width="100%">
 				<span class="tooltip keys en">Fullscreen <span>f</span></span>
 				<span class="tooltip keys ja">フルスクリーン表示 <span>f</span></span>
 			</button>
 			<div class="space"></div>
-			<button id="help" onclick="toggleHelp()">
+			<button id="helpbtn">
 				<img src="res/help.svg" width="100%">
 				<span class="tooltip keys en">Show help <span>?</span></span>
 				<span class="tooltip keys ja">ヘルプを表示 <span>?</span></span>
@@ -302,37 +302,37 @@ var changeLang = function(lang) {
 				</h3>
 			</div>
 			<div class="menu">
-				<button onclick="toggleInfo()">
+				<button id="infobtn">
 					<img src="res/info.svg" width="20">
 					<span class="en">Image information</span>
 					<span class="ja">画像情報</span>
 					<span class="flat keys"><span>i</span></span>
 				</button>
-				<button onclick="toggleHistogram()">
+				<button id="histogrambtn">
 					<img src="res/histogram.svg" width="20">
 					<span class="en">Histogram</span>
 					<span class="ja">ヒストグラム</span>
 					<span class="flat keys"><span>h</span></span>
 				</button>
-				<button onclick="toggleWaveform()">
+				<button id="waveformbtn">
 					<img src="res/waveform.svg" width="20">
 					<span class="en">Waveform</span>
 					<span class="ja">波形</span>
 					<span class="flat keys"><span>w</span></span>
 				</button>
-				<button onclick="toggleVectorscope()">
+				<button id="vectorscopebtn">
 					<img src="res/vectorscope.svg" width="20">
 					<span class="en">Vectorscope</span>
 					<span class="ja">ベクトルスコープ</span>
 					<span class="flat keys"><span>v</span></span>
 				</button>
-				<button onclick="toggleMetrics()">
+				<button id="metricsbtn">
 					<img src="res/psnr.svg" width="20">
 					<span class="en">Image quality metrics (PSNR,MSE, etc)</span>
 					<span class="ja">画質メトリクス (PSNR,MSE, etc)</span>
 					<span class="flat keys"><span>m</span></span>
 				</button>
-				<button onclick="toggleDiff()">
+				<button id="diffbtn">
 					<img src="res/diff.svg" width="20">
 					<span class="en">Image diff</span>
 					<span class="ja">画像のdiff</span>
@@ -481,7 +481,7 @@ var changeLang = function(lang) {
 							<span class="ja">基準画像</span>
 						</td>
 						<td id="diffBaseName" style="min-width: 216px"></td>
-						<td rowspan="2" style="width=40px; max-width: 40px"><button onclick="swapBaseAndTargetImage();" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" width="100%"></button></td>
+						<td rowspan="2" style="width=40px; max-width: 40px"><button id="swapbtn" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" width="100%"></button></td>
 						<td style="min-width: 256px"></td>
 					</tr>
 					<tr>
