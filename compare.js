@@ -1142,13 +1142,16 @@ $( function()
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics == 'string') {
-      return { psnr: metrics, mse: metrics, ncc: metrics, ae: metrics };
+      return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
     } else {
       return {
         psnr:
             isNaN(metrics.psnr) ? '‐' :
             metrics.psnr == Infinity ? '∞ dB' :
             metrics.psnr.toFixed(2) + ' dB',
+        rmse:
+            isNaN(metrics.mse) ? '‐' :
+            Math.sqrt(metrics.mse).toPrecision(6),
         mse:
             isNaN(metrics.mse) ? '‐' :
             metrics.mse.toPrecision(6),
@@ -1226,6 +1229,7 @@ $( function()
       );
       var values = metricsToString(a.metrics[b.index], a);
       $('#psnrValue').append($('<td>').text(values.psnr));
+      $('#rmseValue').append($('<td>').text(values.rmse));
       $('#mseValue').append($('<td>').text(values.mse));
       $('#nccValue').append($('<td>').text(values.ncc));
       $('#aeValue').append($('<td>').text(values.ae));
