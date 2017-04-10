@@ -191,7 +191,7 @@ $( function()
     // 'n' (110)
     110 : { global: false, func: toggleMap },
     // 'g' (103)
-    103 : { global: false, func: toggleGrid },
+    103 : { global: false, func: toggleGrid }
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName == 'input') {
@@ -248,7 +248,7 @@ $( function()
     ignoreAE: 0,
     resizeToLarger: true,
     resizeMethod: 'lanczos3',
-    ignoreRemainder: false,
+    ignoreRemainder: false
   };
 
   var toggleLang = function() {
@@ -369,7 +369,7 @@ $( function()
         css({ wordBreak : 'break-all' }).
         append($('<span class="imageIndex"/>').text(img.index + 1)).
         append($('<span/>').text(img.name));
-  }
+  };
 
   var toggleSingleView = function(targetIndex) {
     if (targetIndex == 0 ||
@@ -525,7 +525,7 @@ $( function()
         if (options.enableZoom) {
           figureZoom.enable({
             zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
-            getBaseSize: options.getBaseSize,
+            getBaseSize: options.getBaseSize
           });
           figureZoom.setZoom(0);
           var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
@@ -815,7 +815,7 @@ $( function()
     addTask({
       cmd:      'calcHistogram',
       type:     histogramType,
-      index:    [img.index],
+      index:    [img.index]
     });
   }
   function updateHistogram(type, img, hist)
@@ -896,7 +896,7 @@ $( function()
       cmd:      'calcWaveform',
       type:     waveformType,
       index:    [img.index],
-      histW:    Math.min(img.canvasWidth, 1024),
+      histW:    Math.min(img.canvasWidth, 1024)
     });
   }
   function updateWaveform(type, img, histW, hist)
@@ -1069,7 +1069,7 @@ $( function()
         { pos: { x: 320,   y: 159.5 } , color: '',     types: [] },
         { pos: { x: 32,    y: 32    } , color: '',     types: [] },
         { pos: { x: 32,    y: 287   } , color: '',     types: [] },
-        { pos: { x: 287,   y: 287   } , color: '',     types: [] },
+        { pos: { x: 287,   y: 287   } , color: '',     types: [] }
       ];
       var lines = [
         { indices: [8, 9, 10, 11], color: '#046', types: [0] },
@@ -1078,7 +1078,7 @@ $( function()
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [2,3,4] },
         { indices: [1, 2, 2, 3, 3, 1], color: '#024', types: [1] },
-        { indices: [12, 13, 13, 14, 14, 12], color: '#046', types: [1] },
+        { indices: [12, 13, 13, 14, 14, 12], color: '#046', types: [1] }
       ];
       var labels = [
         { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
@@ -1087,7 +1087,7 @@ $( function()
         { pos: calcxy(0, 255, 0), align: ['left',  'bottom'], color: '#0f0', label: 'G', types: [2,3] },
         { pos: calcxy(0, 0, 255), align: ['left',  'bottom'], color: '#00f', label: 'B', types: [2,4] },
         { pos: { x: 32,  y: 32  }, align: ['right', 'bottom'], color: '#08f', label: 'y', types: [1] },
-        { pos: { x: 288, y: 288 }, align: ['left',  'top'], color: '#08f', label: 'x', types: [1] },
+        { pos: { x: 288, y: 288 }, align: ['left',  'top'], color: '#08f', label: 'x', types: [1] }
       ];
       context.globalCompositeOperation = 'lighter';
       context.lineWidth = 2;
@@ -1161,7 +1161,7 @@ $( function()
         ae:
             isNaN(metrics.ae) ? '‐' :
             addComma(metrics.ae) +
-                ' (' + toPercent(metrics.ae/imgA.width/imgA.height) + ')',
+                ' (' + toPercent(metrics.ae/imgA.width/imgA.height) + ')'
       };
     }
   };
@@ -1214,7 +1214,7 @@ $( function()
         b.metrics[a.index] = 'calculating...';
         addTask({
           cmd:      'calcMetrics',
-          index:    [a.index, b.index],
+          index:    [a.index, b.index]
         });
       }
       $('#metricsTargetName').append(
@@ -1323,15 +1323,15 @@ $( function()
             ignoreAE:   diffOptions.ignoreAE,
             ignoreRemainder: diffOptions.ignoreRemainder,
             resizeToLarger: diffOptions.resizeToLarger,
-            resizeMethod: diffOptions.resizeMethod,
-          },
+            resizeMethod: diffOptions.resizeMethod
+          }
         });
       }
     }
     var cellStyle = {
         width: '790px',
         height: '422px',
-        textAlign: 'center',
+        textAlign: 'center'
     };
     if (diffResult.result == null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -1504,7 +1504,7 @@ $( function()
           position  : overlayMode ? 'absolute' : '',
           width     : overlayMode ? $('#view').width() + 'px' : '',
           opacity   : isOverlay ? '0.5' : '',
-          background : overlayMode ? '#000' : '',
+          background : overlayMode ? '#000' : ''
         });
       }
     });
@@ -1552,7 +1552,7 @@ $( function()
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
                         viewZoom.makeTransform(i) +
-                        ent.orientationAsCSS,
+                        ent.orientationAsCSS
         };
         $(ent.element).css(style);
         if (ent.grid) {
@@ -1582,7 +1582,7 @@ $( function()
         x : 100 * (0.5 + center.x - 0.5 * roiW) + '%',
         y : 100 * (0.5 + center.y - 0.5 * roiH) + '%',
         width : (100 * roiW)+'%',
-        height : (100 * roiH)+'%',
+        height : (100 * roiH)+'%'
       });
       var s = 120 / Math.max(img.width, img.height);
       var w = img.width * s;
@@ -1680,7 +1680,7 @@ $( function()
             error       : null,
             visible     : true,
             
-            ready   : function() { return null != this.element; },
+            ready   : function() { return null != this.element; }
       };
       entries.push(entry);
       loading.push(entry);
