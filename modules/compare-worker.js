@@ -37,11 +37,11 @@ function calcHistogram( imageData, type )
 {
   var w = imageData.width;
   var h = imageData.height;
-  var hist = new Uint32Array(256 * (type == 0 ? 3 : 1));
+  var hist = new Uint32Array(256 * (type === 0 ? 3 : 1));
   for (var i = 0; i < hist.length; ++i) {
     hist[i] = 0;
   }
-  if (type == 0) { // RGB
+  if (type === 0) { // RGB
     for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       hist[imageData.data[i + 0]] += 1;
       hist[imageData.data[i + 1] + 256] += 1;
@@ -62,7 +62,7 @@ function calcWaveform( imageData, histW, type )
 {
   var w = imageData.width;
   var h = imageData.height;
-  var hist = new Uint32Array(256 * histW * (type == 0 ? 3 : 1));
+  var hist = new Uint32Array(256 * histW * (type === 0 ? 3 : 1));
   var histOff = new Uint32Array(w);
   for (var i = 0; i < hist.length; ++i) {
     hist[i] = 0;
@@ -71,7 +71,7 @@ function calcWaveform( imageData, histW, type )
     var x = Math.round((i + 0.5) / w * histW - 0.5);
     histOff[i] = x * 256;
   }
-  if (type == 0) { // RGB
+  if (type === 0) { // RGB
     for (var x = 0; x < w; ++x) {
       var i = x * 4;
       var rOff = histOff[x];
@@ -111,7 +111,7 @@ function calcVectorscope( imageData, type )
     dist[i] = 0;
   }
   var k = 0;
-  if (type == 0) { // Cb-Cr
+  if (type === 0) { // Cb-Cr
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k + 0];
       var g = imageData.data[k + 1];
@@ -122,7 +122,7 @@ function calcVectorscope( imageData, type )
       var ploty = Math.round(159.5 - cr);
       dist[ploty * 320 + plotx] += 1;
     }
-  } else if (type == 1) { // x-y
+  } else if (type === 1) { // x-y
     var srgbToLinear = [];
     for (var i = 0; i < 256; ++i) {
       var c = i / 255;
@@ -136,11 +136,11 @@ function calcVectorscope( imageData, type )
       var y = 0.212639 * r + 0.715169 * g + 0.072192 * b;
       var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
       var xyz = x + y + z;
-      var plotx = 32 + (xyz == 0 ? 0 : Math.round(x / xyz * 255));
-      var ploty = 287 - (xyz == 0 ? 0 : Math.round(y / xyz * 255));
+      var plotx = 32 + (xyz === 0 ? 0 : Math.round(x / xyz * 255));
+      var ploty = 287 - (xyz === 0 ? 0 : Math.round(y / xyz * 255));
       dist[ploty * 320 + plotx] += 1;
     }
-  } else if (type == 2) { // G-B
+  } else if (type === 2) { // G-B
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
@@ -148,7 +148,7 @@ function calcVectorscope( imageData, type )
       var ploty = 287 - b;
       dist[ploty * 320 + plotx] += 1;
     }
-  } else if (type == 3) { // G-R
+  } else if (type === 3) { // G-R
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k + 0];
       var g = imageData.data[k + 1];
@@ -170,20 +170,20 @@ function calcVectorscope( imageData, type )
 
 function calcAE( a, b )
 {
-  if (a.width != b.width || a.height != b.height) {
+  if (a.width !== b.width || a.height !== b.height) {
     // error
     return NaN;
   }
-  if (a.width == 0 || a.height == 0) {
+  if (a.width === 0 || a.height === 0) {
     // error
     return NaN;
   }
   var count = 0;
-  for (var i = 0, n = a.width * a.height * 4; i != n; i += 4) {
-    if (a.data[i + 0] != b.data[i + 0] ||
-        a.data[i + 1] != b.data[i + 1] ||
-        a.data[i + 2] != b.data[i + 2] ||
-        a.data[i + 3] != b.data[i + 3]) {
+  for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
+    if (a.data[i + 0] !== b.data[i + 0] ||
+        a.data[i + 1] !== b.data[i + 1] ||
+        a.data[i + 2] !== b.data[i + 2] ||
+        a.data[i + 3] !== b.data[i + 3]) {
       ++count;
     }
   }
@@ -192,11 +192,11 @@ function calcAE( a, b )
 
 function calcMetrics( a, b )
 {
-  if (a.width != b.width || a.height != b.height) {
+  if (a.width !== b.width || a.height !== b.height) {
     // error
     return { psnr: NaN, mse: NaN, ncc: NaN };
   }
-  if (a.width == 0 || a.height == 0) {
+  if (a.width === 0 || a.height === 0) {
     // error
     return { psnr: NaN, mse: NaN, ncc: NaN };
   }
@@ -252,8 +252,8 @@ function calcMetrics( a, b )
     return sum / (w * h * 3);
   };
   var mse = calcMSE(a.data, b.data);
-  if (mse == 0) {
-    // a == b;
+  if (mse === 0) {
+    // a === b;
     return { psnr: Infinity, mse: 0, ncc: ncc };
   }
   var max = 255 * 255;
@@ -558,13 +558,13 @@ var imageUtil = (function() {
   var resize = function(dest, src, method) {
     method = method !== undefined ? method : 'bilinear';
     //console.time(method); for (var i = 0; i < 100; ++i) {
-    if (method == 'nn') {
+    if (method === 'nn') {
       resizeNN(dest, src);
-    } else if (method == 'bilinear') {
+    } else if (method === 'bilinear') {
       resizeBilinear(dest, src);
-    } else if (method == 'lanczos2') {
+    } else if (method === 'lanczos2') {
       resizeLanczos2(dest, src);
-    } else if (method == 'lanczos3') {
+    } else if (method === 'lanczos3') {
       resizeLanczos3(dest, src);
     } else {
       console.log('unexpected argument: ' + method);
