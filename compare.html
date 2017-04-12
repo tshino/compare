@@ -488,27 +488,27 @@ var changeLang = function(lang) {
 							<span class="en">Base Image</span>
 							<span class="ja">基準画像</span>
 						</td>
-						<td id="diffBaseName" style="min-width: 216px"></td>
-						<td rowspan="2" style="width=40px; max-width: 40px"><button id="swapbtn" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" width="100%"></button></td>
-						<td style="min-width: 256px"></td>
+						<td id="diffBaseName" colspan="2" style="min-width: 216px"></td>
+						<td class="input" rowspan="2" style="width:40px; max-width: 40px"><button id="swapbtn" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" width="100%"></button></td>
 					</tr>
 					<tr>
 						<td class="prop">
 							<span class="en">Target Image</span>
 							<span class="ja">対象画像</span>
 						</td>
-						<td id="diffTargetName"></td>
-						<td></td>
+						<td id="diffTargetName" colspan="2"></td>
 					</tr>
-					<tr class="num" id="diffDimension">
-						<td class="prop">
+					<tr class="num diffDimension">
+						<td class="prop" rowspan="2">
 							<span class="en">Dimension</span>
 							<span class="ja">画像サイズ</span>
 						</td>
-						<td class="output" colspan="2">
+						<td class="output" colspan="3">
 							&nbsp;<span id="diffDimensionReport"></span>
 						</td>
-						<td class="input">
+					</tr>
+					<tr class="diffDimension">
+						<td class="input" colspan="3">
 							<label>
 								<input type="checkbox" id="diffResizeToLarger">
 								<span class="en">resize to fit to larger one</span>
@@ -531,22 +531,27 @@ var changeLang = function(lang) {
 							</label><br>
 						</td>
 					</tr>
-					<tr class="num">
-						<td class="prop" rowspan="2">
+					<tr>
+						<td class="prop" rowspan="3">
 							<span class="en">RGBA error</span>
 							<span class="ja">RGBA誤差</span>
 						</td>
-						<td class="output" rowspan="2" colspan="2">
-							&nbsp;<span id="diffDetectedMaxAE"></span>
+						<td class="output" colspan="1">
+							<span class="en">detected maximum error value:</span>
+							<span class="ja">検出した最大誤差:</span>
 						</td>
-						<td class="input">
-							<span class="en">maximum error to ignore</span>
-							<span class="ja">無視する誤差の大きさ</span>
-							(0 - 255) <input id="diffIgnoreAE" type="number" min="0" max="255" value="0">
-						</td>
+						<td class="output" colspan="2" id="diffDetectedMaxAE"></td>
 					</tr>
 					<tr class="num">
-						<td class="output">
+						<td class="input" colspan="1">
+							<span class="en">maximum error to ignore</span>
+							<span class="ja">無視する誤差の大きさ</span>
+							(0 - 255)
+						</td>
+						<td class="input" colspan="2" style="min-width:auto"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
+					</tr>
+					<tr class="num">
+						<td class="output" colspan="3">
 							&nbsp;<span id="diffIgnoreAEResult"></span>
 						</td>
 					</tr>

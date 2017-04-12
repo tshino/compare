@@ -1248,7 +1248,7 @@ $( function()
   var updateDiffTable = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
-    $('#diffDimension').css({display:'none'});
+    $('.diffDimension').css({display:'none'});
     $('#diffDimensionReport *').remove();
     $('#diffDetectedMaxAE *').remove();
     $('#diffIgnoreAEResult *').remove();
@@ -1294,9 +1294,9 @@ $( function()
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
     if (a.width == b.width && a.height == b.height) {
-      $('#diffDimension').css({display:'none'});
+      $('.diffDimension').css({display:'none'});
     } else {
-      $('#diffDimension').css({display:''});
+      $('.diffDimension').css({display:''});
       setText($('#diffDimensionReport'), {
         en: 'dimensions are different',
         ja: '画像サイズが異なります'
@@ -1342,10 +1342,7 @@ $( function()
     } else {
       if (diffResult.result.summary.maxAE != 0) {
         var e = diffResult.result.summary.maxAE;
-        setText($('#diffDetectedMaxAE'), {
-          en: 'detected maximum error value: ' + e,
-          ja: '検出した最大誤差: ' + e
-        });
+        $('#diffDetectedMaxAE').text(e);
       }
       if (diffOptions.ignoreAE != 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
