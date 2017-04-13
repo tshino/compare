@@ -1250,8 +1250,8 @@ $( function()
     $('#diffTargetName *').remove();
     $('.diffDimension').css({display:'none'});
     $('#diffDimensionReport *').remove();
-    $('#diffDetectedMaxAE *').remove();
-    $('#diffIgnoreAEResult *').remove();
+    $('#diffDetectedMaxAE').text('');
+    $('#diffIgnoreAEResult').text('');
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
     $('#diffResizeToLarger').prop('checked', diffOptions.resizeToLarger);
@@ -1347,10 +1347,7 @@ $( function()
       if (diffOptions.ignoreAE != 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
         var percent = toPercent(rate);
-        setText($('#diffIgnoreAEResult'), {
-          en: percent + ' unmatched pixels ignored',
-          ja: percent + ' の不一致を無視しました'
-        });
+        $('#diffIgnoreAEResult').text(percent);
       }
       var w = diffResult.result.image.width;
       var h = diffResult.result.image.height;
