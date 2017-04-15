@@ -499,7 +499,7 @@ var changeLang = function(lang) {
 						<td id="diffTargetName" colspan="2"></td>
 					</tr>
 					<tr class="num diffDimension">
-						<td class="prop" rowspan="2">
+						<td class="prop" rowspan="3">
 							<span class="en">Dimension</span>
 							<span class="ja">画像サイズ</span>
 						</td>
@@ -508,27 +508,35 @@ var changeLang = function(lang) {
 						</td>
 					</tr>
 					<tr class="diffDimension">
-						<td class="input" colspan="3">
-							<label>
-								<input type="checkbox" id="diffResizeToLarger">
-								<span class="en">resize to fit to larger one</span>
-								<span class="ja">大きい方に合わせてリサイズ</span>
-							</label><br>
-							&nbsp;&nbsp;<label>
-								<span class="en">resize method: </span>
-								<span class="ja">リサイズ方法: </span>
-								<select id="diffResizeMethod">
-									<option value="lanczos3">Lanczos3</option>
-									<option value="lanczos2">Lanczos2</option>
-									<option value="bilinear">Bilinear</option>
-									<option value="nn">Nearest neighbor</option>
-								</select>
-							</label><br>
-							<label>
-								<input type="checkbox" id="diffIgnoreRemainder">
-								<span class="en">ignore the remainder due to size difference</span>
-								<span class="ja">サイズの違いで余る部分を無視</span>
-							</label><br>
+						<td class="input" colspan="1">
+							<span class="en">dimension option:</span>
+							<span class="ja">画像サイズオプション:</span>
+						</td>
+						<td class="input" colspan="2">
+							<select class="diffDimensionOption en">
+								<option value="resize">resize to fit to larger one</option>
+								<option value="max">no resize (compare in larger dimension)</option>
+								<option value="min">no resize (compare in smaller dimension)</option>
+							</select>
+							<select class="diffDimensionOption ja">
+								<option value="resize">大きい方に合わせてリサイズ</option>
+								<option value="max">リサイズなし（大きいサイズで比較）</option>
+								<option value="min">リサイズなし（小さいサイズで比較）</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="diffDimension">
+						<td class="input" colspan="1">
+							<span class="en">resize method:</span>
+							<span class="ja">リサイズ方法:</span>
+						</td>
+						<td class="input" colspan="2">
+							<select id="diffResizeMethod">
+								<option value="lanczos3">Lanczos3</option>
+								<option value="lanczos2">Lanczos2</option>
+								<option value="bilinear">Bilinear</option>
+								<option value="nn">Nearest neighbor</option>
+							</select>
 						</td>
 					</tr>
 					<tr>
@@ -558,10 +566,10 @@ var changeLang = function(lang) {
 						<td class="output" colspan="2" id="diffIgnoreAEResult"></td>
 					</tr>
 					<tr>
-						<td id="diffResult" class="fig" colspan="4"></td>
+						<td id="diffSummary" class="output" colspan="4" style="text-align:center"></td>
 					</tr>
 					<tr>
-						<td id="diffSummary" class="output" colspan="4" style="text-align:center"></td>
+						<td id="diffResult" class="fig" colspan="4"></td>
 					</tr>
 				</table>
 				<div class="footnote">

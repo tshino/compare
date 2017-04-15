@@ -61,13 +61,10 @@ $( function()
     updateDiffTable();
     return false;
   });
-  $('#diffIgnoreRemainder').on('change', function(e) {
-    diffOptions.ignoreRemainder = this.checked;
-    updateDiffTable();
-    return false;
-  });
-  $('#diffResizeToLarger').on('change', function(e) {
-    diffOptions.resizeToLarger = this.checked;
+  $('.diffDimensionOption').on('change', function(e) {
+    var o = this.options[this.selectedIndex].value;
+    diffOptions.resizeToLarger = o === "resize";
+    diffOptions.ignoreRemainder = o === "min";
     updateDiffTable();
     return false;
   });
@@ -1254,15 +1251,14 @@ $( function()
     $('#diffIgnoreAEResult').text('');
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
-    $('#diffResizeToLarger').prop('checked', diffOptions.resizeToLarger);
+    $('.diffDimensionOption').
+      prop('value',
+        diffOptions.resizeToLarger ? 'resize' :
+        diffOptions.ignoreRemainder ? 'min' : 'max');
     $('#diffResizeMethod').
       prop('value', diffOptions.resizeMethod).
       prop('disabled', !diffOptions.resizeToLarger).
       parent().css({opacity: !diffOptions.resizeToLarger ? '0.5' : ''});
-    $('#diffIgnoreRemainder').
-      prop('checked', diffOptions.ignoreRemainder).
-      prop('disabled', diffOptions.resizeToLarger).
-      parent().css({opacity: diffOptions.resizeToLarger ? '0.5' : ''});
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
