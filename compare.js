@@ -11,6 +11,7 @@ $( function()
     alert('The File APIs are not fully supported in this browser.');
   }
 
+  // Drag & Drop and file selection
   $(document.body).on('dragover', function(e) {
     e.originalEvent.dataTransfer.dropEffect = 'copy';
     return false;
@@ -26,6 +27,11 @@ $( function()
   $('#add').click(function() {
     $('#file').click();
   });
+  $('#view .dropHere').click(function() {
+    $('#file').click();
+  });
+
+  // Side bar buttons
   $('#analysisbtn').click(toggleAnalysis);
   $('#zoomIn').click(viewZoom.zoomIn);
   $('#zoomOut').click(viewZoom.zoomOut);
@@ -34,6 +40,8 @@ $( function()
   $('#gridbtn').click(toggleGrid);
   $('#fullscreen').click(toggleFullscreen);
   $('#helpbtn').click(toggleHelp);
+
+  // Menus and dialogs
   $('#infobtn').click(toggleInfo);
   $('#histogrambtn').click(toggleHistogram);
   $('#waveformbtn').click(toggleWaveform);
@@ -41,9 +49,6 @@ $( function()
   $('#metricsbtn').click(toggleMetrics);
   $('#diffbtn').click(toggleDiff);
   $('#swapbtn').click(swapBaseAndTargetImage);
-  $('#view .dropHere').click(function() {
-    $('#file').click();
-  });
   $('#histogramType > *').click(function() {
     var index = $('#histogramType > *').index(this);
     changeHistogramType(index);
@@ -73,7 +78,7 @@ $( function()
     updateDiffTable();
     return false;
   });
-  
+
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e)
     {
