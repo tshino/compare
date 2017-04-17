@@ -86,17 +86,17 @@ $( function()
         return true;
       }
       // ESC (27)
-      if (dialog && e.keyCode == 27 && !e.shiftKey) {
+      if (dialog && e.keyCode === 27 && !e.shiftKey) {
         dialog.close();
         return false;
       }
-      if (e.target.localName == 'input') {
+      if (e.target.localName === 'input') {
         return true;
       }
       if (dialog)
       {
         // BS (8)
-        if (e.keyCode == 8 && !e.shiftKey) {
+        if (e.keyCode === 8 && !e.shiftKey) {
           dialog.close();
           return false;
         }
@@ -105,7 +105,7 @@ $( function()
             (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
           var num = e.keyCode % 48;
           var sw = $(dialog.element).find('.mode-sw > button:nth-child('+num+')');
-          if (sw.length == 1) {
+          if (sw.length === 1) {
             sw.click();
             return false;
           }
@@ -145,7 +145,7 @@ $( function()
         return false;
       }
       // ESC (27)
-      if (e.keyCode == 27 && !e.shiftKey)
+      if (e.keyCode === 27 && !e.shiftKey)
       {
         currentImageIndex = 0;
         viewZoom.setZoom(0);
@@ -156,7 +156,7 @@ $( function()
         return false;
       }
       // Delete (46)
-      if (e.keyCode == 46 && !e.shiftKey && 0 < images.length)
+      if (e.keyCode === 46 && !e.shiftKey && 0 < images.length)
       {
         var index = isSingleView ? currentImageIndex - 1 : images[0].index;
         removeEntry(index);
@@ -196,7 +196,7 @@ $( function()
     103 : { global: false, func: toggleGrid }
   };
   $(window).keypress(function(e) {
-    if (e.altKey || e.metaKey || e.target.localName == 'input') {
+    if (e.altKey || e.metaKey || e.target.localName === 'input') {
       return true;
     }
     var m = keypressMap[e.which];
@@ -254,14 +254,14 @@ $( function()
   };
 
   var toggleLang = function() {
-    var lang = $(document.body).attr('class') == 'ja' ? 'en' : 'ja';
+    var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
     $('#selectLang').val(lang);
     changeLang(lang);
   };
   var setText = function(target, text) {
     for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
       var e = target.find('.' + lang);
-      if (0 == e.length) {
+      if (0 === e.length) {
         e = $('<span>').addClass(lang);
         target.append(e);
       }
@@ -273,8 +273,8 @@ $( function()
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
   var toPercent = function(num) {
-    if (num == 0) return '0%';
-    if (num == 1) return '100%';
+    if (num === 0) return '0%';
+    if (num === 1) return '100%';
     var digits =
             num < 0.000001 ? 7 :
             num < 0.00001 ? 6 :
@@ -298,13 +298,13 @@ $( function()
         $(ent.view).remove('.image');
         ent.element = null;
       }
-      if (baseImageIndex == index) {
+      if (baseImageIndex === index) {
         baseImageIndex = null;
       }
-      if (targetImageIndex == index) {
+      if (targetImageIndex === index) {
         targetImageIndex = null;
       }
-      if (diffResult.base == index || diffResult.target == index) {
+      if (diffResult.base === index || diffResult.target === index) {
         $('#diffResult *').remove();
         diffResult.result = null;
       }
@@ -374,8 +374,8 @@ $( function()
   };
 
   var toggleSingleView = function(targetIndex) {
-    if (targetIndex == 0 ||
-        targetIndex == currentImageIndex ||
+    if (targetIndex === 0 ||
+        targetIndex === currentImageIndex ||
         targetIndex > entries.length ||
         !entries[targetIndex - 1].visible) {
       currentImageIndex = 0;
@@ -388,7 +388,7 @@ $( function()
   {
     if (isSingleView) {
       currentImageIndex = 0;
-    } else if (layoutMode == 'x') {
+    } else if (layoutMode === 'x') {
       layoutMode = 'y';
     } else {
       layoutMode = 'x';
@@ -422,16 +422,16 @@ $( function()
     }
   }
   var addGrid = function(img) {
-    if (img.element && 0 == img.view.find('.grid').length) {
+    if (img.element && 0 === img.view.find('.grid').length) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
       var makeGridDesc = function(step, skip) {
         var desc = '';
         for (var k = step; k < img.canvasWidth; k += step) {
-          if (skip && (k % skip) == 0) continue;
+          if (skip && (k % skip) === 0) continue;
           desc += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
         }
         for (var k = step; k < img.canvasHeight; k += step) {
-          if (skip && (k % skip) == 0) continue;
+          if (skip && (k % skip) === 0) continue;
           desc += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
         }
         return desc;
@@ -455,7 +455,7 @@ $( function()
     }
   };
   var toggleGrid = function() {
-    enableGrid = 0 == images.length ? false : !enableGrid;
+    enableGrid = 0 === images.length ? false : !enableGrid;
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
@@ -502,7 +502,7 @@ $( function()
       dlg.offset({ left: offset.left + dx, top: offset.top + dy });
     };
     target.on('mousedown', '.header', function(e) {
-      if (e.which == 1 && !$(e.target).is('a, select')) {
+      if (e.which === 1 && !$(e.target).is('a, select')) {
         draggingPoint = { x: e.clientX, y: e.clientY };
         return false;
       }
@@ -572,7 +572,7 @@ $( function()
         [img.lastModified, img.lastModified.toLocaleString()] ];
       for (var j = 0, v; v = val[i][j]; ++j) {
         var expr = val[i][j][1];
-        var e = (typeof expr == 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
+        var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
         if (0 < i && val[i][j][0]) {
           e.addClass(
               val[0][j][0] < val[i][j][0] ? 'sign lt' :
@@ -581,7 +581,7 @@ $( function()
         rows[j].append(e);
       }
     }
-    if (i == 0) {
+    if (i === 0) {
       rows[0].append(
         $('<td>').attr('rowspan', rows.length).
             text('no data')
@@ -624,15 +624,15 @@ $( function()
         !finished ? {
           en: 'Now loading...',
           ja: 'ロード中...'
-        } : 0 == errors ? {
+        } : 0 === errors ? {
           en: 'Finished!',
           ja: '完了！'
         } : {
-          en: 1 == errors ? 'An error occurred.' : 'Some errors occured.',
+          en: 1 === errors ? 'An error occurred.' : 'Some errors occured.',
           ja: errors + '個のエラー'
         });
       toggleNowLoading();
-      if (finished && 0 == errors) {
+      if (finished && 0 === errors) {
         window.setTimeout( function() {
           if ($('#loading').is(':visible')) {
             hideDialog();
@@ -707,7 +707,7 @@ $( function()
         $('<td class="fig">').append($(img[propName]).css(style))
       );
     }
-    if (k == 0) {
+    if (k === 0) {
       $(target).find('tr').eq(0).append(
         $('<td rowspan="2">').text('no data')
       );
@@ -735,19 +735,19 @@ $( function()
     var data = e.data;
     switch (data.cmd) {
     case 'calcHistogram':
-      if (data.type == histogramType) {
+      if (data.type === histogramType) {
         var img = entries[data.index[0]];
         updateHistogram(data.type, img, data.result);
       }
       break;
     case 'calcWaveform':
-      if (data.type == waveformType) {
+      if (data.type === waveformType) {
         var img = entries[data.index[0]];
         updateWaveform(data.type, img, data.histW, data.result);
       }
       break;
     case 'calcVectorscope':
-      if (data.type == vectorscopeType) {
+      if (data.type === vectorscopeType) {
         updateVectorscope(data.type, entries[data.index[0]], data.result);
       }
       break;
@@ -757,11 +757,11 @@ $( function()
       updateMetricsTable();
       break;
     case 'calcDiff':
-      if (diffResult.base == data.index[0] && diffResult.target == data.index[1] &&
-          diffResult.ignoreAE == data.options.ignoreAE &&
-          diffResult.ignoreRemainder == data.options.ignoreRemainder &&
-          diffResult.resizeToLarger == data.options.resizeToLarger &&
-          diffResult.resizeMethod == data.options.resizeMethod) {
+      if (diffResult.base === data.index[0] && diffResult.target === data.index[1] &&
+          diffResult.ignoreAE === data.options.ignoreAE &&
+          diffResult.ignoreRemainder === data.options.ignoreRemainder &&
+          diffResult.resizeToLarger === data.options.resizeToLarger &&
+          diffResult.resizeMethod === data.options.resizeMethod) {
         diffResult.result = data.result;
       }
       updateDiffTable();
@@ -773,7 +773,7 @@ $( function()
   worker.addEventListener('message', processTaskResult, false);
   function kickNextTask()
   {
-    if (taskCount == 0 && 0 < taskQueue.length) {
+    if (taskCount === 0 && 0 < taskQueue.length) {
       var task = taskQueue.shift();
       switch (task.cmd) {
       case 'calcHistogram':
@@ -809,7 +809,7 @@ $( function()
     taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd != cmd; });
   };
   var discardTasksOfEntryByIndex = function(index) {
-    taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) == -1; });
+    taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) === -1; });
   };
   
   function updateHistogramAsync(img)
@@ -836,7 +836,7 @@ $( function()
       }
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
-      if (type == 0) { // RGB
+      if (type === 0) { // RGB
         context.globalCompositeOperation = 'lighter';
         drawHistogram('#f00', 0);
         drawHistogram('#0f0', 256);
@@ -850,7 +850,7 @@ $( function()
       ];
       for (var i = 16; i < 256; i += 16) {
         axes.push({
-          pos: (0.5 + i) / 256, align: 'center', label: (i%64 == 0) ? ''+i : ''
+          pos: (0.5 + i) / 256, align: 'center', label: (i%64 === 0) ? ''+i : ''
         });
       }
       drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
@@ -924,7 +924,7 @@ $( function()
       var bits = context.createImageData(histW, 256);
       for (var x = 0; x < histW; ++x) {
         var max = histN[x] * h;
-        if (type == 0) { // RGB
+        if (type === 0) { // RGB
           var gOff = 256 * histW;
           var bOff = 512 * histW;
           for (var y = 0; y < 256; ++y) {
@@ -997,7 +997,7 @@ $( function()
       img.vectorscope = fig.canvas;
       updateVectorscopeTable();
     };
-    if (type == 1) { // x-y
+    if (type === 1) { // x-y
       var bg = new Image;
       bg.onload = function() {
         makeFigure(fig, w, h, dist);
@@ -1032,11 +1032,11 @@ $( function()
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       };
       var calcxy = function(r, g, b) {
-        if (type == 0) { // Cb-Cr
+        if (type === 0) { // Cb-Cr
           var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
           var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
           return { x: 159.5 + cb, y: 159.5 - cr };
-        } else if (type == 1) { // x-y
+        } else if (type === 1) { // x-y
           r = srgbToLinear(r / 255);
           g = srgbToLinear(g / 255);
           b = srgbToLinear(b / 255);
@@ -1045,12 +1045,12 @@ $( function()
           var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
           var xyz = x + y + z;
           return {
-            x: 32 + (xyz == 0 ? 0 : x / xyz * 255),
-            y: 287 - (xyz == 0 ? 0 : y / xyz * 255)
+            x: 32 + (xyz === 0 ? 0 : x / xyz * 255),
+            y: 287 - (xyz === 0 ? 0 : y / xyz * 255)
           };
-        } else if (type == 2) { // G-B
+        } else if (type === 2) { // G-B
           return { x: 32 + g, y: 287 - b };
-        } else if (type == 3) { // G-R
+        } else if (type === 3) { // G-R
           return { x: 32 + g, y: 287 - r };
         } else { // B-R
           return { x: 32 + b, y: 287 - r };
@@ -1149,7 +1149,7 @@ $( function()
       return {
         psnr:
             isNaN(metrics.psnr) ? '‐' :
-            metrics.psnr == Infinity ? '∞ dB' :
+            metrics.psnr === Infinity ? '∞ dB' :
             metrics.psnr.toFixed(2) + ' dB',
         rmse:
             isNaN(metrics.mse) ? '‐' :
@@ -1176,7 +1176,7 @@ $( function()
     for (var i = 0, img; img = images[i]; i++) {
       var option = $('<option>').text(img.name).attr('value', img.index);
       select.append(option);
-      if (img.index == selectedIndex) {
+      if (img.index === selectedIndex) {
         option.attr('selected','');
       }
     }
@@ -1189,11 +1189,11 @@ $( function()
   {
     $('#metricsTable td:not(.prop)').remove();
     var rowCount = $('#metricsTable tr').length;
-    if (images.length == 0) {
+    if (images.length === 0) {
       $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
       return;
     }
-    if (images.length == 1) {
+    if (images.length === 1) {
       $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
     }
     baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
@@ -1206,7 +1206,7 @@ $( function()
       )
     );
     for (var i = 0, img; img = images[i]; i++) {
-      if (img.index == baseImageIndex) {
+      if (img.index === baseImageIndex) {
         continue;
       }
       var a = entries[baseImageIndex];
@@ -1271,13 +1271,13 @@ $( function()
       return;
     }
     baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-    if (targetImageIndex === null || baseImageIndex == targetImageIndex) {
+    if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
       targetImageIndex = findImageIndexOtherThan(baseImageIndex);
     }
     $('#diffBaseName').append(
       makeImageNameSelector(baseImageIndex, function(index) {
         baseImageIndex = index;
-        if (baseImageIndex == targetImageIndex) {
+        if (baseImageIndex === targetImageIndex) {
           targetImageIndex = findImageIndexOtherThan(baseImageIndex);
         }
         updateDiffTable();
@@ -1286,7 +1286,7 @@ $( function()
     $('#diffTargetName').append(
       makeImageNameSelector(targetImageIndex, function(index) {
         targetImageIndex = index;
-        if (targetImageIndex == baseImageIndex) {
+        if (targetImageIndex === baseImageIndex) {
           baseImageIndex = findImageIndexOtherThan(targetImageIndex);
         }
         updateDiffTable();
@@ -1294,7 +1294,7 @@ $( function()
     );
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
-    if (a.width == b.width && a.height == b.height) {
+    if (a.width === b.width && a.height === b.height) {
       $('.diffDimension').css({display:'none'});
     } else {
       $('.diffDimension').css({display:''});
@@ -1334,7 +1334,7 @@ $( function()
         height: '422px',
         textAlign: 'center'
     };
-    if (diffResult.result == null) {
+    if (diffResult.result === null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
       setText($('#diffSummary'), {
         en: 'calculating...',
@@ -1369,7 +1369,7 @@ $( function()
           transform: figureZoom.makeTransform()
       };
       $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
-      if (diffResult.result.summary.unmatch == 0) {
+      if (diffResult.result.summary.unmatch === 0) {
         setText($('#diffSummary'), {
           en: 'Perfect match',
           ja: '完全に一致しました'
@@ -1394,7 +1394,7 @@ $( function()
   function updateDOM()
   {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
-    if (images.length == 0) {
+    if (images.length === 0) {
       viewZoom.disable();
     } else {
       viewZoom.enable();
@@ -1411,7 +1411,7 @@ $( function()
           );
           $('#drop').before(ent.view);
         }
-        if (ent.element && 0 == ent.view.find('.image').length) {
+        if (ent.element && 0 === ent.view.find('.image').length) {
           ent.view.prepend(ent.element);
         }
         if (ent.error) {
@@ -1453,14 +1453,14 @@ $( function()
     if (!isSingleView && overlayMode) {
       overlayMode = false;
     }
-    if (layoutMode == null) {
+    if (layoutMode === null) {
       layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
     }
-    $('#view').css({ flexDirection : layoutMode == 'x' ? 'row' : 'column' });
-    $('#arrange img').attr('src', layoutMode == 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
+    $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
+    $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
     var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
-    var numColumns = layoutMode == 'x' ? numSlots : 1;
+    var numColumns = layoutMode === 'x' ? numSlots : 1;
     var numRows    = layoutMode != 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
@@ -1473,7 +1473,7 @@ $( function()
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        var isOverlay = isSingleView && index + 1 == currentImageIndex && overlayMode && index != images[0].index;
+        var isOverlay = isSingleView && index + 1 === currentImageIndex && overlayMode && index != images[0].index;
         if (img.element) {
           img.boxW = boxW;
           img.boxH = boxH;
@@ -1590,7 +1590,7 @@ $( function()
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
     var w = img.naturalWidth;
     var h = img.naturalHeight;
-    if (entry.format == 'SVG' && (w == 0 && h == 0)) {
+    if (entry.format === 'SVG' && (w === 0 && h === 0)) {
       w = 150;
       h = 150;
       entry.sizeUnknown = true;
