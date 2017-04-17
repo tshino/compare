@@ -112,7 +112,7 @@ $( function()
           if ($('#diff').is(':visible') &&
               entries[num - 1].ready() &&
               baseImageIndex !== null && targetImageIndex !== null &&
-              targetImageIndex != num - 1) {
+              targetImageIndex !== num - 1) {
             baseImageIndex = targetImageIndex;
             targetImageIndex = num - 1;
             updateDiffTable();
@@ -486,7 +486,7 @@ $( function()
       var border = 10;
       var left = Math.max(0, Math.min(target.width() - dlg.width() - border, offset.left));
       var top  = Math.max(0, Math.min(target.height() - dlg.height() - border, offset.top));
-      if (left != offset.left || top != offset.top) {
+      if (left !== offset.left || top !== offset.top) {
         dlg.offset({ left: left, top: top });
       }
     }
@@ -507,7 +507,7 @@ $( function()
         return false;
       }
     }).on('mousemove', function(e) {
-      if (!draggingPoint || e.buttons != 1) {
+      if (!draggingPoint || e.buttons !== 1) {
         draggingPoint = null;
       } else {
         var dx = e.clientX - draggingPoint.x;
@@ -715,7 +715,7 @@ $( function()
   };
   function changeHistogramType(type)
   {
-    if (histogramType != type) {
+    if (histogramType !== type) {
       histogramType = type;
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
@@ -806,7 +806,7 @@ $( function()
     window.setTimeout(kickNextTask, 0);
   }
   var discardTasksOfCommand = function(cmd) {
-    taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd != cmd; });
+    taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd !== cmd; });
   };
   var discardTasksOfEntryByIndex = function(index) {
     taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) === -1; });
@@ -880,7 +880,7 @@ $( function()
       getBaseSize: function() { return { w: 384, h: 272 }; } });
   function changeWaveformType(type)
   {
-    if (waveformType != type) {
+    if (waveformType !== type) {
       waveformType = type;
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
@@ -970,7 +970,7 @@ $( function()
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: 256 }; } });
   var changeVectorscopeType = function(type) {
-    if (vectorscopeType != type) {
+    if (vectorscopeType !== type) {
       vectorscopeType = type;
       discardTasksOfCommand('calcVectorscope');
       for (var i = 0, img; img = images[i]; i++) {
@@ -1143,7 +1143,7 @@ $( function()
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
   var metricsToString = function(metrics, imgA) {
-    if (typeof metrics == 'string') {
+    if (typeof metrics === 'string') {
       return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
     } else {
       return {
@@ -1211,7 +1211,7 @@ $( function()
       }
       var a = entries[baseImageIndex];
       var b = img;
-      if (a.metrics[b.index] == null) {
+      if (!a.metrics[b.index]) {
         a.metrics[b.index] = 'calculating...';
         b.metrics[a.index] = 'calculating...';
         addTask({
@@ -1241,7 +1241,7 @@ $( function()
 
   var findImageIndexOtherThan = function(index) {
     for (var i = 0, img; img = images[i]; ++i) {
-      if (img.index != index) {
+      if (img.index !== index) {
         return img.index;
       }
     }
@@ -1303,11 +1303,11 @@ $( function()
         ja: '画像サイズが異なります'
       });
     }
-    if (diffResult.base != baseImageIndex || diffResult.target != targetImageIndex ||
-        diffResult.ignoreAE != diffOptions.ignoreAE ||
-        diffResult.ignoreRemainder != diffOptions.ignoreRemainder ||
-        diffResult.resizeToLarger != diffOptions.resizeToLarger ||
-        diffResult.resizeMethod != diffOptions.resizeMethod) {
+    if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
+        diffResult.ignoreAE !== diffOptions.ignoreAE ||
+        diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
+        diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
+        diffResult.resizeMethod !== diffOptions.resizeMethod) {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
@@ -1316,7 +1316,7 @@ $( function()
       diffResult.resizeMethod = diffOptions.resizeMethod;
       diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
-      if (baseImageIndex != targetImageIndex) {
+      if (baseImageIndex !== targetImageIndex) {
         addTask({
           cmd:      'calcDiff',
           index:    [a.index, b.index],
@@ -1341,11 +1341,11 @@ $( function()
         ja: '計算中...'
       });
     } else {
-      if (diffResult.result.summary.maxAE != 0) {
+      if (diffResult.result.summary.maxAE !== 0) {
         var e = diffResult.result.summary.maxAE;
         $('#diffDetectedMaxAE').text(e);
       }
-      if (diffOptions.ignoreAE != 0) {
+      if (diffOptions.ignoreAE !== 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
         var percent = toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
@@ -1448,7 +1448,7 @@ $( function()
   function updateLayout()
   {
     isSingleView =
-            currentImageIndex != 0 &&
+            currentImageIndex !== 0 &&
             currentImageIndex <= entries.length;
     if (!isSingleView && overlayMode) {
       overlayMode = false;
@@ -1461,19 +1461,19 @@ $( function()
     var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
     var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
     var numColumns = layoutMode === 'x' ? numSlots : 1;
-    var numRows    = layoutMode != 'x' ? numSlots : 1;
+    var numRows    = layoutMode !== 'x' ? numSlots : 1;
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
     var MARGIN = 6, MIN_SIZE = 32;
     boxW = Math.max(boxW - MARGIN, Math.min(boxW, MIN_SIZE));
     boxH = Math.max(boxH - MARGIN, Math.min(boxH, MIN_SIZE));
     $('#view > div.imageBox').each(function(index) {
-      var hide = isSingleView && index + 1 != currentImageIndex && (!overlayMode || index != images[0].index);
+      var hide = isSingleView && index + 1 !== currentImageIndex && (!overlayMode || index !== images[0].index);
       var img = entries[index];
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        var isOverlay = isSingleView && index + 1 === currentImageIndex && overlayMode && index != images[0].index;
+        var isOverlay = isSingleView && index + 1 === currentImageIndex && overlayMode && index !== images[0].index;
         if (img.element) {
           img.boxW = boxW;
           img.boxH = boxH;
@@ -1638,7 +1638,7 @@ $( function()
         var message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
-        } else if (!isPNG && !isJPEG && entry.format != 'GIF' && entry.format != 'BMP') {
+        } else if (!isPNG && !isJPEG && entry.format !== 'GIF' && entry.format !== 'BMP') {
           message += ' Maybe unsupported format for the browser.';
         }
         setEntryError(entry, message);
@@ -1675,7 +1675,7 @@ $( function()
             error       : null,
             visible     : true,
             
-            ready   : function() { return null != this.element; }
+            ready   : function() { return null !== this.element; }
       };
       entries.push(entry);
       loading.push(entry);
