@@ -120,8 +120,8 @@
     for (var p = 8; p + 8 <= binary.length; ) {
       var len = binary.big32(p);
       var chunk = binary.big32(p + 4);
-      if (chunk == target) { return p; }
-      if (chunk == before) { break; }
+      if (chunk === target) { return p; }
+      if (chunk === before) { break; }
       p += len + 12;
     }
     return null;
@@ -130,13 +130,13 @@
   var detectMPFIdentifier = function(binary) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
-      if (m == 0xffda /* SOS */) { break; }
-      if (m == 0xffe2 /* APP2 */) {
-        if (binary.big32(p + 4) == 0x4d504600 /* 'MPF\0' */) {
+      if (m === 0xffda /* SOS */) { break; }
+      if (m === 0xffe2 /* APP2 */) {
+        if (binary.big32(p + 4) === 0x4d504600 /* 'MPF\0' */) {
           return p;
         }
       }
-      p += 2 + (m == 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
+      p += 2 + (m === 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
     }
     return null;
   };
@@ -144,21 +144,21 @@
   var detectExifOrientation = function(binary) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
-      if (m == 0xffda /* SOS */) { break; }
-      if (m == 0xffe1 /* APP1 */) {
+      if (m === 0xffda /* SOS */) { break; }
+      if (m === 0xffe1 /* APP1 */) {
         if (p + 20 > binary.length) { break; }
-        var big = binary.big16(p + 10) == 0x4d4d; /* MM */
+        var big = binary.big16(p + 10) === 0x4d4d; /* MM */
         var read16 = big ? binary.big16 : binary.little16;
         var fields = read16(p + 18);
         if (p + 20 + fields * 12 > binary.length) { break; }
         for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
-          if (read16(f) == 0x0112 /* ORIENTATION */) {
+          if (read16(f) === 0x0112 /* ORIENTATION */) {
             return read16(f + 8);
           }
         }
         break;
       }
-      p += 2 + (m == 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
+      p += 2 + (m === 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
     }
     return null;
   };
@@ -167,7 +167,7 @@
     var magic = binary.length < 4 ? 0 : binary.big32(0);
     var magic2 = binary.length < 8 ? 0 : binary.big32(4);
 
-    if (magic == 0x89504e47) {
+    if (magic === 0x89504e47) {
       // PNG
       if (detectPNGChunk(
                 binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
@@ -175,29 +175,29 @@
       }
       return 'PNG';
     }
-    if (magic == 0x47494638) { return 'GIF'; }
-    if ((magic & 0xffff0000) == 0x424d0000) { return 'BMP'; }
-    if ((magic - (magic & 255)) == 0xffd8ff00) {
+    if (magic === 0x47494638) { return 'GIF'; }
+    if ((magic & 0xffff0000) === 0x424d0000) { return 'BMP'; }
+    if ((magic - (magic & 255)) === 0xffd8ff00) {
       if (detectMPFIdentifier(binary)) {
         return 'JPEG (MPF)';
       }
       return 'JPEG';
     }
-    if (magic == 0x4d4d002a || magic == 0x49492a00) { return 'TIFF'; }
-    if ((magic == 0xefbbbf3c /* BOM + '<' */ &&
-            magic2 == 0x3f786d6c /* '?xml' */) ||
-        (magic == 0x3c3f786d /* '<?xm' */ &&
-            (magic2 & 0xff000000) == 0x6c000000 /* 'l' */)) {
+    if (magic === 0x4d4d002a || magic === 0x49492a00) { return 'TIFF'; }
+    if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
+            magic2 === 0x3f786d6c /* '?xml' */) ||
+        (magic === 0x3c3f786d /* '<?xm' */ &&
+            (magic2 & 0xff000000) === 0x6c000000 /* 'l' */)) {
         // XML
         var i = 4;
         for (var x; x = binary.at(i); ++i) {
-          if (x == 0x3c /* '<' */) {
+          if (x === 0x3c /* '<' */) {
             var y = binary.at(i + 1);
-            if (y != 0x3f /* '?' */ && y != 0x21 /* '!' */) { break; }
+            if (y !== 0x3f /* '?' */ && y !== 0x21 /* '!' */) { break; }
           }
         }
         var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
-        if (sig1 == 0x3c737667 /* <svg */) {
+        if (sig1 === 0x3c737667 /* <svg */) {
           return 'SVG';
         }
     }
@@ -292,23 +292,23 @@
     };
     var processKeyDown = function(e) {
       // '+;' (59, 187 or 107 for numpad) / PageUp (33)
-      if (e.keyCode == 59 || e.keyCode == 187 || e.keyCode == 107 ||
-          (e.keyCode == 33 && !e.shiftKey)) {
+      if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
+          (e.keyCode === 33 && !e.shiftKey)) {
         if (zoomIn()) {
           return false;
         }
       }
       // '-' (173, 189 or 109 for numpad) / PageDown (34)
-      if (e.keyCode == 173 || e.keyCode == 189 || e.keyCode == 109 ||
-          (e.keyCode == 34 && !e.shiftKey)) {
+      if (e.keyCode === 173 || e.keyCode === 189 || e.keyCode === 109 ||
+          (e.keyCode === 34 && !e.shiftKey)) {
         if (zoomOut()) {
           return false;
         }
       }
       // cursor key
       if (37 <= e.keyCode && e.keyCode <= 40) {
-        var x = e.keyCode == 37 ? -1 : e.keyCode == 39 ? 1 : 0;
-        var y = e.keyCode == 38 ? -1 : e.keyCode == 40 ? 1 : 0;
+        var x = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
+        var y = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
         if (moveRelative(x * cursorMoveDelta, y * cursorMoveDelta)) {
           return false;
         }
@@ -325,7 +325,7 @@
     };
     var processMouseMove = function(e, selector, target) {
       if (dragLastPoint) {
-        if (e.buttons != 1) {
+        if (e.buttons !== 1) {
           dragLastPoint = null;
         } else {
           var index = selector ? $(selector).index(target) : null;
@@ -348,9 +348,9 @@
       if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
         return true;
       }
-      var deltaScale = event.deltaMode == 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+      var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
       var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
-      if (steps != 0) {
+      if (steps !== 0) {
         zoomRelative(-steps * ZOOM_STEP_WHEEL);
         return false;
       }
@@ -359,7 +359,7 @@
     var processTouchMove = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       var event = e.originalEvent;
-      if (event.touches.length == 1 || event.touches.length == 2) {
+      if (event.touches.length === 1 || event.touches.length === 2) {
         var touches = Array.prototype.slice.call(event.touches);
         touches.sort(function(a, b) {
           return (
@@ -384,7 +384,7 @@
           dy += touches[i].clientY - touchState[i].y;
         }
         moveRelativePx(index, dx / touches.length, dy / touches.length);
-        if (touches.length == 2) {
+        if (touches.length === 2) {
           var x0 = touchState[0].x - touchState[1].x;
           var y0 = touchState[0].y - touchState[1].y;
           var x1 = touches[0].clientX - touches[1].clientX;
