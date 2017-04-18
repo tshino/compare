@@ -269,27 +269,6 @@ $( function()
     }
     return target;
   };
-  var addComma = function(num) {
-    return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-  };
-  var toPercent = function(num) {
-    if (num === 0) return '0%';
-    if (num === 1) return '100%';
-    var digits =
-            num < 0.000001 ? 7 :
-            num < 0.00001 ? 6 :
-            num < 0.0001 ? 5 :
-            num < 0.001 ? 4 :
-            num < 0.01 ? 3 :
-            num < 0.1 ? 2 :
-            num < 0.9 ? 1 :
-            num < 0.99 ? 2 :
-            num < 0.999 ? 3 :
-            num < 0.9999 ? 4 :
-            num < 0.99999 ? 5 :
-            num < 0.999999 ? 6 : 7;
-    return (num * 100).toFixed(digits) + '%';
-  };
   var removeEntry = function(index) {
     var ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
@@ -325,7 +304,7 @@ $( function()
     var gcd = compareUtil.calcGCD(w, h);
     var w0 = w / gcd, h0 = h / gcd;
     var ratio = w0 / h0;  // use gcd to avoid comparison error
-    var result = addComma(w0) + ':' + addComma(h0);
+    var result = compareUtil.addComma(w0) + ':' + compareUtil.addComma(h0);
     if (w0 <= 50 || h0 <= 50) {
       return [ratio, result];
     } else {
@@ -333,10 +312,10 @@ $( function()
         var a = w / h * i, b = h / w * i;
         var aa = Math.round(a), bb = Math.round(b);
         if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
-          return [ratio, result + '\n(approx. ' + addComma(aa) + ':' + i + ')'];
+          return [ratio, result + '\n(approx. ' + compareUtil.addComma(aa) + ':' + i + ')'];
         }
         if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
-          return [ratio, result + '\n(approx. ' + i + ':' + addComma(bb) + ')'];
+          return [ratio, result + '\n(approx. ' + i + ':' + compareUtil.addComma(bb) + ')'];
         }
       }
       return [ratio, result];
@@ -564,11 +543,11 @@ $( function()
       val[i] = [
         [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format ],
-        img.sizeUnknown ? unknown : [img.width, addComma(img.width) ],
-        img.sizeUnknown ? unknown : [img.height, addComma(img.height) ],
+        img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
+        img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : calcAspectRatio(img.width, img.height),
         [orientationToString(img.orientation), orientationToString(img.orientation)],
-        [img.size, addComma(img.size) ],
+        [img.size, compareUtil.addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()] ];
       for (var j = 0, v; v = val[i][j]; ++j) {
         var expr = val[i][j][1];
@@ -1162,8 +1141,8 @@ $( function()
             metrics.ncc.toFixed(6),
         ae:
             isNaN(metrics.ae) ? '‐' :
-            addComma(metrics.ae) +
-                ' (' + toPercent(metrics.ae/imgA.width/imgA.height) + ')'
+            compareUtil.addComma(metrics.ae) +
+                ' (' + compareUtil.toPercent(metrics.ae/imgA.width/imgA.height) + ')'
       };
     }
   };
@@ -1347,7 +1326,7 @@ $( function()
       }
       if (diffOptions.ignoreAE !== 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
-        var percent = toPercent(rate);
+        var percent = compareUtil.toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
       }
       var w = diffResult.result.image.width;
@@ -1376,7 +1355,7 @@ $( function()
         });
       } else {
         var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
-        var percent = toPercent(matchRate);
+        var percent = compareUtil.toPercent(matchRate);
         setText($('#diffSummary'), {
           en: percent + ' pixels are match',
           ja: percent + ' のピクセルが一致しました'

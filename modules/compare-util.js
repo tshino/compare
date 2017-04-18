@@ -59,6 +59,29 @@
     return m;
   };
 
+  var addComma = function(num) {
+    return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+  };
+
+  var toPercent = function(num) {
+    if (num === 0) return '0%';
+    if (num === 1) return '100%';
+    var digits =
+            num < 0.000001 ? 7 :
+            num < 0.00001 ? 6 :
+            num < 0.0001 ? 5 :
+            num < 0.001 ? 4 :
+            num < 0.01 ? 3 :
+            num < 0.1 ? 2 :
+            num < 0.9 ? 1 :
+            num < 0.99 ? 2 :
+            num < 0.999 ? 3 :
+            num < 0.9999 ? 4 :
+            num < 0.99999 ? 5 :
+            num < 0.999999 ? 6 : 7;
+    return (num * 100).toFixed(digits) + '%';
+  };
+
   //
   // Make a binary view of a DataURI string
   //
@@ -459,6 +482,8 @@
     newWorker:              newWorker,
     toggleFullscreen:       toggleFullscreen,
     calcGCD:                calcGCD,
+    addComma:               addComma,
+    toPercent:              toPercent,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
