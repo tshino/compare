@@ -1,5 +1,17 @@
 ﻿var compareUtil = (function() {
 
+  var blobFromDataURI = function(dataURI) {
+    var parts = dataURI.split(',');
+    var type = parts[0].match(/:(.*?);/)[1];
+    var str = atob(parts[1]);
+    var n = str.length;
+    var buffer = new Uint8Array(n);
+    while(n--) {
+      buffer[n] = str.charCodeAt(n);
+    }
+    return new Blob([buffer], {type: type});
+  };
+
   var createObjectURL = function(blob) {
     if (window.URL) {
       return window.URL.createObjectURL(blob);
@@ -478,6 +490,7 @@
     return o;
   };
   return {
+    blobFromDataURI:        blobFromDataURI,
     createObjectURL:        createObjectURL,
     newWorker:              newWorker,
     toggleFullscreen:       toggleFullscreen,

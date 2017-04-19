@@ -566,7 +566,15 @@ var changeLang = function(lang) {
 						<td class="output" colspan="2" id="diffIgnoreAEResult"></td>
 					</tr>
 					<tr>
-						<td id="diffSummary" class="output" colspan="4" style="text-align:center"></td>
+						<td class="output" colspan="4" style="text-align:center">
+							<span id="diffSummary"></span>
+							<span style="float:right">
+								<a id="diffSaveFigure" download="imagediff.png" href="#">
+									<span class="en">Save this figure</span>
+									<span class="ja">図を保存する</span>
+								</a>
+							</span>
+						</td>
 					</tr>
 					<tr>
 						<td id="diffResult" class="fig" colspan="4"></td>

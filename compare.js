@@ -1235,6 +1235,7 @@ $( function()
     $('#diffIgnoreAEResult').text('');
     $('#diffResult *').remove();
     $('#diffSummary *').remove();
+    $('#diffSaveFigure').hide();
     $('.diffDimensionOption').
       prop('value',
         diffOptions.resizeToLarger ? 'resize' :
@@ -1361,6 +1362,12 @@ $( function()
           ja: percent + ' のピクセルが一致しました'
         });
       }
+      /*
+      var url = compareUtil.createObjectURL(
+                    compareUtil.blobFromDataURI(
+                        fig.canvas.toDataURL()));
+      $('#diffSaveFigure').show().attr('href', url);
+      */
     }
   };
   var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
