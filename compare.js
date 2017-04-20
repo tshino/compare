@@ -525,6 +525,28 @@ $( function()
       }
     };
   };
+  var openMessageBox = (function() {
+    var serial = 0;
+    return function(text) {
+      serial += 1;
+      var mySerial = serial;
+      $('#messageBox').css('display', 'block');
+      setText($('#messageBoxBody'), text);
+      var close = function(delay) {
+        var doClose = function() {
+          if (serial === mySerial) {
+            $('#messageBox').css('display', '');
+          }
+        };
+        if (delay) {
+          window.setTimeout(doClose, delay);
+        } else {
+          doClose();
+        }
+      };
+      return { close: close };
+    };
+  })();
   var toggleHelp = defineDialog($('#shortcuts'));
   function updateInfoTable()
   {
@@ -1364,12 +1386,36 @@ $( function()
           ja: percent + ' のピクセルが一致しました'
         });
       }
-      /*
-      var url = compareUtil.createObjectURL(
-                    compareUtil.blobFromDataURI(
-                        fig.canvas.toDataURL()));
-      $('#diffSaveFigure').show().attr('href', url);
-      */
+      $('#diffSaveFigure').show().off('click').click(function() {
+        var msg = openMessageBox({
+          en: 'Encoding the image...',
+          ja: '画像をエンコード中...'
+        });
+        var download = function(url) {
+          msg.close(300);
+          $('#diffSaveFigureHelper').attr('href', url);
+          jQuery('#diffSaveFigureHelper')[0].click();
+        };
+        if (typeof fig.canvas.toBlob === 'function') {
+          fig.canvas.toBlob(function(blob) {
+            var url = compareUtil.createObjectURL(blob);
+            download(url);
+            compareUtil.revokeObjectURL(url);
+          });
+        } else {
+          window.setTimeout(function() {
+            var url = compareUtil.createObjectURL(
+                        compareUtil.blobFromDataURI(
+                          fig.canvas.toDataURL(),
+                          'image/png'));
+            download(url);
+            window.setTimeout(function() {
+              compareUtil.revokeObjectURL(url);
+            }, 500);
+          }, 0);
+        }
+        return false;
+      });
     }
   };
   var updateDiffTable = function(transformOnly) {

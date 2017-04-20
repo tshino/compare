@@ -1,8 +1,8 @@
 ﻿var compareUtil = (function() {
 
-  var blobFromDataURI = function(dataURI) {
+  var blobFromDataURI = function(dataURI, type) {
     var parts = dataURI.split(',');
-    var type = parts[0].match(/:(.*?);/)[1];
+    type = type || parts[0].match(/:(.*?);/)[1];
     var str = atob(parts[1]);
     var n = str.length;
     var buffer = new Uint8Array(n);
@@ -17,6 +17,13 @@
       return window.URL.createObjectURL(blob);
     } else {
       return window.webkitURL.createObjectURL(blob);
+    }
+  };
+  var revokeObjectURL = function(url) {
+    if (window.URL) {
+      return window.URL.revokeObjectURL(url);
+    } else {
+      return window.webkitURL.revokeObjectURL(blob);
     }
   };
 
@@ -492,6 +499,7 @@
   return {
     blobFromDataURI:        blobFromDataURI,
     createObjectURL:        createObjectURL,
+    revokeObjectURL:        revokeObjectURL,
     newWorker:              newWorker,
     toggleFullscreen:       toggleFullscreen,
     calcGCD:                calcGCD,

@@ -569,10 +569,11 @@ var changeLang = function(lang) {
 						<td class="output" colspan="4" style="text-align:center">
 							<span id="diffSummary"></span>
 							<span style="float:right">
-								<a id="diffSaveFigure" download="imagediff.png" href="#">
+								<a id="diffSaveFigure" href="#">
 									<span class="en">Save this figure</span>
-									<span class="ja">図を保存する</span>
+									<span class="ja">この図を保存</span>
 								</a>
+								<a id="diffSaveFigureHelper" download="imagediff.png" href="#" style="display:none"></a>
 							</span>
 						</td>
 					</tr>
@@ -588,6 +589,12 @@ var changeLang = function(lang) {
 						※ 2つの画像の異なる部分を色で示しています
 					</span>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div id="messageBox" class="dialog">
+		<div>
+			<div class="header" id="messageBoxBody">
 			</div>
 		</div>
 	</div>
