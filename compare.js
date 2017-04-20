@@ -236,7 +236,9 @@ $( function()
   var enableGrid = false;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
-    if (dialog && dialog.update) { dialog.update(); }
+    if (dialog && dialog.update) {
+      dialog.update(true /* transformOnly */);
+    }
   }, {
     cursorMoveDelta: 0.125
   });
@@ -1226,7 +1228,7 @@ $( function()
     }
     return null;
   };
-  var updateDiffTable = function() {
+  var updateDiffTableDOM = function() {
     $('#diffBaseName *').remove();
     $('#diffTargetName *').remove();
     $('.diffDimension').css({display:'none'});
@@ -1368,6 +1370,15 @@ $( function()
                         fig.canvas.toDataURL()));
       $('#diffSaveFigure').show().attr('href', url);
       */
+    }
+  };
+  var updateDiffTable = function(transformOnly) {
+    if (transformOnly) {
+      if (diffResult.result !== null) {
+        $('#diffResult canvas').css('transform', figureZoom.makeTransform());
+      }
+    } else {
+      updateDiffTableDOM();
     }
   };
   var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
