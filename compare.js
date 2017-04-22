@@ -3,11 +3,9 @@
   return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
 })();
 
-$( function()
-{
+$( function() {
   // Check for the various File API support.
-  if (!(window.File && window.FileReader && window.FileList && window.Blob))
-  {
+  if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
     alert('The File APIs are not fully supported in this browser.');
   }
 
@@ -80,8 +78,7 @@ $( function()
   });
 
   $(window).resize(function() { layoutMode = null; updateLayout(); });
-  $(window).keydown(function(e)
-    {
+  $(window).keydown(function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
         return true;
       }
@@ -93,8 +90,7 @@ $( function()
       if (e.target.localName === 'input') {
         return true;
       }
-      if (dialog)
-      {
+      if (dialog) {
         // BS (8)
         if (e.keyCode === 8 && !e.shiftKey) {
           dialog.close();
@@ -145,8 +141,7 @@ $( function()
         return false;
       }
       // ESC (27)
-      if (e.keyCode === 27 && !e.shiftKey)
-      {
+      if (e.keyCode === 27 && !e.shiftKey) {
         currentImageIndex = 0;
         viewZoom.setZoom(0);
         viewZoom.setOffset(0.5, 0.5);
@@ -156,14 +151,13 @@ $( function()
         return false;
       }
       // Delete (46)
-      if (e.keyCode === 46 && !e.shiftKey && 0 < images.length)
-      {
+      if (e.keyCode === 46 && !e.shiftKey && 0 < images.length) {
         var index = isSingleView ? currentImageIndex - 1 : images[0].index;
         removeEntry(index);
         return false;
       }
       //alert('keydown: '+e.keyCode);
-    });
+  });
   
   var keypressMap = {
     // '@' (64)
@@ -564,8 +558,7 @@ $( function()
       $('#infoLastModified') ];
     var val = [];
     var unknown = [null, '‐'];
-    for (var i = 0, img; img = images[i]; i++)
-    {
+    for (var i = 0, img; img = images[i]; i++) {
       val[i] = [
         [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format ],
@@ -1444,8 +1437,7 @@ $( function()
     } else {
       viewZoom.enable();
     }
-    for (var i = 0, ent; ent = entries[i]; i++)
-    {
+    for (var i = 0, ent; ent = entries[i]; i++) {
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>').append(
             makeImageNameWithIndex('<span class="imageName">', ent).
@@ -1677,12 +1669,10 @@ $( function()
     }
     var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     var img = new Image;
-    $(img).on('load', function()
-      {
+    $(img).on('load', function() {
         setEntryImage(entry, img, useCanvasToDisplay);
       }).
-      on('error', function()
-      {
+      on('error', function() {
         var message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
