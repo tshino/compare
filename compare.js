@@ -232,6 +232,7 @@ $( function()
   });
   var layoutMode = null;
   var overlayMode = false;
+  var overlayBaseIndex = null;
   var enableMap = false;
   var enableGrid = false;
   var dialog = null;
@@ -383,9 +384,10 @@ $( function()
         currentImageIndex = images[1].index + 1;
       }
       overlayMode = true;
+      overlayBaseIndex = images[0].index;
       updateLayout();
     } else if (overlayMode) {
-      currentImageIndex = 0 < images.length ? images[0].index + 1 : 0;
+      currentImageIndex = overlayBaseIndex + 1;
       overlayMode = false;
       updateLayout();
     }
@@ -1511,12 +1513,15 @@ $( function()
     boxW = Math.max(boxW - MARGIN, Math.min(boxW, MIN_SIZE));
     boxH = Math.max(boxH - MARGIN, Math.min(boxH, MIN_SIZE));
     $('#view > div.imageBox').each(function(index) {
-      var hide = isSingleView && index + 1 !== currentImageIndex && (!overlayMode || index !== images[0].index);
+      var hide = isSingleView && index + 1 !== currentImageIndex;
+      if (overlayMode) {
+        hide = hide && index !== overlayBaseIndex;
+      }
       var img = entries[index];
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        var isOverlay = isSingleView && index + 1 === currentImageIndex && overlayMode && index !== images[0].index;
+        var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
         if (img.element) {
           img.boxW = boxW;
           img.boxH = boxH;
@@ -1551,9 +1556,9 @@ $( function()
       $(this).css({ display : (hide ? 'none' : '') });
     });
     if (overlayMode) {
-      var baseIndex = images[0].index + 1;
+      var baseIndex = overlayBaseIndex + 1;
       var modeDesc =
-          ((isSingleView && baseIndex < currentImageIndex)
+          ((isSingleView && baseIndex !== currentImageIndex)
             ? baseIndex + ' + ' + currentImageIndex : baseIndex + ' only');
       setText($('#mode'), {
         en: 'OVERLAY MODE : ' + modeDesc,
@@ -1567,7 +1572,7 @@ $( function()
     if (isSingleView) {
       $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
       if (overlayMode) {
-        $('.selector').eq(images[0].index).addClass('current');
+        $('.selector').eq(overlayBaseIndex).addClass('current');
       }
     } else {
       $('.selector').removeClass('current');
