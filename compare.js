@@ -187,7 +187,9 @@ $( function() {
     // 'n' (110)
     110 : { global: false, func: toggleMap },
     // 'g' (103)
-    103 : { global: false, func: toggleGrid }
+    103 : { global: false, func: toggleGrid },
+    // 'p' (112)
+    112 : { global: false, func: toggleColorPicker }
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
@@ -209,6 +211,21 @@ $( function() {
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
 
+  $('#view').on('mousemove', 'div.imageBox .image', function(e) {
+    if (enableColorPicker) {
+      var selector = '#view > div.imageBox';
+      var index = selector ? $(selector).index($(this).parent()) : null;
+      if (index !== null && entries[index].ready()) {
+        var ent = entries[index];
+        var x = (e.pageX - $(this).offset().left) / (viewZoom.scale * ent.baseWidth) * ent.width;
+        var y = (e.pageY - $(this).offset().top) / (viewZoom.scale * ent.baseHeight) * ent.height;
+        x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
+        y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
+        updateColorPicker(index, x, y);
+      }
+    }
+  });
+
   updateDOM();
 });
 
@@ -229,6 +246,7 @@ $( function() {
   var overlayBaseIndex = null;
   var enableMap = false;
   var enableGrid = false;
+  var enableColorPicker = false;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -435,6 +453,24 @@ $( function() {
     enableGrid = 0 === images.length ? false : !enableGrid;
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
+  };
+  var updateColorPicker = function(index, x, y) {
+    var context = entries[index].asCanvas.getContext('2d');
+    var imageData = context.getImageData(x, y, 1, 1);
+    var rgb = imageData.data;
+    var coord = 'X=' + x + ' Y=' + y;
+    var color = 'R=' + rgb[0] + ' G=' + rgb[1] + ' B=' + rgb[2];
+    $('#color').text('COLOR: ' + coord + ' | ' + color);
+    //console.log('color(' + x + ',' + y + ') = ' + color);
+  };
+  var toggleColorPicker = function() {
+    if (!enableColorPicker) {
+      enableColorPicker = true;
+      $('#color').show().text('COLOR: ');
+    } else {
+      enableColorPicker = false;
+      $('#color').hide();
+    }
   };
   var swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
