@@ -212,7 +212,7 @@ $( function() {
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
 
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    if (enableColorPicker) {
+    if (colorPickerInfo) {
       var selector = '#view > div.imageBox';
       var index = selector ? $(selector).index($(this).parent()) : null;
       if (index !== null && entries[index].ready()) {
@@ -246,7 +246,7 @@ $( function() {
   var overlayBaseIndex = null;
   var enableMap = false;
   var enableGrid = false;
-  var enableColorPicker = false;
+  var colorPickerInfo = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -455,22 +455,26 @@ $( function() {
     updateLayout();
   };
   var updateColorPicker = function(index, x, y) {
-    var context = entries[index].asCanvas.getContext('2d');
-    var imageData = context.getImageData(x, y, 1, 1);
-    var rgb = imageData.data;
-    var coord = 'X=' + x + ' Y=' + y;
-    var color = 'R=' + rgb[0] + ' G=' + rgb[1] + ' B=' + rgb[2];
-    $('#color').text('COLOR: ' + coord + ' | ' + color);
+    index = index !== undefined ? index : colorPickerInfo.index;
+    x = x !== undefined ? x : colorPickerInfo.x;
+    y = y !== undefined ? y : colorPickerInfo.y;
+    if (index === null || !entries[index] || !entries[index].ready()) {
+      index = null;
+      $('#color').text('COLOR: ');
+    } else {
+      var context = entries[index].asCanvas.getContext('2d');
+      var imageData = context.getImageData(x, y, 1, 1);
+      var rgb = imageData.data;
+      var coord = 'X=' + x + ' Y=' + y;
+      var color = 'R=' + rgb[0] + ' G=' + rgb[1] + ' B=' + rgb[2];
+      $('#color').text('COLOR: ' + coord + ' | ' + color);
+    }
+    colorPickerInfo = { index: index, x: x, y: y };
     //console.log('color(' + x + ',' + y + ') = ' + color);
   };
   var toggleColorPicker = function() {
-    if (!enableColorPicker) {
-      enableColorPicker = true;
-      $('#color').show().text('COLOR: ');
-    } else {
-      enableColorPicker = false;
-      $('#color').hide();
-    }
+    colorPickerInfo = colorPickerInfo ? null : {};
+    updateLayout();
   };
   var swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
@@ -1597,6 +1601,15 @@ $( function() {
       $('#mode').css({ display : '' });
     }
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
+    colorPickerInfo = colorPickerInfo ? {} : null;
+    if (colorPickerInfo) {
+      if (!$('#color').is(':visible')) {
+        $('#color').show();
+      }
+      updateColorPicker();
+    } else if ($('#color').is(':visible')) {
+      $('#color').hide();
+    }
     if (isSingleView) {
       $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
       if (overlayMode) {
