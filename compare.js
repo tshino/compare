@@ -460,14 +460,27 @@ $( function() {
     y = y !== undefined ? y : colorPickerInfo.y;
     if (index === null || !entries[index] || !entries[index].ready()) {
       index = null;
-      $('#color').text('COLOR: ');
+      $('#colorXY, #colorRGB').text('');
+      $('#colorSample').hide();
     } else {
       var context = entries[index].asCanvas.getContext('2d');
       var imageData = context.getImageData(x, y, 1, 1);
       var rgb = imageData.data;
       var coord = 'X=' + x + ' Y=' + y;
-      var color = 'R=' + rgb[0] + ' G=' + rgb[1] + ' B=' + rgb[2];
-      $('#color').text('COLOR: ' + coord + ' | ' + color);
+      var toCSS = function(rgb) {
+        var lut = '0123456789ABCDEF';
+        return '#' +
+            lut[rgb[0] >> 4] + lut[rgb[0] % 16] +
+            lut[rgb[1] >> 4] + lut[rgb[1] % 16] +
+            lut[rgb[2] >> 4] + lut[rgb[2] % 16];
+      };
+      var toRGB = function(rgb) {
+        return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+      };
+      var css = toCSS(rgb);
+      $('#colorXY').text(coord + ' | ');
+      $('#colorSample').show().css('background', css);
+      $('#colorRGB').text(css + ' ' + toRGB(rgb));
     }
     colorPickerInfo = { index: index, x: x, y: y };
     //console.log('color(' + x + ',' + y + ') = ' + color);
