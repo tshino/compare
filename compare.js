@@ -1614,8 +1614,8 @@ $( function() {
       $('#mode').css({ display : '' });
     }
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
-    colorPickerInfo = colorPickerInfo ? {} : null;
     if (colorPickerInfo) {
+      colorPickerInfo.index = isSingleView ? currentImageIndex - 1 : null;
       if (!$('#color').is(':visible')) {
         $('#color').show();
       }
