@@ -172,7 +172,7 @@ button:hover span.tooltip
 {
     background-color: #69f;
 }
-#view .imageBox .image, #view .imageBox .grid
+#view .imageBox .image, #view .imageBox .imageOverlay
 {
     display         : block;
     position        : absolute;

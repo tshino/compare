@@ -246,6 +246,7 @@ $( function() {
   var overlayBaseIndex = null;
   var enableMap = false;
   var enableGrid = false;
+  var enableCrossCursor = false;
   var colorPickerInfo = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
@@ -454,6 +455,38 @@ $( function() {
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
+  var updateCrossCursor = function(img, x, y) {
+    var makeCrossCursor = function(x, y) {
+      var desc = '';
+      desc += 'M ' + x + ',0 l 0,' + img.canvasHeight + ' ';
+      desc += 'M ' + (x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
+      desc += 'M 0,' + y + ' l ' + img.canvasWidth + ',0 ';
+      desc += 'M 0,' + (y + 1) + ' l ' + img.canvasWidth + ',0 ';
+      return desc;
+    };
+    if (!img.element || x === null || x >= img.canvasWidth || y >= img.canvasHeight) {
+      return;
+    }
+    if (0 === img.view.find('.cursor').length) {
+      var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
+      var desc = makeCrossCursor(x, y);
+      img.cursor = $(
+        '<svg class="imageOverlay cursor" viewBox="' + vb + '">' +
+          '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
+        '</svg>').
+        width(img.canvasWidth).
+        height(img.canvasHeight);
+      img.view.append(img.cursor);
+    } else {
+      img.cursor.find('path').attr('d', makeCrossCursor(x, y));
+    }
+  };
+  var removeCrossCursor = function(img) {
+    if (img.cursor) {
+      $(img.cursor).remove();
+      img.cursor = null;
+    }
+  };
   var updateColorPicker = function(index, x, y) {
     index = index !== undefined ? index : colorPickerInfo.index;
     x = x !== undefined ? x : colorPickerInfo.x;
@@ -481,12 +514,16 @@ $( function() {
       $('#colorXY').text(coord + ' | ');
       $('#colorSample').show().css('background', css);
       $('#colorRGB').text(css + ' ' + toRGB(rgb));
+      for (var i = 0, img; img = images[i]; i++) {
+        updateCrossCursor(img, x, y);
+      }
     }
     colorPickerInfo = { index: index, x: x, y: y };
     //console.log('color(' + x + ',' + y + ') = ' + color);
   };
   var toggleColorPicker = function() {
     colorPickerInfo = colorPickerInfo ? null : {};
+    enableCrossCursor = colorPickerInfo ? true : false;
     updateLayout();
   };
   var swapBaseAndTargetImage = function() {
@@ -1586,6 +1623,14 @@ $( function() {
           if (img.grid) {
             $(img.grid).css({ width: w+'px', height: h+'px' });
           }
+          if (enableCrossCursor) {
+            updateCrossCursor(img, 0, 0);
+          } else {
+            removeCrossCursor(img);
+          }
+          if (img.cursor) {
+            $(img.cursor).css({ width: w+'px', height: h+'px' });
+          }
         }
         $(this).css({
           display   : '',
@@ -1666,6 +1711,10 @@ $( function() {
                 attr('stroke-width', strokeWidth[index]).
                 attr('opacity', opacity[index]);
           });
+        }
+        if (ent.cursor) {
+          var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
+          $(ent.cursor).css(style).find('path').attr('stroke-width', strokeWidth);
         }
       }
     }
