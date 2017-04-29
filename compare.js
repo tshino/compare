@@ -495,6 +495,7 @@ $( function() {
       index = null;
       $('#colorXY, #colorRGB').text('');
       $('#colorSample').hide();
+      $('#colorBar').hide();
     } else {
       var context = entries[index].asCanvas.getContext('2d');
       var imageData = context.getImageData(x, y, 1, 1);
@@ -513,6 +514,9 @@ $( function() {
       var css = toCSS(rgb);
       $('#colorXY').text(coord + ' | ');
       $('#colorSample').show().css('background', css);
+      $('#colorBar').show().find('span').each(function(index) {
+        $(this).css('width', (rgb[index]*127.5/255)+'px');
+      });
       $('#colorRGB').text(css + ' ' + toRGB(rgb));
       for (var i = 0, img; img = images[i]; i++) {
         updateCrossCursor(img, x, y);

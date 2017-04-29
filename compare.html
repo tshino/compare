@@ -87,10 +87,18 @@ var changeLang = function(lang) {
 	<div id="view">
 		<div class="hudContainer">
 			<div id="color" class="dark hud">
-				<span>COLOR: </span>
-				<span id="colorXY"></span>
-				<span id="colorSample" style="display: inline-block; width: 1em; height: 1em; vertical-align: middle;"></span>
-				<span id="colorRGB"></span>
+				<span style="display:inline-block">
+					<span>COLOR: </span>
+					<span id="colorXY"></span><br>
+					<span id="colorSample" style="display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
+					</span>
+					<span id="colorBar" style="display:inline-block; background:#000; line-height:0.1; width:127.5px; vertical-align: middle;">
+						<span style="display: inline-block; background:#f00; height:5px;"></span><br>
+						<span style="display: inline-block; background:#0f0; height:5px;"></span><br>
+						<span style="display: inline-block; background:#00f; height:5px;"></span>
+					</span>
+					<span id="colorRGB"></span>
+				</span>
 			</div>
 			<div id="mode" class="light hud">
 				<span class="en"></span>
