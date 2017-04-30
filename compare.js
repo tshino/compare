@@ -211,6 +211,21 @@ $( function() {
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
 
+  viewZoom.setPointCallback(function(e) {
+    if (entries[e.index].ready()) {
+      if (!colorPickerInfo) {
+        toggleColorPicker();
+      }
+      var ent = entries[e.index];
+      var x = e.x * ent.width;
+      var y = e.y * ent.height;
+      x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
+      y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
+      updateColorPicker(e.index, x, y);
+      colorPickerInfo = null;
+      enableCrossCursor = false;
+    }
+  });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
     if (colorPickerInfo) {
       var selector = '#view > div.imageBox';

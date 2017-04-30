@@ -262,6 +262,9 @@
       offset: { x: 0.5, y: 0.5 }
     };
     var enabled = true;
+    var pointCallback = null;
+    var clickPoint = null;
+    var dragStartPoint = null;
     var dragLastPoint = null;
     var touchState = null;
     o.enable = function(options) {
@@ -357,20 +360,43 @@
       }
       return true;
     };
-    var resetDragState = function() { dragLastPoint = null; };
+    var setPointCallback = function(callback) {
+      pointCallback = callback;
+    };
+    var resetDragState = function() { clickPoint = null; dragStartPoint = null; dragLastPoint = null; };
+    var processPointMouseDown = function(e, selector, target) {
+      var index = selector ? $(selector).index($(target).parent()) : null;
+      var base = getBaseSize(index);
+      if (base && e.which === 1) {
+        var viewX = e.pageX - $(target).offset().left;
+        var viewY = e.pageY - $(target).offset().top;
+        var x = viewX / (viewZoom.scale * base.w);
+        var y = viewY / (viewZoom.scale * base.h);
+        clickPoint = { index: index, x: x, y: y };
+      }
+    };
     var processMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
-        dragLastPoint = { x: e.clientX, y: e.clientY };
+        dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
         return false;
       }
     };
     var processMouseMove = function(e, selector, target) {
       if (dragLastPoint) {
         if (e.buttons !== 1) {
+          clickPoint = null;
+          dragStartPoint = null;
           dragLastPoint = null;
         } else {
           var index = selector ? $(selector).index(target) : null;
+          if (clickPoint) {
+            var ax = Math.abs(e.clientX - dragStartPoint.x);
+            var ay = Math.abs(e.clientY - dragStartPoint.y);
+            if (3 <= Math.max(ax, ay)) {
+              clickPoint = null;
+            }
+          }
           var dx = e.clientX - dragLastPoint.x;
           var dy = e.clientY - dragLastPoint.y;
           dragLastPoint = { x: e.clientX, y: e.clientY };
@@ -378,6 +404,12 @@
           return false;
         }
       }
+    };
+    var processMouseUp = function(e, selector, target) {
+      if (clickPoint && pointCallback) {
+        pointCallback(clickPoint)
+      }
+      resetDragState();
     };
     var processDblclick = function(e, selector, target) {
       var index = selector ? $(selector).index($(target).parent()) : null;
@@ -447,13 +479,18 @@
       }
     };
     var enableMouse = function(root, filter, deepFilter, selector) {
+      $(root).on('mousedown', deepFilter, function(e) {
+        return processPointMouseDown(e, selector, this);
+      });
       $(root).on('mousedown', filter, function(e) {
         return processMouseDown(e, selector, this);
       });
       $(root).on('mousemove', filter, function(e) {
         return processMouseMove(e, selector, this);
       });
-      $(root).on('mouseup', filter, resetDragState);
+      $(root).on('mouseup', filter, function(e) {
+        return processMouseUp(e, selector, this);
+      });
       $(root).on('dblclick', deepFilter, function(e) {
         return processDblclick(e, selector, this);
       });
@@ -479,11 +516,12 @@
     o.zoomOut = zoomOut;
     o.setOffset = setOffset;
     o.getCenter = getCenter;
-    o.moveRelative = moveRelative;
-    o.moveRelativePx = moveRelativePx;
-    o.zoomTo = zoomTo;
-    o.zoomToPx = zoomToPx;
+    //o.moveRelative = moveRelative;
+    //o.moveRelativePx = moveRelativePx;
+    //o.zoomTo = zoomTo;
+    //o.zoomToPx = zoomToPx;
     o.processKeyDown = processKeyDown;
+    o.setPointCallback = setPointCallback;
     o.resetDragState = resetDragState;
     o.processMouseDown = processMouseDown;
     o.processMouseMove = processMouseMove;
