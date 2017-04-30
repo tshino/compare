@@ -217,8 +217,10 @@ $( function() {
       var index = selector ? $(selector).index($(this).parent()) : null;
       if (index !== null && entries[index].ready()) {
         var ent = entries[index];
-        var x = (e.pageX - $(this).offset().left) / (viewZoom.scale * ent.baseWidth) * ent.width;
-        var y = (e.pageY - $(this).offset().top) / (viewZoom.scale * ent.baseHeight) * ent.height;
+        var viewX = e.pageX - $(this).offset().left;
+        var viewY = e.pageY - $(this).offset().top;
+        var x = viewX / (viewZoom.scale * ent.baseWidth) * ent.width;
+        var y = viewY / (viewZoom.scale * ent.baseHeight) * ent.height;
         x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
         y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
         updateColorPicker(index, x, y);
@@ -361,6 +363,18 @@ $( function() {
     entry.transposed = o.transposed;
     entry.orientationAsCSS = o.transform;
   }
+  var interpretOrientation = function(ent, x, y) {
+    var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
+    if (ent.orientation === 2) { return { x: w-x, y: y };
+    } else if (ent.orientation === 3) { return { x: w-x, y: h-y };
+    } else if (ent.orientation === 4) { return { x: x, y: h-y };
+    } else if (ent.orientation === 5) { return { x: y, y: x };
+    } else if (ent.orientation === 6) { return { x: y, y: h-x };
+    } else if (ent.orientation === 7) { return { x: w-y, y: h-x };
+    } else if (ent.orientation === 8) { return { x: w-y, y: x };
+    } else { return { x: x, y: y };
+    }
+  };
   var makeImageNameWithIndex = function(tag, img) {
     return $(tag).
         css({ wordBreak : 'break-all' }).
@@ -457,14 +471,15 @@ $( function() {
   };
   var updateCrossCursor = function(img, x, y) {
     var makeCrossCursor = function(x, y) {
+      var pos = interpretOrientation(img, x, y);
       var desc = '';
-      desc += 'M ' + x + ',0 l 0,' + img.canvasHeight + ' ';
-      desc += 'M ' + (x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
-      desc += 'M 0,' + y + ' l ' + img.canvasWidth + ',0 ';
-      desc += 'M 0,' + (y + 1) + ' l ' + img.canvasWidth + ',0 ';
+      desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
+      desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
+      desc += 'M 0,' + pos.y + ' l ' + img.canvasWidth + ',0 ';
+      desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
       return desc;
     };
-    if (!img.element || x === null || x >= img.canvasWidth || y >= img.canvasHeight) {
+    if (!img.element || x === null || x >= img.width || y >= img.height) {
       return;
     }
     if (0 === img.view.find('.cursor').length) {
@@ -498,7 +513,8 @@ $( function() {
       $('#colorBar').hide();
     } else {
       var context = entries[index].asCanvas.getContext('2d');
-      var imageData = context.getImageData(x, y, 1, 1);
+      var canvasPoint = interpretOrientation(entries[index], x, y);
+      var imageData = context.getImageData(canvasPoint.x, canvasPoint.y, 1, 1);
       var rgb = imageData.data;
       var coord = 'X=' + x + ' Y=' + y;
       var toCSS = function(rgb) {
