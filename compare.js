@@ -492,7 +492,7 @@ $( function() {
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
-  var updateCrossCursor = function(img, x, y) {
+  var updateCrossCursor = function(img, x, y, fixed) {
     var makeCrossCursor = function(x, y) {
       var pos = interpretOrientation(img, x, y);
       var desc = '';
@@ -518,6 +518,7 @@ $( function() {
     } else {
       img.cursor.find('path').attr('d', makeCrossCursor(x, y));
     }
+    img.cursor.find('path').attr('stroke-dasharray', fixed ? '' : '4,1');
   };
   var removeCrossCursor = function(img) {
     if (img.cursor) {
@@ -559,7 +560,7 @@ $( function() {
       });
       $('#colorRGB').text(css + ' ' + toRGB(rgb));
       for (var i = 0, img; img = images[i]; i++) {
-        updateCrossCursor(img, x, y);
+        updateCrossCursor(img, x, y, fixed);
       }
     }
     colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
@@ -1668,7 +1669,8 @@ $( function() {
             $(img.grid).css({ width: w+'px', height: h+'px' });
           }
           if (enableCrossCursor) {
-            updateCrossCursor(img, 0, 0);
+            var fixed = colorPickerInfo && colorPickerInfo.fixed;
+            updateCrossCursor(img, 0, 0, fixed);
           } else {
             removeCrossCursor(img);
           }
