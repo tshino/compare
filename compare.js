@@ -142,12 +142,16 @@ $( function() {
       }
       // ESC (27)
       if (e.keyCode === 27 && !e.shiftKey) {
-        currentImageIndex = 0;
-        viewZoom.setZoom(0);
-        viewZoom.setOffset(0.5, 0.5);
-        overlayMode = false;
-        resetMouseDrag();
-        updateLayout();
+        if (colorPickerInfo) {
+          toggleColorPicker();
+        } else {
+          currentImageIndex = 0;
+          viewZoom.setZoom(0);
+          viewZoom.setOffset(0.5, 0.5);
+          overlayMode = false;
+          resetMouseDrag();
+          updateLayout();
+        }
         return false;
       }
       // Delete (46)
@@ -221,13 +225,17 @@ $( function() {
       var y = e.y * ent.height;
       x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
       y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
-      updateColorPicker(e.index, x, y);
-      colorPickerInfo = null;
-      enableCrossCursor = false;
+      var fixed;
+      if (colorPickerInfo.x === x && colorPickerInfo.y === y) {
+        fixed = !colorPickerInfo.fixed;
+      } else {
+        fixed = true;
+      }
+      updateColorPicker(e.index, x, y, fixed);
     }
   });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    if (colorPickerInfo) {
+    if (colorPickerInfo && !colorPickerInfo.fixed) {
       var selector = '#view > div.imageBox';
       var index = selector ? $(selector).index($(this).parent()) : null;
       if (index !== null && entries[index].ready()) {
@@ -238,7 +246,7 @@ $( function() {
         var y = viewY / (viewZoom.scale * ent.baseHeight) * ent.height;
         x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
         y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
-        updateColorPicker(index, x, y);
+        updateColorPicker(index, x, y, false);
       }
     }
   });
@@ -517,10 +525,11 @@ $( function() {
       img.cursor = null;
     }
   };
-  var updateColorPicker = function(index, x, y) {
+  var updateColorPicker = function(index, x, y, fixed) {
     index = index !== undefined ? index : colorPickerInfo.index;
     x = x !== undefined ? x : colorPickerInfo.x;
     y = y !== undefined ? y : colorPickerInfo.y;
+    fixed = fixed !== undefined ? fixed : colorPickerInfo.fixed;
     if (index === null || !entries[index] || !entries[index].ready()) {
       index = null;
       $('#colorXY, #colorRGB').text('');
@@ -553,7 +562,7 @@ $( function() {
         updateCrossCursor(img, x, y);
       }
     }
-    colorPickerInfo = { index: index, x: x, y: y };
+    colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
     //console.log('color(' + x + ',' + y + ') = ' + color);
   };
   var toggleColorPicker = function() {
