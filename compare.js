@@ -77,6 +77,8 @@ $( function() {
     return false;
   });
 
+  $('#color button.close').click(function() { toggleColorPicker(); });
+
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
@@ -1701,7 +1703,7 @@ $( function() {
         ja: 'オーバーレイモード : ' + modeDesc });
       $('#mode').css({ display : 'block' });
     } else {
-      $('#mode *').text('');
+      $('#mode > span').text('');
       $('#mode').css({ display : '' });
     }
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
