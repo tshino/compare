@@ -494,7 +494,7 @@
       $(root).on('dblclick', deepFilter, function(e) {
         return processDblclick(e, selector, this);
       });
-      $(root).on('wheel', processWheel);
+      $(root).on('wheel', filter, processWheel);
     };
     var enableTouch = function(root, filter, deepFilter, selector) {
       $(root).on('touchmove', filter, function(e) {
