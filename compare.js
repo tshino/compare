@@ -212,8 +212,8 @@ $( function() {
     //alert('keypress: '+e.which);
   });
   
-  viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
-  viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox');
+  viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
+  viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
 
