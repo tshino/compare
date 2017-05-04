@@ -533,7 +533,7 @@ $( function() {
     x = x !== undefined ? x : colorPickerInfo.x;
     y = y !== undefined ? y : colorPickerInfo.y;
     fixed = fixed !== undefined ? fixed : colorPickerInfo.fixed;
-    if (index === null || !entries[index] || !entries[index].ready()) {
+    if (index === null || !entries[index] || !entries[index].ready() || x === undefined) {
       index = null;
       $('#colorXY, #colorRGB').text('');
       $('#colorSample').hide();
