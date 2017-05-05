@@ -456,6 +456,26 @@ $( function() {
       updateLayout();
     }
   }
+  var updateMapStyles = function() {
+    if (images.length) {
+      var index = isSingleView ? currentImageIndex - 1 : 0;
+      var img = entries[index].ready() ? entries[index] : images[0];
+      var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
+      var roiH = img.boxH / (img.baseHeight * viewZoom.scale);
+      var center = viewZoom.getCenter();
+      $('#mapROI').attr({
+        x : 100 * (0.5 + center.x - 0.5 * roiW) + '%',
+        y : 100 * (0.5 + center.y - 0.5 * roiH) + '%',
+        width : (100 * roiW)+'%',
+        height : (100 * roiH)+'%'
+      });
+      var s = 120 / Math.max(img.width, img.height);
+      var w = img.width * s;
+      var h = img.height * s;
+      $('#map svg').width(w).height(h);
+      $('#map').width(w).height(h);
+    }
+  };
   var addGrid = function(img) {
     if (img.element && 0 === img.view.find('.grid').length) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
@@ -494,6 +514,20 @@ $( function() {
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
+  var updateGridStyles = function(ent, commonStyle) {
+    var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
+    var strokeWidth = [
+        (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
+        (base > 0.5 ? 0 : 1) * base];
+    var opacity = [
+        0.6,
+        base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
+    $(ent.grid).css(commonStyle).find('path').each(function(index) {
+      $(this).
+          attr('stroke-width', strokeWidth[index]).
+          attr('opacity', opacity[index]);
+    });
+  };
   var updateCrossCursor = function(img, x, y, fixed) {
     var makeCrossCursor = function(x, y) {
       var pos = interpretOrientation(img, x, y);
@@ -527,6 +561,10 @@ $( function() {
       $(img.cursor).remove();
       img.cursor = null;
     }
+  };
+  var updateCrossCursorStyles = function(ent, commonStyle) {
+    var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
+    $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
   };
   var updateColorPicker = function(index, x, y, fixed) {
     index = index !== undefined ? index : colorPickerInfo.index;
@@ -1746,43 +1784,15 @@ $( function() {
         };
         $(ent.element).css(style);
         if (ent.grid) {
-          $(ent.grid).css(style);
-          var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
-          var strokeWidth = [
-              (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
-              (base > 0.5 ? 0 : 1) * base];
-          var opacity = [
-              0.6,
-              base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
-          $(ent.grid).find('path').each(function(index) {
-            $(this).
-                attr('stroke-width', strokeWidth[index]).
-                attr('opacity', opacity[index]);
-          });
+          updateGridStyles(ent, style);
         }
         if (ent.cursor) {
-          var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
-          $(ent.cursor).css(style).find('path').attr('stroke-width', strokeWidth);
+          updateCrossCursorStyles(ent, style);
         }
       }
     }
-    if (enableMap && images.length) {
-      var index = isSingleView ? currentImageIndex - 1 : 0;
-      var img = entries[index].ready() ? entries[index] : images[0];
-      var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
-      var roiH = img.boxH / (img.baseHeight * viewZoom.scale);
-      var center = viewZoom.getCenter();
-      $('#mapROI').attr({
-        x : 100 * (0.5 + center.x - 0.5 * roiW) + '%',
-        y : 100 * (0.5 + center.y - 0.5 * roiH) + '%',
-        width : (100 * roiW)+'%',
-        height : (100 * roiH)+'%'
-      });
-      var s = 120 / Math.max(img.width, img.height);
-      var w = img.width * s;
-      var h = img.height * s;
-      $('#map svg').width(w).height(h);
-      $('#map').width(w).height(h);
+    if (enableMap) {
+      updateMapStyles();
     }
   }
 
