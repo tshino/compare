@@ -514,6 +514,16 @@ $( function() {
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
+  var updateGridBaseLayout = function(img, w, h) {
+    if (enableGrid) {
+      addGrid(img);
+    } else {
+      removeGrid(img);
+    }
+    if (img.grid) {
+      $(img.grid).css({ width: w+'px', height: h+'px' });
+    }
+  };
   var updateGridStyles = function(ent, commonStyle) {
     var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
     var strokeWidth = [
@@ -560,6 +570,17 @@ $( function() {
     if (img.cursor) {
       $(img.cursor).remove();
       img.cursor = null;
+    }
+  };
+  var updateCrossCursorBaseLayout = function(img, w, h) {
+    if (enableCrossCursor) {
+      var fixed = colorPickerInfo && colorPickerInfo.fixed;
+      updateCrossCursor(img, 0, 0, fixed);
+    } else {
+      removeCrossCursor(img);
+    }
+    if (img.cursor) {
+      $(img.cursor).css({ width: w+'px', height: h+'px' });
     }
   };
   var updateCrossCursorStyles = function(ent, commonStyle) {
@@ -1700,23 +1721,8 @@ $( function() {
             var temp = w; w = h; h = temp;
           }
           $(img.element).css({ width: w+'px', height: h+'px' });
-          if (enableGrid) {
-            addGrid(img);
-          } else {
-            removeGrid(img);
-          }
-          if (img.grid) {
-            $(img.grid).css({ width: w+'px', height: h+'px' });
-          }
-          if (enableCrossCursor) {
-            var fixed = colorPickerInfo && colorPickerInfo.fixed;
-            updateCrossCursor(img, 0, 0, fixed);
-          } else {
-            removeCrossCursor(img);
-          }
-          if (img.cursor) {
-            $(img.cursor).css({ width: w+'px', height: h+'px' });
-          }
+          updateGridBaseLayout(img, w, h);
+          updateCrossCursorBaseLayout(img, w, h);
         }
         $(this).css({
           display   : '',
