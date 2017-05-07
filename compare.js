@@ -1625,6 +1625,37 @@ $( function() {
       }
     });
 
+  var newSelectorButton = function(index) {
+    var button = $('<button/>').addClass('selector').
+        text(index + 1).
+        append(
+          setText($('<span class="tooltip"/>'), {
+            en: 'Select picture ',
+            ja: '画像を選択 '
+          })
+        ).
+        click(function(e) { toggleSingleView(index + 1); });
+    if (index < 9) {
+      button.find('span.tooltip span').addClass('keys flat').
+          append($('<span/>').text(index + 1));
+    }
+    return button;
+  };
+  var updateSelectorButtonState = function() {
+    if (isSingleView) {
+      $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
+      if (overlayMode) {
+        $('.selector').eq(overlayBaseIndex).addClass('current');
+      }
+    } else {
+      $('.selector').removeClass('current');
+    }
+    $('.selector').each(function(index) {
+      if (index < entries.length && !entries[index].visible) {
+        $(this).css({ display : 'none' });
+      }
+    });
+  };
   function updateDOM()
   {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
@@ -1652,20 +1683,7 @@ $( function() {
           ent.visible = false;
         }
         if (!ent.button) {
-          ent.button = $('<button/>').addClass('selector').
-            text(i + 1).
-            append(
-              setText($('<span class="tooltip"/>'), {
-                en: 'Select picture ',
-                ja: '画像を選択 '
-              })).
-            click({index : i}, function(e) { toggleSingleView(e.data.index + 1); });
-          if (i < 9) {
-            $(ent.button).find('span.tooltip span').addClass('keys flat').
-              append(
-                $('<span/>').text(i + 1)
-                );
-          }
+          ent.button = newSelectorButton(i);
           $('#overlay').before(ent.button);
         }
     }
@@ -1760,19 +1778,7 @@ $( function() {
     } else if ($('#color').is(':visible')) {
       $('#color').hide();
     }
-    if (isSingleView) {
-      $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
-      if (overlayMode) {
-        $('.selector').eq(overlayBaseIndex).addClass('current');
-      }
-    } else {
-      $('.selector').removeClass('current');
-    }
-    $('.selector').each(function(index) {
-      if (index < entries.length && !entries[index].visible) {
-        $(this).css({ display : 'none' });
-      }
-    });
+    updateSelectorButtonState();
     overlayMode ? $('#overlay').addClass('current') : $('#overlay').removeClass('current');
     updateTransform();
     adjustDialogPosition();
@@ -1858,10 +1864,9 @@ $( function() {
       });
     img.src = dataURI;
   };
-  function addFile(file)
-  {
+  var newEntry = function(file) {
       var entry = {
-            index           : entries.length,
+            index           : null,
             name            : file.name,
             size            : file.size,
             fileType        : file.type,
@@ -1890,6 +1895,12 @@ $( function() {
             
             ready   : function() { return null !== this.element; }
       };
+      return entry;
+  };
+  function addFile(file)
+  {
+      var entry = newEntry(file);
+      entry.index = entries.length;
       entries.push(entry);
       loading.push(entry);
       
