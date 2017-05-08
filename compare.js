@@ -444,6 +444,23 @@ $( function() {
       updateLayout();
     }
   }
+  var updateOverlayModeIndicator = function() {
+    if (overlayMode) {
+      var baseIndex = overlayBaseIndex + 1;
+      var modeDesc =
+          ((isSingleView && baseIndex !== currentImageIndex)
+            ? baseIndex + ' + ' + currentImageIndex : baseIndex + ' only');
+      setText($('#mode'), {
+        en: 'OVERLAY MODE : ' + modeDesc,
+        ja: 'オーバーレイモード : ' + modeDesc });
+      $('#mode').css({ display : 'block' });
+      $('#overlay').addClass('current');
+    } else {
+      $('#mode > span').text('');
+      $('#mode').css({ display : '' });
+      $('#overlay').removeClass('current');
+    }
+  };
   function toggleMap()
   {
     if (!enableMap) {
@@ -631,6 +648,17 @@ $( function() {
     colorPickerInfo = colorPickerInfo ? null : {};
     enableCrossCursor = colorPickerInfo ? true : false;
     updateLayout();
+  };
+  var updateColorPickerOnUpdateLayout = function() {
+    if (colorPickerInfo) {
+      colorPickerInfo.index = isSingleView ? currentImageIndex - 1 : null;
+      if (!$('#color').is(':visible')) {
+        $('#color').show();
+      }
+      updateColorPicker();
+    } else if ($('#color').is(':visible')) {
+      $('#color').hide();
+    }
   };
   var swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
@@ -1755,31 +1783,10 @@ $( function() {
       var hide = isSingleView || numVisibleEntries + index >= numSlots;
       $(this).css({ display : (hide ? 'none' : '') });
     });
-    if (overlayMode) {
-      var baseIndex = overlayBaseIndex + 1;
-      var modeDesc =
-          ((isSingleView && baseIndex !== currentImageIndex)
-            ? baseIndex + ' + ' + currentImageIndex : baseIndex + ' only');
-      setText($('#mode'), {
-        en: 'OVERLAY MODE : ' + modeDesc,
-        ja: 'オーバーレイモード : ' + modeDesc });
-      $('#mode').css({ display : 'block' });
-    } else {
-      $('#mode > span').text('');
-      $('#mode').css({ display : '' });
-    }
+    updateOverlayModeIndicator();
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
-    if (colorPickerInfo) {
-      colorPickerInfo.index = isSingleView ? currentImageIndex - 1 : null;
-      if (!$('#color').is(':visible')) {
-        $('#color').show();
-      }
-      updateColorPicker();
-    } else if ($('#color').is(':visible')) {
-      $('#color').hide();
-    }
+    updateColorPickerOnUpdateLayout();
     updateSelectorButtonState();
-    overlayMode ? $('#overlay').addClass('current') : $('#overlay').removeClass('current');
     updateTransform();
     adjustDialogPosition();
   }
