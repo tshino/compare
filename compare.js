@@ -473,6 +473,9 @@ $( function() {
       updateLayout();
     }
   }
+  var updateMapOnUpdateLayout = function() {
+    $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
+  };
   var updateMapStyles = function() {
     if (images.length) {
       var index = isSingleView ? currentImageIndex - 1 : 0;
@@ -531,7 +534,7 @@ $( function() {
     enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
     updateLayout();
   };
-  var updateGridBaseLayout = function(img, w, h) {
+  var updateGridOnUpdateLayout = function(img, w, h) {
     if (enableGrid) {
       addGrid(img);
     } else {
@@ -589,7 +592,7 @@ $( function() {
       img.cursor = null;
     }
   };
-  var updateCrossCursorBaseLayout = function(img, w, h) {
+  var updateCrossCursorOnUpdateLayout = function(img, w, h) {
     if (enableCrossCursor) {
       var fixed = colorPickerInfo && colorPickerInfo.fixed;
       updateCrossCursor(img, 0, 0, fixed);
@@ -658,6 +661,22 @@ $( function() {
       updateColorPicker();
     } else if ($('#color').is(':visible')) {
       $('#color').hide();
+    }
+  };
+  var updateImageLayoutBox = function(img, boxW, boxH) {
+    if (img.element) {
+      img.boxW = boxW;
+      img.boxH = boxH;
+      img.isLetterBox = boxW * img.height < boxH * img.width;
+      img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
+      img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
+      var w = img.baseWidth, h = img.baseHeight;
+      if (img.transposed) {
+        var temp = w; w = h; h = temp;
+      }
+      $(img.element).css({ width: w+'px', height: h+'px' });
+      updateGridOnUpdateLayout(img, w, h);
+      updateCrossCursorOnUpdateLayout(img, w, h);
     }
   };
   var swapBaseAndTargetImage = function() {
@@ -1755,21 +1774,8 @@ $( function() {
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
+        updateImageLayoutBox(img, boxW, boxH);
         var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
-        if (img.element) {
-          img.boxW = boxW;
-          img.boxH = boxH;
-          img.isLetterBox = boxW * img.height < boxH * img.width;
-          img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
-          img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
-          var w = img.baseWidth, h = img.baseHeight;
-          if (img.transposed) {
-            var temp = w; w = h; h = temp;
-          }
-          $(img.element).css({ width: w+'px', height: h+'px' });
-          updateGridBaseLayout(img, w, h);
-          updateCrossCursorBaseLayout(img, w, h);
-        }
         $(this).css({
           display   : '',
           position  : overlayMode ? 'absolute' : '',
@@ -1784,7 +1790,7 @@ $( function() {
       $(this).css({ display : (hide ? 'none' : '') });
     });
     updateOverlayModeIndicator();
-    $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
+    updateMapOnUpdateLayout();
     updateColorPickerOnUpdateLayout();
     updateSelectorButtonState();
     updateTransform();
