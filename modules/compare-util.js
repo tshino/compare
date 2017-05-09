@@ -68,6 +68,10 @@
     }
   };
 
+  var clamp = function(num, lower, upper) {
+    return Math.max(lower, Math.min(upper, num));
+  };
+
   var calcGCD = function(a, b) {
     var m = Math.max(a, b), n = Math.min(a, b);
     while (n > 0) {
@@ -575,6 +579,7 @@
     revokeObjectURL:        revokeObjectURL,
     newWorker:              newWorker,
     toggleFullscreen:       toggleFullscreen,
+    clamp:                  clamp,
     calcGCD:                calcGCD,
     addComma:               addComma,
     toPercent:              toPercent,

@@ -223,10 +223,8 @@ $( function() {
         toggleColorPicker();
       }
       var ent = entries[e.index];
-      var x = e.x * ent.width;
-      var y = e.y * ent.height;
-      x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
-      y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
+      var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
+      var y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
       var fixed;
       if (colorPickerInfo.x === x && colorPickerInfo.y === y) {
         fixed = !colorPickerInfo.fixed;
@@ -246,8 +244,8 @@ $( function() {
         var viewY = e.pageY - $(this).offset().top;
         var x = viewX / (viewZoom.scale * ent.baseWidth) * ent.width;
         var y = viewY / (viewZoom.scale * ent.baseHeight) * ent.height;
-        x = Math.max(0, Math.min(ent.width - 1, Math.floor(x)));
-        y = Math.max(0, Math.min(ent.height - 1, Math.floor(y)));
+        x = compareUtil.clamp(Math.floor(x), 0, ent.width - 1);
+        y = compareUtil.clamp(Math.floor(y), 0, ent.height - 1);
         updateColorPicker(index, x, y, false);
       }
     }
@@ -704,8 +702,8 @@ $( function() {
       var target = dialog.element, dlg = dialog.element.children();
       var offset = dlg.offset();
       var border = 10;
-      var left = Math.max(0, Math.min(target.width() - dlg.width() - border, offset.left));
-      var top  = Math.max(0, Math.min(target.height() - dlg.height() - border, offset.top));
+      var left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
+      var top  = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
       if (left !== offset.left || top !== offset.top) {
         dlg.offset({ left: left, top: top });
       }
@@ -1763,8 +1761,8 @@ $( function() {
     var boxW = $('#view').width() / numColumns;
     var boxH = $('#view').height() / numRows;
     var MARGIN = 6, MIN_SIZE = 32;
-    boxW = Math.max(boxW - MARGIN, Math.min(boxW, MIN_SIZE));
-    boxH = Math.max(boxH - MARGIN, Math.min(boxH, MIN_SIZE));
+    boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
+    boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 !== currentImageIndex;
       if (overlayMode) {
