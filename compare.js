@@ -661,7 +661,19 @@ $( function() {
       $('#color').hide();
     }
   };
-  var updateImageLayoutBox = function(img, boxW, boxH) {
+  var makeImageLayoutParam = function() {
+    var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
+    var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
+    var numColumns = layoutMode === 'x' ? numSlots : 1;
+    var numRows    = layoutMode !== 'x' ? numSlots : 1;
+    var boxW = $('#view').width() / numColumns;
+    var boxH = $('#view').height() / numRows;
+    var MARGIN = 6, MIN_SIZE = 32;
+    boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
+    boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
+    return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
+  };
+  var updateImageBox = function(img, boxW, boxH) {
     if (img.element) {
       img.boxW = boxW;
       img.boxH = boxH;
@@ -1754,15 +1766,7 @@ $( function() {
     }
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
     $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
-    var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
-    var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
-    var numColumns = layoutMode === 'x' ? numSlots : 1;
-    var numRows    = layoutMode !== 'x' ? numSlots : 1;
-    var boxW = $('#view').width() / numColumns;
-    var boxH = $('#view').height() / numRows;
-    var MARGIN = 6, MIN_SIZE = 32;
-    boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
-    boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
+    var param = makeImageLayoutParam();
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 !== currentImageIndex;
       if (overlayMode) {
@@ -1772,7 +1776,7 @@ $( function() {
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        updateImageLayoutBox(img, boxW, boxH);
+        updateImageBox(img, param.boxW, param.boxH);
         var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
         $(this).css({
           display   : '',
@@ -1784,7 +1788,7 @@ $( function() {
       }
     });
     $('#view > div.emptyBox').each(function(index) {
-      var hide = isSingleView || numVisibleEntries + index >= numSlots;
+      var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
       $(this).css({ display : (hide ? 'none' : '') });
     });
     updateOverlayModeIndicator();
