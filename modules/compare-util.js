@@ -321,20 +321,19 @@
         moveRelative(-dx / base.w, -dy / base.h);
       }
     };
-    var zoomRelativeToPx = function(delta, index, x, y) {
-      if (enabled) {
-        var base = getBaseSize(index);
+    var zoomRelativeToPx = function(delta, pos) {
+      if (enabled && pos) {
         var c1 = getCenter();
         var s1 = o.scale;
         setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
         if (1 < o.scale) {
-          x = Math.max(0, Math.min(1, x));
-          y = Math.max(0, Math.min(1, y));
+          var x = Math.max(0, Math.min(1, pos.x));
+          var y = Math.max(0, Math.min(1, pos.y));
           var s2 = o.scale;
           var px = x - 0.5;
           var py = y - 0.5;
-          var c2x = px - s1 * base.w * (px - c1.x) / (s2 * base.w);
-          var c2y = py - s1 * base.h * (py - c1.y) / (s2 * base.h);
+          var c2x = px - s1 * pos.baseW * (px - c1.x) / (s2 * pos.baseW);
+          var c2y = py - s1 * pos.baseH * (py - c1.y) / (s2 * pos.baseH);
           var o2x = c2x / (1 - 1 / o.scale) + 0.5;
           var o2y = c2y / (1 - 1 / o.scale) + 0.5;
           setOffset(o2x, o2y);
@@ -352,14 +351,6 @@
         setZoom(0);
         update();
       }
-    };
-    var zoomToPx = function(index, x, y) {
-      var base = getBaseSize(index);
-      if (base) {
-        zoomTo(x / (base.w * o.scale), y / (base.h * o.scale));
-        return false;
-      }
-      return true;
     };
     var processKeyDown = function(e) {
       // '+;' (59, 187 or 107 for numpad) / PageUp (33)
@@ -389,16 +380,25 @@
     var setPointCallback = function(callback) {
       pointCallback = callback;
     };
-    var resetDragState = function() { clickPoint = null; dragStartPoint = null; dragLastPoint = null; };
+    var resetDragState = function() {
+      clickPoint = null;
+      dragStartPoint = null;
+      dragLastPoint = null;
+    };
+    var positionFromMouseEvent = function(e, target, index) {
+      var base = getBaseSize(index);
+      return base ? {
+        index: index,
+        x: (e.pageX - $(target).offset().left) / (o.scale * base.w),
+        y: (e.pageY - $(target).offset().top) / (o.scale * base.h),
+        baseW: base.w,
+        baseH: base.h
+      } : null;
+    };
     var processPointMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index($(target).parent()) : null;
-      var base = getBaseSize(index);
-      if (base && e.which === 1) {
-        var viewX = e.pageX - $(target).offset().left;
-        var viewY = e.pageY - $(target).offset().top;
-        var x = viewX / (o.scale * base.w);
-        var y = viewY / (o.scale * base.h);
-        clickPoint = { index: index, x: x, y: y };
+      if (e.which === 1) {
+        clickPoint = positionFromMouseEvent(e, target, index);
       }
     };
     var processMouseDown = function(e, selector, target) {
@@ -439,9 +439,12 @@
     };
     var processDblclick = function(e, selector, target) {
       var index = selector ? $(selector).index($(target).parent()) : null;
-      var x = e.pageX - $(target).offset().left;
-      var y = e.pageY - $(target).offset().top;
-      return zoomToPx(index, x, y);
+      var pos = positionFromMouseEvent(e, target, index);
+      if (pos) {
+        zoomTo(pos.x, pos.y);
+        return false;
+      }
+      return true;
     };
     var processWheel = function(e, selector, relSelector, target) {
       var event = e.originalEvent;
@@ -453,13 +456,9 @@
       if (steps !== 0) {
         if (selector && relSelector) {
           var index = $(selector).index(target);
-          var base = getBaseSize(index);
           target = $(target).find(relSelector);
-          var viewX = e.pageX - $(target).offset().left;
-          var viewY = e.pageY - $(target).offset().top;
-          var x = viewX / (o.scale * base.w);
-          var y = viewY / (o.scale * base.h);
-          zoomRelativeToPx(-steps * ZOOM_STEP_WHEEL, index, x, y);
+          var pos = positionFromMouseEvent(e, target, index);
+          zoomRelativeToPx(-steps * ZOOM_STEP_WHEEL, pos);
         } else {
           zoomRelative(-steps * ZOOM_STEP_WHEEL);
         }
@@ -558,9 +557,9 @@
     //o.moveRelative = moveRelative;
     //o.moveRelativePx = moveRelativePx;
     //o.zoomTo = zoomTo;
-    //o.zoomToPx = zoomToPx;
     o.processKeyDown = processKeyDown;
     o.setPointCallback = setPointCallback;
+    o.positionFromMouseEvent = positionFromMouseEvent;
     o.resetDragState = resetDragState;
     o.processMouseDown = processMouseDown;
     o.processMouseMove = processMouseMove;

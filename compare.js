@@ -238,12 +238,11 @@ $( function() {
     if (colorPickerInfo && !colorPickerInfo.fixed) {
       var selector = '#view > div.imageBox';
       var index = selector ? $(selector).index($(this).parent()) : null;
-      if (index !== null && entries[index].ready()) {
+      var pos = viewZoom.positionFromMouseEvent(e, this, index);
+      if (index !== null && entries[index].ready() && pos) {
         var ent = entries[index];
-        var viewX = e.pageX - $(this).offset().left;
-        var viewY = e.pageY - $(this).offset().top;
-        var x = viewX / (viewZoom.scale * ent.baseWidth) * ent.width;
-        var y = viewY / (viewZoom.scale * ent.baseHeight) * ent.height;
+        var x = pos.x * ent.width;
+        var y = pos.y * ent.height;
         x = compareUtil.clamp(Math.floor(x), 0, ent.width - 1);
         y = compareUtil.clamp(Math.floor(y), 0, ent.height - 1);
         updateColorPicker(index, x, y, false);
