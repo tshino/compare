@@ -284,7 +284,7 @@
     };
     var zoomRelative = function(delta) {
       if (enabled) {
-        setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
+        setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
         update();
         return true;
       }
@@ -292,8 +292,8 @@
     var zoomIn = function() { return zoomRelative(+ZOOM_STEP_KEY); };
     var zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
     var setOffset = function(x, y) {
-      x = Math.min(1, Math.max(0, x));
-      y = zoomXOnly ? 0.5 : Math.min(1, Math.max(0, y));
+      x = clamp(x, 0, 1);
+      y = zoomXOnly ? 0.5 : clamp(y, 0, 1);
       if (o.offset.x !== x || o.offset.y !== y) {
         o.offset.x = x;
         o.offset.y = y;
@@ -325,10 +325,10 @@
       if (enabled && pos) {
         var c1 = getCenter();
         var s1 = o.scale;
-        setZoom(Math.max(0, Math.min(MAX_ZOOM_LEVEL, o.zoom + delta)));
+        setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
         if (1 < o.scale) {
-          var x = Math.max(0, Math.min(1, pos.x));
-          var y = Math.max(0, Math.min(1, pos.y));
+          var x = clamp(pos.x, 0, 1);
+          var y = clamp(pos.y, 0, 1);
           var s2 = o.scale;
           var px = x - 0.5;
           var py = y - 0.5;
@@ -452,7 +452,7 @@
         return true;
       }
       var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-      var steps = Math.max(-3, Math.min(3, event.deltaY * deltaScale));
+      var steps = clamp(event.deltaY * deltaScale, -3, 3);
       if (steps !== 0) {
         if (selector && relSelector) {
           var index = $(selector).index(target);
@@ -503,7 +503,7 @@
           var s1 = Math.sqrt(x1 * x1 + y1 * y1);
           if (0 < s0 * s1) {
             var r = Math.log(s1 / s0) / Math.LN2;
-            r = Math.max(-1, Math.min(1, r));
+            r = clamp(r, -1, 1);
             zoomRelative(r);
           }
         }
