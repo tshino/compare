@@ -147,10 +147,7 @@ $( function() {
         if (colorPickerInfo) {
           toggleColorPicker();
         } else {
-          currentImageIndex = 0;
-          viewZoom.setZoom(0);
-          viewZoom.setOffset(0.5, 0.5);
-          overlayMode = false;
+          resetLayoutState();
           resetMouseDrag();
           updateLayout();
         }
@@ -309,6 +306,12 @@ $( function() {
     }
     return target;
   };
+  var resetLayoutState = function() {
+    currentImageIndex = 0;
+    viewZoom.setZoom(0);
+    viewZoom.setOffset(0.5, 0.5);
+    overlayMode = false;
+  };
   var removeEntry = function(index) {
     var ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
@@ -332,10 +335,7 @@ $( function() {
       ent.histogram = null;
       ent.waveform = null;
       ent.vectorscope = null;
-      currentImageIndex = 0;
-      viewZoom.setZoom(0);
-      viewZoom.setOffset(0.5, 0.5);
-      overlayMode = false;
+      resetLayoutState();
       discardTasksOfEntryByIndex(index);
       updateDOM();
     }
