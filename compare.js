@@ -250,7 +250,6 @@ $( function() {
   updateDOM();
 });
 
-  var loading = [];
   var entries = [];
   var images = [];
   var currentImageIndex = 0;
@@ -839,12 +838,18 @@ $( function() {
   }
   var toggleAnalysis = defineDialog($('#analysis'));
   var toggleInfo = defineDialog($('#info'), updateInfoTable, toggleAnalysis);
-  var toggleNowLoading = defineDialog($('#loading'));
-  function updateNowLoading()
-  {
-    hideDialog();
-    $('#loadingList > tr').remove();
-    if (0 < loading.length) {
+  var nowLoadingDialog = (function() {
+    var loading = [];
+    var toggleNowLoading = defineDialog($('#loading'));
+    var add = function(entry) {
+      loading.push(entry);
+    };
+    var update = function() {
+      hideDialog();
+      $('#loadingList > tr').remove();
+      if (0 === loading.length) {
+        return;
+      }
       var finished = true, errors = 0;
       for (var i = 0, ent; ent = loading[i]; i++) {
         var td = $('<td>').css({ minWidth: '400px' });
@@ -888,8 +893,12 @@ $( function() {
           }
         }, 500);
       }
-    }
-  }
+    };
+    return {
+      add: add,
+      update: update
+    };
+  })();
   function getImageData(img)
   {
     if (!img.imageData) {
@@ -1844,13 +1853,13 @@ $( function() {
     //
     applyExifOrientation(entry);
     updateDOM();
-    updateNowLoading();
+    nowLoadingDialog.update();
   };
   var setEntryError = function(entry, message) {
     entry.loading = false;
     entry.error = message;
     updateDOM();
-    updateNowLoading();
+    nowLoadingDialog.update();
   };
   var setEntryDataURI = function(entry, dataURI) {
     var binary = compareUtil.binaryFromDataURI(dataURI);
@@ -1915,14 +1924,14 @@ $( function() {
       var entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
-      loading.push(entry);
+      nowLoadingDialog.add(entry);
       
       var reader = new FileReader();
       reader.onprogress = function(e) {
         if (e.lengthComputable && 0 < e.total) {
           entry.progress = Math.round(e.loaded * 100 / e.total);
         }
-        updateNowLoading();
+        nowLoadingDialog.update();
       };
       reader.onload = function(e) {
         setEntryDataURI(entry, e.target.result);
@@ -1943,7 +1952,7 @@ $( function() {
     }
     currentImageIndex = 0;
     updateDOM();
-    updateNowLoading();
+    nowLoadingDialog.update();
   }
 
   function toggleFullscreen()
