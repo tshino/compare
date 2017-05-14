@@ -1,4 +1,4 @@
-﻿var NEEDS_IOS_EXIF_WORKAROUND = (function(){
+﻿var NEEDS_IOS_EXIF_WORKAROUND = (function() {
   var ua = window.navigator.userAgent.toLowerCase();
   return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
 })();
@@ -66,8 +66,8 @@ $( function() {
   });
   $('.diffDimensionOption').on('change', function(e) {
     var o = this.options[this.selectedIndex].value;
-    diffOptions.resizeToLarger = o === "resize";
-    diffOptions.ignoreRemainder = o === "min";
+    diffOptions.resizeToLarger = o === 'resize';
+    diffOptions.ignoreRemainder = o === 'min';
     updateDiffTable();
     return false;
   });
@@ -444,9 +444,8 @@ $( function() {
   var updateOverlayModeIndicator = function() {
     if (overlayMode) {
       var baseIndex = overlayBaseIndex + 1;
-      var modeDesc =
-          ((isSingleView && baseIndex !== currentImageIndex)
-            ? baseIndex + ' + ' + currentImageIndex : baseIndex + ' only');
+      var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
+            baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
       setText($('#mode'), {
         en: 'OVERLAY MODE : ' + modeDesc,
         ja: 'オーバーレイモード : ' + modeDesc });
@@ -925,7 +924,7 @@ $( function() {
   var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
     var dLen = Math.sqrt(dx * dx + dy * dy);
     var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
-    ctx.font = "24px sans-serif";
+    ctx.font = '24px sans-serif';
     ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 3;
@@ -1256,7 +1255,7 @@ $( function() {
         fig.context.drawImage(bg, 0, 0, 320, 320);
         notify();
       };
-      bg.src = "res/xy-chromaticity-diagram.png";
+      bg.src = 'res/xy-chromaticity-diagram.png';
     } else {
       makeFigure(fig, w, h, dist);
       notify();
@@ -1367,7 +1366,7 @@ $( function() {
         }
         context.stroke();
       }
-      context.font = "16px sans-serif";
+      context.font = '16px sans-serif';
       for (var i = 0, l; l = labels[i]; ++i) {
         if (0 > l.types.indexOf(type)) {
           continue;
