@@ -456,8 +456,7 @@ $( function() {
       $('#overlay').removeClass('current');
     }
   };
-  function toggleMap()
-  {
+  var toggleMap = function() {
     if (!enableMap) {
       if (0 < images.length) {
         enableMap = true;
@@ -467,12 +466,12 @@ $( function() {
       enableMap = false;
       updateLayout();
     }
-  }
+  };
   var updateMapOnUpdateLayout = function() {
     $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
   };
-  var updateMapStyles = function() {
-    if (images.length) {
+  var updateMapOnUpdateTransform = function() {
+    if (enableMap && images.length) {
       var index = isSingleView ? currentImageIndex - 1 : 0;
       var img = entries[index].ready() ? entries[index] : images[0];
       var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
@@ -539,19 +538,21 @@ $( function() {
       $(img.grid).css({ width: w+'px', height: h+'px' });
     }
   };
-  var updateGridStyles = function(ent, commonStyle) {
-    var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
-    var strokeWidth = [
-        (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
-        (base > 0.5 ? 0 : 1) * base];
-    var opacity = [
-        0.6,
-        base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
-    $(ent.grid).css(commonStyle).find('path').each(function(index) {
-      $(this).
-          attr('stroke-width', strokeWidth[index]).
-          attr('opacity', opacity[index]);
-    });
+  var updateGridOnUpdateTransform = function(ent, commonStyle) {
+    if (ent.grid) {
+      var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
+      var strokeWidth = [
+          (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
+          (base > 0.5 ? 0 : 1) * base];
+      var opacity = [
+          0.6,
+          base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
+      $(ent.grid).css(commonStyle).find('path').each(function(index) {
+        $(this).
+            attr('stroke-width', strokeWidth[index]).
+            attr('opacity', opacity[index]);
+      });
+    }
   };
   var updateCrossCursor = function(img, x, y, fixed) {
     var makeCrossCursor = function(x, y) {
@@ -598,9 +599,11 @@ $( function() {
       $(img.cursor).css({ width: w+'px', height: h+'px' });
     }
   };
-  var updateCrossCursorStyles = function(ent, commonStyle) {
-    var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
-    $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
+  var updateCrossCursorOnUpdateTransform = function(ent, commonStyle) {
+    if (ent.cursor) {
+      var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
+      $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
+    }
   };
   var updateColorPicker = function(index, x, y, fixed) {
     index = index !== undefined ? index : colorPickerInfo.index;
@@ -1817,17 +1820,11 @@ $( function() {
                         ent.orientationAsCSS
         };
         $(ent.element).css(style);
-        if (ent.grid) {
-          updateGridStyles(ent, style);
-        }
-        if (ent.cursor) {
-          updateCrossCursorStyles(ent, style);
-        }
+        updateGridOnUpdateTransform(ent, style);
+        updateCrossCursorOnUpdateTransform(ent, style);
       }
     }
-    if (enableMap) {
-      updateMapStyles();
-    }
+    updateMapOnUpdateTransform();
   }
 
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
