@@ -188,7 +188,7 @@ $( function() {
     // 'o' (111)
     111: { global: false, func: toggleOverlay },
     // 'n' (110)
-    110 : { global: false, func: toggleMap },
+    110 : { global: false, func: roiMap.toggle },
     // 'g' (103)
     103 : { global: false, func: toggleGrid },
     // 'p' (112)
@@ -264,7 +264,6 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var enableMap = false;
   var enableGrid = false;
   var enableCrossCursor = false;
   var colorPickerInfo = null;
@@ -456,24 +455,23 @@ $( function() {
       $('#overlay').removeClass('current');
     }
   };
-  var toggleMap = function() {
-    if (!enableMap) {
-      if (0 < images.length) {
-        enableMap = true;
+  var roiMap = (function() {
+    var enableMap = false;
+    var toggle = function() {
+      if (!enableMap) {
+        if (0 < images.length) {
+          enableMap = true;
+          updateLayout();
+        }
+      } else {
+        enableMap = false;
         updateLayout();
       }
-    } else {
-      enableMap = false;
-      updateLayout();
-    }
-  };
-  var updateMapOnUpdateLayout = function() {
-    $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
-  };
-  var updateMapOnUpdateTransform = function() {
-    if (enableMap && images.length) {
-      var index = isSingleView ? currentImageIndex - 1 : 0;
-      var img = entries[index].ready() ? entries[index] : images[0];
+    };
+    var onUpdateLayout = function() {
+      $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
+    };
+    var updateMap = function(img) {
       var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
       var roiH = img.boxH / (img.baseHeight * viewZoom.scale);
       var center = viewZoom.getCenter();
@@ -488,8 +486,20 @@ $( function() {
       var h = img.height * s;
       $('#map svg').width(w).height(h);
       $('#map').width(w).height(h);
-    }
-  };
+    };
+    var onUpdateTransform = function() {
+      if (enableMap && images.length) {
+        var index = isSingleView ? currentImageIndex - 1 : 0;
+        var img = entries[index].ready() ? entries[index] : images[0];
+        updateMap(img);
+      }
+    };
+    return {
+      toggle: toggle,
+      onUpdateLayout: onUpdateLayout,
+      onUpdateTransform: onUpdateTransform
+    };
+  })();
   var addGrid = function(img) {
     if (img.element && 0 === img.view.find('.grid').length) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
@@ -1802,7 +1812,7 @@ $( function() {
       $(this).css({ display : (hide ? 'none' : '') });
     });
     updateOverlayModeIndicator();
-    updateMapOnUpdateLayout();
+    roiMap.onUpdateLayout();
     updateColorPickerOnUpdateLayout();
     updateSelectorButtonState();
     updateTransform();
@@ -1824,7 +1834,7 @@ $( function() {
         updateCrossCursorOnUpdateTransform(ent, style);
       }
     }
-    updateMapOnUpdateTransform();
+    roiMap.onUpdateTransform();
   }
 
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
