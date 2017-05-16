@@ -6,27 +6,27 @@
   switch (data.cmd) {
   case 'calcHistogram':
     result.type   = data.type;
-    result.result   = calcHistogram(data.imageData, data.type);
+    result.result   = calcHistogram(data.imageData[0], data.type);
     break;
   case 'calcWaveform':
     result.type   = data.type;
-    result.result = calcWaveform(data.imageData, data.histW, data.type);
-    result.w = data.imageData.width;
-    result.h = data.imageData.height;
+    result.result = calcWaveform(data.imageData[0], data.histW, data.type);
+    result.w = data.imageData[0].width;
+    result.h = data.imageData[0].height;
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
     result.type   = data.type;
-    result.result = calcVectorscope(data.imageData, data.type);
-    result.w = data.imageData.width;
-    result.h = data.imageData.height;
+    result.result = calcVectorscope(data.imageData[0], data.type);
+    result.w = data.imageData[0].width;
+    result.h = data.imageData[0].height;
     break;
   case 'calcMetrics':
-    result.result = calcMetrics(data.imageData1, data.imageData2);
-    result.result.ae = calcAE(data.imageData1, data.imageData2);
+    result.result = calcMetrics(data.imageData[0], data.imageData[1]);
+    result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
     break;
   case 'calcDiff':
-    result.result = calcDiff(data.imageData1, data.imageData2, data.options);
+    result.result = calcDiff(data.imageData[0], data.imageData[1], data.options);
     result.options = data.options;
     break;
   }

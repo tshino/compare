@@ -984,20 +984,6 @@ $( function() {
       );
     }
   };
-  function changeHistogramType(type)
-  {
-    if (histogramType !== type) {
-      histogramType = type;
-      discardTasksOfCommand('calcHistogram');
-      for (var i = 0, img; img = images[i]; i++) {
-        img.histogram = null;
-      }
-      $('#histogramType > *').
-        removeClass('current').
-        eq(type).addClass('current');
-      updateHistogramTable();
-    }
-  }
   
   var worker = compareUtil.newWorker('modules/compare-worker.js');
   var taskCount = 0;
@@ -1042,40 +1028,31 @@ $( function() {
     window.setTimeout(kickNextTask, 0);
   };
   worker.addEventListener('message', processTaskResult, false);
-  function kickNextTask()
-  {
+  var kickNextTask = function() {
     if (taskCount === 0 && 0 < taskQueue.length) {
       var task = taskQueue.shift();
-      switch (task.cmd) {
-      case 'calcHistogram':
-      case 'calcWaveform':
-      case 'calcVectorscope':
-        task.imageData = getImageData(entries[task.index[0]]);
-        if (!task.imageData) {
-          alert('out of memory');
-          return;
-        }
-        worker.postMessage(task);
-        break;
-      case 'calcMetrics':
-      case 'calcDiff':
-        task.imageData1 = getImageData(entries[task.index[0]]);
-        task.imageData2 = getImageData(entries[task.index[1]]);
-        if (!task.imageData1 || !task.imageData2) {
-          alert('out of memory');
-          return;
-        }
-        worker.postMessage(task);
-        break;
+      if (task.prepare && false === task.prepare(task.data)) {
+        return;
       }
+      worker.postMessage(task.data);
       ++taskCount;
     }
-  }
-  function addTask(task)
-  {
+  };
+  var addTask = function(data, prepare) {
+    var task = { data: data, prepare: prepare };
     taskQueue.push(task);
     window.setTimeout(kickNextTask, 0);
-  }
+  };
+  var attachImageDataToTask = function(data) {
+    data.imageData = [];
+    for (var i = 0; i < data.index.length; ++i) {
+      data.imageData[i] = getImageData(entries[data.index[i]]);
+      if (!data.imageData[i]) {
+        alert('out of memory');
+        return false;
+      }
+    }
+  };
   var discardTasksOfCommand = function(cmd) {
     taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd !== cmd; });
   };
@@ -1083,13 +1060,27 @@ $( function() {
     taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) === -1; });
   };
   
+  function changeHistogramType(type)
+  {
+    if (histogramType !== type) {
+      histogramType = type;
+      discardTasksOfCommand('calcHistogram');
+      for (var i = 0, img; img = images[i]; i++) {
+        img.histogram = null;
+      }
+      $('#histogramType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      updateHistogramTable();
+    }
+  }
   function updateHistogramAsync(img)
   {
     addTask({
       cmd:      'calcHistogram',
       type:     histogramType,
       index:    [img.index]
-    });
+    }, attachImageDataToTask);
   }
   function updateHistogram(type, img, hist)
   {
@@ -1170,7 +1161,7 @@ $( function() {
       type:     waveformType,
       index:    [img.index],
       histW:    Math.min(img.canvasWidth, 1024)
-    });
+    }, attachImageDataToTask);
   }
   function updateWaveform(type, img, histW, hist)
   {
@@ -1258,7 +1249,7 @@ $( function() {
       cmd:      'calcVectorscope',
       type:     vectorscopeType,
       index:    [img.index]
-    });
+    }, attachImageDataToTask);
   };
   var updateVectorscope = function(type, img, dist) {
     var w = img.canvasWidth;
@@ -1488,7 +1479,7 @@ $( function() {
         addTask({
           cmd:      'calcMetrics',
           index:    [a.index, b.index]
-        });
+        }, attachImageDataToTask);
       }
       $('#metricsTargetName').append(
         $('<td>').append(
@@ -1598,7 +1589,7 @@ $( function() {
             resizeToLarger: diffOptions.resizeToLarger,
             resizeMethod: diffOptions.resizeMethod
           }
-        });
+        }, attachImageDataToTask);
       }
     }
     var cellStyle = {
