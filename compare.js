@@ -985,7 +985,6 @@ $( function() {
     }
   };
   
-  var worker = compareUtil.newWorker('modules/compare-worker.js');
   var processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
@@ -1022,32 +1021,6 @@ $( function() {
       break;
     }
   };
-  var taskCount = 0;
-  var taskQueue = [];
-  var processTaskResponse = function(e) {
-    processTaskResult(e.data);
-    --taskCount;
-    window.setTimeout(kickNextTask, 0);
-  };
-  worker.addEventListener('message', processTaskResponse, false);
-  var kickNextTask = function() {
-    if (taskCount === 0 && 0 < taskQueue.length) {
-      var task = taskQueue.shift();
-      if (task.prepare && false === task.prepare(task.data)) {
-        return;
-      }
-      worker.postMessage(task.data);
-      ++taskCount;
-    }
-  };
-  var addTask = function(data, prepare) {
-    var task = { data: data, prepare: prepare };
-    taskQueue.push(task);
-    window.setTimeout(kickNextTask, 0);
-  };
-  var discardTasksOf = function(pred) {
-    taskQueue = taskQueue.filter(function(task,i,a) { return !pred(task); });
-  };
   var attachImageDataToTask = function(data) {
     data.imageData = [];
     for (var i = 0; i < data.index.length; ++i) {
@@ -1058,11 +1031,12 @@ $( function() {
       }
     }
   };
+  var taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js', processTaskResult);
   var discardTasksOfCommand = function(cmd) {
-    discardTasksOf(function(task) { return task.cmd === cmd; });
+    taskQueue.discardTasksOf(function(task) { return task.cmd === cmd; });
   };
   var discardTasksOfEntryByIndex = function(index) {
-    discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
+    taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
   
   function changeHistogramType(type)
@@ -1081,7 +1055,7 @@ $( function() {
   }
   function updateHistogramAsync(img)
   {
-    addTask({
+    taskQueue.addTask({
       cmd:      'calcHistogram',
       type:     histogramType,
       index:    [img.index]
@@ -1161,7 +1135,7 @@ $( function() {
   }
   function updateWaveformAsync(img)
   {
-    addTask({
+    taskQueue.addTask({
       cmd:      'calcWaveform',
       type:     waveformType,
       index:    [img.index],
@@ -1250,7 +1224,7 @@ $( function() {
     }
   };
   var updateVectorscopeAsync = function(img) {
-    addTask({
+    taskQueue.addTask({
       cmd:      'calcVectorscope',
       type:     vectorscopeType,
       index:    [img.index]
@@ -1481,7 +1455,7 @@ $( function() {
       if (!a.metrics[b.index]) {
         a.metrics[b.index] = 'calculating...';
         b.metrics[a.index] = 'calculating...';
-        addTask({
+        taskQueue.addTask({
           cmd:      'calcMetrics',
           index:    [a.index, b.index]
         }, attachImageDataToTask);
@@ -1585,7 +1559,7 @@ $( function() {
       diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex !== targetImageIndex) {
-        addTask({
+        taskQueue.addTask({
           cmd:      'calcDiff',
           index:    [a.index, b.index],
           options:  {

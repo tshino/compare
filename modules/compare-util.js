@@ -572,6 +572,38 @@
     o.makeTransform = makeTransform;
     return o;
   };
+  var makeTaskQueue = function(workerPath, processResult) {
+    var worker = newWorker(workerPath);
+    var taskCount = 0;
+    var taskQueue = [];
+    var kickNextTask = function() {
+      if (taskCount === 0 && 0 < taskQueue.length) {
+        var task = taskQueue.shift();
+        if (task.prepare && false === task.prepare(task.data)) {
+          return;
+        }
+        worker.postMessage(task.data);
+        ++taskCount;
+      }
+    };
+    var addTask = function(data, prepare) {
+      var task = { data: data, prepare: prepare };
+      taskQueue.push(task);
+      window.setTimeout(kickNextTask, 0);
+    };
+    var discardTasksOf = function(pred) {
+      taskQueue = taskQueue.filter(function(task,i,a) { return !pred(task); });
+    };
+    worker.addEventListener('message', function(e) {
+      processResult(e.data);
+      --taskCount;
+      window.setTimeout(kickNextTask, 0);
+    }, false);
+    return {
+      addTask: addTask,
+      discardTasksOf: discardTasksOf
+    };
+  };
   return {
     blobFromDataURI:        blobFromDataURI,
     createObjectURL:        createObjectURL,
@@ -587,6 +619,7 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
-    makeZoomController:     makeZoomController
+    makeZoomController:     makeZoomController,
+    makeTaskQueue:          makeTaskQueue
   };
 })();
