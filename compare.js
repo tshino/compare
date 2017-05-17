@@ -986,10 +986,7 @@ $( function() {
   };
   
   var worker = compareUtil.newWorker('modules/compare-worker.js');
-  var taskCount = 0;
-  var taskQueue = [];
-  var processTaskResult = function(e) {
-    var data = e.data;
+  var processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
       if (data.type === histogramType) {
@@ -1024,10 +1021,15 @@ $( function() {
       updateDiffTable();
       break;
     }
+  };
+  var taskCount = 0;
+  var taskQueue = [];
+  var processTaskResponse = function(e) {
+    processTaskResult(e.data);
     --taskCount;
     window.setTimeout(kickNextTask, 0);
   };
-  worker.addEventListener('message', processTaskResult, false);
+  worker.addEventListener('message', processTaskResponse, false);
   var kickNextTask = function() {
     if (taskCount === 0 && 0 < taskQueue.length) {
       var task = taskQueue.shift();
@@ -1043,6 +1045,9 @@ $( function() {
     taskQueue.push(task);
     window.setTimeout(kickNextTask, 0);
   };
+  var discardTasksOf = function(pred) {
+    taskQueue = taskQueue.filter(function(task,i,a) { return !pred(task); });
+  };
   var attachImageDataToTask = function(data) {
     data.imageData = [];
     for (var i = 0; i < data.index.length; ++i) {
@@ -1054,10 +1059,10 @@ $( function() {
     }
   };
   var discardTasksOfCommand = function(cmd) {
-    taskQueue = taskQueue.filter(function(task,i,a) { return task.cmd !== cmd; });
+    discardTasksOf(function(task) { return task.cmd === cmd; });
   };
   var discardTasksOfEntryByIndex = function(index) {
-    taskQueue = taskQueue.filter(function(task,i,a) { return task.index.indexOf(index) === -1; });
+    discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
   
   function changeHistogramType(type)
