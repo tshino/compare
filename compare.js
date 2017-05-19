@@ -35,7 +35,7 @@ $( function() {
   $('#zoomOut').click(viewZoom.zoomOut);
   $('#arrange').click(arrangeLayout);
   $('#overlay').click(toggleOverlay);
-  $('#gridbtn').click(toggleGrid);
+  $('#gridbtn').click(grid.toggle);
   $('#fullscreen').click(toggleFullscreen);
   $('#helpbtn').click(toggleHelp);
 
@@ -190,7 +190,7 @@ $( function() {
     // 'n' (110)
     110 : { global: false, func: roiMap.toggle },
     // 'g' (103)
-    103 : { global: false, func: toggleGrid },
+    103 : { global: false, func: grid.toggle },
     // 'p' (112)
     112 : { global: false, func: toggleColorPicker }
   };
@@ -264,7 +264,6 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var enableGrid = false;
   var enableCrossCursor = false;
   var colorPickerInfo = null;
   var dialog = null;
@@ -500,8 +499,14 @@ $( function() {
       onUpdateTransform: onUpdateTransform
     };
   })();
-  var addGrid = function(img) {
-    if (img.element && 0 === img.view.find('.grid').length) {
+  var grid = (function() {
+    var enableGrid = false;
+    var toggle = function() {
+      enableGrid = 0 === images.length ? false : !enableGrid;
+      enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
+      updateLayout();
+    };
+    var makeGrid = function(img) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
       var makeGridDesc = function(step, skip) {
         var desc = '';
@@ -525,31 +530,29 @@ $( function() {
         width(img.canvasWidth).
         height(img.canvasHeight);
       img.view.append(img.grid);
-    }
-  };
-  var removeGrid = function(img) {
-    if (img.grid) {
-      $(img.grid).remove();
-      img.grid = null;
-    }
-  };
-  var toggleGrid = function() {
-    enableGrid = 0 === images.length ? false : !enableGrid;
-    enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
-    updateLayout();
-  };
-  var updateGridOnUpdateLayout = function(img, w, h) {
-    if (enableGrid) {
-      addGrid(img);
-    } else {
-      removeGrid(img);
-    }
-    if (img.grid) {
-      $(img.grid).css({ width: w+'px', height: h+'px' });
-    }
-  };
-  var updateGridOnUpdateTransform = function(ent, commonStyle) {
-    if (ent.grid) {
+    };
+    var addGrid = function(img) {
+      if (img.element && 0 === img.view.find('.grid').length) {
+        makeGrid(img);
+      }
+    };
+    var removeGrid = function(img) {
+      if (img.grid) {
+        $(img.grid).remove();
+        img.grid = null;
+      }
+    };
+    var onUpdateLayout = function(img, w, h) {
+      if (enableGrid) {
+        addGrid(img);
+      } else {
+        removeGrid(img);
+      }
+      if (img.grid) {
+        $(img.grid).css({ width: w+'px', height: h+'px' });
+      }
+    };
+    var updateGridStyle = function(ent, commonStyle) {
       var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
       var strokeWidth = [
           (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
@@ -562,8 +565,18 @@ $( function() {
             attr('stroke-width', strokeWidth[index]).
             attr('opacity', opacity[index]);
       });
-    }
-  };
+    };
+    var onUpdateTransform = function(ent, commonStyle) {
+      if (ent.grid) {
+        updateGridStyle(ent, commonStyle);
+      }
+    };
+    return {
+      toggle: toggle,
+      onUpdateLayout: onUpdateLayout,
+      onUpdateTransform: onUpdateTransform
+    };
+  })();
   var updateCrossCursor = function(img, x, y, fixed) {
     var makeCrossCursor = function(x, y) {
       var pos = interpretOrientation(img, x, y);
@@ -695,7 +708,7 @@ $( function() {
         var temp = w; w = h; h = temp;
       }
       $(img.element).css({ width: w+'px', height: h+'px' });
-      updateGridOnUpdateLayout(img, w, h);
+      grid.onUpdateLayout(img, w, h);
       updateCrossCursorOnUpdateLayout(img, w, h);
     }
   };
@@ -1800,7 +1813,7 @@ $( function() {
                         ent.orientationAsCSS
         };
         $(ent.element).css(style);
-        updateGridOnUpdateTransform(ent, style);
+        grid.onUpdateTransform(ent, style);
         updateCrossCursorOnUpdateTransform(ent, style);
       }
     }
