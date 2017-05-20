@@ -514,35 +514,31 @@ $( function() {
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
       updateLayout();
     };
-    var makeGrid = function(img) {
-      var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
-      var makeGridDesc = function(step, skip) {
-        var desc = '';
-        for (var k = step; k < img.canvasWidth; k += step) {
-          if (skip && (k % skip) === 0) continue;
-          desc += 'M ' + k + ',0 l 0,' + img.canvasHeight + ' ';
-        }
-        for (var k = step; k < img.canvasHeight; k += step) {
-          if (skip && (k % skip) === 0) continue;
-          desc += 'M 0,' + k + ' l ' + img.canvasWidth + ',0 ';
-        }
-        return desc;
-      };
-      var grid100 = makeGridDesc(100);
-      var grid10 = makeGridDesc(10, 100);
+    var makePathDesc = function(size, step, skip) {
+      var desc = '';
+      for (var k = step; k < size.w; k += step) {
+        if (skip && (k % skip) === 0) continue;
+        desc += 'M ' + k + ',0 l 0,' + size.h + ' ';
+      }
+      for (var k = step; k < size.h; k += step) {
+        if (skip && (k % skip) === 0) continue;
+        desc += 'M 0,' + k + ' l ' + size.w + ',0 ';
+      }
+      return desc;
+    };
+    var addGrid = function(img) {
+      var size = { w: img.canvasWidth, h: img.canvasHeight };
+      var vbox = '0 0 ' + size.w + ' ' + size.h;
+      var grid100 = makePathDesc(size, 100);
+      var grid10 = makePathDesc(size, 10, 100);
       img.grid = $(
-        '<svg class="imageOverlay grid" viewBox="' + vb + '">' +
+        '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
           '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid100 + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid10 + '"></path>' +
         '</svg>').
-        width(img.canvasWidth).
-        height(img.canvasHeight);
+        width(size.w).
+        height(size.h);
       img.view.append(img.grid);
-    };
-    var addGrid = function(img) {
-      if (img.element && 0 === img.view.find('.grid').length) {
-        makeGrid(img);
-      }
     };
     var removeGrid = function(img) {
       if (img.grid) {
@@ -552,7 +548,9 @@ $( function() {
     };
     var onUpdateLayout = function(img, w, h) {
       if (enableGrid) {
-        addGrid(img);
+        if (img.element && 0 === img.view.find('.grid').length) {
+          addGrid(img);
+        }
       } else {
         removeGrid(img);
       }
@@ -589,7 +587,7 @@ $( function() {
   // Cross Cursor
   var crossCursor = (function() {
     var enableCrossCursor = false;
-    var makeCrossCursorPath = function(img, x, y) {
+    var makePathDesc = function(img, x, y) {
       var pos = interpretOrientation(img, x, y);
       var desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
@@ -599,13 +597,14 @@ $( function() {
       return desc;
     };
     var addCrossCursor = function(img, desc) {
-      var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
+      var size = { w: img.canvasWidth, h: img.canvasHeight };
+      var vbox = '0 0 ' + size.w + ' ' + size.h;
       img.cursor = $(
-        '<svg class="imageOverlay cursor" viewBox="' + vb + '">' +
+        '<svg class="imageOverlay cursor" viewBox="' + vbox + '">' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
         '</svg>').
-        width(img.canvasWidth).
-        height(img.canvasHeight);
+        width(size.w).
+        height(size.h);
       img.view.append(img.cursor);
     };
     var removeCrossCursor = function(img) {
@@ -618,7 +617,7 @@ $( function() {
       if (!img.element || x === null || x >= img.width || y >= img.height) {
         return;
       }
-      var desc = makeCrossCursorPath(img, x, y);
+      var desc = makePathDesc(img, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
       } else {
