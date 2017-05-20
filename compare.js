@@ -4,6 +4,16 @@
 })();
 
 $( function() {
+  var toggleLang = function() {
+    var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
+    $('#selectLang').val(lang);
+    changeLang(lang);
+  };
+  var toggleFullscreen = function() {
+    resetMouseDrag();
+    compareUtil.toggleFullscreen($('#viewroot').get(0));
+  };
+
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
     alert('The File APIs are not fully supported in this browser.');
@@ -287,11 +297,6 @@ $( function() {
     ignoreRemainder: false
   };
 
-  var toggleLang = function() {
-    var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
-    $('#selectLang').val(lang);
-    changeLang(lang);
-  };
   var setText = function(target, text) {
     for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
       var e = target.find('.' + lang);
@@ -454,6 +459,8 @@ $( function() {
       $('#overlay').removeClass('current');
     }
   };
+
+  // ROI map
   var roiMap = (function() {
     var enableMap = false;
     var toggle = function() {
@@ -499,6 +506,8 @@ $( function() {
       onUpdateTransform: onUpdateTransform
     };
   })();
+
+  // Grid
   var grid = (function() {
     var enableGrid = false;
     var toggle = function() {
@@ -1943,10 +1952,4 @@ $( function() {
     currentImageIndex = 0;
     updateDOM();
     nowLoadingDialog.update();
-  }
-
-  function toggleFullscreen()
-  {
-    resetMouseDrag();
-    compareUtil.toggleFullscreen($('#viewroot').get(0));
   }
