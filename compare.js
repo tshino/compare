@@ -274,7 +274,6 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var enableCrossCursor = false;
   var colorPickerInfo = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
@@ -586,8 +585,11 @@ $( function() {
       onUpdateTransform: onUpdateTransform
     };
   })();
-  var updateCrossCursor = function(img, x, y, fixed) {
-    var makeCrossCursor = function(x, y) {
+
+  // Cross Cursor
+  var crossCursor = (function() {
+    var enableCrossCursor = false;
+    var makeCrossCursorPath = function(img, x, y) {
       var pos = interpretOrientation(img, x, y);
       var desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
@@ -596,12 +598,8 @@ $( function() {
       desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
       return desc;
     };
-    if (!img.element || x === null || x >= img.width || y >= img.height) {
-      return;
-    }
-    if (0 === img.view.find('.cursor').length) {
+    var addCrossCursor = function(img, desc) {
       var vb = '0 0 ' + img.canvasWidth + ' ' + img.canvasHeight;
-      var desc = makeCrossCursor(x, y);
       img.cursor = $(
         '<svg class="imageOverlay cursor" viewBox="' + vb + '">' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
@@ -609,34 +607,49 @@ $( function() {
         width(img.canvasWidth).
         height(img.canvasHeight);
       img.view.append(img.cursor);
-    } else {
-      img.cursor.find('path').attr('d', makeCrossCursor(x, y));
-    }
-    img.cursor.find('path').attr('stroke-dasharray', fixed ? '' : '4,1');
-  };
-  var removeCrossCursor = function(img) {
-    if (img.cursor) {
-      $(img.cursor).remove();
-      img.cursor = null;
-    }
-  };
-  var updateCrossCursorOnUpdateLayout = function(img, w, h) {
-    if (enableCrossCursor) {
-      var fixed = colorPickerInfo && colorPickerInfo.fixed;
-      updateCrossCursor(img, 0, 0, fixed);
-    } else {
-      removeCrossCursor(img);
-    }
-    if (img.cursor) {
-      $(img.cursor).css({ width: w+'px', height: h+'px' });
-    }
-  };
-  var updateCrossCursorOnUpdateTransform = function(ent, commonStyle) {
-    if (ent.cursor) {
-      var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
-      $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
-    }
-  };
+    };
+    var removeCrossCursor = function(img) {
+      if (img.cursor) {
+        $(img.cursor).remove();
+        img.cursor = null;
+      }
+    };
+    var update = function(img, x, y, fixed) {
+      if (!img.element || x === null || x >= img.width || y >= img.height) {
+        return;
+      }
+      var desc = makeCrossCursorPath(img, x, y);
+      if (0 === img.view.find('.cursor').length) {
+        addCrossCursor(img, desc);
+      } else {
+        img.cursor.find('path').attr('d', desc);
+      }
+      img.cursor.find('path').attr('stroke-dasharray', fixed ? '' : '4,1');
+    };
+    var onUpdateLayout = function(img, w, h) {
+      if (enableCrossCursor) {
+        var fixed = colorPickerInfo && colorPickerInfo.fixed;
+        update(img, 0, 0, fixed);
+      } else {
+        removeCrossCursor(img);
+      }
+      if (img.cursor) {
+        $(img.cursor).css({ width: w+'px', height: h+'px' });
+      }
+    };
+    var onUpdateTransform = function(ent, commonStyle) {
+      if (ent.cursor) {
+        var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
+        $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
+      }
+    };
+    return {
+      enable: function(enable) { enableCrossCursor = enable === undefined || enable; },
+      update: update,
+      onUpdateLayout: onUpdateLayout,
+      onUpdateTransform: onUpdateTransform
+    };
+  })();
   var updateColorPicker = function(index, x, y, fixed) {
     index = index !== undefined ? index : colorPickerInfo.index;
     x = x !== undefined ? x : colorPickerInfo.x;
@@ -671,7 +684,7 @@ $( function() {
       });
       $('#colorRGB').text(css + ' ' + toRGB(rgb));
       for (var i = 0, img; img = images[i]; i++) {
-        updateCrossCursor(img, x, y, fixed);
+        crossCursor.update(img, x, y, fixed);
       }
     }
     colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
@@ -679,7 +692,7 @@ $( function() {
   };
   var toggleColorPicker = function() {
     colorPickerInfo = colorPickerInfo ? null : {};
-    enableCrossCursor = colorPickerInfo ? true : false;
+    crossCursor.enable(colorPickerInfo ? true : false);
     updateLayout();
   };
   var updateColorPickerOnUpdateLayout = function() {
@@ -718,7 +731,7 @@ $( function() {
       }
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
-      updateCrossCursorOnUpdateLayout(img, w, h);
+      crossCursor.onUpdateLayout(img, w, h);
     }
   };
   var swapBaseAndTargetImage = function() {
@@ -1823,7 +1836,7 @@ $( function() {
         };
         $(ent.element).css(style);
         grid.onUpdateTransform(ent, style);
-        updateCrossCursorOnUpdateTransform(ent, style);
+        crossCursor.onUpdateTransform(ent, style);
       }
     }
     roiMap.onUpdateTransform();
