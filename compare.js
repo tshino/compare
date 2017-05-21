@@ -87,8 +87,6 @@ $( function() {
     return false;
   });
 
-  $('#color button.close').click(function() { toggleColorPicker(); });
-
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
@@ -649,22 +647,9 @@ $( function() {
       onUpdateTransform: onUpdateTransform
     };
   })();
-  var updateColorPicker = function(index, x, y, fixed) {
-    index = index !== undefined ? index : colorPickerInfo.index;
-    x = x !== undefined ? x : colorPickerInfo.x;
-    y = y !== undefined ? y : colorPickerInfo.y;
-    fixed = fixed !== undefined ? fixed : colorPickerInfo.fixed;
-    if (index === null || !entries[index] || !entries[index].ready() || x === undefined) {
-      index = null;
-      $('#colorXY, #colorRGB').text('');
-      $('#colorSample').hide();
-      $('#colorBar').hide();
-    } else {
-      var context = entries[index].asCanvas.getContext('2d');
-      var canvasPoint = interpretOrientation(entries[index], x, y);
-      var imageData = context.getImageData(canvasPoint.x, canvasPoint.y, 1, 1);
-      var rgb = imageData.data;
-      var coord = 'X=' + x + ' Y=' + y;
+
+  var updateColorHUD = function(img, x, y, fixed) {
+    if (img.colorHUD) {
       var toCSS = function(rgb) {
         var lut = '0123456789ABCDEF';
         return '#' +
@@ -675,34 +660,92 @@ $( function() {
       var toRGB = function(rgb) {
         return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
       };
-      var css = toCSS(rgb);
-      $('#colorXY').text(coord + ' | ');
-      $('#colorSample').show().css('background', css);
-      $('#colorBar').show().find('span').each(function(index) {
-        $(this).css('width', (rgb[index]*127.5/255)+'px');
-      });
-      $('#colorRGB').text(css + ' ' + toRGB(rgb));
-      for (var i = 0, img; img = images[i]; i++) {
-        crossCursor.update(img, x, y, fixed);
+      var canvasPoint = interpretOrientation(img, x, y);
+      if (x < 0 || y < 0 || x >= img.canvasWidth || y >= img.canvasHeight) {
+        img.colorHUD.find('.colorXY, .colorRGB').text('');
+        img.colorHUD.find('.colorSample, .colorBar').hide();
+      } else {
+        var context = img.asCanvas.getContext('2d');
+        var imageData = context.getImageData(canvasPoint.x, canvasPoint.y, 1, 1);
+        var rgb = imageData.data;
+        var coord = 'X=' + x + ' Y=' + y;
+        var css = toCSS(rgb);
+        img.colorHUD.find('.colorXY').text(coord + ' | ');
+        img.colorHUD.find('.colorSample').show().css('background', css);
+        img.colorHUD.find('.colorBar').show().find('span').each(function(index) {
+          $(this).css('width', (rgb[index]*127.5/255)+'px');
+        });
+        img.colorHUD.find('.colorRGB').text(css + ' ' + toRGB(rgb));
       }
     }
+    crossCursor.update(img, x, y, fixed);
+  };
+  var updateColorPicker = function(index, x, y, fixed) {
+    index = index !== undefined ? index : colorPickerInfo.index;
+    x = x !== undefined ? x : colorPickerInfo.x;
+    y = y !== undefined ? y : colorPickerInfo.y;
+    fixed = fixed !== undefined ? fixed : colorPickerInfo.fixed;
     colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
-    //console.log('color(' + x + ',' + y + ') = ' + color);
+    for (var i = 0, img; img = images[i]; i++) {
+      updateColorHUD(img, x, y, fixed);
+    }
   };
   var toggleColorPicker = function() {
     colorPickerInfo = colorPickerInfo ? null : {};
     crossCursor.enable(colorPickerInfo ? true : false);
     updateLayout();
   };
-  var updateColorPickerOnUpdateLayout = function() {
-    if (colorPickerInfo) {
-      colorPickerInfo.index = isSingleView ? currentImageIndex - 1 : null;
-      if (!$('#color').is(':visible')) {
-        $('#color').show();
+  var addColorHUD = function(img) {
+    if (!img.colorHUD) {
+      if (0 === img.view.find('.hudContainer').length) {
+        img.view.append($('<div class="hudContainer">'));
       }
-      updateColorPicker();
-    } else if ($('#color').is(':visible')) {
-      $('#color').hide();
+      img.colorHUD = $('<div class="dark hud">').
+        css(
+          { 'pointer-events': 'auto', minWidth: '440px'}
+        ).append(
+          $('<span>').css({ display: 'inline-block' }).
+            append($('<span>').text('COLOR: ')).
+            append($('<span class="colorXY">')).
+            append($('<br>')).
+            append(
+              $('<span class="colorSample">').
+                css({
+                  display: 'inline-block',
+                  width: '1em', height: '1em', verticalAlign: 'middle'
+                })
+            ).append(
+              $('<span class="colorBar">').
+                css({
+                  display: 'inline-block', background: '#000',
+                  lineHeight: '0.1', width: '127.5px', verticalAlign: 'middle'
+                }).append(
+                  $('<span style="display: inline-block; background:#f00; height:5px;"></span><br>')
+                ).append(
+                  $('<span style="display: inline-block; background:#0f0; height:5px;"></span><br>')
+                ).append(
+                  $('<span style="display: inline-block; background:#00f; height:5px;"></span>')
+                )
+            ).append(
+              $('<span class="colorRGB">')
+            )
+        ).append(
+          $('<button class="close">').
+            text('×').
+            click(toggleColorPicker)
+        );
+      img.view.find('.hudContainer').append(img.colorHUD);
+      img.colorHUD.show();
+    }
+  };
+  var updateColorPickerOnUpdateLayout = function(img) {
+    if (colorPickerInfo) {
+      addColorHUD(img);
+    } else {
+      if (img.colorHUD) {
+        img.colorHUD.remove();
+        img.colorHUD = null;
+      }
     }
   };
   var makeImageLayoutParam = function() {
@@ -731,6 +774,7 @@ $( function() {
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
+      updateColorPickerOnUpdateLayout(img);
     }
   };
   var swapBaseAndTargetImage = function() {
@@ -1817,7 +1861,6 @@ $( function() {
     });
     updateOverlayModeIndicator();
     roiMap.onUpdateLayout();
-    updateColorPickerOnUpdateLayout();
     updateSelectorButtonState();
     updateTransform();
     adjustDialogPosition();
