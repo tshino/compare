@@ -660,13 +660,13 @@ $( function() {
       var toRGB = function(rgb) {
         return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
       };
-      var canvasPoint = interpretOrientation(img, x, y);
-      if (x < 0 || y < 0 || x >= img.canvasWidth || y >= img.canvasHeight) {
+      var pos = interpretOrientation(img, x, y);
+      if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
         img.colorHUD.find('.colorXY, .colorRGB').text('');
         img.colorHUD.find('.colorSample, .colorBar').hide();
       } else {
         var context = img.asCanvas.getContext('2d');
-        var imageData = context.getImageData(canvasPoint.x, canvasPoint.y, 1, 1);
+        var imageData = context.getImageData(pos.x, pos.y, 1, 1);
         var rgb = imageData.data;
         var coord = 'X=' + x + ' Y=' + y;
         var css = toCSS(rgb);
