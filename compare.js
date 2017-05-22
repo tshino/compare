@@ -678,16 +678,12 @@ $( function() {
         img.colorHUD.find('.colorRGB').text(css + ' ' + toRGB(rgb));
       }
     }
-    crossCursor.update(img, x, y, fixed);
   };
   var updateColorPicker = function(index, x, y, fixed) {
-    index = index !== undefined ? index : colorPickerInfo.index;
-    x = x !== undefined ? x : colorPickerInfo.x;
-    y = y !== undefined ? y : colorPickerInfo.y;
-    fixed = fixed !== undefined ? fixed : colorPickerInfo.fixed;
     colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
     for (var i = 0, img; img = images[i]; i++) {
       updateColorHUD(img, x, y, fixed);
+      crossCursor.update(img, x, y, fixed);
     }
   };
   var toggleColorPicker = function() {
