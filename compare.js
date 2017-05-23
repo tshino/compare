@@ -696,40 +696,33 @@ $( function() {
       if (0 === img.view.find('.hudContainer').length) {
         img.view.append($('<div class="hudContainer">'));
       }
-      img.colorHUD = $('<div class="dark hud">').
-        css(
-          { 'pointer-events': 'auto', minWidth: '440px'}
-        ).append(
-          $('<span>').css({ display: 'inline-block' }).
-            append($('<span>').text('COLOR: ')).
-            append($('<span class="colorXY">')).
-            append($('<br>')).
-            append(
-              $('<span class="colorSample">').
-                css({
-                  display: 'inline-block',
-                  width: '1em', height: '1em', verticalAlign: 'middle'
-                })
-            ).append(
-              $('<span class="colorBar">').
-                css({
-                  display: 'inline-block', background: '#000',
-                  lineHeight: '0.1', width: '127.5px', verticalAlign: 'middle'
-                }).append(
-                  $('<span style="display: inline-block; background:#f00; height:5px;"></span><br>')
-                ).append(
-                  $('<span style="display: inline-block; background:#0f0; height:5px;"></span><br>')
-                ).append(
-                  $('<span style="display: inline-block; background:#00f; height:5px;"></span>')
-                )
-            ).append(
-              $('<span class="colorRGB">')
-            )
-        ).append(
-          $('<button class="close">').
-            text('×').
-            click(toggleColorPicker)
-        );
+      img.colorHUD = $(
+        '<div class="dark hud" style="pointer-events: auto; min-width: 440px">' +
+          '<span style="display: inline-block">' +
+            '<span>COLOR: </span>' +
+            '<span class="colorXY"></span>' +
+            '<br>' +
+            '<span class="colorSample" style="' +
+                'display: inline-block; ' +
+                'width: 1em; height: 1em; vertical-align: middle; ' +
+                '">' +
+            '</span>' +
+            '<span class="colorBar" style="' +
+                'display: inline-block; background: #000; ' +
+                'line-height: 0.1; width: 127.5px; vertical-align: middle; ' +
+                '">' +
+              '<span style="display: inline-block; background:#f00; height:5px;"></span>' +
+              '<br>' +
+              '<span style="display: inline-block; background:#0f0; height:5px;"></span>' +
+              '<br>' +
+              '<span style="display: inline-block; background:#00f; height:5px;"></span>' +
+            '</span>' +
+            '<span class="colorRGB"></span>' +
+          '</span>' +
+          '<button class="close">×</button>' +
+        '</div>'
+      );
+      img.colorHUD.find('button.close').click(toggleColorPicker);
       img.view.find('.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
     }
