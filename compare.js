@@ -625,8 +625,10 @@ $( function() {
     };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
+        var x = colorPickerInfo ? (colorPickerInfo.x || 0) : 0;
+        var y = colorPickerInfo ? (colorPickerInfo.y || 0) : 0;
         var fixed = colorPickerInfo && colorPickerInfo.fixed;
-        update(img, 0, 0, fixed);
+        update(img, x, y, fixed);
       } else {
         removeCrossCursor(img);
       }
