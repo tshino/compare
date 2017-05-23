@@ -657,25 +657,26 @@ $( function() {
             lut[rgb[1] >> 4] + lut[rgb[1] % 16] +
             lut[rgb[2] >> 4] + lut[rgb[2] % 16];
       };
-      var toRGB = function(rgb) {
-        return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
-      };
       var pos = interpretOrientation(img, x, y);
       if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
-        img.colorHUD.find('.colorXY, .colorRGB').text('');
+        img.colorHUD.find('.colorXY span, .colorCSS, .colorRGB span').text('');
         img.colorHUD.find('.colorSample, .colorBar').hide();
       } else {
         var context = img.asCanvas.getContext('2d');
         var imageData = context.getImageData(pos.x, pos.y, 1, 1);
         var rgb = imageData.data;
-        var coord = 'X=' + x + ' Y=' + y;
         var css = toCSS(rgb);
-        img.colorHUD.find('.colorXY').text(coord + ' | ');
         img.colorHUD.find('.colorSample').show().css('background', css);
         img.colorHUD.find('.colorBar').show().find('span').each(function(index) {
           $(this).css('width', (rgb[index]*127.5/255)+'px');
         });
-        img.colorHUD.find('.colorRGB').text(css + ' ' + toRGB(rgb));
+        img.colorHUD.find('.colorCSS').text(css);
+        img.colorHUD.find('.colorRGB span').each(function(i) {
+          $(this).text(rgb[i]);
+        });
+        img.colorHUD.find('.colorXY span').each(function(i) {
+          $(this).text([x,y][i]);
+        });
       }
     }
   };
@@ -697,11 +698,8 @@ $( function() {
         img.view.append($('<div class="hudContainer">'));
       }
       img.colorHUD = $(
-        '<div class="dark hud" style="pointer-events: auto; min-width: 440px">' +
+        '<div class="dark hud" style="pointer-events: auto; min-width: 280px">' +
           '<span style="display: inline-block">' +
-            '<span>COLOR: </span>' +
-            '<span class="colorXY"></span>' +
-            '<br>' +
             '<span class="colorSample" style="' +
                 'display: inline-block; ' +
                 'width: 1em; height: 1em; vertical-align: middle; ' +
@@ -717,7 +715,11 @@ $( function() {
               '<br>' +
               '<span style="display: inline-block; background:#00f; height:5px;"></span>' +
             '</span>' +
-            '<span class="colorRGB"></span>' +
+            '<span class="colorCSS"></span>' +
+            '<br>' +
+            '<span class="colorRGB">RGB: <span></span>,<span></span>,<span></span></span>' +
+            '<br>' +
+            '<span class="colorXY">XY: <span></span>,<span></span></span>' +
           '</span>' +
           '<button class="close">×</button>' +
         '</div>'
