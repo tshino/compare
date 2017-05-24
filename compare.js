@@ -239,6 +239,9 @@ $( function() {
       updateColorPicker(e.index, x, y, fixed);
     }
   });
+  $('#view').on('mousedown', 'div.hudContainer', function(e) {
+    e.stopPropagation();
+  });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
     if (colorPickerInfo && !colorPickerInfo.fixed) {
       var selector = '#view > div.imageBox';
