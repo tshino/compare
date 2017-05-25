@@ -46,6 +46,7 @@ $( function() {
   $('#arrange').click(arrangeLayout);
   $('#overlay').click(toggleOverlay);
   $('#gridbtn').click(grid.toggle);
+  $('#pickerbtn').click(toggleColorPicker);
   $('#fullscreen').click(toggleFullscreen);
   $('#helpbtn').click(toggleHelp);
 
@@ -694,6 +695,7 @@ $( function() {
   };
   var toggleColorPicker = function() {
     colorPickerInfo = colorPickerInfo ? null : {};
+    colorPickerInfo ? $('#pickerbtn').addClass('current') : $('#pickerbtn').removeClass('current');
     crossCursor.enable(colorPickerInfo ? true : false);
     updateLayout();
   };
