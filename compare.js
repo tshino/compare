@@ -512,7 +512,7 @@ $( function() {
   var grid = (function() {
     var enableGrid = false;
     var toggle = function() {
-      enableGrid = 0 === images.length ? false : !enableGrid;
+      enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
       updateLayout();
     };
