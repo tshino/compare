@@ -686,11 +686,29 @@ $( function() {
       }
     }
   };
+  var adjustHUDPlacementToAvoidPoint = function(position) {
+    var center = viewZoom.getCenter();
+    style = {};
+    style['bottom'] = position.y < center.y + 0.5 ? '0px' : 'auto';
+    style['right'] = position.x < center.x + 0.5 ? '0px' : 'auto';
+    for (var i = 0, img; img = images[i]; i++) {
+      img.view.find('div.hudContainer').css(style);
+    }
+  };
+  var adjustColorHUDPlacement = function(index) {
+    if (colorPickerInfo && colorPickerInfo.index === index) {
+      adjustHUDPlacementToAvoidPoint({
+        x: colorPickerInfo.x / entries[index].width,
+        y: colorPickerInfo.y / entries[index].height
+      });
+    };
+  };
   var updateColorPicker = function(index, x, y, fixed) {
     colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
     for (var i = 0, img; img = images[i]; i++) {
       updateColorHUD(img, x, y, fixed);
       crossCursor.update(img, x, y, fixed);
+      adjustColorHUDPlacement(i);
     }
   };
   var toggleColorPicker = function() {
@@ -701,7 +719,7 @@ $( function() {
   };
   var addColorHUD = function(img) {
     if (!img.colorHUD) {
-      if (0 === img.view.find('.hudContainer').length) {
+      if (0 === img.view.find('div.hudContainer').length) {
         img.view.append($('<div class="hudContainer">'));
       }
       img.colorHUD = $(
@@ -732,7 +750,7 @@ $( function() {
         '</div>'
       );
       img.colorHUD.find('button.close').click(toggleColorPicker);
-      img.view.find('.hudContainer').append(img.colorHUD);
+      img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
     }
   };
@@ -745,6 +763,9 @@ $( function() {
         img.colorHUD = null;
       }
     }
+  };
+  var updateColorPickerOnUpdateTransform = function(ent) {
+    adjustColorHUDPlacement(ent.index);
   };
   var makeImageLayoutParam = function() {
     var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
@@ -1877,6 +1898,7 @@ $( function() {
         $(ent.element).css(style);
         grid.onUpdateTransform(ent, style);
         crossCursor.onUpdateTransform(ent, style);
+        updateColorPickerOnUpdateTransform(ent);
       }
     }
     roiMap.onUpdateTransform();
