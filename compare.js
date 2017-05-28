@@ -723,6 +723,18 @@ $( function() {
     colorPickerInfo ? $('#pickerbtn').addClass('current') : $('#pickerbtn').removeClass('current');
     crossCursor.enable(colorPickerInfo ? true : false);
     updateLayout();
+    if (colorPickerInfo) {
+      var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+      if (0 <= index) {
+        var img = entries[index];
+        var center = viewZoom.getCenter();
+        var x = (0.5 + center.x) * img.width;
+        var y = (0.5 + center.y) * img.height;
+        x = compareUtil.clamp(Math.floor(x), 0, img.width - 1);
+        y = compareUtil.clamp(Math.floor(y), 0, img.height - 1);
+        updateColorPicker(index, x, y, false);
+      }
+    }
   };
   var addColorHUD = function(img) {
     if (!img.colorHUD) {
