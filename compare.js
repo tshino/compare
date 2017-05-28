@@ -686,11 +686,18 @@ $( function() {
       }
     }
   };
+  var hudPlacement = { right: true, bottom: true };
   var adjustHUDPlacementToAvoidPoint = function(position) {
     var center = viewZoom.getCenter();
+    var relative = {
+        x: (position.x - (center.x + 0.5)) * viewZoom.scale,
+        y: (position.y - (center.y + 0.5)) * viewZoom.scale
+    };
+    hudPlacement.right = relative.x < (hudPlacement.right ? 0.3 : -0.3);
+    hudPlacement.bottom = relative.y < (hudPlacement.bottom ? 0.4 : -0.4);
     style = {};
-    style['bottom'] = position.y < center.y + 0.5 ? '0px' : 'auto';
-    style['right'] = position.x < center.x + 0.5 ? '0px' : 'auto';
+    style['right'] = hudPlacement.right ? '0px' : 'auto';
+    style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
     for (var i = 0, img; img = images[i]; i++) {
       img.view.find('div.hudContainer').css(style);
     }
