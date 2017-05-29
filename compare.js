@@ -147,6 +147,10 @@ $( function() {
         toggleSingleView(e.keyCode % 48);
         return false;
       }
+      // Cross cursor
+      if (false === processKeyDownForCrossCursor(e)) {
+        return false;
+      }
       // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
       if (!viewZoom.processKeyDown(e)) {
         return false;
@@ -733,6 +737,20 @@ $( function() {
         x = compareUtil.clamp(Math.floor(x), 0, img.width - 1);
         y = compareUtil.clamp(Math.floor(y), 0, img.height - 1);
         updateColorPicker(index, x, y, false);
+      }
+    }
+  };
+  var processKeyDownForCrossCursor = function(e) {
+    if (colorPickerInfo && colorPickerInfo.index !== undefined) {
+      // cursor key
+      if (37 <= e.keyCode && e.keyCode <= 40) {
+        var img = entries[colorPickerInfo.index];
+        var x = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
+        var y = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
+        x = compareUtil.clamp(colorPickerInfo.x + x, 0, img.width - 1);
+        y = compareUtil.clamp(colorPickerInfo.y + y, 0, img.height - 1);
+        updateColorPicker(colorPickerInfo.index, x, y, colorPickerInfo.fixed);
+        return false;
       }
     }
   };
