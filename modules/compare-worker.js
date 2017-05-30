@@ -571,6 +571,15 @@ var imageUtil = (function() {
     }
     //} console.timeEnd(method);
   };
+  var gaussianBlur = function(dest, src, stdev) {
+    var filterSize = Math.round(4 * stdev) * 2;
+    var a = 1 / Math.sqrt(2 * Math.PI * stdev * stdev);
+    var b = -1 / (2 * stdev * stdev);
+    var gaussian = function(x) {
+      return a * Math.exp(b * x * x);
+    };
+    return resizeGeneral(dest, src, filterSize, gaussian);
+  };
   return {
     makeImage:      makeImage,
     makeRegion:     makeRegion,
@@ -578,7 +587,8 @@ var imageUtil = (function() {
     copy:           copy,
     resize:         resize,
     resizeNN:       resizeNN,
-    resizeBilinear: resizeBilinear
+    resizeBilinear: resizeBilinear,
+    gaussianBlur:   gaussianBlur
   };
 })();
 
