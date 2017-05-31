@@ -572,6 +572,8 @@ var imageUtil = (function() {
     //} console.timeEnd(method);
   };
   var gaussianBlur = function(dest, src, stdev) {
+    //console.log('blur :' + src.width + 'x' + src.height + ' => ' +
+    //            dest.width + 'x' + dest.height + ' (' + stdev + ')');
     var filterSize = Math.round(4 * stdev) * 2;
     var a = 1 / Math.sqrt(2 * Math.PI * stdev * stdev);
     var b = -1 / (2 * stdev * stdev);
@@ -579,6 +581,21 @@ var imageUtil = (function() {
       return a * Math.exp(b * x * x);
     };
     return resizeGeneral(dest, src, filterSize, gaussian);
+  };
+  var resizeWithGaussianBlur = function(dest, src) {
+    var lx = Math.log(dest.width / src.width);
+    var ly = Math.log(dest.height / src.height);
+    var n = Math.max(1, Math.round(Math.max(-lx, -ly) / Math.log(2)));
+    for (var k = 0; k < n; ++k) {
+      var sx = Math.exp(lx / n);
+      var sy = Math.exp(ly / n);
+      var w = Math.round(src.width * sx);
+      var h = Math.round(src.height * sy);
+      var temp = k + 1 < n ? imageUtil.makeImage(w, h) : dest;
+      var stdev = 0.5 / Math.min(sx, sy);
+      imageUtil.gaussianBlur(temp, src, stdev);
+      src = temp;
+    }
   };
   return {
     makeImage:      makeImage,
@@ -588,7 +605,8 @@ var imageUtil = (function() {
     resize:         resize,
     resizeNN:       resizeNN,
     resizeBilinear: resizeBilinear,
-    gaussianBlur:   gaussianBlur
+    gaussianBlur:   gaussianBlur,
+    resizeWithGaussianBlur: resizeWithGaussianBlur
   };
 })();
 
