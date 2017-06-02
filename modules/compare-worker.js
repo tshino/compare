@@ -607,7 +607,7 @@ var imageUtil = (function() {
     var oy = Math.floor(kh / 2);
     var i = dest.offset * 4;
     var ddata = dest.data, sdata = src.data;
-    var floor = Math.floor;
+    var round = Math.round;
     var sxo = new Uint32Array(w * kw);
     var syo = new Uint32Array(h * kh);
     for (var x = 0; x < w; x++) {
@@ -619,11 +619,11 @@ var imageUtil = (function() {
     for (var y = 0; y < h; y++) {
       for (var k = 0; k < kh; k++) {
         var ky = Math.max(0, Math.min(h - 1, y - oy + k));
-        syo[y * kh + k] = 4 * src.picth * ky;
+        syo[y * kh + k] = 4 * src.pitch * ky;
       }
     }
+    var j0 = src.offset * 4;
     for (var y = 0; y < h; y++) {
-      var j0 = src.offset * 4;
       for (var x = 0; x < w; x++, i += 4) {
         var r = 0, g = 0, b = 0, a = 0;
         for (var ky = 0, k = 0; ky < kh; ky++) {
@@ -637,10 +637,10 @@ var imageUtil = (function() {
             a += c * sdata[j + 3];
           }
         }
-        ddata[i    ] = r;
-        ddata[i + 1] = g;
-        ddata[i + 2] = b;
-        ddata[i + 3] = a;
+        ddata[i    ] = Math.max(0, Math.min(255, round(128 + r)));
+        ddata[i + 1] = Math.max(0, Math.min(255, round(128 + g)));
+        ddata[i + 2] = Math.max(0, Math.min(255, round(128 + b)));
+        ddata[i + 3] = Math.max(0, Math.min(255, round(128 + a)));
       }
       i += (dest.pitch - w) * 4;
     }
@@ -654,7 +654,8 @@ var imageUtil = (function() {
     resizeNN:       resizeNN,
     resizeBilinear: resizeBilinear,
     gaussianBlur:   gaussianBlur,
-    resizeWithGaussianBlur: resizeWithGaussianBlur
+    resizeWithGaussianBlur: resizeWithGaussianBlur,
+    convolution:    convolution
   };
 })();
 
