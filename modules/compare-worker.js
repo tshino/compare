@@ -645,6 +645,20 @@ var imageUtil = (function() {
       i += (dest.pitch - w) * 4;
     }
   };
+  var sobelX = function(dest, src) {
+    convolution(dest, src, { w: 3, h: 3 }, [
+      -1, 0, 1,
+      -2, 0, 2,
+      -1, 0, 1
+    ]);
+  };
+  var sobelY = function(dest, src) {
+    convolution(dest, src, { w: 3, h: 3 }, [
+      -1, -2, -1,
+       0,  0,  0,
+       1,  2,  1
+    ]);
+  };
   return {
     makeImage:      makeImage,
     makeRegion:     makeRegion,
@@ -655,7 +669,9 @@ var imageUtil = (function() {
     resizeBilinear: resizeBilinear,
     gaussianBlur:   gaussianBlur,
     resizeWithGaussianBlur: resizeWithGaussianBlur,
-    convolution:    convolution
+    convolution:    convolution,
+    sobelX:         sobelX,
+    sobelY:         sobelY
   };
 })();
 
