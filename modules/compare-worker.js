@@ -575,6 +575,9 @@ var imageUtil = (function() {
     //console.log('blur :' + src.width + 'x' + src.height + ' => ' +
     //            dest.width + 'x' + dest.height + ' (' + stdev + ')');
     var filterSize = Math.round(4 * stdev) * 2;
+    if (filterSize === 0) {
+      return resizeNN(dest, src);
+    }
     var a = 1 / Math.sqrt(2 * Math.PI * stdev * stdev);
     var b = -1 / (2 * stdev * stdev);
     var gaussian = function(x) {
@@ -658,6 +661,75 @@ var imageUtil = (function() {
        0,  0,  0,
        1,  2,  1
     ]);
+  };
+  var estimateMotion = function(a, b) {
+    var baseA = imageUtil.makeImage(256, 256);
+    var baseB = imageUtil.makeImage(256, 256);
+    var blurA = imageUtil.makeImage(256, 256);
+    var blurB = imageUtil.makeImage(256, 256);
+    imageUtil.resizeWithGaussianBlur(baseA, a);
+    imageUtil.resizeWithGaussianBlur(baseB, b);
+    imageUtil.gaussianBlur(blurA, baseA, 20);
+    imageUtil.gaussianBlur(blurB, baseB, 20);
+    var gradAX = imageUtil.makeImage(256, 256);
+    var gradBX = imageUtil.makeImage(256, 256);
+    imageUtil.sobelX(gradAX, blurA);
+    imageUtil.sobelX(gradBX, blurB);
+    var w = 256, h = 256;
+    var input = [ blurA, blurB, gradAX, gradBX ];
+    var d = [];
+    var i = [];
+    for (var k = 0; k < input.length; k++) {
+      d[k] = input[k].data;
+      i[k] = input[k].offset * 4;
+    }
+    var motionXsum = 0, motionXcount = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++) {
+        for (var e = 0; e < 3; e++) {
+          var d0 = d[0][i[0] + e];
+          var d1 = d[1][i[1] + e];
+          var d2 = d[2][i[2] + e];
+          var d3 = d[3][i[3] + e];
+          var valA = d0;
+          var valB = d1;
+          if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255) {
+            continue;
+          }
+          var dAX = (d2 - 128) / 8;
+          var dBX = (d3 - 128) / 8;
+          if (Math.abs(valA - valB) < 20) {
+            continue;
+          }
+          if (Math.abs(dAX) < 1 || Math.abs(dBX) < 1){
+            continue;
+          }
+          var mxA = (valA - valB) / dAX;
+          var mxB = (valA - valB) / dBX;
+          if ((mxA < 0) !== (mxB < 0) ||
+              Math.abs(mxA) * 1.1 < Math.abs(mxB) ||
+              Math.abs(mxB) * 1.1 < Math.abs(mxA)) {
+            continue;
+          }
+          motionXsum += mxA;
+          motionXsum += mxB;
+          motionXcount += 2;
+        }
+        //
+        for (var k = 0; k < input.length; k++) {
+          i[k] += 4;
+        }
+      }
+      //
+      for (var k = 0; k < input.length; k++) {
+        i[k] += (input[k].pitch - w) * 4;
+      }
+    }
+    console.log('motionXsum = ' + motionXsum);
+    console.log('motionXcount = ' + motionXcount);
+    if (motionXcount !== 0) {
+      console.log('mx --> ' + motionXsum / motionXcount);
+    }
   };
   return {
     makeImage:      makeImage,
