@@ -117,6 +117,7 @@ $( function() {
             return false;
           }
           if ($('#diff').is(':visible') &&
+              num - 1 < entries.length &&
               entries[num - 1].ready() &&
               baseImageIndex !== null && targetImageIndex !== null &&
               targetImageIndex !== num - 1) {
@@ -126,6 +127,7 @@ $( function() {
             return false;
           }
           if ($('#metrics').is(':visible') &&
+              num - 1 < entries.length &&
               entries[num - 1].ready() &&
               baseImageIndex !== null &&
               baseImageIndex !== num - 1) {
