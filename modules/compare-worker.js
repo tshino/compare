@@ -663,20 +663,24 @@ var imageUtil = (function() {
     ]);
   };
   var estimateMotion = function(a, b) {
-    var baseA = imageUtil.makeImage(256, 256);
-    var baseB = imageUtil.makeImage(256, 256);
-    var blurA = imageUtil.makeImage(256, 256);
-    var blurB = imageUtil.makeImage(256, 256);
+    var w = 256, h = 256;
+    var baseA = imageUtil.makeImage(w, h);
+    var baseB = imageUtil.makeImage(w, h);
+    var blurA = imageUtil.makeImage(w, h);
+    var blurB = imageUtil.makeImage(w, h);
     imageUtil.resizeWithGaussianBlur(baseA, a);
     imageUtil.resizeWithGaussianBlur(baseB, b);
     imageUtil.gaussianBlur(blurA, baseA, 20);
     imageUtil.gaussianBlur(blurB, baseB, 20);
-    var gradAX = imageUtil.makeImage(256, 256);
-    var gradBX = imageUtil.makeImage(256, 256);
+    var gradAX = imageUtil.makeImage(w, h);
+    var gradBX = imageUtil.makeImage(w, h);
+    var gradAY = imageUtil.makeImage(w, h);
+    var gradBY = imageUtil.makeImage(w, h);
     imageUtil.sobelX(gradAX, blurA);
     imageUtil.sobelX(gradBX, blurB);
-    var w = 256, h = 256;
-    var input = [ blurA, blurB, gradAX, gradBX ];
+    imageUtil.sobelY(gradAY, blurA);
+    imageUtil.sobelY(gradBY, blurB);
+    var input = [ blurA, blurB, gradAX, gradBX, gradAY, gradBY ];
     var d = [];
     var i = [];
     for (var k = 0; k < input.length; k++) {
@@ -684,6 +688,7 @@ var imageUtil = (function() {
       i[k] = input[k].offset * 4;
     }
     var motionXsum = 0, motionXcount = 0;
+    var motionYsum = 0, motionYcount = 0;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++) {
         for (var e = 0; e < 3; e++) {
@@ -691,29 +696,43 @@ var imageUtil = (function() {
           var d1 = d[1][i[1] + e];
           var d2 = d[2][i[2] + e];
           var d3 = d[3][i[3] + e];
+          var d4 = d[4][i[4] + e];
+          var d5 = d[5][i[5] + e];
           var valA = d0;
           var valB = d1;
-          if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255) {
+          if (Math.abs(valA - valB) < 20) {
+            continue;
+          }
+          if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255 ||
+              d4 === 0 || d4 === 255 || d5 === 0 || d5 === 255) {
             continue;
           }
           var dAX = (d2 - 128) / 8;
           var dBX = (d3 - 128) / 8;
-          if (Math.abs(valA - valB) < 20) {
-            continue;
+          if (1 <= Math.abs(dAX) && 1 <= Math.abs(dBX)) {
+            var mxA = (valA - valB) / dAX;
+            var mxB = (valA - valB) / dBX;
+            if ((mxA < 0) === (mxB < 0) &&
+                Math.abs(mxA) * 1.1 >= Math.abs(mxB) &&
+                Math.abs(mxB) * 1.1 >= Math.abs(mxA)) {
+              motionXsum += mxA;
+              motionXsum += mxB;
+              motionXcount += 2;
+            }
           }
-          if (Math.abs(dAX) < 1 || Math.abs(dBX) < 1){
-            continue;
+          var dAY = (d4 - 128) / 8;
+          var dBY = (d5 - 128) / 8;
+          if (1 <= Math.abs(dAY) && 1 <= Math.abs(dBY)) {
+            var myA = (valA - valB) / dAY;
+            var myB = (valA - valB) / dBY;
+            if ((myA < 0) === (myB < 0) &&
+                Math.abs(myA) * 1.1 >= Math.abs(myB) &&
+                Math.abs(myB) * 1.1 >= Math.abs(myA)) {
+              motionYsum += myA;
+              motionYsum += myB;
+              motionYcount += 2;
+            }
           }
-          var mxA = (valA - valB) / dAX;
-          var mxB = (valA - valB) / dBX;
-          if ((mxA < 0) !== (mxB < 0) ||
-              Math.abs(mxA) * 1.1 < Math.abs(mxB) ||
-              Math.abs(mxB) * 1.1 < Math.abs(mxA)) {
-            continue;
-          }
-          motionXsum += mxA;
-          motionXsum += mxB;
-          motionXcount += 2;
         }
         //
         for (var k = 0; k < input.length; k++) {
@@ -725,11 +744,19 @@ var imageUtil = (function() {
         i[k] += (input[k].pitch - w) * 4;
       }
     }
-    console.log('motionXsum = ' + motionXsum);
-    console.log('motionXcount = ' + motionXcount);
-    if (motionXcount !== 0) {
-      console.log('mx --> ' + motionXsum / motionXcount);
+    var nx = motionXcount === 0 ? null : motionXsum / motionXcount;
+    var ny = motionYcount === 0 ? null : motionYsum / motionYcount;
+    var mx = nx === null ? null : nx * a.width / w;
+    var my = ny === null ? null : ny * a.height / h;
+    console.log('motion x (sum = ' + motionXsum.toFixed(3) + ', count = ' + motionXcount + ')');
+    if (nx !== null) {
+      console.log('  --> ' + mx.toFixed(3) + 'px (sum/count = ' + nx.toFixed(5) + ')');
     }
+    console.log('motion y (sum = ' + motionYsum.toFixed(3) + ', count = ' + motionYcount + ')');
+    if (ny !== null) {
+      console.log('  --> ' + my.toFixed(3) + 'px (sum/count = ' + ny.toFixed(5) + ')');
+    }
+    return { motionX: mx, motionY: my };
   };
   return {
     makeImage:      makeImage,
@@ -743,7 +770,8 @@ var imageUtil = (function() {
     resizeWithGaussianBlur: resizeWithGaussianBlur,
     convolution:    convolution,
     sobelX:         sobelX,
-    sobelY:         sobelY
+    sobelY:         sobelY,
+    estimateMotion: estimateMotion
   };
 })();
 
