@@ -692,15 +692,14 @@ var imageUtil = (function() {
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++) {
         for (var e = 0; e < 3; e++) {
-          var d0 = d[0][i[0] + e];
-          var d1 = d[1][i[1] + e];
+          var valA = d[0][i[0] + e];
+          var valB = d[1][i[1] + e];
           var d2 = d[2][i[2] + e];
           var d3 = d[3][i[3] + e];
           var d4 = d[4][i[4] + e];
           var d5 = d[5][i[5] + e];
-          var valA = d0;
-          var valB = d1;
-          if (Math.abs(valA - valB) < 20) {
+          var diff = valA - valB;
+          if (Math.abs(diff) < 20) {
             continue;
           }
           if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255 ||
@@ -710,8 +709,8 @@ var imageUtil = (function() {
           var dAX = (d2 - 128) / 8;
           var dBX = (d3 - 128) / 8;
           if (1 <= Math.abs(dAX) && 1 <= Math.abs(dBX)) {
-            var mxA = (valA - valB) / dAX;
-            var mxB = (valA - valB) / dBX;
+            var mxA = diff / dAX;
+            var mxB = diff / dBX;
             if ((mxA < 0) === (mxB < 0) &&
                 Math.abs(mxA) * 1.1 >= Math.abs(mxB) &&
                 Math.abs(mxB) * 1.1 >= Math.abs(mxA)) {
@@ -723,8 +722,8 @@ var imageUtil = (function() {
           var dAY = (d4 - 128) / 8;
           var dBY = (d5 - 128) / 8;
           if (1 <= Math.abs(dAY) && 1 <= Math.abs(dBY)) {
-            var myA = (valA - valB) / dAY;
-            var myB = (valA - valB) / dBY;
+            var myA = diff / dAY;
+            var myB = diff / dBY;
             if ((myA < 0) === (myB < 0) &&
                 Math.abs(myA) * 1.1 >= Math.abs(myB) &&
                 Math.abs(myB) * 1.1 >= Math.abs(myA)) {
