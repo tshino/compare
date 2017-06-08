@@ -708,30 +708,21 @@ var imageUtil = (function() {
           }
           var dAX = (d2 - 128) / 8;
           var dBX = (d3 - 128) / 8;
-          if (1 <= Math.abs(dAX) && 1 <= Math.abs(dBX)) {
-            var mxA = diff / dAX;
-            var mxB = diff / dBX;
-            if ((mxA < 0) === (mxB < 0) &&
-                Math.abs(mxA) * 1.1 >= Math.abs(mxB) &&
-                Math.abs(mxB) * 1.1 >= Math.abs(mxA)) {
-              motionXsum += mxA;
-              motionXsum += mxB;
-              motionXcount += 2;
-            }
-          }
           var dAY = (d4 - 128) / 8;
           var dBY = (d5 - 128) / 8;
-          if (1 <= Math.abs(dAY) && 1 <= Math.abs(dBY)) {
-            var myA = diff / dAY;
-            var myB = diff / dBY;
-            if ((myA < 0) === (myB < 0) &&
-                Math.abs(myA) * 1.1 >= Math.abs(myB) &&
-                Math.abs(myB) * 1.1 >= Math.abs(myA)) {
-              motionYsum += myA;
-              motionYsum += myB;
-              motionYcount += 2;
-            }
+          var dX = (dAX + dBX) / 2;
+          var dY = (dAY + dBY) / 2;
+          var sq = Math.sqrt(dX * dX + dY * dY);
+          if (sq < 1 ||
+              sq * 0.1 < Math.abs(dAX - dBX) ||
+              sq * 0.1 < Math.abs(dAY - dBY)) {
+            continue;
           }
+          var sq2 = diff / (sq * sq);
+          motionXsum += dX * sq2;
+          motionXcount += 1;
+          motionYsum += dY * sq2;
+          motionYcount += 1;
         }
         //
         for (var k = 0; k < input.length; k++) {
