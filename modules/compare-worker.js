@@ -699,7 +699,7 @@ var imageUtil = (function() {
           var d4 = d[4][i[4] + e];
           var d5 = d[5][i[5] + e];
           var diff = valA - valB;
-          if (Math.abs(diff) < 20) {
+          if (Math.abs(diff) < 3) {
             continue;
           }
           if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255 ||
@@ -719,10 +719,11 @@ var imageUtil = (function() {
             continue;
           }
           var sq2 = diff / (sq * sq);
-          motionXsum += dX * sq2;
-          motionXcount += 1;
-          motionYsum += dY * sq2;
-          motionYcount += 1;
+          var weight = Math.pow(diff, 4);
+          motionXsum += dX * sq2 * weight;
+          motionXcount += weight;
+          motionYsum += dY * sq2 * weight;
+          motionYcount += weight;
         }
         //
         for (var k = 0; k < input.length; k++) {
