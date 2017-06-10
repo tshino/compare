@@ -687,8 +687,9 @@ var imageUtil = (function() {
       d[k] = input[k].data;
       i[k] = input[k].offset * 4;
     }
-    var motionXsum = 0, motionXcount = 0;
-    var motionYsum = 0, motionYcount = 0;
+    var weight = [];
+    var deltaX = [];
+    var deltaY = [];
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++) {
         for (var e = 0; e < 3; e++) {
@@ -719,11 +720,9 @@ var imageUtil = (function() {
             continue;
           }
           var sq2 = diff / (sq * sq);
-          var weight = Math.pow(diff, 4);
-          motionXsum += dX * sq2 * weight;
-          motionXcount += weight;
-          motionYsum += dY * sq2 * weight;
-          motionYcount += weight;
+          weight.push(Math.pow(diff, 4));
+          deltaX.push(dX * sq2);
+          deltaY.push(dY * sq2);
         }
         //
         for (var k = 0; k < input.length; k++) {
@@ -735,18 +734,25 @@ var imageUtil = (function() {
         i[k] += (input[k].pitch - w) * 4;
       }
     }
-    var nx = motionXcount === 0 ? null : motionXsum / motionXcount;
-    var ny = motionYcount === 0 ? null : motionYsum / motionYcount;
-    var mx = nx === null ? null : nx * a.width / w;
-    var my = ny === null ? null : ny * a.height / h;
-    console.log('motion x (sum = ' + motionXsum.toFixed(3) + ', count = ' + motionXcount + ')');
-    if (nx !== null) {
-      console.log('  --> ' + mx.toFixed(3) + 'px (sum/count = ' + nx.toFixed(5) + ')');
-    }
-    console.log('motion y (sum = ' + motionYsum.toFixed(3) + ', count = ' + motionYcount + ')');
-    if (ny !== null) {
-      console.log('  --> ' + my.toFixed(3) + 'px (sum/count = ' + ny.toFixed(5) + ')');
-    }
+    var weightedAverageDelta = function() {
+      var count = deltaX.length;
+      var xsum = 0, ysum = 0, wsum = 0;
+      for (var k = 0; k < count; ++k) {
+        xsum += deltaX[k] * weight[k];
+        ysum += deltaY[k] * weight[k];
+        wsum += weight[k];
+      }
+      console.log('weightedAverageDelta (count = ' + count + ')');
+      return count == 0 ? null : {
+        nx: xsum / wsum,
+        ny: ysum / wsum
+      };
+    };
+    var delta = weightedAverageDelta();
+    var mx = delta === null ? null : delta.nx * a.width / w;
+    var my = delta === null ? null : delta.ny * a.height / h;
+    console.log('motion x --> ' + (mx === null ? 'null' : mx.toFixed(3) + 'px'));
+    console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
     return { motionX: mx, motionY: my };
   };
   return {
