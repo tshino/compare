@@ -680,12 +680,13 @@ var imageUtil = (function() {
     imageUtil.sobelX(gradBX, blurB);
     imageUtil.sobelY(gradAY, blurA);
     imageUtil.sobelY(gradBY, blurB);
-    var input = [ blurA, blurB, gradAX, gradBX, gradAY, gradBY ];
+    var output = imageUtil.makeImage(w, h);
+    var images = [ blurA, blurB, gradAX, gradBX, gradAY, gradBY, output ];
     var d = [];
     var i = [];
-    for (var k = 0; k < input.length; k++) {
-      d[k] = input[k].data;
-      i[k] = input[k].offset * 4;
+    for (var k = 0; k < images.length; k++) {
+      d[k] = images[k].data;
+      i[k] = images[k].offset * 4;
     }
     var weight = [];
     var deltaX = [];
@@ -699,6 +700,8 @@ var imageUtil = (function() {
           var d3 = d[3][i[3] + e];
           var d4 = d[4][i[4] + e];
           var d5 = d[5][i[5] + e];
+          d[6][i[6] + e] = 0;
+          //
           var diff = valA - valB;
           if (Math.abs(diff) < 3) {
             continue;
@@ -723,15 +726,18 @@ var imageUtil = (function() {
           weight.push(Math.pow(diff, 4));
           deltaX.push(dX * sq2);
           deltaY.push(dY * sq2);
+          //
+          d[6][i[6] + e] = 255;
         }
+        d[6][i[6] + 3] = 255;
         //
-        for (var k = 0; k < input.length; k++) {
+        for (var k = 0; k < images.length; k++) {
           i[k] += 4;
         }
       }
       //
-      for (var k = 0; k < input.length; k++) {
-        i[k] += (input[k].pitch - w) * 4;
+      for (var k = 0; k < images.length; k++) {
+        i[k] += (images[k].pitch - w) * 4;
       }
     }
     var weightedAverageDelta = function() {
@@ -753,7 +759,7 @@ var imageUtil = (function() {
     var my = delta === null ? null : delta.ny * a.height / h;
     console.log('motion x --> ' + (mx === null ? 'null' : mx.toFixed(3) + 'px'));
     console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
-    return { motionX: mx, motionY: my };
+    return { imageOut: output, motionX: mx, motionY: my };
   };
   return {
     makeImage:      makeImage,
