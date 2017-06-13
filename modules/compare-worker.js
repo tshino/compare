@@ -663,15 +663,15 @@ var imageUtil = (function() {
     ]);
   };
   var estimateMotion = function(a, b) {
-    var w = 256, h = 256;
+    var w = 256, h = 256, blurStdev = 20;
     var baseA = imageUtil.makeImage(w, h);
     var baseB = imageUtil.makeImage(w, h);
     var blurA = imageUtil.makeImage(w, h);
     var blurB = imageUtil.makeImage(w, h);
     imageUtil.resizeWithGaussianBlur(baseA, a);
     imageUtil.resizeWithGaussianBlur(baseB, b);
-    imageUtil.gaussianBlur(blurA, baseA, 20);
-    imageUtil.gaussianBlur(blurB, baseB, 20);
+    imageUtil.gaussianBlur(blurA, baseA, blurStdev);
+    imageUtil.gaussianBlur(blurB, baseB, blurStdev);
     var gradAX = imageUtil.makeImage(w, h);
     var gradBX = imageUtil.makeImage(w, h);
     var gradAY = imageUtil.makeImage(w, h);
