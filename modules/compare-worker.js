@@ -662,7 +662,24 @@ var imageUtil = (function() {
        1,  2,  1
     ]);
   };
-  var estimateMotion = function(a, b) {
+  var estimateMotion = function(a, b, offsetX, offsetY) {
+    offsetX = offsetX === undefined ? 0 : Math.round(offsetX);
+    offsetY = offsetY === undefined ? 0 : Math.round(offsetY);
+    if (0 !== offsetX || 0 !== offsetY) {
+      if (offsetX >= Math.abs(a.width) || offsetY >= Math.abs(a.height)) {
+        return null;
+      }
+      a = imageUtil.makeRegion(a,
+                               Math.max(0, offsetX),
+                               Math.max(0, offsetY),
+                               a.width - Math.abs(offsetX),
+                               a.height - Math.abs(offsetY));
+      b = imageUtil.makeRegion(b,
+                               Math.max(0, -offsetX),
+                               Math.max(0, -offsetY),
+                               b.width - Math.abs(offsetX),
+                               b.height - Math.abs(offsetY));
+    }
     var w = 256, h = 256, blurStdev = 20;
     var baseA = imageUtil.makeImage(w, h);
     var baseB = imageUtil.makeImage(w, h);
