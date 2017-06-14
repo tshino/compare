@@ -662,23 +662,25 @@ var imageUtil = (function() {
        1,  2,  1
     ]);
   };
-  var estimateMotion = function(a, b, offsetX, offsetY) {
-    offsetX = offsetX === undefined ? 0 : Math.round(offsetX);
-    offsetY = offsetY === undefined ? 0 : Math.round(offsetY);
-    if (0 !== offsetX || 0 !== offsetY) {
-      if (offsetX >= Math.abs(a.width) || offsetY >= Math.abs(a.height)) {
+  var estimateMotionImpl = function(a, b, offsetX, offsetY) {
+    offsetX = offsetX === undefined ? 0 : offsetX;
+    offsetY = offsetY === undefined ? 0 : offsetY;
+    offsetXi = Math.round(offsetX);
+    offsetYi = Math.round(offsetY);
+    if (0 !== offsetXi || 0 !== offsetYi) {
+      if (Math.abs(offsetXi) >= a.width || Math.abs(offsetYi) >= a.height) {
         return null;
       }
       a = imageUtil.makeRegion(a,
-                               Math.max(0, offsetX),
-                               Math.max(0, offsetY),
-                               a.width - Math.abs(offsetX),
-                               a.height - Math.abs(offsetY));
+                               Math.max(0, offsetXi),
+                               Math.max(0, offsetYi),
+                               a.width - Math.abs(offsetXi),
+                               a.height - Math.abs(offsetYi));
       b = imageUtil.makeRegion(b,
-                               Math.max(0, -offsetX),
-                               Math.max(0, -offsetY),
-                               b.width - Math.abs(offsetX),
-                               b.height - Math.abs(offsetY));
+                               Math.max(0, -offsetXi),
+                               Math.max(0, -offsetYi),
+                               b.width - Math.abs(offsetXi),
+                               b.height - Math.abs(offsetYi));
     }
     var w = 256, h = 256, blurStdev = 20;
     var baseA = imageUtil.makeImage(w, h);
@@ -772,11 +774,30 @@ var imageUtil = (function() {
       };
     };
     var delta = weightedAverageDelta();
-    var mx = delta === null ? null : delta.nx * a.width / w;
-    var my = delta === null ? null : delta.ny * a.height / h;
+    var mx = delta === null ? null : delta.nx * a.width / w + (offsetX - offsetXi);
+    var my = delta === null ? null : delta.ny * a.height / h + (offsetY - offsetYi);
     console.log('motion x --> ' + (mx === null ? 'null' : mx.toFixed(3) + 'px'));
     console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
     return { imageOut: output, motionX: mx, motionY: my };
+  };
+  var estimateMotion = function(a, b, offsetX, offsetY) {
+    var max_iteration = 5;
+    var mx = 0, my = 0, imageOut = null;
+    for (var k = 0; k < max_iteration; ++k) {
+      var result = estimateMotionImpl(a, b, -mx, -my);
+      if (result === null) {
+        break;
+      }
+      imageOut = result.imageOut;
+      if (result.motionX !== null && result.motionY !== null) {
+        mx += result.motionX;
+        my += result.motionY;
+      } else {
+        break;
+      }
+    }
+    console.log('total mx --> ' + mx.toFixed(3) + 'px, my --> ' + my.toFixed(3) + 'px');
+    return { imageOut: imageOut, motionX: mx, motionY: my };
   };
   return {
     makeImage:      makeImage,
