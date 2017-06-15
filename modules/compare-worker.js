@@ -784,15 +784,19 @@ var imageUtil = (function() {
     var max_iteration = 5;
     var mx = 0, my = 0, imageOut = null;
     for (var k = 0; k < max_iteration; ++k) {
-      var result = estimateMotionImpl(a, b, -mx, -my);
+      var mxi = Math.round(mx);
+      var myi = Math.round(my);
+      var result = estimateMotionImpl(a, b, -mxi, -myi);
       if (result === null) {
         break;
       }
       imageOut = result.imageOut;
       if (result.motionX !== null && result.motionY !== null) {
-        mx += result.motionX;
-        my += result.motionY;
+        mx = result.motionX + mxi;
+        my = result.motionY + myi;
       } else {
+        mx = mxi;
+        my = myi;
         break;
       }
     }
