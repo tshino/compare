@@ -665,8 +665,8 @@ var imageUtil = (function() {
   var estimateMotionImpl = function(a, b, offsetX, offsetY) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
-    offsetXi = Math.round(offsetX);
-    offsetYi = Math.round(offsetY);
+    var offsetXi = Math.round(offsetX);
+    var offsetYi = Math.round(offsetY);
     if (0 !== offsetXi || 0 !== offsetYi) {
       if (Math.abs(offsetXi) >= a.width || Math.abs(offsetYi) >= a.height) {
         return null;
