@@ -615,13 +615,13 @@ var imageUtil = (function() {
     var syo = new Uint32Array(h * kh);
     for (var x = 0; x < w; x++) {
       for (var k = 0; k < kw; k++) {
-        var kx = Math.max(0, Math.min(w - 1, x - ox + k));
+        var kx = Math.max(0, Math.min(w - 1, x + ox - k));
         sxo[x * kw + k] = 4 * kx;
       }
     }
     for (var y = 0; y < h; y++) {
       for (var k = 0; k < kh; k++) {
-        var ky = Math.max(0, Math.min(h - 1, y - oy + k));
+        var ky = Math.max(0, Math.min(h - 1, y + oy - k));
         syo[y * kh + k] = 4 * src.pitch * ky;
       }
     }
@@ -650,16 +650,16 @@ var imageUtil = (function() {
   };
   var sobelX = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
-      -1, 0, 1,
-      -2, 0, 2,
-      -1, 0, 1
+      1, 0, -1,
+      2, 0, -2,
+      1, 0, -1
     ]);
   };
   var sobelY = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
-      -1, -2, -1,
+       1,  2,  1,
        0,  0,  0,
-       1,  2,  1
+      -1, -2, -1
     ]);
   };
   var estimateMotionImpl = function(a, b, offsetX, offsetY) {
