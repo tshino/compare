@@ -790,7 +790,9 @@ var imageUtil = (function() {
       if (result === null) {
         break;
       }
-      imageOut = result.imageOut;
+      if (!imageOut) {
+        imageOut = result.imageOut;
+      }
       if (result.motionX !== null && result.motionY !== null) {
         mx = result.motionX + mxi;
         my = result.motionY + myi;
