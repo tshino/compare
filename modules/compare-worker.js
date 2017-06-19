@@ -722,7 +722,8 @@ var imageUtil = (function() {
           d[6][i[6] + e] = 0;
           //
           var diff = valA - valB;
-          if (Math.abs(diff) < 3) {
+          if (Math.abs(diff) < 1) {
+            d[6][i[6] + e] = 64;
             continue;
           }
           if (d2 === 0 || d2 === 255 || d3 === 0 || d3 === 255 ||
@@ -781,7 +782,7 @@ var imageUtil = (function() {
     return { imageOut: output, motionX: mx, motionY: my };
   };
   var estimateMotion = function(a, b, offsetX, offsetY) {
-    var max_iteration = 5;
+    var max_iteration = 6;
     var mx = 0, my = 0, imageOut = null;
     for (var k = 0; k < max_iteration; ++k) {
       var mxi = Math.round(mx);
