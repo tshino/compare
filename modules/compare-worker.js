@@ -782,11 +782,13 @@ var imageUtil = (function() {
     return { imageOut: output, motionX: mx, motionY: my };
   };
   var estimateMotion = function(a, b, offsetX, offsetY) {
-    var max_iteration = 6;
+    var max_iteration = 8;
     var mx = 0, my = 0, imageOut = null;
+    var history = [];
     for (var k = 0; k < max_iteration; ++k) {
       var mxi = Math.round(mx);
       var myi = Math.round(my);
+      history.push({ mx: mxi, my: myi });
       var result = estimateMotionImpl(a, b, -mxi, -myi);
       if (result === null) {
         break;
@@ -795,8 +797,24 @@ var imageUtil = (function() {
         imageOut = result.imageOut;
       }
       if (result.motionX !== null && result.motionY !== null) {
-        mx = result.motionX + mxi;
-        my = result.motionY + myi;
+        var nextX = mxi + result.motionX;
+        var nextY = myi + result.motionY;
+        var duplicate = history.filter(function(h) {
+          return h.mx === Math.round(nextX) && h.my === Math.round(nextY);
+        });
+        if (0 < duplicate.length) {
+          if (Math.round(result.motionX / 2) == 0 &&
+              Math.round(result.motionY / 2) == 0) {
+            mx = mxi;
+            my = myi;
+            break;
+          } else {
+            nextX = mxi + result.motionX / 2;
+            nextY = myi + result.motionY / 2;
+          }
+        }
+        mx = nextX;
+        my = nextY;
       } else {
         mx = mxi;
         my = myi;
