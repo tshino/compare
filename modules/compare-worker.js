@@ -889,7 +889,6 @@ function calcDiff( a, b, options )
   var useLargerSize = options.resizeToLarger || !options.ignoreRemainder;
   var regionW = useLargerSize ? maxW : minW;
   var regionH = useLargerSize ? maxH : minH;
-  var diff = imageUtil.makeImage(regionW, regionH);
   a = imageUtil.makeRegion(a, 0, 0, regionW, regionH);
   b = imageUtil.makeRegion(b, 0, 0, regionW, regionH);
   if (a.width < regionW || a.height < regionH) {
@@ -910,6 +909,23 @@ function calcDiff( a, b, options )
     }
     b = new_b;
   }
+  if (options.offsetX !== 0 || options.offsetY !== 0) {
+    var ox = Math.max(-regionW, Math.min(regionW, options.offsetX));
+    var oy = Math.max(-regionH, Math.min(regionH, options.offsetY));
+    regionW -= Math.abs(ox);
+    regionH -= Math.abs(oy);
+    a = imageUtil.makeRegion(a,
+                             Math.max(0, ox),
+                             Math.max(0, oy),
+                             regionW,
+                             regionH);
+    b = imageUtil.makeRegion(b,
+                             Math.max(0, -ox),
+                             Math.max(0, -oy),
+                             regionW,
+                             regionH);
+  }
+  var diff = imageUtil.makeImage(regionW, regionH);
   var summary = {
     total: 0,
     countIgnoreAE: 0,

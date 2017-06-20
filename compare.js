@@ -87,6 +87,16 @@ $( function() {
     updateDiffTable();
     return false;
   });
+  $('#diffOffsetX').on('change', function(e) {
+    diffOptions.offsetX = this.value;
+    updateDiffTable();
+    return false;
+  });
+  $('#diffOffsetY').on('change', function(e) {
+    diffOptions.offsetY = this.value;
+    updateDiffTable();
+    return false;
+  });
 
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e) {
@@ -301,7 +311,9 @@ $( function() {
     ignoreAE: 0,
     resizeToLarger: true,
     resizeMethod: 'lanczos3',
-    ignoreRemainder: false
+    ignoreRemainder: false,
+    offsetX: 0,
+    offsetY: 0
   };
 
   var setText = function(target, text) {
@@ -1150,7 +1162,9 @@ $( function() {
           diffResult.ignoreAE === data.options.ignoreAE &&
           diffResult.ignoreRemainder === data.options.ignoreRemainder &&
           diffResult.resizeToLarger === data.options.resizeToLarger &&
-          diffResult.resizeMethod === data.options.resizeMethod) {
+          diffResult.resizeMethod === data.options.resizeMethod &&
+          diffResult.offsetX === data.options.offsetX &&
+          diffResult.offsetY === data.options.offsetY) {
         diffResult.result = data.result;
       }
       updateDiffTable();
@@ -1642,6 +1656,8 @@ $( function() {
       prop('value', diffOptions.resizeMethod).
       prop('disabled', !diffOptions.resizeToLarger).
       parent().css({opacity: !diffOptions.resizeToLarger ? '0.5' : ''});
+    $('#diffOffsetX').val(diffOptions.offsetX);
+    $('#diffOffsetY').val(diffOptions.offsetY);
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (images.length < 2) {
       $('#diffBaseName').append($('<span>').text('no data'));
@@ -1685,13 +1701,17 @@ $( function() {
         diffResult.ignoreAE !== diffOptions.ignoreAE ||
         diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
         diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
-        diffResult.resizeMethod !== diffOptions.resizeMethod) {
+        diffResult.resizeMethod !== diffOptions.resizeMethod ||
+        diffResult.offsetX !== diffOptions.offsetX ||
+        diffResult.offsetY !== diffOptions.offsetY) {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
       diffResult.ignoreRemainder = diffOptions.ignoreRemainder;
       diffResult.resizeToLarger = diffOptions.resizeToLarger;
       diffResult.resizeMethod = diffOptions.resizeMethod;
+      diffResult.offsetX = diffOptions.offsetX;
+      diffResult.offsetY = diffOptions.offsetY;
       diffResult.result  = null;
       discardTasksOfCommand('calcDiff');
       if (baseImageIndex !== targetImageIndex) {
@@ -1702,7 +1722,9 @@ $( function() {
             ignoreAE:   diffOptions.ignoreAE,
             ignoreRemainder: diffOptions.ignoreRemainder,
             resizeToLarger: diffOptions.resizeToLarger,
-            resizeMethod: diffOptions.resizeMethod
+            resizeMethod: diffOptions.resizeMethod,
+            offsetX: diffOptions.offsetX,
+            offsetY: diffOptions.offsetY
           }
         }, attachImageDataToTask);
       }
