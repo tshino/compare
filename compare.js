@@ -71,7 +71,7 @@ $( function() {
     changeVectorscopeType(index);
   });
   $('#diffIgnoreAE').on('change', function(e) {
-    diffOptions.ignoreAE = this.value;
+    diffOptions.ignoreAE = +this.value;
     updateDiffTable();
     return false;
   });
@@ -88,12 +88,12 @@ $( function() {
     return false;
   });
   $('#diffOffsetX').on('change', function(e) {
-    diffOptions.offsetX = this.value;
+    diffOptions.offsetX = +this.value;
     updateDiffTable();
     return false;
   });
   $('#diffOffsetY').on('change', function(e) {
-    diffOptions.offsetY = this.value;
+    diffOptions.offsetY = +this.value;
     updateDiffTable();
     return false;
   });
