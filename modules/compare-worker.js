@@ -662,7 +662,7 @@ var imageUtil = (function() {
       -1, -2, -1
     ]);
   };
-  var estimateMotionImpl = function(a, b, offsetX, offsetY) {
+  var estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
     var offsetXi = Math.round(offsetX);
@@ -682,7 +682,7 @@ var imageUtil = (function() {
                                b.width - Math.abs(offsetXi),
                                b.height - Math.abs(offsetYi));
     }
-    var w = 256, h = 256, blurStdev = 20;
+    var w = 256, h = 256;
     var baseA = imageUtil.makeImage(w, h);
     var baseB = imageUtil.makeImage(w, h);
     var blurA = imageUtil.makeImage(w, h);
@@ -781,7 +781,7 @@ var imageUtil = (function() {
     console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
     return { imageOut: output, motionX: mx, motionY: my };
   };
-  var estimateMotion = function(a, b, offsetX, offsetY) {
+  var estimateMotionIteration = function(a, b, blurStdev) {
     var max_iteration = 8;
     var mx = 0, my = 0, imageOut = null;
     var history = [];
@@ -789,7 +789,7 @@ var imageUtil = (function() {
       var mxi = Math.round(mx);
       var myi = Math.round(my);
       history.push({ mx: mxi, my: myi });
-      var result = estimateMotionImpl(a, b, -mxi, -myi);
+      var result = estimateMotionImpl(a, b, -mxi, -myi, blurStdev);
       if (result === null) {
         break;
       }
@@ -823,6 +823,25 @@ var imageUtil = (function() {
     }
     console.log('total mx --> ' + mx.toFixed(3) + 'px, my --> ' + my.toFixed(3) + 'px');
     return { imageOut: imageOut, motionX: mx, motionY: my };
+  };
+  var estimateMotion = function(a, b) {
+    var stdev = [ 3, 5, 10, 20 ];
+    var results = [];
+    var result;
+    for (var k = 0; k < stdev.length; ++k) {
+      result = estimateMotionIteration(a, b, stdev[k]);
+      if (result.motionX === null || result.motionY === null) {
+        continue;
+      }
+      var sameResult = results.filter(function(e) {
+        return e.motionX == result.motionX && e.motionY == result.motionY;
+      });
+      if (0 < sameResult.length) {
+        return result;
+      }
+      results.push(result);
+    }
+    return result;
   };
   return {
     makeImage:      makeImage,
