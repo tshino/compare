@@ -244,12 +244,13 @@ $( function() {
       if (!colorPickerInfo) {
         toggleColorPicker();
       }
+      var pos = crossCursor.getPosition(e.index);
       var ent = entries[e.index];
       var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
       var y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
       var fixed;
-      if (colorPickerInfo.x === x && colorPickerInfo.y === y) {
-        fixed = !colorPickerInfo.fixed;
+      if (pos && pos.x === x && pos.y === y) {
+        fixed = !pos.fixed;
       } else {
         fixed = true;
       }
@@ -268,8 +269,6 @@ $( function() {
         var ent = entries[index];
         var x = pos.x * ent.width;
         var y = pos.y * ent.height;
-        x = compareUtil.clamp(Math.floor(x), 0, ent.width - 1);
-        y = compareUtil.clamp(Math.floor(y), 0, ent.height - 1);
         updateColorPicker(index, x, y, false);
       }
     }
@@ -607,6 +606,10 @@ $( function() {
   // Cross Cursor
   var crossCursor = (function() {
     var enableCrossCursor = false;
+    var positions = [];
+    var getPosition = function(index) {
+      return positions[index];
+    };
     var makePathDesc = function(img, x, y) {
       var pos = interpretOrientation(img, x, y);
       var desc = '';
@@ -634,9 +637,12 @@ $( function() {
       }
     };
     var update = function(img, x, y, fixed) {
-      if (!img.element || x === null || x >= img.width || y >= img.height) {
+      if (!img.element) {
         return;
       }
+      x = compareUtil.clamp(x, 0, img.width - 1);
+      y = compareUtil.clamp(y, 0, img.height - 1);
+      positions[img.index] = { x: x, y: y, fixed: fixed };
       var desc = makePathDesc(img, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
@@ -647,9 +653,10 @@ $( function() {
     };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
-        var x = colorPickerInfo ? (colorPickerInfo.x || 0) : 0;
-        var y = colorPickerInfo ? (colorPickerInfo.y || 0) : 0;
-        var fixed = colorPickerInfo && colorPickerInfo.fixed;
+        var pos = positions[img.index];
+        var x = pos ? (pos.x || 0) : 0;
+        var y = pos ? (pos.y || 0) : 0;
+        var fixed = pos && pos.fixed;
         update(img, x, y, fixed);
       } else {
         removeCrossCursor(img);
@@ -666,6 +673,7 @@ $( function() {
     };
     return {
       enable: function(enable) { enableCrossCursor = enable === undefined || enable; },
+      getPosition: getPosition,
       update: update,
       onUpdateLayout: onUpdateLayout,
       onUpdateTransform: onUpdateTransform
@@ -722,17 +730,20 @@ $( function() {
   };
   var adjustColorHUDPlacement = function(index) {
     if (colorPickerInfo && colorPickerInfo.index === index) {
+      var pos = crossCursor.getPosition(index);
       adjustHUDPlacementToAvoidPoint({
-        x: colorPickerInfo.x / entries[index].width,
-        y: colorPickerInfo.y / entries[index].height
+        x: pos.x / entries[index].width,
+        y: pos.y / entries[index].height
       });
     };
   };
   var updateColorPicker = function(index, x, y, fixed) {
-    colorPickerInfo = { index: index, x: x, y: y, fixed: fixed };
+    x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
+    y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
+    colorPickerInfo = { index: index, fixed: fixed };
     for (var i = 0, img; img = images[i]; i++) {
-      updateColorHUD(img, x, y, fixed);
       crossCursor.update(img, x, y, fixed);
+      updateColorHUD(img, x, y, fixed);
       adjustColorHUDPlacement(i);
     }
   };
@@ -748,8 +759,6 @@ $( function() {
         var center = viewZoom.getCenter();
         var x = (0.5 + center.x) * img.width;
         var y = (0.5 + center.y) * img.height;
-        x = compareUtil.clamp(Math.floor(x), 0, img.width - 1);
-        y = compareUtil.clamp(Math.floor(y), 0, img.height - 1);
         updateColorPicker(index, x, y, false);
       }
     }
@@ -758,12 +767,10 @@ $( function() {
     if (colorPickerInfo && colorPickerInfo.index !== undefined) {
       // cursor key
       if (37 <= e.keyCode && e.keyCode <= 40) {
-        var img = entries[colorPickerInfo.index];
-        var x = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
-        var y = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
-        x = compareUtil.clamp(colorPickerInfo.x + x, 0, img.width - 1);
-        y = compareUtil.clamp(colorPickerInfo.y + y, 0, img.height - 1);
-        updateColorPicker(colorPickerInfo.index, x, y, colorPickerInfo.fixed);
+        var pos = crossCursor.getPosition(colorPickerInfo.index);
+        var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
+        var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
+        updateColorPicker(colorPickerInfo.index, pos.x + dx, pos.y + dy, pos.fixed);
         return false;
       }
     }
