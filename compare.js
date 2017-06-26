@@ -680,7 +680,7 @@ $( function() {
     };
   })();
 
-  var updateColorHUD = function(img, x, y, fixed) {
+  var updateColorHUD = function(img, fixed) {
     if (img.colorHUD) {
       var toCSS = function(rgb) {
         var lut = '0123456789ABCDEF';
@@ -689,6 +689,8 @@ $( function() {
             lut[rgb[1] >> 4] + lut[rgb[1] % 16] +
             lut[rgb[2] >> 4] + lut[rgb[2] % 16];
       };
+      var cursor = crossCursor.getPosition(img.index);
+      var x = cursor.x, y = cursor.y;
       var pos = interpretOrientation(img, x, y);
       if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
         img.colorHUD.find('.colorXY span, .colorCSS, .colorRGB span').text('');
@@ -707,7 +709,7 @@ $( function() {
           $(this).text(rgb[i]);
         });
         img.colorHUD.find('.colorXY span').each(function(i) {
-          $(this).text([x,y][i]);
+          $(this).text([x, y][i]);
         });
       }
     }
@@ -743,7 +745,7 @@ $( function() {
     colorPickerInfo = { index: index, fixed: fixed };
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y, fixed);
-      updateColorHUD(img, x, y, fixed);
+      updateColorHUD(img, fixed);
       adjustColorHUDPlacement(i);
     }
   };
