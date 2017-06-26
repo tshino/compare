@@ -607,6 +607,9 @@ $( function() {
   var crossCursor = (function() {
     var enableCrossCursor = false;
     var positions = [];
+    var enable = function(e) {
+      enableCrossCursor = e === undefined || e;
+    };
     var getPosition = function(index) {
       return positions[index];
     };
@@ -672,7 +675,8 @@ $( function() {
       }
     };
     return {
-      enable: function(enable) { enableCrossCursor = enable === undefined || enable; },
+      enable: enable,
+      isEnabled: function() { return enableCrossCursor; },
       getPosition: getPosition,
       update: update,
       onUpdateLayout: onUpdateLayout,
