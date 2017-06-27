@@ -754,19 +754,23 @@ $( function() {
     }
   };
   var toggleColorPicker = function() {
-    colorPickerInfo = colorPickerInfo ? null : {};
-    colorPickerInfo ? $('#pickerbtn').addClass('current') : $('#pickerbtn').removeClass('current');
-    crossCursor.enable(colorPickerInfo ? true : false);
+    var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+    if (!colorPickerInfo && 0 <= index) {
+      colorPickerInfo = {};
+      $('#pickerbtn').addClass('current');
+      crossCursor.enable(true);
+    } else {
+      colorPickerInfo = null;
+      $('#pickerbtn').removeClass('current');
+      crossCursor.enable(false);
+    }
     updateLayout();
     if (colorPickerInfo) {
-      var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
-      if (0 <= index) {
-        var img = entries[index];
-        var center = viewZoom.getCenter();
-        var x = (0.5 + center.x) * img.width;
-        var y = (0.5 + center.y) * img.height;
-        updateColorPicker(index, x, y, false);
-      }
+      var img = entries[index];
+      var center = viewZoom.getCenter();
+      var x = (0.5 + center.x) * img.width;
+      var y = (0.5 + center.y) * img.height;
+      updateColorPicker(index, x, y, false);
     }
   };
   var processKeyDownForCrossCursor = function(e) {
