@@ -753,6 +753,13 @@ $( function() {
       adjustColorHUDPlacement(i);
     }
   };
+  var makeInitialColorPickerPosition = function(index) {
+    var img = entries[index];
+    var center = viewZoom.getCenter();
+    var x = (0.5 + center.x) * img.width;
+    var y = (0.5 + center.y) * img.height;
+    return { x: x, y: y };
+  };
   var toggleColorPicker = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
@@ -766,11 +773,8 @@ $( function() {
     }
     updateLayout();
     if (colorPickerInfo) {
-      var img = entries[index];
-      var center = viewZoom.getCenter();
-      var x = (0.5 + center.x) * img.width;
-      var y = (0.5 + center.y) * img.height;
-      updateColorPicker(index, x, y, false);
+      var pos = makeInitialColorPickerPosition(index);
+      updateColorPicker(index, pos.x, pos.y, false);
     }
   };
   var processKeyDownForCrossCursor = function(e) {
