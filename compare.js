@@ -781,9 +781,10 @@ $( function() {
     if (colorPickerInfo && colorPickerInfo.index !== undefined) {
       // cursor key
       if (37 <= e.keyCode && e.keyCode <= 40) {
+        var step = e.shiftKey ? 10 : 1;
         var pos = crossCursor.getPosition(colorPickerInfo.index);
-        var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
-        var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
+        var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
+        var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
         updateColorPicker(colorPickerInfo.index, pos.x + dx, pos.y + dy, pos.fixed);
         return false;
       }
