@@ -771,11 +771,11 @@ $( function() {
       $('#pickerbtn').removeClass('current');
       crossCursor.enable(false);
     }
-    updateLayout();
     if (colorPickerInfo) {
       var pos = makeInitialColorPickerPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
     }
+    updateLayout();
   };
   var processKeyDownForCrossCursor = function(e) {
     if (colorPickerInfo && colorPickerInfo.index !== undefined) {
@@ -825,6 +825,7 @@ $( function() {
       img.colorHUD.find('button.close').click(toggleColorPicker);
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
+      updateColorHUD(img, colorPickerInfo.fixed);
     }
   };
   var updateColorPickerOnUpdateLayout = function(img) {
