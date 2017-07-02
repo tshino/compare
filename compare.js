@@ -676,7 +676,7 @@ $( function() {
       } else {
         img.cursor.find('path').attr('d', desc);
       }
-      img.cursor.find('path').attr('stroke-dasharray', fixed ? '' : '4,1');
+      img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
     };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
