@@ -167,6 +167,12 @@ $( function() {
       if (!viewZoom.processKeyDown(e)) {
         return false;
       }
+      // TAB (9)
+      if (e.keyCode === 9) {
+        if (false == flipSingleView(!e.shiftKey)) {
+          return false;
+        }
+      }
       // ESC (27)
       if (e.keyCode === 27 && !e.shiftKey) {
         if (colorPickerInfo) {
@@ -434,6 +440,24 @@ $( function() {
       currentImageIndex = targetIndex;
     }
     updateLayout();
+  };
+  var flipSingleView = function(forward) {
+    if (0 < images.length) {
+      var k = forward ? 0 : images.length - 1;
+      for (var i = 0, img; img = images[i]; i++) {
+        if (currentImageIndex === 1 + img.index) {
+          if (forward) {
+            k = (i + 1) % images.length;
+          } else {
+            k = (i + images.length - 1) % images.length;
+          }
+          break;
+        }
+      }
+      currentImageIndex = 1 + images[k].index;
+      updateLayout();
+      return false;
+    }
   };
   function arrangeLayout()
   {
