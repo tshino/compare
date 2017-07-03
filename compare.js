@@ -651,6 +651,7 @@ $( function() {
       var vbox = '0 0 ' + size.w + ' ' + size.h;
       img.cursor = $(
         '<svg class="imageOverlay cursor" viewBox="' + vbox + '">' +
+          '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
         '</svg>').
         width(size.w).
@@ -695,7 +696,9 @@ $( function() {
     var onUpdateTransform = function(ent, commonStyle) {
       if (ent.cursor) {
         var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
-        $(ent.cursor).css(commonStyle).find('path').attr('stroke-width', strokeWidth);
+        $(ent.cursor).css(commonStyle).find('path').each(function(i) {
+          $(this).attr('stroke-width', strokeWidth * [2, 1][i]);
+        });
       }
     };
     return {
