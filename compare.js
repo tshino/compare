@@ -793,14 +793,12 @@ $( function() {
       colorPickerInfo = {};
       $('#pickerbtn').addClass('current');
       crossCursor.enable(true);
+      var pos = makeInitialColorPickerPosition(index);
+      updateColorPicker(index, pos.x, pos.y, false);
     } else {
       colorPickerInfo = null;
       $('#pickerbtn').removeClass('current');
       crossCursor.enable(false);
-    }
-    if (colorPickerInfo) {
-      var pos = makeInitialColorPickerPosition(index);
-      updateColorPicker(index, pos.x, pos.y, false);
     }
     updateLayout();
   };
