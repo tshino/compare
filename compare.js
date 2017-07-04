@@ -630,12 +630,25 @@ $( function() {
   // Cross Cursor
   var crossCursor = (function() {
     var enableCrossCursor = false;
+    var primaryIndex = null;
     var positions = [];
-    var enable = function(e) {
-      enableCrossCursor = e === undefined || e;
+    var enable = function(index) {
+      enableCrossCursor = true;
+      primaryIndex = index;
+    };
+    var disable = function() {
+      enableCrossCursor = false;
+      primaryIndex = null;
     };
     var getPosition = function(index) {
+      index = index !== undefined ? index : primaryIndex;
       return positions[index];
+    };
+    var setIndex = function(index) {
+      primaryIndex = index;
+    };
+    var getIndex = function() {
+      return primaryIndex;
     };
     var makePathDesc = function(img, x, y) {
       var pos = interpretOrientation(img, x, y);
@@ -703,8 +716,11 @@ $( function() {
     };
     return {
       enable: enable,
+      disable: disable,
       isEnabled: function() { return enableCrossCursor; },
       getPosition: getPosition,
+      setIndex: setIndex,
+      getIndex: getIndex,
       update: update,
       onUpdateLayout: onUpdateLayout,
       onUpdateTransform: onUpdateTransform
@@ -774,6 +790,7 @@ $( function() {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
     y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
     colorPickerInfo = { index: index, fixed: fixed };
+    crossCursor.setIndex(index);
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y, fixed);
       updateColorHUD(img, fixed);
@@ -792,25 +809,25 @@ $( function() {
     if (!colorPickerInfo && 0 <= index) {
       colorPickerInfo = {};
       $('#pickerbtn').addClass('current');
-      crossCursor.enable(true);
+      crossCursor.enable(index);
       var pos = makeInitialColorPickerPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
     } else {
       colorPickerInfo = null;
       $('#pickerbtn').removeClass('current');
-      crossCursor.enable(false);
+      crossCursor.disable();
     }
     updateLayout();
   };
   var processKeyDownForCrossCursor = function(e) {
-    if (colorPickerInfo && colorPickerInfo.index !== undefined) {
+    if (crossCursor.isEnabled()) {
       // cursor key
       if (37 <= e.keyCode && e.keyCode <= 40) {
         var step = e.shiftKey ? 10 : 1;
-        var pos = crossCursor.getPosition(colorPickerInfo.index);
+        var pos = crossCursor.getPosition();
         var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
         var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-        updateColorPicker(colorPickerInfo.index, pos.x + dx, pos.y + dy, pos.fixed);
+        updateColorPicker(crossCursor.getIndex(), pos.x + dx, pos.y + dy, pos.fixed);
         return false;
       }
     }
