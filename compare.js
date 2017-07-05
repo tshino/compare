@@ -267,7 +267,7 @@ $( function() {
     e.stopPropagation();
   });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    if (colorPickerInfo && !colorPickerInfo.fixed) {
+    if (crossCursor.isEnabled() && !crossCursor.isFixed()) {
       var selector = '#view > div.imageBox';
       var index = selector ? $(selector).index($(this).parent()) : null;
       var pos = viewZoom.positionFromMouseEvent(e, this, index);
@@ -653,6 +653,9 @@ $( function() {
     var getIndex = function() {
       return primaryIndex;
     };
+    var isFixed = function() {
+      return fixedPosition;
+    };
     var makePathDesc = function(img, x, y) {
       var pos = interpretOrientation(img, x, y);
       var desc = '';
@@ -723,13 +726,14 @@ $( function() {
       getPosition: getPosition,
       setIndex: setIndex,
       getIndex: getIndex,
+      isFixed: isFixed,
       update: update,
       onUpdateLayout: onUpdateLayout,
       onUpdateTransform: onUpdateTransform
     };
   })();
 
-  var updateColorHUD = function(img, fixed) {
+  var updateColorHUD = function(img) {
     if (img.colorHUD) {
       var toCSS = function(rgb) {
         var lut = '0123456789ABCDEF';
@@ -791,11 +795,11 @@ $( function() {
   var updateColorPicker = function(index, x, y, fixed) {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
     y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
-    colorPickerInfo = { index: index, fixed: fixed };
+    colorPickerInfo = { index: index };
     crossCursor.setIndex(index, fixed);
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y);
-      updateColorHUD(img, fixed);
+      updateColorHUD(img);
       adjustColorHUDPlacement(i);
     }
   };
@@ -869,7 +873,7 @@ $( function() {
       img.colorHUD.find('button.close').click(toggleColorPicker);
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
-      updateColorHUD(img, colorPickerInfo.fixed);
+      updateColorHUD(img);
     }
   };
   var updateColorPickerOnUpdateLayout = function(img) {
