@@ -631,10 +631,12 @@ $( function() {
   var crossCursor = (function() {
     var enableCrossCursor = false;
     var primaryIndex = null;
+    var fixedPosition = false;
     var positions = [];
-    var enable = function(index) {
+    var enable = function(index, fixed) {
       enableCrossCursor = true;
       primaryIndex = index;
+      fixedPosition = fixed;
     };
     var disable = function() {
       enableCrossCursor = false;
@@ -644,8 +646,9 @@ $( function() {
       index = index !== undefined ? index : primaryIndex;
       return positions[index];
     };
-    var setIndex = function(index) {
+    var setIndex = function(index, fixed) {
       primaryIndex = index;
+      fixedPosition = fixed;
     };
     var getIndex = function() {
       return primaryIndex;
@@ -677,28 +680,27 @@ $( function() {
         img.cursor = null;
       }
     };
-    var update = function(img, x, y, fixed) {
+    var update = function(img, x, y) {
       if (!img.element) {
         return;
       }
       x = compareUtil.clamp(x, 0, img.width - 1);
       y = compareUtil.clamp(y, 0, img.height - 1);
-      positions[img.index] = { x: x, y: y, fixed: fixed };
+      positions[img.index] = { x: x, y: y, fixed: fixedPosition };
       var desc = makePathDesc(img, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
       } else {
         img.cursor.find('path').attr('d', desc);
       }
-      img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
+      img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
     };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
         var x = pos ? (pos.x || 0) : 0;
         var y = pos ? (pos.y || 0) : 0;
-        var fixed = pos && pos.fixed;
-        update(img, x, y, fixed);
+        update(img, x, y);
       } else {
         removeCrossCursor(img);
       }
@@ -790,9 +792,9 @@ $( function() {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
     y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
     colorPickerInfo = { index: index, fixed: fixed };
-    crossCursor.setIndex(index);
+    crossCursor.setIndex(index, fixed);
     for (var i = 0, img; img = images[i]; i++) {
-      crossCursor.update(img, x, y, fixed);
+      crossCursor.update(img, x, y);
       updateColorHUD(img, fixed);
       adjustColorHUDPlacement(i);
     }
@@ -809,7 +811,7 @@ $( function() {
     if (!colorPickerInfo && 0 <= index) {
       colorPickerInfo = {};
       $('#pickerbtn').addClass('current');
-      crossCursor.enable(index);
+      crossCursor.enable(index, false);
       var pos = makeInitialColorPickerPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
     } else {
