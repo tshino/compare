@@ -297,7 +297,7 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var colorPickerInfo = null;
+  var colorPickerInfo = false;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -794,7 +794,7 @@ $( function() {
   var updateColorPicker = function(index, x, y, fixed) {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
     y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
-    colorPickerInfo = { index: index };
+    colorPickerInfo = true;
     crossCursor.setIndex(index, fixed);
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y);
@@ -812,13 +812,13 @@ $( function() {
   var toggleColorPicker = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
-      colorPickerInfo = {};
+      colorPickerInfo = true;
       $('#pickerbtn').addClass('current');
       crossCursor.enable(index, false);
       var pos = makeInitialColorPickerPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
     } else {
-      colorPickerInfo = null;
+      colorPickerInfo = false;
       $('#pickerbtn').removeClass('current');
       crossCursor.disable();
     }
