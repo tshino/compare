@@ -783,14 +783,13 @@ $( function() {
       img.view.find('div.hudContainer').css(style);
     }
   };
-  var adjustColorHUDPlacement = function(index) {
-    if (colorPickerInfo && colorPickerInfo.index === index) {
-      var pos = crossCursor.getPosition(index);
-      adjustHUDPlacementToAvoidPoint({
-        x: pos.x / entries[index].width,
-        y: pos.y / entries[index].height
-      });
-    };
+  var adjustColorHUDPlacement = function() {
+    var index = crossCursor.getIndex();
+    var pos = crossCursor.getPosition(index);
+    adjustHUDPlacementToAvoidPoint({
+      x: pos.x / entries[index].width,
+      y: pos.y / entries[index].height
+    });
   };
   var updateColorPicker = function(index, x, y, fixed) {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
@@ -800,8 +799,8 @@ $( function() {
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y);
       updateColorHUD(img);
-      adjustColorHUDPlacement(i);
     }
+    adjustColorHUDPlacement();
   };
   var makeInitialColorPickerPosition = function(index) {
     var img = entries[index];
@@ -887,7 +886,9 @@ $( function() {
     }
   };
   var updateColorPickerOnUpdateTransform = function(ent) {
-    adjustColorHUDPlacement(ent.index);
+    if (crossCursor.isEnabled() && ent.index == crossCursor.getIndex()) {
+      adjustColorHUDPlacement();
+    }
   };
   var makeImageLayoutParam = function() {
     var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
