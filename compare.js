@@ -247,7 +247,7 @@ $( function() {
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
-      if (!colorPickerInfo) {
+      if (!crossCursor.isEnabled()) {
         toggleColorHUD();
       }
       var pos = crossCursor.getPosition(e.index);
@@ -719,6 +719,13 @@ $( function() {
         });
       }
     };
+    var makeInitialPosition = function(index) {
+      var img = entries[index];
+      var center = viewZoom.getCenter();
+      var x = (0.5 + center.x) * img.width;
+      var y = (0.5 + center.y) * img.height;
+      return { x: x, y: y };
+    };
     return {
       enable: enable,
       disable: disable,
@@ -729,7 +736,8 @@ $( function() {
       isFixed: isFixed,
       update: update,
       onUpdateLayout: onUpdateLayout,
-      onUpdateTransform: onUpdateTransform
+      onUpdateTransform: onUpdateTransform,
+      makeInitialPosition: makeInitialPosition
     };
   })();
 
@@ -783,7 +791,7 @@ $( function() {
       img.view.find('div.hudContainer').css(style);
     }
   };
-  var adjustColorHUDPlacement = function() {
+  var adjustHUDPlacement = function() {
     var index = crossCursor.getIndex();
     var pos = crossCursor.getPosition(index);
     adjustHUDPlacementToAvoidPoint({
@@ -794,20 +802,12 @@ $( function() {
   var updateColorPicker = function(index, x, y, fixed) {
     x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
     y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
-    colorPickerInfo = true;
     crossCursor.setIndex(index, fixed);
     for (var i = 0, img; img = images[i]; i++) {
       crossCursor.update(img, x, y);
       updateColorHUD(img);
     }
-    adjustColorHUDPlacement();
-  };
-  var makeInitialColorPickerPosition = function(index) {
-    var img = entries[index];
-    var center = viewZoom.getCenter();
-    var x = (0.5 + center.x) * img.width;
-    var y = (0.5 + center.y) * img.height;
-    return { x: x, y: y };
+    adjustHUDPlacement();
   };
   var toggleColorHUD = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
@@ -815,7 +815,7 @@ $( function() {
       colorPickerInfo = true;
       $('#pickerbtn').addClass('current');
       crossCursor.enable(index, false);
-      var pos = makeInitialColorPickerPosition(index);
+      var pos = crossCursor.makeInitialPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
     } else {
       colorPickerInfo = false;
@@ -887,7 +887,7 @@ $( function() {
   };
   var updateColorHUDOnUpdateTransform = function(ent) {
     if (crossCursor.isEnabled() && ent.index == crossCursor.getIndex()) {
-      adjustColorHUDPlacement();
+      adjustHUDPlacement();
     }
   };
   var makeImageLayoutParam = function() {
