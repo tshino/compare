@@ -46,7 +46,7 @@ $( function() {
   $('#arrange').click(arrangeLayout);
   $('#overlay').click(toggleOverlay);
   $('#gridbtn').click(grid.toggle);
-  $('#pickerbtn').click(toggleColorPicker);
+  $('#pickerbtn').click(toggleColorHUD);
   $('#fullscreen').click(toggleFullscreen);
   $('#helpbtn').click(toggleHelp);
 
@@ -176,7 +176,7 @@ $( function() {
       // ESC (27)
       if (e.keyCode === 27 && !e.shiftKey) {
         if (colorPickerInfo) {
-          toggleColorPicker();
+          toggleColorHUD();
         } else {
           resetLayoutState();
           resetMouseDrag();
@@ -223,7 +223,7 @@ $( function() {
     // 'g' (103)
     103 : { global: false, func: grid.toggle },
     // 'p' (112)
-    112 : { global: false, func: toggleColorPicker }
+    112 : { global: false, func: toggleColorHUD }
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
@@ -248,7 +248,7 @@ $( function() {
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
       if (!colorPickerInfo) {
-        toggleColorPicker();
+        toggleColorHUD();
       }
       var pos = crossCursor.getPosition(e.index);
       var ent = entries[e.index];
@@ -809,7 +809,7 @@ $( function() {
     var y = (0.5 + center.y) * img.height;
     return { x: x, y: y };
   };
-  var toggleColorPicker = function() {
+  var toggleColorHUD = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
       colorPickerInfo = true;
@@ -869,13 +869,13 @@ $( function() {
           '<button class="close">×</button>' +
         '</div>'
       );
-      img.colorHUD.find('button.close').click(toggleColorPicker);
+      img.colorHUD.find('button.close').click(toggleColorHUD);
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
     }
   };
-  var updateColorPickerOnUpdateLayout = function(img) {
+  var updateColorHUDOnUpdateLayout = function(img) {
     if (colorPickerInfo) {
       addColorHUD(img);
     } else {
@@ -885,7 +885,7 @@ $( function() {
       }
     }
   };
-  var updateColorPickerOnUpdateTransform = function(ent) {
+  var updateColorHUDOnUpdateTransform = function(ent) {
     if (crossCursor.isEnabled() && ent.index == crossCursor.getIndex()) {
       adjustColorHUDPlacement();
     }
@@ -916,7 +916,7 @@ $( function() {
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
-      updateColorPickerOnUpdateLayout(img);
+      updateColorHUDOnUpdateLayout(img);
     }
   };
   var swapBaseAndTargetImage = function() {
@@ -2031,7 +2031,7 @@ $( function() {
         $(ent.element).css(style);
         grid.onUpdateTransform(ent, style);
         crossCursor.onUpdateTransform(ent, style);
-        updateColorPickerOnUpdateTransform(ent);
+        updateColorHUDOnUpdateTransform(ent);
       }
     }
     roiMap.onUpdateTransform();
