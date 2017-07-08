@@ -160,7 +160,7 @@ $( function() {
         return false;
       }
       // Cross cursor
-      if (false === processKeyDownForCrossCursor(e)) {
+      if (false === crossCursor.processKeyDown(e)) {
         return false;
       }
       // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
@@ -260,7 +260,7 @@ $( function() {
       } else {
         fixed = true;
       }
-      updateColorPicker(e.index, x, y, fixed);
+      crossCursor.setPosition(e.index, x, y, fixed);
     }
   });
   $('#view').on('mousedown', 'div.hudContainer', function(e) {
@@ -275,7 +275,7 @@ $( function() {
         var ent = entries[index];
         var x = pos.x * ent.width;
         var y = pos.y * ent.height;
-        updateColorPicker(index, x, y, false);
+        crossCursor.setPosition(index, x, y, false);
       }
     }
   });
@@ -633,14 +633,26 @@ $( function() {
     var primaryIndex = null;
     var fixedPosition = false;
     var positions = [];
-    var enable = function(index, fixed) {
+    var onUpdateCallback = null;
+    var makeInitialPosition = function(index) {
+      var img = entries[index];
+      var center = viewZoom.getCenter();
+      var x = (0.5 + center.x) * img.width;
+      var y = (0.5 + center.y) * img.height;
+      return { x: x, y: y };
+    };
+    var enable = function(index, fixed, onUpdate) {
       enableCrossCursor = true;
       primaryIndex = index;
       fixedPosition = fixed;
+      onUpdateCallback = onUpdate;
+      var pos = makeInitialPosition(index);
+      setPosition(index, pos.x, pos.y, false);
     };
     var disable = function() {
       enableCrossCursor = false;
       primaryIndex = null;
+      onUpdateCallback = null;
     };
     var getPosition = function(index) {
       index = index !== undefined ? index : primaryIndex;
@@ -683,7 +695,7 @@ $( function() {
         img.cursor = null;
       }
     };
-    var update = function(img, x, y) {
+    var updateCrossCursor = function(img, x, y) {
       if (!img.element) {
         return;
       }
@@ -698,12 +710,36 @@ $( function() {
       }
       img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
     };
+    var setPosition = function(index, x, y, fixed) {
+      x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
+      y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
+      setIndex(index, fixed);
+      for (var i = 0, img; img = images[i]; i++) {
+        updateCrossCursor(img, x, y);
+      }
+      if (onUpdateCallback) {
+        onUpdateCallback();
+      }
+    };
+    var processKeyDown = function(e) {
+      if (enableCrossCursor) {
+        // cursor key
+        if (37 <= e.keyCode && e.keyCode <= 40) {
+          var step = e.shiftKey ? 10 : 1;
+          var pos = getPosition();
+          var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
+          var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
+          setPosition(primaryIndex, pos.x + dx, pos.y + dy, pos.fixed);
+          return false;
+        }
+      }
+    };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
         var x = pos ? (pos.x || 0) : 0;
         var y = pos ? (pos.y || 0) : 0;
-        update(img, x, y);
+        updateCrossCursor(img, x, y);
       } else {
         removeCrossCursor(img);
       }
@@ -719,25 +755,17 @@ $( function() {
         });
       }
     };
-    var makeInitialPosition = function(index) {
-      var img = entries[index];
-      var center = viewZoom.getCenter();
-      var x = (0.5 + center.x) * img.width;
-      var y = (0.5 + center.y) * img.height;
-      return { x: x, y: y };
-    };
     return {
       enable: enable,
       disable: disable,
       isEnabled: function() { return enableCrossCursor; },
       getPosition: getPosition,
-      setIndex: setIndex,
       getIndex: getIndex,
       isFixed: isFixed,
-      update: update,
+      setPosition: setPosition,
+      processKeyDown: processKeyDown,
       onUpdateLayout: onUpdateLayout,
-      onUpdateTransform: onUpdateTransform,
-      makeInitialPosition: makeInitialPosition
+      onUpdateTransform: onUpdateTransform
     };
   })();
 
@@ -799,12 +827,8 @@ $( function() {
       y: pos.y / entries[index].height
     });
   };
-  var updateColorPicker = function(index, x, y, fixed) {
-    x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
-    y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
-    crossCursor.setIndex(index, fixed);
+  var updateHUD = function() {
     for (var i = 0, img; img = images[i]; i++) {
-      crossCursor.update(img, x, y);
       updateColorHUD(img);
     }
     adjustHUDPlacement();
@@ -821,26 +845,11 @@ $( function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
       colorPickerInfo = true;
+      crossCursor.enable(index, false, updateHUD);
       $('#pickerbtn').addClass('current');
-      crossCursor.enable(index, false);
-      var pos = crossCursor.makeInitialPosition(index);
-      updateColorPicker(index, pos.x, pos.y, false);
       updateLayout();
     } else {
       removeColorHUD();
-    }
-  };
-  var processKeyDownForCrossCursor = function(e) {
-    if (crossCursor.isEnabled()) {
-      // cursor key
-      if (37 <= e.keyCode && e.keyCode <= 40) {
-        var step = e.shiftKey ? 10 : 1;
-        var pos = crossCursor.getPosition();
-        var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
-        var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-        updateColorPicker(crossCursor.getIndex(), pos.x + dx, pos.y + dy, pos.fixed);
-        return false;
-      }
     }
   };
   var addColorHUD = function(img) {
