@@ -176,7 +176,7 @@ $( function() {
       // ESC (27)
       if (e.keyCode === 27 && !e.shiftKey) {
         if (colorPickerInfo) {
-          toggleColorHUD();
+          removeColorHUD();
         } else {
           resetLayoutState();
           resetMouseDrag();
@@ -809,6 +809,14 @@ $( function() {
     }
     adjustHUDPlacement();
   };
+  var removeColorHUD = function() {
+    if (colorPickerInfo) {
+      colorPickerInfo = false;
+      crossCursor.disable();
+      $('#pickerbtn').removeClass('current');
+      updateLayout();
+    }
+  };
   var toggleColorHUD = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
@@ -817,12 +825,10 @@ $( function() {
       crossCursor.enable(index, false);
       var pos = crossCursor.makeInitialPosition(index);
       updateColorPicker(index, pos.x, pos.y, false);
+      updateLayout();
     } else {
-      colorPickerInfo = false;
-      $('#pickerbtn').removeClass('current');
-      crossCursor.disable();
+      removeColorHUD();
     }
-    updateLayout();
   };
   var processKeyDownForCrossCursor = function(e) {
     if (crossCursor.isEnabled()) {
@@ -869,7 +875,7 @@ $( function() {
           '<button class="close">×</button>' +
         '</div>'
       );
-      img.colorHUD.find('button.close').click(toggleColorHUD);
+      img.colorHUD.find('button.close').click(removeColorHUD);
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
