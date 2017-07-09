@@ -711,6 +711,18 @@ $( function() {
         onUpdateCallback();
       }
     };
+    var adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
+      var img = entries[primaryIndex];
+      var center = viewZoom.getCenter();
+      var rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
+      var ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
+      if (0.45 < Math.abs(rx) && 0 < dx * rx) {
+        viewZoom.moveRelative(0 < rx ? 0.25 : -0.25, 0);
+      }
+      if (0.45 < Math.abs(ry) && 0 < dy * ry) {
+        viewZoom.moveRelative(0, 0 < ry ? 0.25 : -0.25);
+      }
+    };
     var processKeyDown = function(e) {
       if (enableCrossCursor) {
         // cursor key
@@ -719,7 +731,10 @@ $( function() {
           var pos = getPosition();
           var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
           var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-          setPosition(primaryIndex, pos.x + dx, pos.y + dy, pos.fixed);
+          var x = pos.x + dx;
+          var y = pos.y + dy;
+          setPosition(primaryIndex, x, y, pos.fixed);
+          adjustViewOffsetToFollowCrossCursor(dx, dy, x, y);
           return false;
         }
       }

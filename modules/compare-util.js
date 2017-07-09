@@ -554,7 +554,7 @@
     o.zoomOut = zoomOut;
     o.setOffset = setOffset;
     o.getCenter = getCenter;
-    //o.moveRelative = moveRelative;
+    o.moveRelative = moveRelative;
     //o.moveRelativePx = moveRelativePx;
     //o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
