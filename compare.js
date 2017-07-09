@@ -904,8 +904,8 @@ $( function() {
       }
     }
   };
-  var updateColorHUDOnUpdateTransform = function(ent) {
-    if (crossCursor.isEnabled() && ent.index == crossCursor.getIndex()) {
+  var updateColorHUDOnUpdateTransform = function() {
+    if (crossCursor.isEnabled()) {
       adjustHUDPlacement();
     }
   };
@@ -2050,10 +2050,10 @@ $( function() {
         $(ent.element).css(style);
         grid.onUpdateTransform(ent, style);
         crossCursor.onUpdateTransform(ent, style);
-        updateColorHUDOnUpdateTransform(ent);
       }
     }
     roiMap.onUpdateTransform();
+    updateColorHUDOnUpdateTransform();
   }
 
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
