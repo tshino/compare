@@ -250,17 +250,7 @@ $( function() {
       if (!crossCursor.isEnabled()) {
         toggleColorHUD();
       }
-      var pos = crossCursor.getPosition(e.index);
-      var ent = entries[e.index];
-      var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
-      var y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
-      var fixed;
-      if (pos && pos.x === x && pos.y === y) {
-        fixed = !pos.fixed;
-      } else {
-        fixed = true;
-      }
-      crossCursor.setPosition(e.index, x, y, fixed);
+      crossCursor.processClick(e);
     }
   });
   $('#view').on('mousedown', 'div.hudContainer', function(e) {
@@ -734,6 +724,19 @@ $( function() {
         }
       }
     };
+    var processClick = function(e) {
+      var pos = getPosition(e.index);
+      var ent = entries[e.index];
+      var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
+      var y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
+      var fixed;
+      if (pos && pos.x === x && pos.y === y) {
+        fixed = !pos.fixed;
+      } else {
+        fixed = true;
+      }
+      setPosition(e.index, x, y, fixed);
+    };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
@@ -764,6 +767,7 @@ $( function() {
       isFixed: isFixed,
       setPosition: setPosition,
       processKeyDown: processKeyDown,
+      processClick: processClick,
       onUpdateLayout: onUpdateLayout,
       onUpdateTransform: onUpdateTransform
     };
