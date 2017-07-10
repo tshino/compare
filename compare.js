@@ -701,11 +701,13 @@ $( function() {
       img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
     };
     var setPosition = function(index, x, y, fixed) {
-      x = compareUtil.clamp(Math.floor(x), 0, entries[index].width - 1);
-      y = compareUtil.clamp(Math.floor(y), 0, entries[index].height - 1);
+      var rx = (Math.floor(x) + 0.5) / entries[index].width;
+      var ry = (Math.floor(y) + 0.5) / entries[index].height;
       setIndex(index, fixed);
       for (var i = 0, img; img = images[i]; i++) {
-        updateCrossCursor(img, x, y);
+        var ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
+        var iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
+        updateCrossCursor(img, ix, iy);
       }
       if (onUpdateCallback) {
         onUpdateCallback();
@@ -727,13 +729,17 @@ $( function() {
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
+          var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+          if (index < 0 || !positions[index]) {
+            index = primaryIndex;
+          }
           var step = e.shiftKey ? 10 : 1;
-          var pos = getPosition();
+          var pos = getPosition(index);
           var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
           var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
           var x = pos.x + dx;
           var y = pos.y + dy;
-          setPosition(primaryIndex, x, y, pos.fixed);
+          setPosition(index, x, y, pos.fixed);
           adjustViewOffsetToFollowCrossCursor(dx, dy, x, y);
           return false;
         }
