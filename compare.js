@@ -730,7 +730,7 @@ $( function() {
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
-          var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+          var index = isSingleView ? currentImageIndex - 1 : primaryIndex;
           if (index < 0 || !positions[index]) {
             index = primaryIndex;
           }
