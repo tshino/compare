@@ -637,7 +637,7 @@ $( function() {
       fixedPosition = fixed;
       onUpdateCallback = onUpdate;
       var pos = makeInitialPosition(index);
-      setPosition(index, pos.x, pos.y, false);
+      setPosition(index, pos.x, pos.y);
     };
     var disable = function() {
       enableCrossCursor = false;
@@ -701,6 +701,7 @@ $( function() {
       img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
     };
     var setPosition = function(index, x, y, fixed) {
+      fixed = fixed !== undefined ? fixed : fixedPosition;
       var rx = (Math.floor(x) + 0.5) / entries[index].width;
       var ry = (Math.floor(y) + 0.5) / entries[index].height;
       setIndex(index, fixed);
@@ -739,7 +740,7 @@ $( function() {
           var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
           var x = pos.x + dx;
           var y = pos.y + dy;
-          setPosition(index, x, y, pos.fixed);
+          setPosition(index, x, y);
           adjustViewOffsetToFollowCrossCursor(dx, dy, x, y);
           return false;
         }
