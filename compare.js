@@ -632,14 +632,20 @@ $( function() {
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var enable = function(index, fixed, onUpdate, onRemove) {
-      enableCrossCursor = true;
-      primaryIndex = index;
-      fixedPosition = fixed;
+    var setObserver = function(onUpdate, onRemove) {
       onUpdateCallback = onUpdate;
       onRemoveCallback = onRemove;
-      var pos = makeInitialPosition(index);
-      setPosition(index, pos.x, pos.y);
+    };
+    var enable = function() {
+      var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+      if (!enableCrossCursor && 0 <= index) {
+        enableCrossCursor = true;
+        primaryIndex = index;
+        fixedPosition = false;
+        var pos = makeInitialPosition(index);
+        setPosition(index, pos.x, pos.y);
+      }
+      return enableCrossCursor;
     };
     var disable = function() {
       if (enableCrossCursor) {
@@ -648,8 +654,6 @@ $( function() {
           onRemoveCallback();
         }
         primaryIndex = null;
-        onUpdateCallback = null;
-        onRemoveCallback = null;
         updateLayout();
       }
     };
@@ -790,6 +794,7 @@ $( function() {
       }
     };
     return {
+      setObserver: setObserver,
       enable: enable,
       disable: disable,
       isEnabled: function() { return enableCrossCursor; },
@@ -873,10 +878,9 @@ $( function() {
     $('#pickerbtn').removeClass('current');
   };
   var toggleColorHUD = function() {
-    var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
-    if (!colorPickerInfo && 0 <= index) {
+    crossCursor.setObserver(updateHUD, removeHUD);
+    if (!crossCursor.isEnabled() && crossCursor.enable()) {
       colorPickerInfo = true;
-      crossCursor.enable(index, false, updateHUD, removeHUD);
       $('#pickerbtn').addClass('current');
       updateLayout();
     } else {
