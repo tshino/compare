@@ -175,8 +175,8 @@ $( function() {
       }
       // ESC (27)
       if (e.keyCode === 27 && !e.shiftKey) {
-        if (colorPickerInfo) {
-          removeColorHUD();
+        if (crossCursor.isEnabled()) {
+          crossCursor.disable();
         } else {
           resetLayoutState();
           resetMouseDrag();
@@ -624,6 +624,7 @@ $( function() {
     var fixedPosition = false;
     var positions = [];
     var onUpdateCallback = null;
+    var onRemoveCallback = null;
     var makeInitialPosition = function(index) {
       var img = entries[index];
       var center = viewZoom.getCenter();
@@ -631,18 +632,26 @@ $( function() {
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var enable = function(index, fixed, onUpdate) {
+    var enable = function(index, fixed, onUpdate, onRemove) {
       enableCrossCursor = true;
       primaryIndex = index;
       fixedPosition = fixed;
       onUpdateCallback = onUpdate;
+      onRemoveCallback = onRemove;
       var pos = makeInitialPosition(index);
       setPosition(index, pos.x, pos.y);
     };
     var disable = function() {
-      enableCrossCursor = false;
-      primaryIndex = null;
-      onUpdateCallback = null;
+      if (enableCrossCursor) {
+        enableCrossCursor = false;
+        if (onRemoveCallback) {
+          onRemoveCallback();
+        }
+        primaryIndex = null;
+        onUpdateCallback = null;
+        onRemoveCallback = null;
+        updateLayout();
+      }
     };
     var getPosition = function(index) {
       index = index !== undefined ? index : primaryIndex;
@@ -859,23 +868,19 @@ $( function() {
     }
     adjustHUDPlacement();
   };
-  var removeColorHUD = function() {
-    if (colorPickerInfo) {
-      colorPickerInfo = false;
-      crossCursor.disable();
-      $('#pickerbtn').removeClass('current');
-      updateLayout();
-    }
+  var removeHUD = function() {
+    colorPickerInfo = false;
+    $('#pickerbtn').removeClass('current');
   };
   var toggleColorHUD = function() {
     var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
     if (!colorPickerInfo && 0 <= index) {
       colorPickerInfo = true;
-      crossCursor.enable(index, false, updateHUD);
+      crossCursor.enable(index, false, updateHUD, removeHUD);
       $('#pickerbtn').addClass('current');
       updateLayout();
     } else {
-      removeColorHUD();
+      crossCursor.disable();
     }
   };
   var addColorHUD = function(img) {
@@ -910,7 +915,7 @@ $( function() {
           '<button class="close">×</button>' +
         '</div>'
       );
-      img.colorHUD.find('button.close').click(removeColorHUD);
+      img.colorHUD.find('button.close').click(crossCursor.disable);
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
