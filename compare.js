@@ -270,6 +270,8 @@ $( function() {
     }
   });
 
+  initializeColorHUD();
+
   updateDOM();
 });
 
@@ -287,7 +289,7 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var colorPickerInfo = false;
+  var hudType = '';
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -867,20 +869,21 @@ $( function() {
       y: pos.y / entries[index].height
     });
   };
-  var updateHUD = function() {
-    for (var i = 0, img; img = images[i]; i++) {
-      updateColorHUD(img);
-    }
-    adjustHUDPlacement();
-  };
-  var removeHUD = function() {
-    colorPickerInfo = false;
-    $('#pickerbtn').removeClass('current');
+  var initializeColorHUD = function() {
+    var updateHUD = function() {
+      for (var i = 0, img; img = images[i]; i++) {
+        updateColorHUD(img);
+      }
+      adjustHUDPlacement();
+    };
+    var removeHUD = function() {
+      $('#pickerbtn').removeClass('current');
+    };
+    crossCursor.setObserver(updateHUD, removeHUD);
+    hudType = 'colorPicker';
   };
   var toggleColorHUD = function() {
-    crossCursor.setObserver(updateHUD, removeHUD);
     if (!crossCursor.isEnabled() && crossCursor.enable()) {
-      colorPickerInfo = true;
       $('#pickerbtn').addClass('current');
       updateLayout();
     } else {
@@ -926,10 +929,10 @@ $( function() {
     }
   };
   var updateColorHUDOnUpdateLayout = function(img) {
-    if (colorPickerInfo) {
-      addColorHUD(img);
-    } else {
-      if (img.colorHUD) {
+    if (hudType === 'colorPicker') {
+      if (crossCursor.isEnabled()) {
+        addColorHUD(img);
+      } else if (img.colorHUD) {
         img.colorHUD.remove();
         img.colorHUD = null;
       }
