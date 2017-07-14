@@ -46,7 +46,7 @@ $( function() {
   $('#arrange').click(arrangeLayout);
   $('#overlay').click(toggleOverlay);
   $('#gridbtn').click(grid.toggle);
-  $('#pickerbtn').click(toggleColorHUD);
+  $('#pickerbtn').click(crossCursor.toggle);
   $('#fullscreen').click(toggleFullscreen);
   $('#helpbtn').click(toggleHelp);
 
@@ -223,7 +223,7 @@ $( function() {
     // 'g' (103)
     103 : { global: false, func: grid.toggle },
     // 'p' (112)
-    112 : { global: false, func: toggleColorHUD }
+    112 : { global: false, func: crossCursor.toggle }
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
@@ -247,9 +247,7 @@ $( function() {
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
-      if (!crossCursor.isEnabled()) {
-        toggleColorHUD();
-      }
+      crossCursor.enable();
       crossCursor.processClick(e);
     }
   });
@@ -626,6 +624,7 @@ $( function() {
     var fixedPosition = false;
     var positions = [];
     var onShowCallback = null;
+    var onUpdateLayoutCallback = null;
     var onUpdateCallback = null;
     var onRemoveCallback = null;
     var makeInitialPosition = function(index) {
@@ -635,8 +634,9 @@ $( function() {
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var setObserver = function(onShow, onUpdate, onRemove) {
+    var setObserver = function(onShow, onUpdateLayout, onUpdate, onRemove) {
       onShowCallback = onShow;
+      onUpdateLayoutCallback = onUpdateLayout;
       onUpdateCallback = onUpdate;
       onRemoveCallback = onRemove;
     };
@@ -663,6 +663,13 @@ $( function() {
         }
         primaryIndex = null;
         updateLayout();
+      }
+    };
+    var toggle = function() {
+      if (!enableCrossCursor) {
+        enable();
+      } else {
+        disable();
       }
     };
     var getPosition = function(index) {
@@ -792,6 +799,9 @@ $( function() {
       if (img.cursor) {
         $(img.cursor).css({ width: w+'px', height: h+'px' });
       }
+      if (onUpdateLayoutCallback) {
+        onUpdateLayoutCallback(img);
+      }
     };
     var onUpdateTransform = function(ent, commonStyle) {
       if (ent.cursor) {
@@ -805,6 +815,7 @@ $( function() {
       setObserver: setObserver,
       enable: enable,
       disable: disable,
+      toggle: toggle,
       isEnabled: function() { return enableCrossCursor; },
       getPosition: getPosition,
       getIndex: getIndex,
@@ -879,6 +890,14 @@ $( function() {
     var showHUD = function() {
       $('#pickerbtn').addClass('current');
     };
+    var onUpdateLayout = function(img) {
+      if (crossCursor.isEnabled()) {
+        addColorHUD(img);
+      } else if (img.colorHUD) {
+        img.colorHUD.remove();
+        img.colorHUD = null;
+      }
+    };
     var updateHUD = function() {
       for (var i = 0, img; img = images[i]; i++) {
         updateColorHUD(img);
@@ -888,15 +907,8 @@ $( function() {
     var removeHUD = function() {
       $('#pickerbtn').removeClass('current');
     };
-    crossCursor.setObserver(showHUD, updateHUD, removeHUD);
+    crossCursor.setObserver(showHUD, onUpdateLayout, updateHUD, removeHUD);
     hudType = 'colorPicker';
-  };
-  var toggleColorHUD = function() {
-    if (!crossCursor.isEnabled()) {
-      crossCursor.enable();
-    } else {
-      crossCursor.disable();
-    }
   };
   var addColorHUD = function(img) {
     if (!img.colorHUD) {
@@ -936,16 +948,6 @@ $( function() {
       updateColorHUD(img);
     }
   };
-  var updateColorHUDOnUpdateLayout = function(img) {
-    if (hudType === 'colorPicker') {
-      if (crossCursor.isEnabled()) {
-        addColorHUD(img);
-      } else if (img.colorHUD) {
-        img.colorHUD.remove();
-        img.colorHUD = null;
-      }
-    }
-  };
   var updateColorHUDOnUpdateTransform = function() {
     if (crossCursor.isEnabled()) {
       adjustHUDPlacement();
@@ -977,7 +979,6 @@ $( function() {
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
-      updateColorHUDOnUpdateLayout(img);
     }
   };
   var swapBaseAndTargetImage = function() {
