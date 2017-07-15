@@ -255,17 +255,8 @@ $( function() {
     e.stopPropagation();
   });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    if (crossCursor.isEnabled() && !crossCursor.isFixed()) {
-      var selector = '#view > div.imageBox';
-      var index = selector ? $(selector).index($(this).parent()) : null;
-      var pos = viewZoom.positionFromMouseEvent(e, this, index);
-      if (index !== null && entries[index].ready() && pos) {
-        var ent = entries[index];
-        var x = pos.x * ent.width;
-        var y = pos.y * ent.height;
-        crossCursor.setPosition(index, x, y, false);
-      }
-    }
+    var selector = '#view > div.imageBox';
+    return crossCursor.processMouseMove(e, selector, this);
   });
 
   initializeColorHUD();
@@ -287,7 +278,6 @@ $( function() {
   var layoutMode = null;
   var overlayMode = false;
   var overlayBaseIndex = null;
-  var hudType = '';
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -739,7 +729,7 @@ $( function() {
         updateCrossCursor(img, ix, iy);
       }
       if (onUpdateCallback) {
-        onUpdateCallback();
+        onUpdateCallback(true);
       }
     };
     var adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
@@ -787,6 +777,18 @@ $( function() {
       }
       setPosition(e.index, x, y, fixed);
     };
+    var processMouseMove = function(e, selector, target) {
+      if (enableCrossCursor && !fixedPosition) {
+        var index = selector ? $(selector).index($(target).parent()) : null;
+        var pos = viewZoom.positionFromMouseEvent(e, target, index);
+        if (index !== null && entries[index].ready() && pos) {
+          var ent = entries[index];
+          var x = pos.x * ent.width;
+          var y = pos.y * ent.height;
+          setPosition(index, x, y);
+        }
+      }
+    };
     var onUpdateLayout = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
@@ -803,12 +805,19 @@ $( function() {
         onUpdateLayoutCallback(img);
       }
     };
-    var onUpdateTransform = function(ent, commonStyle) {
+    var onUpdateTransformEach = function(ent, commonStyle) {
       if (ent.cursor) {
         var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
           $(this).attr('stroke-width', strokeWidth * [2, 1][i]);
         });
+      }
+    };
+    var onUpdateTransform = function() {
+      if (enableCrossCursor) {
+        if (onUpdateCallback) {
+          onUpdateCallback(false);
+        }
       }
     };
     return {
@@ -823,7 +832,9 @@ $( function() {
       setPosition: setPosition,
       processKeyDown: processKeyDown,
       processClick: processClick,
+      processMouseMove: processMouseMove,
       onUpdateLayout: onUpdateLayout,
+      onUpdateTransformEach: onUpdateTransformEach,
       onUpdateTransform: onUpdateTransform
     };
   })();
@@ -898,9 +909,11 @@ $( function() {
         img.colorHUD = null;
       }
     };
-    var updateHUD = function() {
-      for (var i = 0, img; img = images[i]; i++) {
-        updateColorHUD(img);
+    var updateHUD = function(pointChanged) {
+      if (pointChanged) {
+        for (var i = 0, img; img = images[i]; i++) {
+          updateColorHUD(img);
+        }
       }
       adjustHUDPlacement();
     };
@@ -908,7 +921,6 @@ $( function() {
       $('#pickerbtn').removeClass('current');
     };
     crossCursor.setObserver(showHUD, onUpdateLayout, updateHUD, removeHUD);
-    hudType = 'colorPicker';
   };
   var addColorHUD = function(img) {
     if (!img.colorHUD) {
@@ -946,11 +958,6 @@ $( function() {
       img.view.find('div.hudContainer').append(img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
-    }
-  };
-  var updateColorHUDOnUpdateTransform = function() {
-    if (crossCursor.isEnabled()) {
-      adjustHUDPlacement();
     }
   };
   var makeImageLayoutParam = function() {
@@ -2092,11 +2099,11 @@ $( function() {
         };
         $(ent.element).css(style);
         grid.onUpdateTransform(ent, style);
-        crossCursor.onUpdateTransform(ent, style);
+        crossCursor.onUpdateTransformEach(ent, style);
       }
     }
     roiMap.onUpdateTransform();
-    updateColorHUDOnUpdateTransform();
+    crossCursor.onUpdateTransform();
   }
 
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
