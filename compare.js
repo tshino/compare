@@ -56,8 +56,9 @@ $( function() {
   $('#waveformbtn').click(toggleWaveform);
   $('#vectorscopebtn').click(toggleVectorscope);
   $('#metricsbtn').click(toggleMetrics);
+  $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
-  $('#swapbtn').click(swapBaseAndTargetImage);
+  $('.swapbtn').click(swapBaseAndTargetImage);
   $('#histogramType > *').click(function() {
     var index = $('#histogramType > *').index(this);
     changeHistogramType(index);
@@ -126,14 +127,18 @@ $( function() {
             sw.click();
             return false;
           }
-          if ($('#diff').is(':visible') &&
+          if (($('#diff').is(':visible') || $('#toneCurve').is(':visible')) &&
               num - 1 < entries.length &&
               entries[num - 1].ready() &&
               baseImageIndex !== null && targetImageIndex !== null &&
               targetImageIndex !== num - 1) {
             baseImageIndex = targetImageIndex;
             targetImageIndex = num - 1;
-            updateDiffTable();
+            if ($('#toneCurve').is(':visible')) {
+              updateToneCurveTable();
+            } else if ($('#diff').is(':visible')) {
+              updateDiffTable();
+            }
             return false;
           }
           if ($('#metrics').is(':visible') &&
@@ -210,6 +215,8 @@ $( function() {
     118 : { global: true, func: toggleVectorscope },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
+    // 't' (116)
+    116 : { global: true, func: toggleToneCurve },
     // 'd' (100)
     100 : { global: true, func: toggleDiff },
     // 'i' (105)
@@ -289,6 +296,7 @@ $( function() {
   var vectorscopeType = 0;
   var baseImageIndex = null;
   var targetImageIndex = null;
+  var toneCurveResult = {};
   var diffResult = {};
   var diffOptions = {
     ignoreAE: 0,
@@ -329,6 +337,10 @@ $( function() {
       }
       if (targetImageIndex === index) {
         targetImageIndex = null;
+      }
+      if (toneCurveResult.base === index || toneCurveResult.target === index) {
+        $('#toneCurveResult *').remove();
+        toneCurveResult.result = null;
       }
       if (diffResult.base === index || diffResult.target === index) {
         $('#diffResult *').remove();
@@ -1003,7 +1015,11 @@ $( function() {
       var temp = targetImageIndex;
       targetImageIndex = baseImageIndex;
       baseImageIndex = temp;
-      updateDiffTable();
+      if ($('#toneCurve').is(':visible')) {
+        updateToneCurveTable();
+      } else if ($('#diff').is(':visible')) {
+        updateDiffTable();
+      }
     }
   };
   var hideDialog = function() {
@@ -1307,6 +1323,13 @@ $( function() {
       entries[data.index[0]].metrics[data.index[1]] = data.result;
       entries[data.index[1]].metrics[data.index[0]] = data.result;
       updateMetricsTable();
+      break;
+    case 'calcToneCurve':
+      if (toneCurveResult.base === data.index[0] &&
+          toneCurveResult.target === data.index[1]) {
+        toneCurveResult.result = data.result;
+      }
+      updateToneCurveTable();
       break;
     case 'calcDiff':
       if (diffResult.base === data.index[0] && diffResult.target === data.index[1] &&
@@ -1789,9 +1812,101 @@ $( function() {
     }
     return null;
   };
+  var setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
+    $(baseSelector).children().remove();
+    $(targetSelector).children().remove();
+    if (images.length < 2) {
+      $(baseSelector).append($('<span>').text('no data'));
+      $(targetSelector).append($('<span>').text('no data'));
+      return false;
+    }
+    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+    if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
+      targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+    }
+    $(baseSelector).append(
+      makeImageNameSelector(baseImageIndex, function(index) {
+        baseImageIndex = index;
+        if (baseImageIndex === targetImageIndex) {
+          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+        }
+        onUpdate();
+      })
+    );
+    $(targetSelector).append(
+      makeImageNameSelector(targetImageIndex, function(index) {
+        targetImageIndex = index;
+        if (targetImageIndex === baseImageIndex) {
+          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
+        }
+        onUpdate();
+      })
+    );
+  };
+  var updateToneCurveTable = function() {
+    $('#toneCurveResult *').remove();
+    if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateToneCurveTable)) {
+      return;
+    }
+    var a = entries[baseImageIndex];
+    var b = entries[targetImageIndex];
+    if (toneCurveResult.base !== baseImageIndex || toneCurveResult.target !== targetImageIndex) {
+      toneCurveResult.base   = baseImageIndex;
+      toneCurveResult.target = targetImageIndex;
+      toneCurveResult.result = null;
+      discardTasksOfCommand('calcToneCurve');
+      if (baseImageIndex !== targetImageIndex) {
+        taskQueue.addTask({
+          cmd:      'calcToneCurve',
+          index:    [a.index, b.index]
+        }, attachImageDataToTask);
+      }
+    }
+    var cellStyle = {
+        width: '320px',
+        height: '320px',
+        textAlign: 'center'
+    };
+    if (toneCurveResult.result === null) {
+      $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
+    } else {
+      var result = toneCurveResult.result;
+      var vbox = '0 0 ' + 320 + ' ' + 320;
+      var curveDesc = '';
+      for (var i = 0, point; point = result.points[i]; ++i) {
+        var x = 32 + (point[0] + 0.5);
+        var y = 288 - (point[1] + 0.5);
+        curveDesc += (i === 0 ? 'M ' : ' L ') + x + ',' + y;
+      }
+      var axesDesc = 'M 32,16 L 32,288 L 304,288';
+      var scaleDesc = '';
+      for (var i = 1; i <= 10; ++i) {
+        var x = 32 + i / 10 * 256;
+        var y = 288 - i / 10 * 256;
+        scaleDesc += 'M 32,' + y + ' l 256,0 ';
+        scaleDesc += 'M ' + x + ',288 l 0,-256 ';
+      }
+      var style = {
+          background:'#444',
+          padding:'8px'
+      };
+      var fig = $(
+        '<svg viewBox="' + vbox + '">' +
+          '<g stroke="white" fill="none" stroke-width="1">' +
+            '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
+            '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
+            '<path d="' + curveDesc + '"></path>' +
+          '</g>' +
+        '</svg>').
+        width(320).
+        height(320).
+        css(style);
+      $('#toneCurveResult').append(fig).css(cellStyle);
+    }
+  };
+  var toggleToneCurve = defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis);
+
   var updateDiffTableDOM = function() {
-    $('#diffBaseName *').remove();
-    $('#diffTargetName *').remove();
     $('.diffDimension').css({display:'none'});
     $('#diffDimensionReport *').remove();
     $('#diffDetectedMaxAE').text('');
@@ -1810,33 +1925,9 @@ $( function() {
     $('#diffOffsetX').val(diffOptions.offsetX);
     $('#diffOffsetY').val(diffOptions.offsetY);
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
-    if (images.length < 2) {
-      $('#diffBaseName').append($('<span>').text('no data'));
-      $('#diffTargetName').append($('<span>').text('no data'));
+    if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateDiffTable)) {
       return;
     }
-    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-    if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
-      targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-    }
-    $('#diffBaseName').append(
-      makeImageNameSelector(baseImageIndex, function(index) {
-        baseImageIndex = index;
-        if (baseImageIndex === targetImageIndex) {
-          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-        }
-        updateDiffTable();
-      })
-    );
-    $('#diffTargetName').append(
-      makeImageNameSelector(targetImageIndex, function(index) {
-        targetImageIndex = index;
-        if (targetImageIndex === baseImageIndex) {
-          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
-        }
-        updateDiffTable();
-      })
-    );
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
     if (a.width === b.width && a.height === b.height) {

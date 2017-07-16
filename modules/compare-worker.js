@@ -25,6 +25,9 @@
     result.result = calcMetrics(data.imageData[0], data.imageData[1]);
     result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
     break;
+  case 'calcToneCurve':
+    result.result = calcToneCurve(data.imageData[0], data.imageData[1]);
+    break;
   case 'calcDiff':
     result.result = calcDiff(data.imageData[0], data.imageData[1], data.options);
     result.options = data.options;
@@ -260,6 +263,55 @@ function calcMetrics( a, b )
   var psnr = 10 * Math.log(max / mse) / Math.LN10;
   return { psnr: psnr, mse: mse, ncc: ncc };
 }
+
+var calcToneCurve = function(a, b) {
+  var hist = [calcHistogram(a, 1), calcHistogram(b, 1)];
+  var total = [a.width * a.height, b.width * b.height ];
+  var result = {
+      cum : [ new Float32Array(1 + 256), new Float32Array(1 + 256) ],
+      min : [ 0, 0 ],
+      max : [ 255, 255 ]
+  };
+  for (var k = 0; k < 2; ++k) {
+    var sum = 0;
+    result.cum[k][0] = 0;
+    for (var i = 0; i < 256; ++i) {
+      sum += hist[k][i];
+      result.cum[k][i + 1] = sum / total[k];
+    }
+    result.cum[k][256] = 1;
+    for (var i = 0; i < 256; ++i) {
+      if (0 < result.cum[k][1 + i]) {
+        result.min[k] = i;
+        break;
+      }
+    }
+    for (var i = 255; i >= 0; --i) {
+      if (1 > result.cum[k][i]) {
+        result.max[k] = i;
+        break;
+      }
+    }
+  }
+  result.points = [];
+  result.points[0] = [result.min[0] - 0.5, result.min[1] - 0.5];
+  result.points[1000] = [result.max[0] + 0.5, result.max[1] + 0.5];
+  var j = [1, 1];
+  for (var i = 1; i < 1000; ++i) {
+    var a = i / 1000;
+    var point = [];
+    for (var k = 0; k < 2; ++k) {
+      while (result.cum[k][j[k]] < a) {
+        j[k] += 1;
+      }
+      var step = result.cum[k][j[k]] - result.cum[k][j[k] - 1];
+      var delta = a - result.cum[k][j[k] - 1];
+      point[k] = (j[k] - 1) - 0.5 + delta / step;
+    }
+    result.points[i] = point;
+  }
+  return result;
+};
 
 var imageUtil = (function() {
   var makeImage = function(a, b) {
