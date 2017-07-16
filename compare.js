@@ -251,14 +251,12 @@ $( function() {
       crossCursor.processClick(e);
     }
   });
-  $('#view').on('mousedown', 'div.hudContainer', function(e) {
-    e.stopPropagation();
-  });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
     var selector = '#view > div.imageBox';
     return crossCursor.processMouseMove(e, selector, this);
   });
 
+  hud.initialize();
   initializeColorHUD();
 
   updateDOM();
@@ -839,6 +837,42 @@ $( function() {
     };
   })();
 
+  var hud = (function() {
+    var hudPlacement = { right: true, bottom: true };
+    var initialize = function() {
+      $('#view').on('mousedown', 'div.hudContainer', function(e) {
+        e.stopPropagation();
+      });
+    };
+    var adjustHUDPlacementToAvoidPoint = function(position) {
+      var center = viewZoom.getCenter();
+      var relative = {
+          x: (position.x - (center.x + 0.5)) * viewZoom.scale,
+          y: (position.y - (center.y + 0.5)) * viewZoom.scale
+      };
+      hudPlacement.right = relative.x < (hudPlacement.right ? 0.3 : -0.3);
+      hudPlacement.bottom = relative.y < (hudPlacement.bottom ? 0.4 : -0.4);
+      style = {};
+      style['right'] = hudPlacement.right ? '0px' : 'auto';
+      style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
+      for (var i = 0, img; img = images[i]; i++) {
+        img.view.find('div.hudContainer').css(style);
+      }
+    };
+    var adjustPlacement = function() {
+      var index = crossCursor.getIndex();
+      var pos = crossCursor.getPosition(index);
+      adjustHUDPlacementToAvoidPoint({
+        x: pos.x / entries[index].width,
+        y: pos.y / entries[index].height
+      });
+    };
+    return {
+      initialize: initialize,
+      adjustPlacement: adjustPlacement
+    };
+  })();
+
   var updateColorHUD = function(img) {
     if (img.colorHUD) {
       var toCSS = function(rgb) {
@@ -873,30 +907,6 @@ $( function() {
       }
     }
   };
-  var hudPlacement = { right: true, bottom: true };
-  var adjustHUDPlacementToAvoidPoint = function(position) {
-    var center = viewZoom.getCenter();
-    var relative = {
-        x: (position.x - (center.x + 0.5)) * viewZoom.scale,
-        y: (position.y - (center.y + 0.5)) * viewZoom.scale
-    };
-    hudPlacement.right = relative.x < (hudPlacement.right ? 0.3 : -0.3);
-    hudPlacement.bottom = relative.y < (hudPlacement.bottom ? 0.4 : -0.4);
-    style = {};
-    style['right'] = hudPlacement.right ? '0px' : 'auto';
-    style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
-    for (var i = 0, img; img = images[i]; i++) {
-      img.view.find('div.hudContainer').css(style);
-    }
-  };
-  var adjustHUDPlacement = function() {
-    var index = crossCursor.getIndex();
-    var pos = crossCursor.getPosition(index);
-    adjustHUDPlacementToAvoidPoint({
-      x: pos.x / entries[index].width,
-      y: pos.y / entries[index].height
-    });
-  };
   var initializeColorHUD = function() {
     var showHUD = function() {
       $('#pickerbtn').addClass('current');
@@ -915,7 +925,7 @@ $( function() {
           updateColorHUD(img);
         }
       }
-      adjustHUDPlacement();
+      hud.adjustPlacement();
     };
     var removeHUD = function() {
       $('#pickerbtn').removeClass('current');
