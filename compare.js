@@ -1872,12 +1872,13 @@ $( function() {
     } else {
       var result = toneCurveResult.result;
       var vbox = '0 0 ' + 320 + ' ' + 320;
-      var curveDesc = '';
+      var curveDesc = 'M 32,288';
       for (var i = 0, point; point = result.points[i]; ++i) {
         var x = 32 + (point[0] + 0.5);
         var y = 288 - (point[1] + 0.5);
-        curveDesc += (i === 0 ? 'M ' : ' L ') + x + ',' + y;
+        curveDesc += ' L ' + x + ',' + y;
       }
+      curveDesc += ' L 288,32';
       var axesDesc = 'M 32,16 L 32,288 L 304,288';
       var scaleDesc = '';
       for (var i = 1; i <= 10; ++i) {
