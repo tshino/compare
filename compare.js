@@ -1872,13 +1872,24 @@ $( function() {
     } else {
       var result = toneCurveResult.result;
       var vbox = '0 0 ' + 320 + ' ' + 320;
-      var curveDesc = 'M 32,288';
-      for (var i = 0, point; point = result.points[i]; ++i) {
-        var x = 32 + (point[0] + 0.5);
-        var y = 288 - (point[1] + 0.5);
-        curveDesc += ' L ' + x + ',' + y;
+      var curvePaths = '';
+      var pointToCoord = function(p) {
+        var x = 32 + p[0];
+        var y = 288 - p[1];
+        return x.toFixed(2) + ',' + y.toFixed(2);
+      };
+      var pointToPath = function(conf, p0, p1) {
+        var MIN_OPACITY = 0.2;
+        var opacity = Math.max(MIN_OPACITY, conf);
+        return '<path opacity="' + opacity.toFixed(2) + '"' +
+               ' d="M ' + pointToCoord(p0) + ' L ' + pointToCoord(p1) + '"></path>';
+      };
+      curvePaths += pointToPath(0, [0, 0], result.points[0]);
+      for (var i = 1, p0 = result.points[0], p1; p1 = result.points[i]; i++, p0 = p1) {
+        var conf = Math.min(result.conf[i - 1], result.conf[i]);
+        curvePaths += pointToPath(conf, p0, p1);
       }
-      curveDesc += ' L 288,32';
+      curvePaths += pointToPath(0, result.points[result.points.length - 1], [256, 256]);
       var axesDesc = 'M 32,16 L 32,288 L 304,288';
       var scaleDesc = '';
       for (var i = 1; i <= 10; ++i) {
@@ -1896,7 +1907,7 @@ $( function() {
           '<g stroke="white" fill="none" stroke-width="1">' +
             '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
             '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
-            '<path d="' + curveDesc + '"></path>' +
+            curvePaths +
           '</g>' +
         '</svg>').
         width(320).

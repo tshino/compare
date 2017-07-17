@@ -293,12 +293,13 @@ var calcToneCurve = function(a, b) {
       }
     }
   }
+  var N = 1000;
   result.points = [];
-  result.points[0] = [result.min[0] - 0.5, result.min[1] - 0.5];
-  result.points[1000] = [result.max[0] + 0.5, result.max[1] + 0.5];
+  result.points[0] = [result.min[0], result.min[1]];
+  result.points[N] = [result.max[0] + 1, result.max[1] + 1];
   var j = [1, 1];
-  for (var i = 1; i < 1000; ++i) {
-    var a = i / 1000;
+  for (var i = 1; i < N; ++i) {
+    var a = i / N;
     var point = [];
     for (var k = 0; k < 2; ++k) {
       while (result.cum[k][j[k]] < a) {
@@ -306,9 +307,21 @@ var calcToneCurve = function(a, b) {
       }
       var step = result.cum[k][j[k]] - result.cum[k][j[k] - 1];
       var delta = a - result.cum[k][j[k] - 1];
-      point[k] = (j[k] - 1) - 0.5 + delta / step;
+      point[k] = (j[k] - 1) + delta / step;
     }
     result.points[i] = point;
+  }
+  result.conf = [];
+  result.conf[0] = 0;
+  result.conf[N] = 0;
+  var thresh = 1.5 * (256 / N);
+  for (var i = 0; i < N; ++i) {
+    var conf = [];
+    for (var k = 0; k < 2; ++k) {
+      var d = result.points[i + 1][k] - result.points[i][k];
+      conf[k] = d < thresh ? 1 : thresh / d;
+    }
+    result.conf[i] = Math.min(conf[0], conf[1]);
   }
   return result;
 };
