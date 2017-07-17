@@ -319,7 +319,7 @@ var calcToneCurve = function(a, b) {
     var conf = [];
     for (var k = 0; k < 2; ++k) {
       var d = result.points[i + 1][k] - result.points[i][k];
-      conf[k] = d < thresh ? 1 : thresh / d;
+      conf[k] = d < thresh ? 1 : Math.pow(thresh / d, 0.3);
     }
     result.conf[i] = Math.min(conf[0], conf[1]);
   }
