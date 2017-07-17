@@ -71,6 +71,10 @@ $( function() {
     var index = $('#vectorscopeType > *').index(this);
     changeVectorscopeType(index);
   });
+  $('#toneCurveType > *').click(function() {
+    var index = $('#toneCurveType > *').index(this);
+    changeToneCurveType(index);
+  });
   $('#diffIgnoreAE').on('change', function(e) {
     diffOptions.ignoreAE = +this.value;
     updateDiffTable();
@@ -127,7 +131,7 @@ $( function() {
             sw.click();
             return false;
           }
-          if (($('#diff').is(':visible') || $('#toneCurve').is(':visible')) &&
+          if (($('#diff').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
               num - 1 < entries.length &&
               entries[num - 1].ready() &&
               baseImageIndex !== null && targetImageIndex !== null &&
@@ -296,6 +300,7 @@ $( function() {
   var vectorscopeType = 0;
   var baseImageIndex = null;
   var targetImageIndex = null;
+  var toneCurveType = 1;
   var toneCurveResult = {};
   var diffResult = {};
   var diffOptions = {
@@ -1325,8 +1330,10 @@ $( function() {
       updateMetricsTable();
       break;
     case 'calcToneCurve':
-      if (toneCurveResult.base === data.index[0] &&
-          toneCurveResult.target === data.index[1]) {
+      if (data.type === toneCurveType &&
+          data.index[0] === toneCurveResult.base &&
+          data.index[1] === toneCurveResult.target) {
+        toneCurveResult.type = data.type;
         toneCurveResult.result = data.result;
       }
       updateToneCurveTable();
@@ -1843,6 +1850,17 @@ $( function() {
       })
     );
   };
+  var changeToneCurveType = function(type) {
+    if (toneCurveType !== type) {
+      toneCurveType = type;
+      discardTasksOfCommand('calcToneCurve');
+      toneCurveResult = {};
+      $('#toneCurveType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      updateToneCurveTable();
+    }
+  };
   var updateToneCurveTable = function() {
     $('#toneCurveResult *').remove();
     if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateToneCurveTable)) {
@@ -1850,14 +1868,18 @@ $( function() {
     }
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
-    if (toneCurveResult.base !== baseImageIndex || toneCurveResult.target !== targetImageIndex) {
+    if (toneCurveResult.base !== baseImageIndex ||
+        toneCurveResult.target !== targetImageIndex ||
+        toneCurveResult.type !== toneCurveType) {
       toneCurveResult.base   = baseImageIndex;
       toneCurveResult.target = targetImageIndex;
+      toneCurveResult.type   = toneCurveType;
       toneCurveResult.result = null;
       discardTasksOfCommand('calcToneCurve');
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
+          type:     toneCurveType,
           index:    [a.index, b.index]
         }, attachImageDataToTask);
       }
@@ -1870,9 +1892,10 @@ $( function() {
     if (toneCurveResult.result === null) {
       $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
     } else {
-      var result = toneCurveResult.result;
+      var numComponents = toneCurveResult.type === 0 ? 3 : 1;
+      var components = toneCurveResult.result.components;
       var vbox = '0 0 ' + 320 + ' ' + 320;
-      var curvePaths = '';
+      var curvePaths = [];
       var pointToCoord = function(p) {
         var x = 32 + p[0];
         var y = 288 - p[1];
@@ -1884,12 +1907,20 @@ $( function() {
         return '<path opacity="' + opacity.toFixed(2) + '"' +
                ' d="M ' + pointToCoord(p0) + ' L ' + pointToCoord(p1) + '"></path>';
       };
-      curvePaths += pointToPath(0, [0, 0], result.points[0]);
-      for (var i = 1, p0 = result.points[0], p1; p1 = result.points[i]; i++, p0 = p1) {
-        var conf = Math.min(result.conf[i - 1], result.conf[i]);
-        curvePaths += pointToPath(conf, p0, p1);
+      for (var c = 0; c < numComponents; ++c) {
+        var result = components[c];
+        var color = toneCurveResult.type === 0 ? ['#f00', '#0f0', '#00f'][c] : '#fff';
+        curvePaths[c] = '<g stroke="' + color + '" ' +
+            'style="mix-blend-mode: lighten" ' +
+            'fill="none" stroke-width="1">';
+        curvePaths[c] += pointToPath(0, [0, 0], result.points[0]);
+        for (var i = 1, p0 = result.points[0], p1; p1 = result.points[i]; i++, p0 = p1) {
+          var conf = Math.min(result.conf[i - 1], result.conf[i]);
+          curvePaths[c] += pointToPath(conf, p0, p1);
+        }
+        curvePaths[c] += pointToPath(0, result.points[result.points.length - 1], [256, 256]);
+        curvePaths[c] += '</g>';
       }
-      curvePaths += pointToPath(0, result.points[result.points.length - 1], [256, 256]);
       var axesDesc = 'M 32,16 L 32,288 L 304,288';
       var scaleDesc = '';
       for (var i = 1; i <= 10; ++i) {
@@ -1907,8 +1938,8 @@ $( function() {
           '<g stroke="white" fill="none" stroke-width="1">' +
             '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
             '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
-            curvePaths +
           '</g>' +
+          curvePaths.join() +
         '</svg>').
         width(320).
         height(320).

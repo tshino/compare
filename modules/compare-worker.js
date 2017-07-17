@@ -26,7 +26,8 @@
     result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
     break;
   case 'calcToneCurve':
-    result.result = calcToneCurve(data.imageData[0], data.imageData[1]);
+    result.type   = data.type;
+    result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type);
     break;
   case 'calcDiff':
     result.result = calcDiff(data.imageData[0], data.imageData[1], data.options);
@@ -264,9 +265,7 @@ function calcMetrics( a, b )
   return { psnr: psnr, mse: mse, ncc: ncc };
 }
 
-var calcToneCurve = function(a, b) {
-  var hist = [calcHistogram(a, 1), calcHistogram(b, 1)];
-  var total = [a.width * a.height, b.width * b.height ];
+var calcToneCurveImpl = function(hist, offset, total) {
   var result = {
       cum : [ new Float32Array(1 + 256), new Float32Array(1 + 256) ],
       min : [ 0, 0 ],
@@ -276,7 +275,7 @@ var calcToneCurve = function(a, b) {
     var sum = 0;
     result.cum[k][0] = 0;
     for (var i = 0; i < 256; ++i) {
-      sum += hist[k][i];
+      sum += hist[k][i + offset];
       result.cum[k][i + 1] = sum / total[k];
     }
     result.cum[k][256] = 1;
@@ -322,6 +321,21 @@ var calcToneCurve = function(a, b) {
       conf[k] = d < thresh ? 1 : Math.pow(thresh / d, 0.3);
     }
     result.conf[i] = Math.min(conf[0], conf[1]);
+  }
+  return result;
+};
+var calcToneCurve = function(a, b, type) {
+  var hist = [calcHistogram(a, type), calcHistogram(b, type)];
+  var total = [a.width * a.height, b.width * b.height ];
+  var result = {
+      components : []
+  };
+  if (type === 0) { // RGB
+    result.components[0] = calcToneCurveImpl(hist, 0, total);
+    result.components[1] = calcToneCurveImpl(hist, 256, total);
+    result.components[2] = calcToneCurveImpl(hist, 512, total);
+  } else { // Luminance
+    result.components[0] = calcToneCurveImpl(hist, 0, total);
   }
   return result;
 };
