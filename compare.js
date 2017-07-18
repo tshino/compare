@@ -253,8 +253,8 @@ $( function() {
   
   viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
-  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
@@ -1861,7 +1861,7 @@ $( function() {
       updateToneCurveTable();
     }
   };
-  var updateToneCurveTable = function() {
+  var updateToneCurveTableDOM = function() {
     $('#toneCurveResult *').remove();
     if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateToneCurveTable)) {
       return;
@@ -1930,8 +1930,9 @@ $( function() {
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
       var style = {
-          background:'#444',
-          padding:'8px'
+          background: '#444',
+          padding: '8px',
+          transform: figureZoom.makeTransform()
       };
       var fig = $(
         '<svg viewBox="' + vbox + '">' +
@@ -1947,7 +1948,17 @@ $( function() {
       $('#toneCurveResult').append(fig).css(cellStyle);
     }
   };
-  var toggleToneCurve = defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis);
+  var updateToneCurveTable = function(transformOnly) {
+    if (transformOnly) {
+      if (toneCurveResult.result !== null) {
+        $('#toneCurveResult svg').css('transform', figureZoom.makeTransform());
+      }
+    } else {
+      updateToneCurveTableDOM();
+    }
+  };
+  var toggleToneCurve = defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis,
+    { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
 
   var updateDiffTableDOM = function() {
     $('.diffDimension').css({display:'none'});
