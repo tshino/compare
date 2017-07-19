@@ -1923,9 +1923,9 @@ $( function() {
       }
       var axesDesc = 'M 32,16 L 32,288 L 304,288';
       var scaleDesc = '';
-      for (var i = 1; i <= 10; ++i) {
-        var x = 32 + i / 10 * 256;
-        var y = 288 - i / 10 * 256;
+      for (var i = 1; i <= 8; ++i) {
+        var x = 32 + i / 8 * 256;
+        var y = 288 - i / 8 * 256;
         scaleDesc += 'M 32,' + y + ' l 256,0 ';
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
