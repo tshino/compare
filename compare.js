@@ -1930,7 +1930,7 @@ $( function() {
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
       var style = {
-          background: '#444',
+          background: '#222',
           padding: '8px',
           transform: figureZoom.makeTransform()
       };
