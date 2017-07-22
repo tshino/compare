@@ -265,7 +265,7 @@ function calcMetrics( a, b )
   return { psnr: psnr, mse: mse, ncc: ncc };
 }
 
-var calcToneCurveImpl = function(hist, offset, total) {
+var calcToneCurveByHistogram = function(hist, offset, total) {
   var result = {
       cum : [ new Float32Array(1 + 256), new Float32Array(1 + 256) ],
       min : [ 0, 0 ],
@@ -324,19 +324,60 @@ var calcToneCurveImpl = function(hist, offset, total) {
   }
   return result;
 };
+var calcToneMap = function(a, b, type) {
+  var w = Math.min(a.width, b.width);
+  var h = Math.min(a.height, b.height);
+  var sampleA, sampleB;
+  if (w === a.width && h === a.height) {
+    sampleA = a;
+  } else {
+    sampleA = imageUtil.makeImage(w, h);
+    imageUtil.resize(sampleA, a);
+  }
+  if (w === b.width && h === b.height) {
+    sampleB = b;
+  } else {
+    sampleB = imageUtil.makeImage(w, h);
+    imageUtil.resize(sampleB, b);
+  }
+  var dist = new Uint32Array(256 * 256);
+  for (var i = 0; i < dist.length; ++i) {
+    dist[i] = 0;
+  }
+  {
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
+      var ra = sampleA.data[k + 0];
+      var ga = sampleA.data[k + 1];
+      var ba = sampleA.data[k + 2];
+      var ya = Math.round(0.299 * ra + 0.587 * ga + 0.114 * ba);
+      var rb = sampleB.data[k + 0];
+      var gb = sampleB.data[k + 1];
+      var bb = sampleB.data[k + 2];
+      var yb = Math.round(0.299 * rb + 0.587 * gb + 0.114 * bb);
+      dist[ya + 256 * yb] += 1;
+    }
+  }
+  return {
+    dist : dist,
+    max : w * h
+  };
+};
 var calcToneCurve = function(a, b, type) {
-  var hist = [calcHistogram(a, type), calcHistogram(b, type)];
-  var total = [a.width * a.height, b.width * b.height ];
   var result = {
       components : []
   };
+  // tone curve by Histogram
+  var hist = [calcHistogram(a, type), calcHistogram(b, type)];
+  var total = [a.width * a.height, b.width * b.height ];
   if (type === 0) { // RGB
-    result.components[0] = calcToneCurveImpl(hist, 0, total);
-    result.components[1] = calcToneCurveImpl(hist, 256, total);
-    result.components[2] = calcToneCurveImpl(hist, 512, total);
+    result.components[0] = calcToneCurveByHistogram(hist, 0, total);
+    result.components[1] = calcToneCurveByHistogram(hist, 256, total);
+    result.components[2] = calcToneCurveByHistogram(hist, 512, total);
   } else { // Luminance
-    result.components[0] = calcToneCurveImpl(hist, 0, total);
+    result.components[0] = calcToneCurveByHistogram(hist, 0, total);
   }
+  // tone map
+  result.toneMap = calcToneMap(a, b, type);
   return result;
 };
 
