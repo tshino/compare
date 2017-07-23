@@ -1861,7 +1861,7 @@ $( function() {
       updateToneCurveTable();
     }
   };
-  var makeToneMapFigure = function(toneMapData) {
+  var makeToneMapFigure = function(toneMapData, type) {
     var fig = makeBlankFigure(320, 320);
     var bits = fig.context.createImageData(256, 256);
     var dist = toneMapData.dist;
@@ -1869,15 +1869,33 @@ $( function() {
     var i = 0;
     fig.context.fillStyle = '#000';
     fig.context.fillRect(0, 0, 320, 320);
-    for (var y = 0; y < 256; ++y) {
-      var k = 256 * 4 * (255 - y);
-      for (var x = 0; x < 256; ++x, i++, k += 4) {
-        var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-        var c = Math.round(a * 96);
-        bits.data[k + 0] = c;
-        bits.data[k + 1] = c;
-        bits.data[k + 2] = c;
-        bits.data[k + 3] = 255;
+    if (type === 0) { // RGB
+      for (var y = 0; y < 256; ++y) {
+        var k = 256 * 4 * (255 - y);
+        for (var x = 0; x < 256; ++x, i++, k += 4) {
+          var aR = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          var aG = 1 - Math.pow(1 - dist[i + 65536] / max, 20000.0);
+          var aB = 1 - Math.pow(1 - dist[i + 131072] / max, 20000.0);
+          var cR = Math.round(aR * 96);
+          var cG = Math.round(aG * 96);
+          var cB = Math.round(aB * 96);
+          bits.data[k + 0] = cR;
+          bits.data[k + 1] = cG;
+          bits.data[k + 2] = cB;
+          bits.data[k + 3] = 255;
+        }
+      }
+    } else { // Luminance
+      for (var y = 0; y < 256; ++y) {
+        var k = 256 * 4 * (255 - y);
+        for (var x = 0; x < 256; ++x, i++, k += 4) {
+          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          var c = Math.round(a * 96);
+          bits.data[k + 0] = c;
+          bits.data[k + 1] = c;
+          bits.data[k + 2] = c;
+          bits.data[k + 3] = 255;
+        }
       }
     }
     fig.context.putImageData(bits, 32, 32);
@@ -1971,7 +1989,7 @@ $( function() {
         '</svg>').
         css(style);
       var dist = $(
-          makeToneMapFigure(toneCurveResult.result.toneMap).canvas
+          makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type).canvas
         ).css(style);
       var curve = $(
         '<svg viewBox="' + vbox + '">' +

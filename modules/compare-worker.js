@@ -340,11 +340,23 @@ var calcToneMap = function(a, b, type) {
     sampleB = imageUtil.makeImage(w, h);
     imageUtil.resize(sampleB, b);
   }
-  var dist = new Uint32Array(256 * 256);
+  var dist = new Uint32Array(256 * 256 * (type === 0 ? 3 : 1));
   for (var i = 0; i < dist.length; ++i) {
     dist[i] = 0;
   }
-  {
+  if (type === 0) { // RGB
+    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
+      var ra = sampleA.data[k + 0];
+      var ga = sampleA.data[k + 1];
+      var ba = sampleA.data[k + 2];
+      var rb = sampleB.data[k + 0];
+      var gb = sampleB.data[k + 1];
+      var bb = sampleB.data[k + 2];
+      dist[ra + 256 * rb] += 1;
+      dist[ga + 256 * gb + 65536] += 1;
+      dist[ba + 256 * bb + 131072] += 1;
+    }
+  } else { // Luminance
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var ra = sampleA.data[k + 0];
       var ga = sampleA.data[k + 1];
