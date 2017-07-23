@@ -327,16 +327,13 @@ var calcToneCurveByHistogram = function(hist, offset, total) {
 var calcToneMap = function(a, b, type) {
   var w = Math.min(a.width, b.width);
   var h = Math.min(a.height, b.height);
-  var sampleA, sampleB;
-  if (w === a.width && h === a.height) {
-    sampleA = a;
-  } else {
+  var sampleA = imageUtil.makeImage(a);
+  var sampleB = imageUtil.makeImage(b);
+  if (w !== a.width || h !== a.height) {
     sampleA = imageUtil.makeImage(w, h);
     imageUtil.resize(sampleA, a);
   }
-  if (w === b.width && h === b.height) {
-    sampleB = b;
-  } else {
+  if (w !== b.width || h !== b.height) {
     sampleB = imageUtil.makeImage(w, h);
     imageUtil.resize(sampleB, b);
   }
@@ -345,28 +342,36 @@ var calcToneMap = function(a, b, type) {
     dist[i] = 0;
   }
   if (type === 0) { // RGB
-    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var ra = sampleA.data[k + 0];
-      var ga = sampleA.data[k + 1];
-      var ba = sampleA.data[k + 2];
-      var rb = sampleB.data[k + 0];
-      var gb = sampleB.data[k + 1];
-      var bb = sampleB.data[k + 2];
-      dist[ra + 256 * rb] += 1;
-      dist[ga + 256 * gb + 65536] += 1;
-      dist[ba + 256 * bb + 131072] += 1;
+    for (var y = 0; y < h; ++y) {
+      var ka = 4 * (sampleA.offset + y * sampleA.pitch);
+      var kb = 4 * (sampleB.offset + y * sampleB.pitch);
+      for (var e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
+        var ra = sampleA.data[ka + 0];
+        var ga = sampleA.data[ka + 1];
+        var ba = sampleA.data[ka + 2];
+        var rb = sampleB.data[kb + 0];
+        var gb = sampleB.data[kb + 1];
+        var bb = sampleB.data[kb + 2];
+        dist[ra + 256 * rb] += 1;
+        dist[ga + 256 * gb + 65536] += 1;
+        dist[ba + 256 * bb + 131072] += 1;
+      }
     }
   } else { // Luminance
-    for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var ra = sampleA.data[k + 0];
-      var ga = sampleA.data[k + 1];
-      var ba = sampleA.data[k + 2];
-      var ya = Math.round(0.299 * ra + 0.587 * ga + 0.114 * ba);
-      var rb = sampleB.data[k + 0];
-      var gb = sampleB.data[k + 1];
-      var bb = sampleB.data[k + 2];
-      var yb = Math.round(0.299 * rb + 0.587 * gb + 0.114 * bb);
-      dist[ya + 256 * yb] += 1;
+    for (var y = 0; y < h; ++y) {
+      var ka = 4 * (sampleA.offset + y * sampleA.pitch);
+      var kb = 4 * (sampleB.offset + y * sampleB.pitch);
+      for (var e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
+        var ra = sampleA.data[ka + 0];
+        var ga = sampleA.data[ka + 1];
+        var ba = sampleA.data[ka + 2];
+        var ya = Math.round(0.299 * ra + 0.587 * ga + 0.114 * ba);
+        var rb = sampleB.data[kb + 0];
+        var gb = sampleB.data[kb + 1];
+        var bb = sampleB.data[kb + 2];
+        var yb = Math.round(0.299 * rb + 0.587 * gb + 0.114 * bb);
+        dist[ya + 256 * yb] += 1;
+      }
     }
   }
   return {
@@ -433,6 +438,7 @@ var imageUtil = (function() {
     };
   };
   var fill = function(image, r, g, b, a) {
+    image = makeImage(image);
     var w = image.width, h = image.height;
     var i = image.offset * 4;
     for (var y = 0; y < h; y++) {
@@ -446,6 +452,8 @@ var imageUtil = (function() {
     }
   };
   var copy = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
     var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
     var i = dest.offset * 4, j = src.offset * 4;
     for (var y = 0; y < h; y++) {
@@ -460,6 +468,8 @@ var imageUtil = (function() {
     }
   };
   var resizeNN = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
     var w = dest.width, h = dest.height;
     var mw = src.width / w, mh = src.height / h;
     var i = dest.offset * 4;
@@ -487,6 +497,8 @@ var imageUtil = (function() {
     }
   };
   var resizeBilinear = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
     var w = dest.width, h = dest.height;
     var sw = src.width, sh = src.height;
     var mw = sw / w, mh = sh / h;
@@ -570,6 +582,8 @@ var imageUtil = (function() {
     }
   };
   var resizeGeneral = function(dest, src, filterSize, filterFunc) {
+    dest = makeImage(dest);
+    src = makeImage(src);
     var w = dest.width, h = dest.height;
     var sw = src.width, sh = src.height;
     var mw = sw / w, mh = sh / h;
@@ -733,6 +747,8 @@ var imageUtil = (function() {
     }
   };
   var convolution = function(dest, src, kernelSize, kernel) {
+    dest = makeImage(dest);
+    src = makeImage(src);
     var w = dest.width, h = dest.height;
     if (src.width !== w || src.height !== h) {
       return;
