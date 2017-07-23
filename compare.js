@@ -1861,6 +1861,28 @@ $( function() {
       updateToneCurveTable();
     }
   };
+  var makeToneMapFigure = function(toneMapData) {
+    var fig = makeBlankFigure(320, 320);
+    var bits = fig.context.createImageData(256, 256);
+    var dist = toneMapData.dist;
+    var max = toneMapData.max;
+    var i = 0;
+    fig.context.fillStyle = '#000';
+    fig.context.fillRect(0, 0, 320, 320);
+    for (var y = 0; y < 256; ++y) {
+      var k = 256 * 4 * (255 - y);
+      for (var x = 0; x < 256; ++x, i++, k += 4) {
+        var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+        var c = Math.round(a * 96);
+        bits.data[k + 0] = c;
+        bits.data[k + 1] = c;
+        bits.data[k + 2] = c;
+        bits.data[k + 3] = 255;
+      }
+    }
+    fig.context.putImageData(bits, 32, 32);
+    return fig;
+  };
   var updateToneCurveTableDOM = function() {
     $('#toneCurveResult *').remove();
     if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateToneCurveTable)) {
@@ -1885,6 +1907,7 @@ $( function() {
       }
     }
     var cellStyle = {
+        position: 'relative',
         width: '320px',
         height: '320px',
         textAlign: 'center'
@@ -1930,28 +1953,40 @@ $( function() {
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
       var style = {
-          background: '#222',
+          //background: '#222',
+          position: 'absolute',
+          width: '320px',
+          height: '320px',
           padding: '8px',
-          transform: figureZoom.makeTransform()
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
       };
-      var fig = $(
+      var axes = $(
         '<svg viewBox="' + vbox + '">' +
-          '<g stroke="white" fill="none" stroke-width="1">' +
+          '<g stroke="white" fill="none">' +
             '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
             '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
           '</g>' +
+        '</svg>').
+        css(style);
+      var dist = $(
+          makeToneMapFigure(toneCurveResult.result.toneMap).canvas
+        ).css(style);
+      var curve = $(
+        '<svg viewBox="' + vbox + '">' +
           curvePaths.join() +
         '</svg>').
-        width(320).
-        height(320).
         css(style);
-      $('#toneCurveResult').append(fig).css(cellStyle);
+      $('#toneCurveResult').append(dist).append(curve).append(axes).css(cellStyle);
     }
   };
   var updateToneCurveTable = function(transformOnly) {
     if (transformOnly) {
       if (toneCurveResult.result !== null) {
-        $('#toneCurveResult svg').css('transform', figureZoom.makeTransform());
+        $('#toneCurveResult > *').css({
+          transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
+        });
       }
     } else {
       updateToneCurveTableDOM();
