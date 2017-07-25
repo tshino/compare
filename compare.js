@@ -629,7 +629,6 @@ $( function() {
     var fixedPosition = false;
     var positions = [];
     var onShowCallback = null;
-    var onUpdateLayoutCallback = null;
     var onUpdateCallback = null;
     var onRemoveCallback = null;
     var makeInitialPosition = function(index) {
@@ -639,9 +638,8 @@ $( function() {
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var setObserver = function(onShow, onUpdateLayout, onUpdate, onRemove) {
+    var setObserver = function(onShow, onUpdate, onRemove) {
       onShowCallback = onShow;
-      onUpdateLayoutCallback = onUpdateLayout;
       onUpdateCallback = onUpdate;
       onRemoveCallback = onRemove;
     };
@@ -816,9 +814,6 @@ $( function() {
       if (img.cursor) {
         $(img.cursor).css({ width: w+'px', height: h+'px' });
       }
-      if (onUpdateLayoutCallback) {
-        onUpdateLayoutCallback(img);
-      }
     };
     var onUpdateTransformEach = function(ent, commonStyle) {
       if (ent.cursor) {
@@ -856,10 +851,14 @@ $( function() {
 
   var hud = (function() {
     var hudPlacement = { right: true, bottom: true };
+    var onUpdateLayoutCallback = null;
     var initialize = function() {
       $('#view').on('mousedown', 'div.hudContainer', function(e) {
         e.stopPropagation();
       });
+    };
+    var setObserver = function(onUpdateLayout) {
+      onUpdateLayoutCallback = onUpdateLayout;
     };
     var adjustHUDPlacementToAvoidPoint = function(position) {
       var center = viewZoom.getCenter();
@@ -884,9 +883,27 @@ $( function() {
         y: pos.y / entries[index].height
       });
     };
+    var append = function(img, hud) {
+      if (img && img.view) {
+        var container = img.view.find('div.hudContainer');
+        if (0 === container.length) {
+          container = $('<div class="hudContainer">');
+          img.view.append(container);
+        }
+        container.append(hud);
+      }
+    };
+    var onUpdateLayout = function(img) {
+      if (onUpdateLayoutCallback) {
+        onUpdateLayoutCallback(img);
+      }
+    };
     return {
       initialize: initialize,
-      adjustPlacement: adjustPlacement
+      setObserver: setObserver,
+      adjustPlacement: adjustPlacement,
+      append: append,
+      onUpdateLayout: onUpdateLayout
     };
   })();
 
@@ -947,13 +964,11 @@ $( function() {
     var removeHUD = function() {
       $('#pickerbtn').removeClass('current');
     };
-    crossCursor.setObserver(showHUD, onUpdateLayout, updateHUD, removeHUD);
+    crossCursor.setObserver(showHUD, updateHUD, removeHUD);
+    hud.setObserver(onUpdateLayout);
   };
   var addColorHUD = function(img) {
     if (!img.colorHUD) {
-      if (0 === img.view.find('div.hudContainer').length) {
-        img.view.append($('<div class="hudContainer">'));
-      }
       img.colorHUD = $(
         '<div class="dark hud" style="pointer-events: auto; min-width: 280px">' +
           '<span style="display: inline-block">' +
@@ -982,7 +997,7 @@ $( function() {
         '</div>'
       );
       img.colorHUD.find('button.close').click(crossCursor.disable);
-      img.view.find('div.hudContainer').append(img.colorHUD);
+      hud.append(img, img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
     }
@@ -1013,6 +1028,7 @@ $( function() {
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
+      hud.onUpdateLayout(img);
     }
   };
   var swapBaseAndTargetImage = function() {
