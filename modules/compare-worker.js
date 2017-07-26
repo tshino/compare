@@ -991,6 +991,35 @@ var imageUtil = (function() {
     }
     return result;
   };
+  var makeUniqueColorArray = function(imageData) {
+    var w = imageData.width;
+    var h = imageData.height;
+    var colors = new Uint32Array(w * h);
+    for (var i = 0, k = 0, n = 4 * w * h; k < n; k += 4, i += 1) {
+      var r = imageData.data[k + 0];
+      var g = imageData.data[k + 1];
+      var b = imageData.data[k + 2];
+      colors[i] = (r << 16) + (g << 8) + b;
+    }
+    colors.sort();
+    var counts = new Uint32Array(w * h);
+    var totalCount = 0;
+    var uniqueCount = 1;
+    for (var i = 1; i < colors.length; i += 1) {
+      if (colors[i - 1] !== colors[i]) {
+        colors[uniqueCount] = colors[i];
+        counts[uniqueCount - 1] = i - totalCount;
+        uniqueCount += 1;
+        totalCount = i;
+      }
+    }
+    counts[uniqueCount - 1] = colors.length - totalCount;
+    return {
+      colors: colors,
+      counts: counts,
+      uniqueCount: uniqueCount
+    };
+  };
   return {
     makeImage:      makeImage,
     makeRegion:     makeRegion,
@@ -1004,7 +1033,8 @@ var imageUtil = (function() {
     convolution:    convolution,
     sobelX:         sobelX,
     sobelY:         sobelY,
-    estimateMotion: estimateMotion
+    estimateMotion: estimateMotion,
+    makeUniqueColorArray: makeUniqueColorArray
   };
 })();
 
