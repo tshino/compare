@@ -21,6 +21,9 @@
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;
+  case 'calcColorTable':
+    result.result = imageUtil.getUniqueColors(data.imageData[0]);
+    break;
   case 'calcMetrics':
     result.result = calcMetrics(data.imageData[0], data.imageData[1]);
     result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
@@ -991,7 +994,7 @@ var imageUtil = (function() {
     }
     return result;
   };
-  var makeUniqueColorArray = function(imageData) {
+  var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
     var colors = new Uint32Array(w * h);
@@ -1014,10 +1017,11 @@ var imageUtil = (function() {
       }
     }
     counts[uniqueCount - 1] = colors.length - totalCount;
+    colors = colors.slice(0, uniqueCount);
+    counts = counts.slice(0, uniqueCount);
     return {
       colors: colors,
-      counts: counts,
-      uniqueCount: uniqueCount
+      counts: counts
     };
   };
   return {
@@ -1034,7 +1038,7 @@ var imageUtil = (function() {
     sobelX:         sobelX,
     sobelY:         sobelY,
     estimateMotion: estimateMotion,
-    makeUniqueColorArray: makeUniqueColorArray
+    getUniqueColors: getUniqueColors
   };
 })();
 
