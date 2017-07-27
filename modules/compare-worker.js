@@ -352,9 +352,9 @@ var calcToneMap = function(a, b, type) {
         var rb = sampleB.data[kb + 0];
         var gb = sampleB.data[kb + 1];
         var bb = sampleB.data[kb + 2];
-        dist[ra + 256 * rb] += 1;
-        dist[ga + 256 * gb + 65536] += 1;
-        dist[ba + 256 * bb + 131072] += 1;
+        dist[ra + 256 * (255 - rb)] += 1;
+        dist[ga + 256 * (255 - gb) + 65536] += 1;
+        dist[ba + 256 * (255 - bb) + 131072] += 1;
       }
     }
   } else { // Luminance
@@ -370,7 +370,7 @@ var calcToneMap = function(a, b, type) {
         var gb = sampleB.data[kb + 1];
         var bb = sampleB.data[kb + 2];
         var yb = Math.round(0.299 * rb + 0.587 * gb + 0.114 * bb);
-        dist[ya + 256 * yb] += 1;
+        dist[ya + 256 * (255 - yb)] += 1;
       }
     }
   }

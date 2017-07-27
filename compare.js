@@ -1557,6 +1557,40 @@ $( function() {
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: 256 }; } });
+  var makeDitributionImageData = function(context, w, h, dist, max, scale, mode) {
+    var bits = context.createImageData(w, h);
+    var i = 0, k = 0;
+    if (mode === 0) { // RGB
+      var offsetG = w * h;
+      var offsetB = w * h * 2;
+      for (var y = 0; y < h; ++y) {
+        for (var x = 0; x < w; ++x, i++, k += 4) {
+          var aR = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          var aG = 1 - Math.pow(1 - dist[i + offsetG] / max, 20000.0);
+          var aB = 1 - Math.pow(1 - dist[i + offsetB] / max, 20000.0);
+          var cR = Math.round(aR * scale);
+          var cG = Math.round(aG * scale);
+          var cB = Math.round(aB * scale);
+          bits.data[k + 0] = cR;
+          bits.data[k + 1] = cG;
+          bits.data[k + 2] = cB;
+          bits.data[k + 3] = 255;
+        }
+      }
+    } else { // Luminance
+      for (var y = 0; y < h; ++y) {
+        for (var x = 0; x < w; ++x, i++, k += 4) {
+          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          var c = Math.round(a * scale);
+          bits.data[k + 0] = c;
+          bits.data[k + 1] = c;
+          bits.data[k + 2] = c;
+          bits.data[k + 3] = 255;
+        }
+      }
+    }
+    return bits;
+  };
   var changeVectorscopeType = function(type) {
     if (vectorscopeType !== type) {
       vectorscopeType = type;
@@ -1602,19 +1636,7 @@ $( function() {
     
     function makeFigure(fig, w, h, dist) {
       var context = fig.context;
-      var bits = context.createImageData(320, 320);
-      var max = w * h;
-      var i = 0, k = 0;
-      for (var y = 0; y < 320; ++y) {
-        for (var x = 0; x < 320; ++x, i++, k += 4) {
-          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-          var c = Math.round(a * 255);
-          bits.data[k + 0] = c;
-          bits.data[k + 1] = c;
-          bits.data[k + 2] = c;
-          bits.data[k + 3] = 255;
-        }
-      }
+      var bits = makeDitributionImageData(context, 320, 320, dist, w * h, 255, 1);
       context.putImageData(bits, 0, 0);
       var srgbToLinear = function(c) {
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -1879,41 +1901,11 @@ $( function() {
   };
   var makeToneMapFigure = function(toneMapData, type) {
     var fig = makeBlankFigure(320, 320);
-    var bits = fig.context.createImageData(256, 256);
     var dist = toneMapData.dist;
     var max = toneMapData.max;
-    var i = 0;
+    var bits = makeDitributionImageData(fig.context, 256, 256, dist, max, 96, type);
     fig.context.fillStyle = '#000';
     fig.context.fillRect(0, 0, 320, 320);
-    if (type === 0) { // RGB
-      for (var y = 0; y < 256; ++y) {
-        var k = 256 * 4 * (255 - y);
-        for (var x = 0; x < 256; ++x, i++, k += 4) {
-          var aR = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-          var aG = 1 - Math.pow(1 - dist[i + 65536] / max, 20000.0);
-          var aB = 1 - Math.pow(1 - dist[i + 131072] / max, 20000.0);
-          var cR = Math.round(aR * 96);
-          var cG = Math.round(aG * 96);
-          var cB = Math.round(aB * 96);
-          bits.data[k + 0] = cR;
-          bits.data[k + 1] = cG;
-          bits.data[k + 2] = cB;
-          bits.data[k + 3] = 255;
-        }
-      }
-    } else { // Luminance
-      for (var y = 0; y < 256; ++y) {
-        var k = 256 * 4 * (255 - y);
-        for (var x = 0; x < 256; ++x, i++, k += 4) {
-          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-          var c = Math.round(a * 96);
-          bits.data[k + 0] = c;
-          bits.data[k + 1] = c;
-          bits.data[k + 2] = c;
-          bits.data[k + 3] = 255;
-        }
-      }
-    }
     fig.context.putImageData(bits, 32, 32);
     return fig;
   };
