@@ -42,8 +42,8 @@ var changeLang = function(lang) {
 		<div class="space"></div>
 		<button id="analysisbtn">
 			<img src="res/histogram.svg" width="100%">
-			<span class="tooltip keys en">Show analysis tools <span>c</span></span>
-			<span class="tooltip keys ja">分析ツールを表示 <span>c</span></span>
+			<span class="tooltip keys en">Show analysis tools <span>a</span></span>
+			<span class="tooltip keys ja">分析ツールを表示 <span>a</span></span>
 		</button>
 		<button id="zoomIn">
 			<img src="res/zoomin.svg" width="100%">
@@ -57,8 +57,8 @@ var changeLang = function(lang) {
 		</button>
 		<button id="arrange">
 			<img src="res/layout_x.svg" width="100%">
-			<span class="tooltip keys en">Arrange layout <span>a</span></span>
-			<span class="tooltip keys ja">レイアウト変更 <span>a</span></span>
+			<span class="tooltip keys en">Arrange layout <span>/</span></span>
+			<span class="tooltip keys ja">レイアウト変更 <span>/</span></span>
 		</button>
 		<button id="overlay">
 			<img src="res/overlay.svg" width="100%">
@@ -166,7 +166,7 @@ var changeLang = function(lang) {
 					<td><span class="en">show all pictures</span><span class="ja">すべての画像を表示</span></td>
 				</tr>
 				<tr>
-					<td class="keys"><span>a</span></td>
+					<td class="keys"><span>/</span></td>
 					<td><span class="en">arrange layout</span><span class="ja">レイアウト変更</span></td>
 				</tr>
 				<tr>
@@ -182,7 +182,7 @@ var changeLang = function(lang) {
 					<td><span class="en">show grid</span><span class="ja">グリッドを表示</span></td>
 				</tr>
 				<tr>
-					<td class="keys"><span>c</span></td>
+					<td class="keys"><span>a</span></td>
 					<td><span class="en">analysis tools</span><span class="ja">分析ツール</span></td>
 				</tr>
 				<tr>
@@ -200,6 +200,10 @@ var changeLang = function(lang) {
 				<tr>
 					<td class="keys"><span>v</span></td>
 					<td><span class="en">vectorscope</span><span class="ja">ベクトルスコープ</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>c</span></td>
+					<td><span class="en">3D color distribution</span><span class="ja">3次元色分布</span></td>
 				</tr>
 				<tr>
 					<td class="keys"><span>m</span></td>
@@ -339,6 +343,7 @@ var changeLang = function(lang) {
 					<img src="res/vectorscope.svg" width="20">
 					<span class="en">3D Color Distribution</span>
 					<span class="ja">3次元色分布</span>
+					<span class="flat keys"><span>c</span></span>
 				</button>
 				<button id="metricsbtn">
 					<img src="res/psnr.svg" width="20">

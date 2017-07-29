@@ -222,16 +222,16 @@ $( function() {
     63 : { global: true, func: toggleHelp },
     // 'f' (102)
     102 : { global: true, func: toggleFullscreen },
-    // 'c' (99)
-    99 : { global: true, func: toggleAnalysis },
+    // 'a' (97)
+    97 : { global: true, func: toggleAnalysis },
     // 'h' (104)
     104 : { global: true, func: toggleHistogram },
     // 'w' (119)
     119 : { global: true, func: toggleWaveform },
     // 'v' (118)
     118 : { global: true, func: toggleVectorscope },
-    // 'q' (113)
-    113 : { global: true, func: toggleColorDist },
+    // 'c' (99)
+    99 : { global: true, func: toggleColorDist },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
     // 't' (116)
@@ -240,8 +240,8 @@ $( function() {
     100 : { global: true, func: toggleDiff },
     // 'i' (105)
     105 : { global: true, func: toggleInfo },
-    // 'a' (97)
-    97 : { global: false, func: arrangeLayout },
+    // '/' (47)
+    47 : { global: false, func: arrangeLayout },
     // 'o' (111)
     111: { global: false, func: toggleOverlay },
     // 'n' (110)
