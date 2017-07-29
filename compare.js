@@ -55,6 +55,7 @@ $( function() {
   $('#histogrambtn').click(toggleHistogram);
   $('#waveformbtn').click(toggleWaveform);
   $('#vectorscopebtn').click(toggleVectorscope);
+  $('#colordistbtn').click(toggleColorDist);
   $('#metricsbtn').click(toggleMetrics);
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
@@ -155,6 +156,18 @@ $( function() {
             return false;
           }
         }
+        // cursor key
+        if (37 <= e.keyCode && e.keyCode <= 40) {
+          if ($('#colorDist').is(':visible')) {
+            var step = 2;
+            var x = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
+            var y = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
+            colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x + y, -90, 90);
+            colorDistOrientation.y += x;
+            updateColorDist();
+            return false;
+          }
+        }
         // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
         if (!figureZoom.processKeyDown(e)) {
           return false;
@@ -217,6 +230,8 @@ $( function() {
     119 : { global: true, func: toggleWaveform },
     // 'v' (118)
     118 : { global: true, func: toggleVectorscope },
+    // 'q' (113)
+    113 : { global: true, func: toggleColorDist },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
     // 't' (116)
@@ -298,6 +313,10 @@ $( function() {
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
+  var colorDistOrientation = {
+    x: 30,
+    y: -30
+  };
   var baseImageIndex = null;
   var targetImageIndex = null;
   var toneCurveType = 1;
@@ -356,6 +375,8 @@ $( function() {
       ent.histogram = null;
       ent.waveform = null;
       ent.vectorscope = null;
+      ent.colorTable = null;
+      ent.colorDist = null;
       resetLayoutState();
       discardTasksOfEntryByIndex(index);
       updateDOM();
@@ -1340,6 +1361,10 @@ $( function() {
         updateVectorscope(data.type, entries[data.index[0]], data.result);
       }
       break;
+    case 'calcColorTable':
+      entries[data.index[0]].colorTable = data.result;
+      updateColorDist(entries[data.index[0]]);
+      break;
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
       entries[data.index[1]].metrics[data.index[0]] = data.result;
@@ -1752,6 +1777,61 @@ $( function() {
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
+  var updateColorDistAsync = function(img) {
+    taskQueue.addTask({
+      cmd:      'calcColorTable',
+      index:    [img.index]
+    }, attachImageDataToTask);
+  };
+  var updateColorDist = function(img) {
+    if (img === undefined) {
+      for (var i = 0; img = images[i]; i++) {
+        updateColorDist(img);
+      }
+      return;
+    }
+    var fig = makeBlankFigure(320, 320);
+    makeFigure(fig, img.colorTable);
+    img.colorDist = fig.canvas;
+    updateColorDistTable();
+
+    function makeFigure(fig, colorTable) {
+      var context = fig.context;
+      var distMax = colorTable.colors.length;
+      var dist = new Uint32Array(320 * 320);
+      for (var i = 0; i < dist.length; ++i) {
+        dist[i] = 0;
+      }
+      var colors = colorTable.colors;
+      var ax = colorDistOrientation.x * (Math.PI / 180);
+      var ay = colorDistOrientation.y * (Math.PI / 180);
+      var r = 0.707;
+      var xr = r * Math.cos(ay), yr = -r * Math.sin(ay) * Math.sin(ax);
+      var xg = -r * Math.sin(ay), yg = -r * Math.cos(ay) * Math.sin(ax);
+      var yb = -r * Math.cos(ax);
+      for (var k = 0, n = colors.length; k < n; k += 1) {
+        var rgb = colors[k];
+        var r = (rgb >> 16) - 128;
+        var g = ((rgb >> 8) & 255) - 128;
+        var b = (rgb & 255) - 128;
+        var plotx = Math.round(160 + xr * r + xg * g);
+        var ploty = Math.round(160 + yr * r + yg * g + yb * b);
+        dist[ploty * 320 + plotx] += 1;
+      }
+      var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
+      context.putImageData(bits, 0, 0);
+    }
+  };
+  var updateColorDistTable = function() {
+    var style = {
+            width: '320px',
+            height:'320px',
+            background:'#444',
+            padding:'10px'
+    };
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style);
+  };
+  var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics === 'string') {
       return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
@@ -2401,6 +2481,8 @@ $( function() {
             histogram   : null,
             waveform    : null,
             vectorscope : null,
+            colorTable  : null,
+            colorDist   : null,
             metrics     : [],
             loading     : true,
             progress    : 0,
