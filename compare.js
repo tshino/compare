@@ -1829,18 +1829,19 @@ $( function() {
     function makeFigure(colorTable) {
       var fig = makeBlankFigure(320, 320);
       var context = fig.context;
-      var distMax = colorTable.colors.length;
+      var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
       for (var i = 0; i < dist.length; ++i) {
         dist[i] = 0;
       }
       var colors = colorTable.colors;
+      var counts = colorTable.counts;
       var ax = Math.round(colorDistOrientation.x) * (Math.PI / 180);
       var ay = Math.round(colorDistOrientation.y) * (Math.PI / 180);
-      var r = 0.707;
-      var xr = r * Math.cos(ay), yr = -r * Math.sin(ay) * Math.sin(ax);
-      var xg = -r * Math.sin(ay), yg = -r * Math.cos(ay) * Math.sin(ax);
-      var yb = -r * Math.cos(ax);
+      var scale = 0.707;
+      var xr = scale * Math.cos(ay), yr = -scale * Math.sin(ay) * Math.sin(ax);
+      var xg = -scale * Math.sin(ay), yg = -scale * Math.cos(ay) * Math.sin(ax);
+      var yb = -scale * Math.cos(ax);
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
         var r = (rgb >> 16) - 127.5;
@@ -1848,7 +1849,7 @@ $( function() {
         var b = (rgb & 255) - 127.5;
         var plotx = Math.round(159.5 + xr * r + xg * g);
         var ploty = Math.round(159.5 + yr * r + yg * g + yb * b);
-        dist[ploty * 320 + plotx] += 1;
+        dist[ploty * 320 + plotx] += counts[k];
       }
       var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
       context.putImageData(bits, 0, 0);

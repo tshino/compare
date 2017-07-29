@@ -1021,7 +1021,8 @@ var imageUtil = (function() {
     counts = counts.slice(0, uniqueCount);
     return {
       colors: colors,
-      counts: counts
+      counts: counts,
+      totalCount: w * h
     };
   };
   return {
