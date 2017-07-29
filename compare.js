@@ -377,6 +377,7 @@ $( function() {
       ent.vectorscope = null;
       ent.colorTable = null;
       ent.colorDist = null;
+      ent.colorDistAxes = null;
       resetLayoutState();
       discardTasksOfEntryByIndex(index);
       updateDOM();
@@ -1321,7 +1322,8 @@ $( function() {
         y + pos.y + lineDy + 20);
     }
   };
-  var updateFigureTable = function(target, propName, update, style) {
+  var updateFigureTable = function(target, propName, update, style, cellStyle) {
+    cellStyle = cellStyle !== undefined ? cellStyle : {};
     $(target).find('td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img[propName]) {
@@ -1331,9 +1333,12 @@ $( function() {
       $(target).find('tr').eq(0).append(
         makeImageNameWithIndex('<td>', img)
       );
-      $(target).find('tr').eq(1).append(
-        $('<td class="fig">').append($(img[propName]).css(style))
-      );
+      var fig = $('<td class="fig">').css(cellStyle).append($(img[propName]).css(style));
+      var axes = img[propName + 'Axes'];
+      if (axes) {
+        fig.append($(axes).css(style));
+      }
+      $(target).find('tr').eq(1).append(fig);
     }
     if (k === 0) {
       $(target).find('tr').eq(0).append(
@@ -1790,12 +1795,13 @@ $( function() {
       }
       return;
     }
-    var fig = makeBlankFigure(320, 320);
-    makeFigure(fig, img.colorTable);
+    var fig = makeFigure(img.colorTable);
     img.colorDist = fig.canvas;
+    img.colorDistAxes = fig.axes;
     updateColorDistTable();
 
-    function makeFigure(fig, colorTable) {
+    function makeFigure(colorTable) {
+      var fig = makeBlankFigure(320, 320);
       var context = fig.context;
       var distMax = colorTable.colors.length;
       var dist = new Uint32Array(320 * 320);
@@ -1811,25 +1817,54 @@ $( function() {
       var yb = -r * Math.cos(ax);
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
-        var r = (rgb >> 16) - 128;
-        var g = ((rgb >> 8) & 255) - 128;
-        var b = (rgb & 255) - 128;
-        var plotx = Math.round(160 + xr * r + xg * g);
-        var ploty = Math.round(160 + yr * r + yg * g + yb * b);
+        var r = (rgb >> 16) - 127.5;
+        var g = ((rgb >> 8) & 255) - 127.5;
+        var b = (rgb & 255) - 127.5;
+        var plotx = Math.round(159.5 + xr * r + xg * g);
+        var ploty = Math.round(159.5 + yr * r + yg * g + yb * b);
         dist[ploty * 320 + plotx] += 1;
       }
       var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
       context.putImageData(bits, 0, 0);
+      var vbox = '0 0 ' + 320 + ' ' + 320;
+      var pointToDesc = function(r, g, b) {
+        var x = 160 - xr * r - xg * g;
+        var y = 160 - yr * r - yg * g - yb * b;
+        return x + ',' + y;
+      };
+      var v = [];
+      for (var i = 0; i < 8; ++i) {
+        v[i] = pointToDesc(-128 + (i & 4) * 64, -128 + (i & 2) * 128, -128 + (i & 1) * 256);
+      }
+      var axesDesc =
+            'M ' + v[0] + ' L ' + v[1] + ' L ' + v[3] + ' L ' + v[2] + ' L ' + v[0] +
+            ' M ' + v[0] + ' L ' + v[4] + ' M ' + v[1] + ' L ' + v[5] +
+            ' M ' + v[2] + ' L ' + v[6] + ' M ' + v[3] + ' L ' + v[7] +
+            ' M ' + v[4] + ' L ' + v[5] + ' L ' + v[7] + ' L ' + v[6] + ' L ' + v[4];
+      fig.axes = $(
+        '<svg viewBox="' + vbox + '">' +
+          '<g stroke="white" fill="none">' +
+            '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
+          '</g>' +
+        '</svg>');
+      return fig;
     }
   };
   var updateColorDistTable = function() {
-    var style = {
-            width: '320px',
-            height:'320px',
-            background:'#444',
-            padding:'10px'
+    var cellStyle = {
+        width: '340px',
+        height: '340px',
     };
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style);
+    var style = {
+        width: '320px',
+        height:'320px',
+        padding:'10px',
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)'
+    };
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
   var metricsToString = function(metrics, imgA) {
@@ -2013,10 +2048,8 @@ $( function() {
       }
     }
     var cellStyle = {
-        position: 'relative',
         width: '320px',
-        height: '320px',
-        textAlign: 'center'
+        height: '320px'
     };
     if (toneCurveResult.result === null) {
       $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -2168,8 +2201,7 @@ $( function() {
     }
     var cellStyle = {
         width: '790px',
-        height: '422px',
-        textAlign: 'center'
+        height: '422px'
     };
     if (diffResult.result === null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);

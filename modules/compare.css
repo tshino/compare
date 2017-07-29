@@ -291,6 +291,8 @@ div.dialog table td, div.dialog table th
 div.dialog table td.fig
 {
     overflow        : hidden;
+    position        : relative;
+    text-align      : center;
 }
 div.footnote
 {
