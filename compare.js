@@ -162,7 +162,7 @@ $( function() {
             var step = 2;
             var x = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
             var y = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-            colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x + y, -90, 90);
+            colorDistOrientation.x += y;
             colorDistOrientation.y += x;
             updateColorDist();
             return false;
@@ -271,6 +271,29 @@ $( function() {
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
 
+  $('#colorDist').on('mousedown', 'td.fig > *', function(e) {
+    if (e.which === 1) {
+      colorDistDragState = { x: e.clientX, y: e.clientY };
+      return false;
+    }
+  });
+  $('#colorDist').on('mousemove', 'td.fig', function(e) {
+    if (colorDistDragState) {
+      if (e.buttons !== 1) {
+        colorDistDragState = null;
+      } else {
+        var scale = 0.5;
+        var dx = scale * (e.clientX - colorDistDragState.x);
+        var dy = scale * (e.clientY - colorDistDragState.y);
+        colorDistDragState = { x: e.clientX, y: e.clientY };
+        colorDistOrientation.x += dy;
+        colorDistOrientation.y += dx;
+        updateColorDist();
+        return false;
+      }
+    }
+  });
+
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
       crossCursor.enable();
@@ -317,6 +340,7 @@ $( function() {
     x: 30,
     y: -30
   };
+  var colorDistDragState = null;
   var baseImageIndex = null;
   var targetImageIndex = null;
   var toneCurveType = 1;
@@ -1790,6 +1814,8 @@ $( function() {
   };
   var updateColorDist = function(img) {
     if (img === undefined) {
+      colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
+      colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
       for (var i = 0; img = images[i]; i++) {
         updateColorDist(img);
       }
@@ -1809,8 +1835,8 @@ $( function() {
         dist[i] = 0;
       }
       var colors = colorTable.colors;
-      var ax = colorDistOrientation.x * (Math.PI / 180);
-      var ay = colorDistOrientation.y * (Math.PI / 180);
+      var ax = Math.round(colorDistOrientation.x) * (Math.PI / 180);
+      var ay = Math.round(colorDistOrientation.y) * (Math.PI / 180);
       var r = 0.707;
       var xr = r * Math.cos(ay), yr = -r * Math.sin(ay) * Math.sin(ax);
       var xg = -r * Math.sin(ay), yg = -r * Math.cos(ay) * Math.sin(ax);
