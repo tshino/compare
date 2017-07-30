@@ -1854,10 +1854,15 @@ $( function() {
       var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 ' + 320 + ' ' + 320;
+      var pointToXY = function(r, g, b) {
+        return {
+            x : 160 + xr * r + xg * g,
+            y : 160 + yr * r + yg * g + yb * b
+        };
+      };
       var pointToDesc = function(r, g, b) {
-        var x = 160 - xr * r - xg * g;
-        var y = 160 - yr * r - yg * g - yb * b;
-        return x + ',' + y;
+        var xy = pointToXY(r, g, b);
+        return xy.x + ',' + xy.y;
       };
       var v = [];
       for (var i = 0; i < 8; ++i) {
@@ -1868,11 +1873,30 @@ $( function() {
             ' M ' + v[0] + ' L ' + v[4] + ' M ' + v[1] + ' L ' + v[5] +
             ' M ' + v[2] + ' L ' + v[6] + ' M ' + v[3] + ' L ' + v[7] +
             ' M ' + v[4] + ' L ' + v[5] + ' L ' + v[7] + ' L ' + v[6] + ' L ' + v[4];
+      var labels = [
+          { r : -140, g : -140, b : -140, text : 'O', color : '#888' },
+          { r : 140, g : -140, b : -140, text : 'R', color : '#f00' },
+          { r : -140, g : 140, b : -140, text : 'G', color : '#0f0' },
+          { r : -140, g : -140, b : 140, text : 'B', color : '#00f' }
+      ];
+      var axesLabels = '';
+      for (var i = 0, label; label = labels[i]; ++i) {
+        if (i === 0 && xr < 0 && 0 < yr && 0 < xg) continue;
+        if (i === 1 && xr < 0 && yr < 0 && xg < 0) continue;
+        if (i === 2 && 0 < xg && yg < 0 && 0 < yr) continue;
+        if (i === 3 && xr < 0 && yr < 0 && 0 < xg) continue;
+        var xy = pointToXY(label.r, label.g, label.b);
+        axesLabels +=
+            '<text fill="' + label.color + '" x="' + xy.x + '" y="' + xy.y + '">' +
+            label.text +
+            '</text>';
+      }
       fig.axes = $(
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
           '</g>' +
+          '<g font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabels + '</g>' +
         '</svg>');
       return fig;
     }
