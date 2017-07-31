@@ -159,12 +159,10 @@ $( function() {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
           if ($('#colorDist').is(':visible')) {
-            var step = 2;
-            var x = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
-            var y = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-            colorDistOrientation.x += y;
-            colorDistOrientation.y += x;
-            updateColorDist();
+            var step = 1;
+            var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
+            var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
+            rotateColorDist(dx, dy);
             return false;
           }
         }
@@ -286,9 +284,7 @@ $( function() {
         var dx = scale * (e.clientX - colorDistDragState.x);
         var dy = scale * (e.clientY - colorDistDragState.y);
         colorDistDragState = { x: e.clientX, y: e.clientY };
-        colorDistOrientation.x += dy;
-        colorDistOrientation.y += dx;
-        updateColorDist();
+        rotateColorDist(dx, dy);
         return false;
       }
     }
@@ -1812,10 +1808,15 @@ $( function() {
       index:    [img.index]
     }, attachImageDataToTask);
   };
+  var rotateColorDist = function(dx, dy) {
+    colorDistOrientation.x += dy;
+    colorDistOrientation.y += dx;
+    colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
+    colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
+    updateColorDist();
+  };
   var updateColorDist = function(img) {
     if (img === undefined) {
-      colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
-      colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
       for (var i = 0; img = images[i]; i++) {
         updateColorDist(img);
       }
