@@ -270,24 +270,10 @@ $( function() {
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
 
   $('#colorDist').on('mousedown', 'td.fig > *', function(e) {
-    if (e.which === 1) {
-      colorDistDragState = { x: e.clientX, y: e.clientY };
-      return false;
-    }
+    return colorDistProcessMouseDown(e);
   });
   $('#colorDist').on('mousemove', 'td.fig', function(e) {
-    if (colorDistDragState) {
-      if (e.buttons !== 1) {
-        colorDistDragState = null;
-      } else {
-        var scale = 0.5;
-        var dx = scale * (e.clientX - colorDistDragState.x);
-        var dy = scale * (e.clientY - colorDistDragState.y);
-        colorDistDragState = { x: e.clientX, y: e.clientY };
-        rotateColorDist(dx, dy);
-        return false;
-      }
-    }
+    return colorDistProcessMouseMove(e);
   });
 
   viewZoom.setPointCallback(function(e) {
@@ -1919,6 +1905,26 @@ $( function() {
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
+  var colorDistProcessMouseDown = function(e) {
+    if (e.which === 1) {
+      colorDistDragState = { x: e.clientX, y: e.clientY };
+      return false;
+    }
+  };
+  var colorDistProcessMouseMove = function(e) {
+    if (colorDistDragState) {
+      if (e.buttons !== 1) {
+        colorDistDragState = null;
+      } else {
+        var scale = 0.5;
+        var dx = scale * (e.clientX - colorDistDragState.x);
+        var dy = scale * (e.clientY - colorDistDragState.y);
+        colorDistDragState = { x: e.clientX, y: e.clientY };
+        rotateColorDist(dx, dy);
+        return false;
+      }
+    }
+  };
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics === 'string') {
       return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
