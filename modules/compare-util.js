@@ -640,6 +640,7 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
+    makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,
     makeTaskQueue:          makeTaskQueue
   };

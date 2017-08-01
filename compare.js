@@ -275,6 +275,15 @@ $( function() {
   $('#colorDist').on('mousemove', 'td.fig', function(e) {
     return colorDistProcessMouseMove(e);
   });
+  $('#colorDist').on('touchmove', 'td.fig', function(e) {
+    return colorDistTouchFilter.onTouchMove(e, {
+      move: function(dx, dy) { rotateColorDist(dx, dy); }
+    });
+  });
+  $('#colorDist').on('touchend', 'td.fig', function(e) {
+    console.log('touchend');
+    colorDistTouchFilter.resetState();
+  });
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
@@ -323,6 +332,7 @@ $( function() {
     y: -30
   };
   var colorDistDragState = null;
+  var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
   var baseImageIndex = null;
   var targetImageIndex = null;
   var toneCurveType = 1;
@@ -1799,19 +1809,24 @@ $( function() {
     colorDistOrientation.y += dx;
     colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
     colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
-    updateColorDist();
-  };
-  var updateColorDist = function(img) {
-    if (img === undefined) {
-      for (var i = 0; img = images[i]; i++) {
-        updateColorDist(img);
-      }
-      return;
+    for (var i = 0; img = images[i]; i++) {
+      updateColorDist(img, /* redrawOnly = */ true);
     }
+  };
+  var updateColorDist = function(img, redrawOnly) {
     var fig = makeFigure(img.colorTable);
     img.colorDist = fig.canvas;
     img.colorDistAxes = fig.axes;
-    updateColorDistTable();
+    if (redrawOnly) {
+      var styles = getColorDistTableStyle();
+      var fig = $('#colorDistTable td.fig').eq(images.indexOf(img));
+      fig.children().remove();
+      fig.css(styles.cellStyle);
+      fig.append($(img.colorDist).css(styles.style));
+      fig.append($(img.colorDistAxes).css(styles.style));
+    } else {
+      updateColorDistTable();
+    }
 
     function makeFigure(colorTable) {
       var fig = makeBlankFigure(320, 320);
@@ -1888,12 +1903,13 @@ $( function() {
       return fig;
     }
   };
-  var updateColorDistTable = function() {
-    var cellStyle = {
+  var getColorDistTableStyle = function() {
+    return {
+      cellStyle: {
         width: '340px',
         height: '340px',
-    };
-    var style = {
+      },
+      style: {
         width: '320px',
         height:'320px',
         padding:'10px',
@@ -1901,8 +1917,12 @@ $( function() {
         left: '50%',
         top: '50%',
         transform: 'translate(-50%, -50%)'
+      }
     };
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
+  };
+  var updateColorDistTable = function() {
+    var styles = getColorDistTableStyle();
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles.style, styles.cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
   var colorDistProcessMouseDown = function(e) {
