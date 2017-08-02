@@ -159,10 +159,9 @@ $( function() {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
           if ($('#colorDist').is(':visible')) {
-            var step = 1;
-            var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
-            var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-            rotateColorDist(dx, dy);
+            var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
+            var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
+            rotateColorDist(dx, dy, 1);
             return false;
           }
         }
@@ -277,11 +276,10 @@ $( function() {
   });
   $('#colorDist').on('touchmove', 'td.fig', function(e) {
     return colorDistTouchFilter.onTouchMove(e, {
-      move: function(dx, dy) { rotateColorDist(dx, dy); }
+      move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); }
     });
   });
   $('#colorDist').on('touchend', 'td.fig', function(e) {
-    console.log('touchend');
     colorDistTouchFilter.resetState();
   });
 
@@ -1804,9 +1802,9 @@ $( function() {
       index:    [img.index]
     }, attachImageDataToTask);
   };
-  var rotateColorDist = function(dx, dy) {
-    colorDistOrientation.x += dy;
-    colorDistOrientation.y += dx;
+  var rotateColorDist = function(dx, dy, scale) {
+    colorDistOrientation.x += dy * scale;
+    colorDistOrientation.y += dx * scale;
     colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
     colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
     for (var i = 0; img = images[i]; i++) {
@@ -1910,6 +1908,7 @@ $( function() {
         height: '340px',
       },
       style: {
+        pointerEvents: 'none',
         width: '320px',
         height:'320px',
         padding:'10px',
@@ -1936,11 +1935,10 @@ $( function() {
       if (e.buttons !== 1) {
         colorDistDragState = null;
       } else {
-        var scale = 0.5;
-        var dx = scale * (e.clientX - colorDistDragState.x);
-        var dy = scale * (e.clientY - colorDistDragState.y);
+        var dx = e.clientX - colorDistDragState.x;
+        var dy = e.clientY - colorDistDragState.y;
         colorDistDragState = { x: e.clientX, y: e.clientY };
-        rotateColorDist(dx, dy);
+        rotateColorDist(dx, dy, 0.5);
         return false;
       }
     }
