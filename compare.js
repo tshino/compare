@@ -1908,7 +1908,7 @@ $( function() {
         height: '340px',
       },
       style: {
-        pointerEvents: 'none',
+        //pointerEvents: 'none',
         width: '320px',
         height:'320px',
         padding:'10px',
