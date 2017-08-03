@@ -1812,22 +1812,19 @@ $( function() {
     }
   };
   var updateColorDist = function(img, redrawOnly) {
-    var fig = makeFigure(img.colorTable);
-    img.colorDist = fig.canvas;
-    img.colorDistAxes = fig.axes;
-    if (redrawOnly) {
-      var styles = getColorDistTableStyle();
-      var fig = $('#colorDistTable td.fig').eq(images.indexOf(img));
-      fig.children().remove();
-      fig.css(styles.cellStyle);
-      fig.append($(img.colorDist).css(styles.style));
-      fig.append($(img.colorDistAxes).css(styles.style));
-    } else {
+    var fig = redrawOnly ? {
+      canvas : img.colorDist,
+      context : img.colorDist.getContext('2d'),
+      axes : img.colorDistAxes
+    } : makeBlankFigure(320, 320);
+    makeFigure(fig, img.colorTable);
+    if (!redrawOnly) {
+      img.colorDist = fig.canvas;
+      img.colorDistAxes = fig.axes;
       updateColorDistTable();
     }
 
-    function makeFigure(colorTable) {
-      var fig = makeBlankFigure(320, 320);
+    function makeFigure(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
@@ -1842,31 +1839,33 @@ $( function() {
       var xr = scale * Math.cos(ay), yr = -scale * Math.sin(ay) * Math.sin(ax);
       var xg = -scale * Math.sin(ay), yg = -scale * Math.cos(ay) * Math.sin(ax);
       var yb = -scale * Math.cos(ax);
+      var orgx = 159.5 - xr * 127.5 - xg * 127.5;
+      var orgy = 159.5 - yr * 127.5 - yg * 127.5 - yb * 127.5;
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
-        var r = (rgb >> 16) - 127.5;
-        var g = ((rgb >> 8) & 255) - 127.5;
-        var b = (rgb & 255) - 127.5;
-        var plotx = Math.round(159.5 + xr * r + xg * g);
-        var ploty = Math.round(159.5 + yr * r + yg * g + yb * b);
+        var r = rgb >> 16;
+        var g = (rgb >> 8) & 255;
+        var b = rgb & 255;
+        var plotx = Math.round(orgx + xr * r + xg * g);
+        var ploty = Math.round(orgy + yr * r + yg * g + yb * b);
         dist[ploty * 320 + plotx] += counts[k];
       }
       var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 ' + 320 + ' ' + 320;
-      var pointToXY = function(r, g, b) {
+      var colorToXY = function(r, g, b) {
         return {
             x : 160 + xr * r + xg * g,
             y : 160 + yr * r + yg * g + yb * b
         };
       };
-      var pointToDesc = function(r, g, b) {
-        var xy = pointToXY(r, g, b);
+      var colorToDesc = function(r, g, b) {
+        var xy = colorToXY(r, g, b);
         return xy.x + ',' + xy.y;
       };
       var v = [];
       for (var i = 0; i < 8; ++i) {
-        v[i] = pointToDesc(-128 + (i & 4) * 64, -128 + (i & 2) * 128, -128 + (i & 1) * 256);
+        v[i] = colorToDesc(-128 + (i & 4) * 64, -128 + (i & 2) * 128, -128 + (i & 1) * 256);
       }
       var axesDesc =
             'M ' + v[0] + ' L ' + v[1] + ' L ' + v[3] + ' L ' + v[2] + ' L ' + v[0] +
@@ -1879,26 +1878,36 @@ $( function() {
           { r : -140, g : 140, b : -140, text : 'G', color : '#0f0' },
           { r : -140, g : -140, b : 140, text : 'B', color : '#00f' }
       ];
-      var axesLabels = '';
+      var axesLabels = [];
+      var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
         if (i === 0 && xr < 0 && 0 < yr && 0 < xg) continue;
         if (i === 1 && xr < 0 && yr < 0 && xg < 0) continue;
         if (i === 2 && 0 < xg && yg < 0 && 0 < yr) continue;
         if (i === 3 && xr < 0 && yr < 0 && 0 < xg) continue;
-        var xy = pointToXY(label.r, label.g, label.b);
-        axesLabels +=
-            '<text fill="' + label.color + '" x="' + xy.x + '" y="' + xy.y + '">' +
-            label.text +
-            '</text>';
+        var xy = colorToXY(label.r, label.g, label.b);
+        var attr = {
+          fill : label.color,
+          x : xy.x,
+          y : xy.y
+        };
+        axesLabels.push('<text>' + label.text + '</text>');
+        axesLabelsAttr.push(attr);
       }
-      fig.axes = $(
+      if (!fig.axes) {
+        fig.axes = $(
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
           '</g>' +
-          '<g font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabels + '</g>' +
+          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabels.join('') + '</g>' +
         '</svg>');
-      return fig;
+      } else {
+        $(fig.axes).find('g path').attr('d', axesDesc);
+      }
+      for (var i = 0, a; a = axesLabelsAttr[i]; ++i) {
+        $(fig.axes).find('g.labels text').eq(i).attr(a);
+      }
     }
   };
   var getColorDistTableStyle = function() {
@@ -1908,7 +1917,6 @@ $( function() {
         height: '340px',
       },
       style: {
-        //pointerEvents: 'none',
         width: '320px',
         height:'320px',
         padding:'10px',
