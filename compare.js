@@ -1881,13 +1881,14 @@ $( function() {
       var axesLabels = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
-        if (i === 0 && xr < 0 && 0 < yr && 0 < xg) continue;
-        if (i === 1 && xr < 0 && yr < 0 && xg < 0) continue;
-        if (i === 2 && 0 < xg && yg < 0 && 0 < yr) continue;
-        if (i === 3 && xr < 0 && yr < 0 && 0 < xg) continue;
+        var fillColor = label.color;
+        if (i === 0 && xr < 0 && 0 < yr && 0 < xg) fillColor = 'transparent';
+        if (i === 1 && xr < 0 && yr < 0 && xg < 0) fillColor = 'transparent';
+        if (i === 2 && 0 < xg && yg < 0 && 0 < yr) fillColor = 'transparent';
+        if (i === 3 && xr < 0 && yr < 0 && 0 < xg) fillColor = 'transparent';
         var xy = colorToXY(label.r, label.g, label.b);
         var attr = {
-          fill : label.color,
+          fill : fillColor,
           x : xy.x,
           y : xy.y
         };
