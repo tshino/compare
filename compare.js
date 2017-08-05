@@ -159,9 +159,10 @@ $( function() {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
           if ($('#colorDist').is(':visible')) {
+            var step = e.shiftKey ? 10 : 1;
             var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
             var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
-            rotateColorDist(dx, dy, 1);
+            rotateColorDist(dx, dy, step);
             return false;
           }
         }
