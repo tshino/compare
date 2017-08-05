@@ -156,13 +156,8 @@ $( function() {
             return false;
           }
         }
-        // cursor key
-        if (37 <= e.keyCode && e.keyCode <= 40) {
-          if ($('#colorDist').is(':visible')) {
-            var step = e.shiftKey ? 10 : 1;
-            var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
-            var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
-            rotateColorDist(dx, dy, step);
+        if ($('#colorDist').is(':visible')) {
+          if (false === colorDistProcessKeyDown(e)) {
             return false;
           }
         }
@@ -179,7 +174,7 @@ $( function() {
         toggleSingleView(e.keyCode % 48);
         return false;
       }
-      // Cross cursor
+      // Cross cursor (cursor key)
       if (false === crossCursor.processKeyDown(e)) {
         return false;
       }
@@ -1934,6 +1929,16 @@ $( function() {
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles.style, styles.cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
+  var colorDistProcessKeyDown = function(e) {
+    // cursor key
+    if (37 <= e.keyCode && e.keyCode <= 40) {
+      var step = e.shiftKey ? 10 : 1;
+      var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
+      var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
+      rotateColorDist(dx, dy, step);
+      return false;
+    }
+  };
   var colorDistProcessMouseDown = function(e) {
     if (e.which === 1) {
       colorDistDragState = { x: e.clientX, y: e.clientY };
