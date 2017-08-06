@@ -264,20 +264,7 @@ $( function() {
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
 
-  $('#colorDist').on('mousedown', 'td.fig > *', function(e) {
-    return colorDistProcessMouseDown(e);
-  });
-  $('#colorDist').on('mousemove', 'td.fig', function(e) {
-    return colorDistProcessMouseMove(e);
-  });
-  $('#colorDist').on('touchmove', 'td.fig', function(e) {
-    return colorDistTouchFilter.onTouchMove(e, {
-      move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); }
-    });
-  });
-  $('#colorDist').on('touchend', 'td.fig', function(e) {
-    colorDistTouchFilter.resetState();
-  });
+  colorDistEnableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
@@ -1957,6 +1944,22 @@ $( function() {
         return false;
       }
     }
+  };
+  var colorDistEnableMouseAndTouch = function(root, filter, deepFilter) {
+    $(root).on('mousedown', deepFilter, function(e) {
+      return colorDistProcessMouseDown(e);
+    });
+    $(root).on('mousemove', filter, function(e) {
+      return colorDistProcessMouseMove(e);
+    });
+    $(root).on('touchmove', filter, function(e) {
+      return colorDistTouchFilter.onTouchMove(e, {
+        move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); }
+      });
+    });
+    $(root).on('touchend', filter, function(e) {
+      colorDistTouchFilter.resetState();
+    });
   };
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics === 'string') {
