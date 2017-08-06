@@ -72,6 +72,10 @@ $( function() {
     var index = $('#vectorscopeType > *').index(this);
     changeVectorscopeType(index);
   });
+  $('#colorDistType > *').click(function() {
+    var index = $('#colorDistType > *').index(this);
+    changeColorDistType(index);
+  });
   $('#toneCurveType > *').click(function() {
     var index = $('#toneCurveType > *').index(this);
     changeToneCurveType(index);
@@ -308,6 +312,7 @@ $( function() {
   var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
+  var colorDistType = 0;
   var colorDistOrientation = {
     x: 30,
     y: -30
@@ -1584,7 +1589,7 @@ $( function() {
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: 256 }; } });
-  var makeDitributionImageData = function(context, w, h, dist, max, scale, mode) {
+  var makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
     var bits = context.createImageData(w, h);
     var i = 0, k = 0;
     if (mode === 0) { // RGB
@@ -1614,6 +1619,28 @@ $( function() {
           bits.data[k + 2] = c;
           bits.data[k + 3] = 255;
         }
+      }
+    }
+    return bits;
+  };
+  var makeDistributionImageDataRGBA = function(context, w, h, dist, colorMap, max, scale) {
+    var bits = context.createImageData(w, h);
+    var i = 0, k = 0;
+    var offsetG = w * h;
+    var offsetB = w * h * 2;
+    for (var y = 0; y < h; ++y) {
+      for (var x = 0; x < w; ++x, i++, k += 4) {
+        var d = dist[i];
+        var a = 1 - Math.pow(1 - d / max, 20000.0);
+        var cA = Math.round(a * scale);
+        var cScale = d === 0 ? scale : scale / (255 * d);
+        var cR = Math.round(colorMap[i] * cScale);
+        var cG = Math.round(colorMap[i + offsetG] * cScale);
+        var cB = Math.round(colorMap[i + offsetB] * cScale);
+        bits.data[k + 0] = cR;
+        bits.data[k + 1] = cG;
+        bits.data[k + 2] = cB;
+        bits.data[k + 3] = cA;
       }
     }
     return bits;
@@ -1663,7 +1690,7 @@ $( function() {
     
     function makeFigure(fig, w, h, dist) {
       var context = fig.context;
-      var bits = makeDitributionImageData(context, 320, 320, dist, w * h, 255, 1);
+      var bits = makeDistributionImageData(context, 320, 320, dist, w * h, 255, 1);
       context.putImageData(bits, 0, 0);
       var srgbToLinear = function(c) {
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -1779,6 +1806,19 @@ $( function() {
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
+  var changeColorDistType = function(type) {
+    if (colorDistType !== type) {
+      colorDistType = type;
+      for (var i = 0, img; img = images[i]; i++) {
+        img.colorDist = null;
+        img.colorDistAxes = null;
+      }
+      $('#colorDistType > *').
+        removeClass('current').
+        eq(type).addClass('current');
+      updateColorDistAll();
+    }
+  };
   var updateColorDistAsync = function(img) {
     taskQueue.addTask({
       cmd:      'calcColorTable',
@@ -1790,8 +1830,11 @@ $( function() {
     colorDistOrientation.y += dx * scale;
     colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
     colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
+    updateColorDistAll(/* redrawOnly = */ true);
+  };
+  var updateColorDistAll = function(redrawOnly) {
     for (var i = 0; img = images[i]; i++) {
-      updateColorDist(img, /* redrawOnly = */ true);
+      updateColorDist(img, redrawOnly);
     }
   };
   var updateColorDist = function(img, redrawOnly) {
@@ -1814,6 +1857,13 @@ $( function() {
       for (var i = 0; i < dist.length; ++i) {
         dist[i] = 0;
       }
+      var colorMap = null;
+      if (colorDistType === 0) { // RGB with Color
+        colorMap = new Float32Array(320 * 320 * 3);
+        for (var i = 0; i < colorMap.length; ++i) {
+          colorMap[i] = 0;
+        }
+      }
       var colors = colorTable.colors;
       var counts = colorTable.counts;
       var ax = Math.round(colorDistOrientation.x) * (Math.PI / 180);
@@ -1831,9 +1881,20 @@ $( function() {
         var b = rgb & 255;
         var plotx = Math.round(orgx + xr * r + xg * g);
         var ploty = Math.round(orgy + yr * r + yg * g + yb * b);
-        dist[ploty * 320 + plotx] += counts[k];
+        var offset = ploty * 320 + plotx;
+        var count = counts[k]
+        dist[offset] += count;
+        if (colorDistType === 0) { // RGB with Color
+          colorMap[offset] += count * r;
+          colorMap[offset + 102400] += count * g;
+          colorMap[offset + 204800] += count * b;
+        }
       }
-      var bits = makeDitributionImageData(context, 320, 320, dist, distMax, 255, 1);
+      if (colorDistType === 0) { // RGB with Color
+        var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
+      } else { // RGB without Color
+        var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
+      }
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 ' + 320 + ' ' + 320;
       var colorToXY = function(r, g, b) {
@@ -1894,13 +1955,15 @@ $( function() {
       }
     }
   };
-  var getColorDistTableStyle = function() {
-    return {
-      cellStyle: {
+  var updateColorDistTable = function() {
+    cellStyle = {
         width: '340px',
         height: '340px',
-      },
-      style: {
+    };
+    if (colorDistType === 0) { // RGB with Color
+      cellStyle.background = '#444';
+    }
+    style = {
         width: '320px',
         height:'320px',
         padding:'10px',
@@ -1908,12 +1971,8 @@ $( function() {
         left: '50%',
         top: '50%',
         transform: 'translate(-50%, -50%)'
-      }
     };
-  };
-  var updateColorDistTable = function() {
-    var styles = getColorDistTableStyle();
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles.style, styles.cellStyle);
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
   var colorDistProcessKeyDown = function(e) {
@@ -2112,7 +2171,7 @@ $( function() {
     var fig = makeBlankFigure(320, 320);
     var dist = toneMapData.dist;
     var max = toneMapData.max;
-    var bits = makeDitributionImageData(fig.context, 256, 256, dist, max, 96, type);
+    var bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
     fig.context.fillStyle = '#000';
     fig.context.fillRect(0, 0, 320, 320);
     fig.context.putImageData(bits, 32, 32);
