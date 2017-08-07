@@ -317,6 +317,7 @@ $( function() {
     x: 30,
     y: -30
   };
+  var colorDistZoom = 0;
   var colorDistDragState = null;
   var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
   var baseImageIndex = null;
@@ -1142,6 +1143,9 @@ $( function() {
         } else {
           figureZoom.disable();
         }
+        if (options.onOpen) {
+          options.onOpen();
+        }
         if (update) {
           update();
         }
@@ -1838,6 +1842,11 @@ $( function() {
     colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
     updateColorDistAll(/* redrawOnly = */ true);
   };
+  var zoomColorDist = function(delta) {
+    var MAX_ZOOM_LEVEL = 6;
+    colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
+    updateColorDistTable();
+  };
   var updateColorDistAll = function(redrawOnly) {
     for (var i = 0; img = images[i]; i++) {
       updateColorDist(img, redrawOnly);
@@ -1969,6 +1978,7 @@ $( function() {
     if (colorDistType === 0) { // RGB with Color
       cellStyle.background = '#444';
     }
+    var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
     style = {
         width: '320px',
         height:'320px',
@@ -1976,11 +1986,13 @@ $( function() {
         position: 'absolute',
         left: '50%',
         top: '50%',
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%) scale(' + scale + ')'
     };
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
   };
-  var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis);
+  var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
+    onOpen: function() { colorDistZoom = 0; }
+  });
   var colorDistProcessKeyDown = function(e) {
     // cursor key
     if (37 <= e.keyCode && e.keyCode <= 40) {
@@ -1988,6 +2000,18 @@ $( function() {
       var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
       var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
       rotateColorDist(dx, dy, step);
+      return false;
+    }
+    // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+    if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
+        (e.keyCode === 33 && !e.shiftKey)) {
+      zoomColorDist(0.25);
+      return false;
+    }
+    // '-' (173, 189 or 109 for numpad) / PageDown (34)
+    if (e.keyCode === 173 || e.keyCode === 189 || e.keyCode === 109 ||
+        (e.keyCode === 34 && !e.shiftKey)) {
+      zoomColorDist(-0.25);
       return false;
     }
   };
