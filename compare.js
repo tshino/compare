@@ -282,7 +282,7 @@ $( function() {
   });
 
   hud.initialize();
-  initializeColorHUD();
+  colorHUD.initialize();
 
   updateDOM();
 });
@@ -931,8 +931,11 @@ $( function() {
     };
   })();
 
-  var updateColorHUD = function(img) {
-    if (img.colorHUD) {
+  var colorHUD = (function() {
+    var updateColorHUD = function(img) {
+      if (!img.colorHUD) {
+        return;
+      }
       var toCSS = function(rgb) {
         var lut = '0123456789ABCDEF';
         return '#' +
@@ -963,19 +966,9 @@ $( function() {
           $(this).text([x, y][i]);
         });
       }
-    }
-  };
-  var initializeColorHUD = function() {
+    };
     var showHUD = function() {
       $('#pickerbtn').addClass('current');
-    };
-    var onUpdateLayout = function(img) {
-      if (crossCursor.isEnabled()) {
-        addColorHUD(img);
-      } else if (img.colorHUD) {
-        img.colorHUD.remove();
-        img.colorHUD = null;
-      }
     };
     var updateHUD = function(pointChanged) {
       if (pointChanged) {
@@ -988,11 +981,7 @@ $( function() {
     var removeHUD = function() {
       $('#pickerbtn').removeClass('current');
     };
-    crossCursor.setObserver(showHUD, updateHUD, removeHUD);
-    hud.setObserver(onUpdateLayout);
-  };
-  var addColorHUD = function(img) {
-    if (!img.colorHUD) {
+    var addColorHUD = function(img) {
       img.colorHUD = $(
         '<div class="dark hud" style="pointer-events: auto; min-width: 280px">' +
           '<span style="display: inline-block">' +
@@ -1024,8 +1013,25 @@ $( function() {
       hud.append(img, img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
-    }
-  };
+    };
+    var onUpdateLayout = function(img) {
+      if (crossCursor.isEnabled()) {
+        if (!img.colorHUD) {
+          addColorHUD(img);
+        }
+      } else if (img.colorHUD) {
+        img.colorHUD.remove();
+        img.colorHUD = null;
+      }
+    };
+    var initialize = function() {
+      crossCursor.setObserver(showHUD, updateHUD, removeHUD);
+      hud.setObserver(onUpdateLayout);
+    };
+    return {
+      initialize: initialize
+    };
+  })();
   var makeImageLayoutParam = function() {
     var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
     var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
