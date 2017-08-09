@@ -2059,7 +2059,8 @@ $( function() {
     });
     $(root).on('touchmove', filter, function(e) {
       return colorDistTouchFilter.onTouchMove(e, {
-        move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); }
+        move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
+        zoom: function(delta) { zoomColorDist(delta); }
       });
     });
     $(root).on('touchend', filter, function(e) {
