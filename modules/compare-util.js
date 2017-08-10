@@ -251,6 +251,12 @@
     return null;
   };
 
+  var cursorKeyCodeToXY = function(keyCode, step) {
+    step = step !== undefined ? step : 1;
+    var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
+    var y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
+    return { x: x, y: y };
+  };
   var processWheelEvent = function(e, callback) {
     var event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
@@ -445,9 +451,8 @@
       }
       // cursor key
       if (37 <= e.keyCode && e.keyCode <= 40) {
-        var x = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
-        var y = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
-        if (moveRelative(x * cursorMoveDelta, y * cursorMoveDelta)) {
+        var d = cursorKeyCodeToXY(e.keyCode, cursorMoveDelta);
+        if (moveRelative(d.x, d.y)) {
           return false;
         }
       }
@@ -649,6 +654,7 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
+    cursorKeyCodeToXY:      cursorKeyCodeToXY,
     processWheelEvent:      processWheelEvent,
     makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,

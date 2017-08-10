@@ -792,12 +792,11 @@ $( function() {
           }
           var step = e.shiftKey ? 10 : 1;
           var pos = getPosition(index);
-          var dx = e.keyCode === 37 ? -step : e.keyCode === 39 ? step : 0;
-          var dy = e.keyCode === 38 ? -step : e.keyCode === 40 ? step : 0;
-          var x = pos.x + dx;
-          var y = pos.y + dy;
+          var d = compareUtil.cursorKeyCodeToXY(e.keyCode, step);
+          var x = pos.x + d.x;
+          var y = pos.y + d.y;
           setPosition(index, x, y);
-          adjustViewOffsetToFollowCrossCursor(dx, dy, x, y);
+          adjustViewOffsetToFollowCrossCursor(d.x, d.y, x, y);
           return false;
         }
       }
@@ -1997,9 +1996,8 @@ $( function() {
     // cursor key
     if (37 <= e.keyCode && e.keyCode <= 40) {
       var step = e.shiftKey ? 10 : 1;
-      var dx = e.keyCode === 37 ? -1 : e.keyCode === 39 ? 1 : 0;
-      var dy = e.keyCode === 38 ? -1 : e.keyCode === 40 ? 1 : 0;
-      rotateColorDist(dx, dy, step);
+      var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
+      rotateColorDist(d.x, d.y, step);
       return false;
     }
     // '+;' (59, 187 or 107 for numpad) / PageUp (33)
@@ -2034,14 +2032,6 @@ $( function() {
       }
     }
   };
-  var colorDistProcessWheel = function(e) {
-    return compareUtil.processWheelEvent(e, {
-      zoom: function(steps) {
-        var ZOOM_STEP_WHEEL = 0.0625;
-        zoomColorDist(-steps * ZOOM_STEP_WHEEL);
-      }
-    });
-  };
   var colorDistEnableMouseAndTouch = function(root, filter, deepFilter) {
     $(root).on('mousedown', deepFilter, function(e) {
       return colorDistProcessMouseDown(e);
@@ -2050,7 +2040,12 @@ $( function() {
       return colorDistProcessMouseMove(e);
     });
     $(root).on('wheel', filter, function(e) {
-      return colorDistProcessWheel(e);
+      return compareUtil.processWheelEvent(e, {
+        zoom: function(steps) {
+          var ZOOM_STEP_WHEEL = 0.0625;
+          zoomColorDist(-steps * ZOOM_STEP_WHEEL);
+        }
+      });
     });
     $(root).on('touchmove', filter, function(e) {
       return colorDistTouchFilter.onTouchMove(e, {
