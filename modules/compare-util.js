@@ -251,6 +251,20 @@
     return null;
   };
 
+  var processWheelEvent = function(e, callback) {
+    var event = e.originalEvent;
+    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
+      return true;
+    }
+    var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+    var steps = clamp(event.deltaY * deltaScale, -3, 3);
+    if (steps !== 0) {
+      if (callback.zoom) {
+        callback.zoom(steps);
+      }
+      return false;
+    }
+  };
   var makeTouchEventFilter = function() {
     var touchState = null;
     var resetState = function() {
@@ -509,23 +523,18 @@
       return true;
     };
     var processWheel = function(e, selector, relSelector, target) {
-      var event = e.originalEvent;
-      if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
-        return true;
-      }
-      var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-      var steps = clamp(event.deltaY * deltaScale, -3, 3);
-      if (steps !== 0) {
-        if (selector && relSelector) {
-          var index = $(selector).index(target);
-          target = $(target).find(relSelector);
-          var pos = positionFromMouseEvent(e, target, index);
-          zoomRelativeToPx(-steps * ZOOM_STEP_WHEEL, pos);
-        } else {
-          zoomRelative(-steps * ZOOM_STEP_WHEEL);
+      return processWheelEvent(e, {
+        zoom: function(steps) {
+          if (selector && relSelector) {
+            var index = $(selector).index(target);
+            target = $(target).find(relSelector);
+            var pos = positionFromMouseEvent(e, target, index);
+            zoomRelativeToPx(-steps * ZOOM_STEP_WHEEL, pos);
+          } else {
+            zoomRelative(-steps * ZOOM_STEP_WHEEL);
+          }
         }
-        return false;
-      }
+      });
     };
     var resetTouchState = function() { touchFilter.resetState(); };
     var processTouchMove = function(e, selector, target) {
@@ -640,6 +649,7 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
+    processWheelEvent:      processWheelEvent,
     makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,
     makeTaskQueue:          makeTaskQueue

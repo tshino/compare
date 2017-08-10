@@ -2035,17 +2035,12 @@ $( function() {
     }
   };
   var colorDistProcessWheel = function(e) {
-    var event = e.originalEvent;
-    if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
-      return true;
-    }
-    var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-    var steps = compareUtil.clamp(event.deltaY * deltaScale, -3, 3);
-    if (steps !== 0) {
-      var ZOOM_STEP_WHEEL = 0.0625;
-      zoomColorDist(-steps * ZOOM_STEP_WHEEL);
-      return false;
-    }
+    return compareUtil.processWheelEvent(e, {
+      zoom: function(steps) {
+        var ZOOM_STEP_WHEEL = 0.0625;
+        zoomColorDist(-steps * ZOOM_STEP_WHEEL);
+      }
+    });
   };
   var colorDistEnableMouseAndTouch = function(root, filter, deepFilter) {
     $(root).on('mousedown', deepFilter, function(e) {
