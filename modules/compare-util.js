@@ -257,6 +257,28 @@
     var y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
     return { x: x, y: y };
   };
+  var processKeyDownEvent = function(e, callback) {
+    // '+;' (59, 187 or 107 for numpad) / PageUp (33)
+    if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
+        (e.keyCode === 33 && !e.shiftKey)) {
+      if (callback.zoomIn) {
+        return callback.zoomIn();
+      }
+    }
+    // '-' (173, 189 or 109 for numpad) / PageDown (34)
+    if (e.keyCode === 173 || e.keyCode === 189 || e.keyCode === 109 ||
+        (e.keyCode === 34 && !e.shiftKey)) {
+      if (callback.zoomOut) {
+        return callback.zoomOut();
+      }
+    }
+    // cursor key
+    if (37 <= e.keyCode && e.keyCode <= 40) {
+      if (callback.cursor) {
+        return callback.cursor();
+      }
+    }
+  };
   var processWheelEvent = function(e, callback) {
     var event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
@@ -435,28 +457,16 @@
       }
     };
     var processKeyDown = function(e) {
-      // '+;' (59, 187 or 107 for numpad) / PageUp (33)
-      if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
-          (e.keyCode === 33 && !e.shiftKey)) {
-        if (zoomIn()) {
-          return false;
+      return processKeyDownEvent(e, {
+        zoomIn: function() { if (zoomIn()) return false; },
+        zoomOut: function() { if (zoomOut()) return false; },
+        cursor: function() {
+          var d = cursorKeyCodeToXY(e.keyCode, cursorMoveDelta);
+          if (moveRelative(d.x, d.y)) {
+            return false;
+          }
         }
-      }
-      // '-' (173, 189 or 109 for numpad) / PageDown (34)
-      if (e.keyCode === 173 || e.keyCode === 189 || e.keyCode === 109 ||
-          (e.keyCode === 34 && !e.shiftKey)) {
-        if (zoomOut()) {
-          return false;
-        }
-      }
-      // cursor key
-      if (37 <= e.keyCode && e.keyCode <= 40) {
-        var d = cursorKeyCodeToXY(e.keyCode, cursorMoveDelta);
-        if (moveRelative(d.x, d.y)) {
-          return false;
-        }
-      }
-      return true;
+      });
     };
     var setPointCallback = function(callback) {
       pointCallback = callback;
@@ -655,6 +665,7 @@
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
+    processKeyDownEvent:    processKeyDownEvent,
     processWheelEvent:      processWheelEvent,
     makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,

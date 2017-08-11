@@ -166,7 +166,7 @@ $( function() {
           }
         }
         // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
-        if (!figureZoom.processKeyDown(e)) {
+        if (false === figureZoom.processKeyDown(e)) {
           return false;
         }
         return true;
@@ -183,7 +183,7 @@ $( function() {
         return false;
       }
       // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
-      if (!viewZoom.processKeyDown(e)) {
+      if (false === viewZoom.processKeyDown(e)) {
         return false;
       }
       // TAB (9)
@@ -1993,25 +1993,16 @@ $( function() {
     onOpen: function() { colorDistZoom = 0; }
   });
   var colorDistProcessKeyDown = function(e) {
-    // cursor key
-    if (37 <= e.keyCode && e.keyCode <= 40) {
-      var step = e.shiftKey ? 10 : 1;
-      var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
-      rotateColorDist(d.x, d.y, step);
-      return false;
-    }
-    // '+;' (59, 187 or 107 for numpad) / PageUp (33)
-    if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
-        (e.keyCode === 33 && !e.shiftKey)) {
-      zoomColorDist(0.25);
-      return false;
-    }
-    // '-' (173, 189 or 109 for numpad) / PageDown (34)
-    if (e.keyCode === 173 || e.keyCode === 189 || e.keyCode === 109 ||
-        (e.keyCode === 34 && !e.shiftKey)) {
-      zoomColorDist(-0.25);
-      return false;
-    }
+    return compareUtil.processKeyDownEvent(e, {
+      zoomIn: function() { zoomColorDist(0.25); return false; },
+      zoomOut: function() { zoomColorDist(-0.25); return false; },
+      cursor: function() {
+        var step = e.shiftKey ? 10 : 1;
+        var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
+        rotateColorDist(d.x, d.y, step);
+        return false;
+      }
+    });
   };
   var colorDistProcessMouseDown = function(e) {
     if (e.which === 1) {
