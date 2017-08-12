@@ -1010,6 +1010,7 @@ $( function() {
         '</div>'
       );
       img.colorHUD.find('button.close').click(crossCursor.disable);
+      img.colorHUD.on('touchstart touchmove touchend', function(e) { e.stopPropagation(); });
       hud.append(img, img.colorHUD);
       img.colorHUD.show();
       updateColorHUD(img);
