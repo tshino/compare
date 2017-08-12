@@ -295,10 +295,12 @@
   };
   var makeTouchEventFilter = function() {
     var touchState = null;
+    var tapPoint = null;
     var resetState = function() {
       touchState = null;
+      tapPoint = null;
     };
-    var onTouchMove = function(e, callback) {
+    var updateState = function(e, callback) {
       var event = e.originalEvent;
       if (event.touches.length === 1 || event.touches.length === 2) {
         var touches = Array.prototype.slice.call(event.touches);
@@ -311,7 +313,6 @@
         if (!touchState || touchState.length !== touches.length) {
           touchState = [];
         }
-        var dx = 0, dy = 0;
         for (var i = 0; i < touches.length; ++i) {
           if (!touchState[i] ||
                 touchState[i].identifier !== touches[i].identifier) {
@@ -321,15 +322,46 @@
               identifier: touches[i].identifier
             };
           }
-          dx += touches[i].clientX - touchState[i].x;
-          dy += touches[i].clientY - touchState[i].y;
+        }
+        if (callback) {
+          callback(touchState, touches);
+        }
+        for (var i = 0; i < touches.length; ++i) {
+          touchState[i].x = touches[i].clientX;
+          touchState[i].y = touches[i].clientY;
+          touchState[i].pageX = touches[i].pageX;
+          touchState[i].pageY = touches[i].pageY;
+        }
+        return false;
+      }
+    };
+    var onTouchStart = function(e) {
+      return updateState(e, function(lastTouches, touches) {
+        if (touches.length === 1) {
+          tapPoint = touches[0];
+        }
+      });
+    };
+    var onTouchMove = function(e, callback) {
+      return updateState(e, function(lastTouches, touches) {
+        var dx = 0, dy = 0;
+        for (var i = 0; i < touches.length; ++i) {
+          dx += touches[i].clientX - lastTouches[i].x;
+          dy += touches[i].clientY - lastTouches[i].y;
+        }
+        if (tapPoint) {
+          if (touches.length !== 1 ||
+              3 <= Math.abs(touches[0].clientX - tapPoint.clientX) ||
+              3 <= Math.abs(touches[0].clientY - tapPoint.clientY)) {
+            tapPoint = null;
+          }
         }
         if (callback.move) {
           callback.move(dx / touches.length, dy / touches.length);
         }
         if (touches.length === 2) {
-          var x0 = touchState[0].x - touchState[1].x;
-          var y0 = touchState[0].y - touchState[1].y;
+          var x0 = lastTouches[0].x - lastTouches[1].x;
+          var y0 = lastTouches[0].y - lastTouches[1].y;
           var x1 = touches[0].clientX - touches[1].clientX;
           var y1 = touches[0].clientY - touches[1].clientY;
           var s0 = Math.sqrt(x0 * x0 + y0 * y0);
@@ -342,16 +374,25 @@
             }
           }
         }
-        for (var i = 0; i < touches.length; ++i) {
-          touchState[i].x = touches[i].clientX;
-          touchState[i].y = touches[i].clientY;
+      });
+    };
+    var onTouchEnd = function(e, callback) {
+      if (touchState) {
+        updateState(e);
+        if (tapPoint && e.originalEvent.touches.length === 0) {
+          if (callback.pointClick) {
+            callback.pointClick(tapPoint);
+          }
+          resetState();
         }
         return false;
       }
     };
     return {
       resetState: resetState,
-      onTouchMove: onTouchMove
+      onTouchStart: onTouchStart,
+      onTouchMove: onTouchMove,
+      onTouchEnd: onTouchEnd
     };
   };
 
@@ -524,7 +565,7 @@
     };
     var processMouseUp = function(e, selector, target) {
       if (clickPoint && pointCallback) {
-        pointCallback(clickPoint)
+        pointCallback(clickPoint);
       }
       resetDragState();
     };
@@ -552,11 +593,26 @@
       });
     };
     var resetTouchState = function() { touchFilter.resetState(); };
+    var processTouchStart = function(e) {
+      return touchFilter.onTouchStart(e);
+    };
     var processTouchMove = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       return touchFilter.onTouchMove(e, {
         move: function(dx, dy) { moveRelativePx(index, dx, dy); },
         zoom: function(r) { zoomRelative(r); }
+      });
+    };
+    var processTouchEnd = function(e, selector, relSelector, target) {
+      return touchFilter.onTouchEnd(e, {
+        pointClick: function(lastTouch) {
+          if (pointCallback && relSelector) {
+            var index = selector ? $(selector).index(target) : null;
+            target = $(target).find(relSelector);
+            var pos = positionFromMouseEvent(lastTouch, target, index);
+            pointCallback(pos);
+          }
+        }
       });
     };
     var enableMouse = function(root, filter, deepFilter, selector, relSelector) {
@@ -579,11 +635,16 @@
         return processWheel(e, selector, relSelector, this);
       });
     };
-    var enableTouch = function(root, filter, deepFilter, selector) {
+    var enableTouch = function(root, filter, deepFilter, selector, relSelector) {
+      $(root).on('touchstart', filter, function(e) {
+        return processTouchStart(e);
+      });
       $(root).on('touchmove', filter, function(e) {
         return processTouchMove(e, selector, this);
       });
-      $(root).on('touchend', filter, resetTouchState);
+      $(root).on('touchend', filter, function(e) {
+        return processTouchEnd(e, selector, relSelector, this);
+      });
     };
     var makeTransform = function(index) {
       var base = getBaseSize(index);
