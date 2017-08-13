@@ -369,8 +369,12 @@
           if (0 < s0 * s1) {
             var r = Math.log(s1 / s0) / Math.LN2;
             r = clamp(r, -1, 1);
+            var center = {
+              pageX: (lastTouches[0].pageX + lastTouches[1].pageX) * 0.5,
+              pageY: (lastTouches[0].pageY + lastTouches[1].pageY) * 0.5
+            };
             if (callback.zoom) {
-              callback.zoom(r);
+              callback.zoom(r, center);
             }
           }
         }
@@ -596,11 +600,19 @@
     var processTouchStart = function(e) {
       return touchFilter.onTouchStart(e);
     };
-    var processTouchMove = function(e, selector, target) {
+    var processTouchMove = function(e, selector, relSelector, target) {
       var index = selector ? $(selector).index(target) : null;
       return touchFilter.onTouchMove(e, {
         move: function(dx, dy) { moveRelativePx(index, dx, dy); },
-        zoom: function(r) { zoomRelative(r); }
+        zoom: function(r, center) {
+          if (center && selector && relSelector) {
+            target = $(target).find(relSelector);
+            var pos = positionFromMouseEvent(center, target, index);
+            zoomRelativeToPx(r, pos);
+          } else {
+            zoomRelative(r);
+          }
+        }
       });
     };
     var processTouchEnd = function(e, selector, relSelector, target) {
@@ -640,7 +652,7 @@
         return processTouchStart(e);
       });
       $(root).on('touchmove', filter, function(e) {
-        return processTouchMove(e, selector, this);
+        return processTouchMove(e, selector, relSelector, this);
       });
       $(root).on('touchend', filter, function(e) {
         return processTouchEnd(e, selector, relSelector, this);
