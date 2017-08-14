@@ -265,7 +265,7 @@ $( function() {
   
   viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
   figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
 
   colorDistEnableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
@@ -1345,7 +1345,8 @@ $( function() {
       $(target).find('tr').eq(0).append(
         makeImageNameWithIndex('<td>', img)
       );
-      var fig = $('<td class="fig">').css(cellStyle).append($(img[propName]).css(style));
+      var figMain = $(img[propName]).css(style).addClass('figMain');
+      var fig = $('<td class="fig">').css(cellStyle).append(figMain);
       var axes = img[propName + 'Axes'];
       if (axes) {
         fig.append($(axes).css(style));
@@ -2293,7 +2294,7 @@ $( function() {
         css(style);
       var dist = $(
           makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type).canvas
-        ).css(style);
+        ).css(style).addClass('figMain');
       var curve = $(
         '<svg viewBox="' + vbox + '">' +
           curvePaths.join() +
@@ -2419,7 +2420,7 @@ $( function() {
           padding:'8px',
           transform: figureZoom.makeTransform()
       };
-      $('#diffResult').append($(fig.canvas).css(style)).css(cellStyle);
+      $('#diffResult').append($(fig.canvas).css(style).addClass('figMain')).css(cellStyle);
       if (diffResult.result.summary.unmatch === 0) {
         setText($('#diffSummary'), {
           en: 'Perfect match',
