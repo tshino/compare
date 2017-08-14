@@ -368,10 +368,10 @@
           var s1 = Math.sqrt(x1 * x1 + y1 * y1);
           if (0 < s0 * s1) {
             var r = Math.log(s1 / s0) / Math.LN2;
-            r = clamp(r, -1, 1);
+            r = clamp(r, -2, 2);
             var center = {
-              pageX: (lastTouches[0].pageX + lastTouches[1].pageX) * 0.5,
-              pageY: (lastTouches[0].pageY + lastTouches[1].pageY) * 0.5
+              pageX: (touches[0].pageX + touches[1].pageX) * 0.5,
+              pageY: (touches[0].pageY + touches[1].pageY) * 0.5
             };
             if (callback.zoom) {
               callback.zoom(r, center);
