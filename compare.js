@@ -1497,14 +1497,23 @@ $( function() {
     }
   }
   var updateHistogramTable = function() {
-    var style = {
-            width: '384px',
-            height:'272px',
-            background:'#bbb',
-            padding:'8px',
-            transform: figureZoom.makeTransform()
+    var w = 384, h = 272;
+    var cellStyle = {
+      width: (w + 16) + 'px',
+      height: (h + 16) + 'px',
+      background:'#bbb',
+      padding: '0px'
     };
-    updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style);
+    var style = {
+      display: 'block',
+      position: 'absolute',
+      width: w + 'px',
+      height: h + 'px',
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
+    };
+    updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style, cellStyle);
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
