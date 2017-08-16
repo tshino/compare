@@ -1499,6 +1499,8 @@ $( function() {
   var updateHistogramTable = function() {
     var w = 384, h = 272;
     var cellStyle = {
+      position: 'relative',
+      minWidth: (w + 16) + 'px',
       width: (w + 16) + 'px',
       height: (h + 16) + 'px',
       background:'#bbb',
@@ -1510,8 +1512,8 @@ $( function() {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
-      top: '50%',
-      transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
+      top: '8px',
+      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style, cellStyle);
   };
