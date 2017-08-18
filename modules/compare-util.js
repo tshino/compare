@@ -344,11 +344,6 @@
     };
     var onTouchMove = function(e, callback) {
       return updateState(e, function(lastTouches, touches) {
-        var dx = 0, dy = 0;
-        for (var i = 0; i < touches.length; ++i) {
-          dx += touches[i].clientX - lastTouches[i].x;
-          dy += touches[i].clientY - lastTouches[i].y;
-        }
         if (tapPoint) {
           if (touches.length !== 1 ||
               3 <= Math.abs(touches[0].clientX - tapPoint.clientX) ||
@@ -356,10 +351,18 @@
             tapPoint = null;
           }
         }
-        if (callback.move) {
-          callback.move(dx / touches.length, dy / touches.length);
+        var dx = 0, dy = 0;
+        for (var i = 0; i < touches.length; ++i) {
+          dx += touches[i].clientX - lastTouches[i].x;
+          dy += touches[i].clientY - lastTouches[i].y;
         }
-        if (touches.length === 2) {
+        dx = dx / touches.length;
+        dy = dy / touches.length;
+        if (touches.length === 1) {
+          if (callback.move) {
+            callback.move(dx, dy);
+          }
+        } else if (touches.length === 2) {
           var x0 = lastTouches[0].x - lastTouches[1].x;
           var y0 = lastTouches[0].y - lastTouches[1].y;
           var x1 = touches[0].clientX - touches[1].clientX;
@@ -374,7 +377,7 @@
               pageY: (touches[0].pageY + touches[1].pageY) * 0.5
             };
             if (callback.zoom) {
-              callback.zoom(r, center);
+              callback.zoom(dx, dy, r, center);
             }
           }
         }
@@ -455,11 +458,16 @@
         y: (o.offset.y - 0.5) * (1 - 1 / o.scale)
       };
     };
-    var moveRelative = function(dx, dy) {
+    var moveRelativeWithoutUpdate = function(dx, dy) {
       if (1 < o.scale && enabled) {
-        var result = setOffset(
+        return setOffset(
                         o.offset.x + dx / (o.scale - 1),
                         o.offset.y + dy / (o.scale - 1));
+      }
+    };
+    var moveRelative = function(dx, dy) {
+      var result = moveRelativeWithoutUpdate(dx, dy);
+      if (result) {
         update();
         return result;
       }
@@ -470,8 +478,11 @@
         moveRelative(-dx / base.w, -dy / base.h);
       }
     };
-    var zoomRelativeToPx = function(delta, pos) {
+    var zoomRelativeToPoint = function(dx, dy, delta, pos) {
       if (enabled && pos) {
+        if (dx !== 0 || dy !== 0) {
+          moveRelativeWithoutUpdate(dx, dy);
+        }
         var c1 = getCenter();
         var s1 = o.scale;
         setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
@@ -589,7 +600,7 @@
             var index = $(selector).index(target);
             target = $(target).find(relSelector);
             var pos = positionFromMouseEvent(e, target, index);
-            zoomRelativeToPx(-steps * ZOOM_STEP_WHEEL, pos);
+            zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, pos);
           } else {
             zoomRelative(-steps * ZOOM_STEP_WHEEL);
           }
@@ -602,13 +613,18 @@
     };
     var processTouchMove = function(e, selector, relSelector, target) {
       var index = selector ? $(selector).index(target) : null;
-      return touchFilter.onTouchMove(e, {
-        move: function(dx, dy) { moveRelativePx(index, dx, dy); },
-        zoom: function(r, center) {
+      var ret = touchFilter.onTouchMove(e, {
+        move: function(dx, dy) {
+          moveRelativePx(index, dx, dy);
+        },
+        zoom: function(dx, dy, r, center) {
           if (center && selector && relSelector) {
             target = $(target).find(relSelector);
+            var base = getBaseSize(index);
+            dx = -dx / base.w;
+            dy = -dy / base.h;
             var pos = positionFromMouseEvent(center, target, index);
-            zoomRelativeToPx(r, pos);
+            zoomRelativeToPoint(dx, dy, r, pos);
           } else {
             zoomRelative(r);
           }

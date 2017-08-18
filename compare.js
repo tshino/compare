@@ -266,7 +266,7 @@ $( function() {
   viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
-  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', null);
+  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
 
   colorDistEnableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
@@ -2054,7 +2054,7 @@ $( function() {
     $(root).on('touchmove', filter, function(e) {
       return colorDistTouchFilter.onTouchMove(e, {
         move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
-        zoom: function(delta) { zoomColorDist(delta); }
+        zoom: function(dx, dy, delta) { zoomColorDist(delta); }
       });
     });
     $(root).on('touchend', filter, function(e) {
