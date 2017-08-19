@@ -1599,14 +1599,25 @@ $( function() {
     }
   }
   var updateWaveformTable = function() {
-    var style = {
-            width: '320px',
-            height:'256px',
-            background:'#666',
-            padding:'10px',
-            transform: figureZoom.makeTransform()
+    var w = 320, h = 256;
+    var cellStyle = {
+      position: 'relative',
+      minWidth: (w + 20) + 'px',
+      width: (w + 20) + 'px',
+      height: (h + 20) + 'px',
+      background:'#666',
+      padding: '0px'
     };
-    updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style);
+    var style = {
+      display: 'block',
+      position: 'absolute',
+      width: w + 'px',
+      height: h + 'px',
+      left: '50%',
+      top: '10px',
+      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
+    };
+    updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style, cellStyle);
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
