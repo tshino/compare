@@ -1828,14 +1828,25 @@ $( function() {
     }
   };
   var updateVectorscopeTable = function() {
-    var style = {
-            width: '320px',
-            height:'320px',
-            background:'#444',
-            padding:'10px',
-            transform: figureZoom.makeTransform()
+    var w = 320, h = 320;
+    var cellStyle = {
+      position: 'relative',
+      minWidth: (w + 20) + 'px',
+      width: (w + 20) + 'px',
+      height: (h + 20) + 'px',
+      background:'#444',
+      padding: '0px'
     };
-    updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style);
+    var style = {
+      display: 'block',
+      position: 'absolute',
+      width: w + 'px',
+      height: h + 'px',
+      left: '50%',
+      top: '10px',
+      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
+    };
+    updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style, cellStyle);
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
