@@ -2415,9 +2415,15 @@ $( function() {
         }, attachImageDataToTask);
       }
     }
+    var cellW = 768;
+    var cellH = 400;
     var cellStyle = {
-        width: '790px',
-        height: '422px'
+      position: 'relative',
+      minWidth: '790px',
+      width: '790px',
+      height: (cellH + 16) + 'px',
+      background:'#000',
+      padding:'0px'
     };
     if (diffResult.result === null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -2441,17 +2447,17 @@ $( function() {
       var bits = fig.context.createImageData(w, h);
       copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
-      var cellW = 768;
-      var cellH = 400;
       var isLetterBox = cellW * h < cellH * w;
       diffResult.baseWidth = isLetterBox ? cellW : cellH * w / h;
       diffResult.baseHeight = isLetterBox ? cellW * h / w : cellH;
       var style = {
-          maxWidth: cellW + 'px',
-          maxHeight: cellH + 'px',
-          background:'#000',
-          padding:'8px',
-          transform: figureZoom.makeTransform()
+        display: 'block',
+        position: 'absolute',
+        maxWidth: cellW + 'px',
+        maxHeight: cellH + 'px',
+        left: '50%',
+        top: '8px',
+        transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
       };
       $('#diffResult').append($(fig.canvas).css(style).addClass('figMain')).css(cellStyle);
       if (diffResult.result.summary.unmatch === 0) {
@@ -2502,7 +2508,7 @@ $( function() {
   var updateDiffTable = function(transformOnly) {
     if (transformOnly) {
       if (diffResult.result !== null) {
-        $('#diffResult canvas').css('transform', figureZoom.makeTransform());
+        $('#diffResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
       }
     } else {
       updateDiffTableDOM();
