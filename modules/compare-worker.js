@@ -1004,7 +1004,13 @@ var imageUtil = (function() {
       var b = imageData.data[k + 2];
       colors[i] = (r << 16) + (g << 8) + b;
     }
-    colors.sort();
+    try {
+      colors.sort();
+    } catch(e) {
+      // IE11: no typedarray.sort() ?
+      colors = Array.prototype.slice.call(colors);
+      colors.sort();
+    }
     var counts = new Uint32Array(w * h);
     var totalCount = 0;
     var uniqueCount = 1;
@@ -1018,7 +1024,12 @@ var imageUtil = (function() {
     }
     counts[uniqueCount - 1] = colors.length - totalCount;
     colors = colors.slice(0, uniqueCount);
-    counts = counts.slice(0, uniqueCount);
+    try {
+      counts = counts.slice(0, uniqueCount);
+    } catch(e) {
+      // IE11: no typedarray.slice() ?
+      counts = Array.prototype.slice.call(counts, 0, uniqueCount);
+    }
     return {
       colors: colors,
       counts: counts,
