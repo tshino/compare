@@ -2263,9 +2263,15 @@ $( function() {
         }, attachImageDataToTask);
       }
     }
+    var figW = 320;
+    var figH = 320;
     var cellStyle = {
-        width: '320px',
-        height: '320px'
+      position: 'relative',
+      minWidth: (figW + 16) + 'px',
+      width: (figW + 16) + 'px',
+      height: (figH + 16) + 'px',
+      background:'#666',
+      padding:'0px'
     };
     if (toneCurveResult.result === null) {
       $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -2308,14 +2314,13 @@ $( function() {
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
       var style = {
-          //background: '#222',
-          position: 'absolute',
-          width: '320px',
-          height: '320px',
-          padding: '8px',
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
+        display: 'block',
+        position: 'absolute',
+        width: figW + 'px',
+        height: figH + 'px',
+        left: '50%',
+        top: '8px',
+        transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
       };
       var axes = $(
         '<svg viewBox="' + vbox + '">' +
@@ -2340,7 +2345,7 @@ $( function() {
     if (transformOnly) {
       if (toneCurveResult.result !== null) {
         $('#toneCurveResult > *').css({
-          transform: 'translate(-50%, -50%) ' + figureZoom.makeTransform()
+          transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
         });
       }
     } else {
