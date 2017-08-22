@@ -2005,22 +2005,26 @@ $( function() {
     }
   };
   var updateColorDistTable = function() {
+    var w = 320, h = 320;
     cellStyle = {
-        width: '340px',
-        height: '340px',
+      position: 'relative',
+      minWidth: (w + 20) + 'px',
+      width: (w + 20) + 'px',
+      height: (h + 20) + 'px',
+      padding: '0px'
     };
     if (colorDistType === 0) { // RGB with Color
       cellStyle.background = '#444';
     }
     var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
     style = {
-        width: '320px',
-        height:'320px',
-        padding:'10px',
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%) scale(' + scale + ')'
+      display: 'block',
+      position: 'absolute',
+      width: w + 'px',
+      height: h + 'px',
+      left: '50%',
+      top: '10px',
+      transform: 'translate(-50%, 0%) scale(' + scale + ')'
     };
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
   };
