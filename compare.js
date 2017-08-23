@@ -1499,16 +1499,12 @@ $( function() {
   var updateHistogramTable = function() {
     var w = 384, h = 272;
     var cellStyle = {
-      position: 'relative',
       minWidth: (w + 16) + 'px',
       width: (w + 16) + 'px',
       height: (h + 16) + 'px',
-      background:'#bbb',
-      padding: '0px'
+      background:'#bbb'
     };
     var style = {
-      display: 'block',
-      position: 'absolute',
       width: w + 'px',
       height: h + 'px',
       left: '50%',
@@ -1601,16 +1597,12 @@ $( function() {
   var updateWaveformTable = function() {
     var w = 320, h = 256;
     var cellStyle = {
-      position: 'relative',
       minWidth: (w + 20) + 'px',
       width: (w + 20) + 'px',
       height: (h + 20) + 'px',
-      background:'#666',
-      padding: '0px'
+      background:'#666'
     };
     var style = {
-      display: 'block',
-      position: 'absolute',
       width: w + 'px',
       height: h + 'px',
       left: '50%',
@@ -1830,16 +1822,12 @@ $( function() {
   var updateVectorscopeTable = function() {
     var w = 320, h = 320;
     var cellStyle = {
-      position: 'relative',
       minWidth: (w + 20) + 'px',
       width: (w + 20) + 'px',
       height: (h + 20) + 'px',
-      background:'#444',
-      padding: '0px'
+      background:'#444'
     };
     var style = {
-      display: 'block',
-      position: 'absolute',
       width: w + 'px',
       height: h + 'px',
       left: '50%',
@@ -2007,19 +1995,15 @@ $( function() {
   var updateColorDistTable = function() {
     var w = 320, h = 320;
     cellStyle = {
-      position: 'relative',
       minWidth: (w + 20) + 'px',
       width: (w + 20) + 'px',
-      height: (h + 20) + 'px',
-      padding: '0px'
+      height: (h + 20) + 'px'
     };
     if (colorDistType === 0) { // RGB with Color
       cellStyle.background = '#444';
     }
     var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
     style = {
-      display: 'block',
-      position: 'absolute',
       width: w + 'px',
       height: h + 'px',
       left: '50%',
@@ -2270,12 +2254,10 @@ $( function() {
     var figW = 320;
     var figH = 320;
     var cellStyle = {
-      position: 'relative',
       minWidth: (figW + 16) + 'px',
       width: (figW + 16) + 'px',
       height: (figH + 16) + 'px',
-      background:'#666',
-      padding:'0px'
+      background:'#666'
     };
     if (toneCurveResult.result === null) {
       $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -2318,8 +2300,6 @@ $( function() {
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
       var style = {
-        display: 'block',
-        position: 'absolute',
         width: figW + 'px',
         height: figH + 'px',
         left: '50%',
@@ -2427,12 +2407,10 @@ $( function() {
     var cellW = 768;
     var cellH = 400;
     var cellStyle = {
-      position: 'relative',
       minWidth: '790px',
       width: '790px',
       height: (cellH + 16) + 'px',
-      background:'#000',
-      padding:'0px'
+      background:'#000'
     };
     if (diffResult.result === null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
@@ -2460,8 +2438,6 @@ $( function() {
       diffResult.baseWidth = isLetterBox ? cellW : cellH * w / h;
       diffResult.baseHeight = isLetterBox ? cellW * h / w : cellH;
       var style = {
-        display: 'block',
-        position: 'absolute',
         maxWidth: cellW + 'px',
         maxHeight: cellH + 'px',
         left: '50%',

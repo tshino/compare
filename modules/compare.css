@@ -292,8 +292,14 @@ div.dialog table td.fig
 {
     overflow        : hidden;
     position        : relative;
+    padding         : 0px;
     text-align      : center;
 }
+div.dialog table td.fig > *
+{
+    display         : block;
+    position        : absolute;
+};
 div.footnote
 {
     font-size:      0.8em;
