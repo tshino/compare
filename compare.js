@@ -1496,7 +1496,7 @@ $( function() {
       }
     }
   }
-  var updateHistogramTable = function() {
+  var updateHistogramTable = function(transformOnly) {
     var w = 384, h = 272;
     var cellStyle = {
       minWidth: (w + 16) + 'px',
@@ -1511,7 +1511,11 @@ $( function() {
       top: '8px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
-    updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style, cellStyle);
+    if (transformOnly) {
+      $('#histoTable td.fig > *').css(style);
+    } else {
+      updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style, cellStyle);
+    }
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
@@ -1594,7 +1598,7 @@ $( function() {
       return fig.canvas;
     }
   }
-  var updateWaveformTable = function() {
+  var updateWaveformTable = function(transformOnly) {
     var w = 320, h = 256;
     var cellStyle = {
       minWidth: (w + 20) + 'px',
@@ -1609,7 +1613,11 @@ $( function() {
       top: '10px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
-    updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style, cellStyle);
+    if (transformOnly) {
+      $('#waveTable td.fig > *').css(style);
+    } else {
+      updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style, cellStyle);
+    }
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
     { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
@@ -1819,7 +1827,7 @@ $( function() {
       return fig.canvas;
     }
   };
-  var updateVectorscopeTable = function() {
+  var updateVectorscopeTable = function(transformOnly) {
     var w = 320, h = 320;
     var cellStyle = {
       minWidth: (w + 20) + 'px',
@@ -1834,7 +1842,11 @@ $( function() {
       top: '10px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
-    updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style, cellStyle);
+    if (transformOnly) {
+      $('#vectorscopeTable td.fig > *').css(style);
+    } else {
+      updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style, cellStyle);
+    }
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
     { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
