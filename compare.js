@@ -1497,18 +1497,18 @@ $( function() {
     }
   }
   var updateHistogramTable = function(transformOnly) {
-    var w = 384, h = 272;
+    var w = 384, h = 272, margin = 8;
     var cellStyle = {
-      minWidth: (w + 16) + 'px',
-      width: (w + 16) + 'px',
-      height: (h + 16) + 'px',
+      minWidth: (w + margin * 2) + 'px',
+      width: (w + margin * 2) + 'px',
+      height: (h + margin * 2) + 'px',
       background:'#bbb'
     };
     var style = {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
-      top: '8px',
+      top: margin + 'px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
     if (transformOnly) {
@@ -1599,18 +1599,18 @@ $( function() {
     }
   }
   var updateWaveformTable = function(transformOnly) {
-    var w = 320, h = 256;
+    var w = 320, h = 256, margin = 10;
     var cellStyle = {
-      minWidth: (w + 20) + 'px',
-      width: (w + 20) + 'px',
-      height: (h + 20) + 'px',
+      minWidth: (w + margin * 2) + 'px',
+      width: (w + margin * 2) + 'px',
+      height: (h + margin * 2) + 'px',
       background:'#666'
     };
     var style = {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
-      top: '10px',
+      top: margin + 'px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
     if (transformOnly) {
@@ -1828,7 +1828,7 @@ $( function() {
     }
   };
   var updateVectorscopeTable = function(transformOnly) {
-    var w = 320, h = 320;
+    var w = 320, h = 320, margin = 10;
     var cellStyle = {
       minWidth: (w + 20) + 'px',
       width: (w + 20) + 'px',
@@ -1839,7 +1839,7 @@ $( function() {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
-      top: '10px',
+      top: margin + 'px',
       transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
     };
     if (transformOnly) {
@@ -2005,11 +2005,11 @@ $( function() {
     }
   };
   var updateColorDistTable = function() {
-    var w = 320, h = 320;
-    cellStyle = {
-      minWidth: (w + 20) + 'px',
-      width: (w + 20) + 'px',
-      height: (h + 20) + 'px'
+    var w = 320, h = 320, margin = 10;
+    var cellStyle = {
+      minWidth: (w + margin * 2) + 'px',
+      width: (w + margin * 2) + 'px',
+      height: (h + margin * 2) + 'px'
     };
     if (colorDistType === 0) { // RGB with Color
       cellStyle.background = '#444';
@@ -2019,7 +2019,7 @@ $( function() {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
-      top: '10px',
+      top: margin + 'px',
       transform: 'translate(-50%, 0%) scale(' + scale + ')'
     };
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
@@ -2265,10 +2265,11 @@ $( function() {
     }
     var figW = 320;
     var figH = 320;
+    var figMargin = 8;
     var cellStyle = {
-      minWidth: (figW + 16) + 'px',
-      width: (figW + 16) + 'px',
-      height: (figH + 16) + 'px',
+      minWidth: (figW + figMargin * 2) + 'px',
+      width: (figW + figMargin * 2) + 'px',
+      height: (figH + figMargin * 2) + 'px',
       background:'#666'
     };
     if (toneCurveResult.result === null) {
@@ -2315,7 +2316,7 @@ $( function() {
         width: figW + 'px',
         height: figH + 'px',
         left: '50%',
-        top: '8px',
+        top: figMargin + 'px',
         transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
       };
       var axes = $(
@@ -2418,10 +2419,11 @@ $( function() {
     }
     var cellW = 768;
     var cellH = 400;
+    var figMargin = 8;
     var cellStyle = {
       minWidth: '790px',
       width: '790px',
-      height: (cellH + 16) + 'px',
+      height: (cellH + figMargin * 2) + 'px',
       background:'#000'
     };
     if (diffResult.result === null) {
@@ -2453,7 +2455,7 @@ $( function() {
         maxWidth: cellW + 'px',
         maxHeight: cellH + 'px',
         left: '50%',
-        top: '8px',
+        top: figMargin + 'px',
         transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
       };
       $('#diffResult').append($(fig.canvas).css(style).addClass('figMain')).css(cellStyle);
