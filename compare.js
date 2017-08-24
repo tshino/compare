@@ -2417,13 +2417,13 @@ $( function() {
         }, attachImageDataToTask);
       }
     }
-    var cellW = 768;
-    var cellH = 400;
+    var figW = 768;
+    var figH = 400;
     var figMargin = 8;
     var cellStyle = {
-      minWidth: '790px',
-      width: '790px',
-      height: (cellH + figMargin * 2) + 'px',
+      minWidth: (figW + figMargin * 2) + 'px',
+      width: (figW + figMargin * 2) + 'px',
+      height: (figH + figMargin * 2) + 'px',
       background:'#000'
     };
     if (diffResult.result === null) {
@@ -2448,12 +2448,12 @@ $( function() {
       var bits = fig.context.createImageData(w, h);
       copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
-      var isLetterBox = cellW * h < cellH * w;
-      diffResult.baseWidth = isLetterBox ? cellW : cellH * w / h;
-      diffResult.baseHeight = isLetterBox ? cellW * h / w : cellH;
+      var isLetterBox = figW * h < figH * w;
+      diffResult.baseWidth = isLetterBox ? figW : figH * w / h;
+      diffResult.baseHeight = isLetterBox ? figW * h / w : figH;
       var style = {
-        maxWidth: cellW + 'px',
-        maxHeight: cellH + 'px',
+        maxWidth: figW + 'px',
+        maxHeight: figH + 'px',
         left: '50%',
         top: figMargin + 'px',
         transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
