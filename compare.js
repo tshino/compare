@@ -1359,6 +1359,22 @@ $( function() {
       );
     }
   };
+  var makeFigureStyles = function(w, h, margin, background) {
+    var cellStyle = {
+      minWidth: (w + margin * 2) + 'px',
+      width: (w + margin * 2) + 'px',
+      height: (h + margin * 2) + 'px',
+      background: background
+    };
+    var style = {
+      width: w + 'px',
+      height: h + 'px',
+      left: '50%',
+      top: margin + 'px',
+      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
+    };
+    return { cellStyle: cellStyle, style: style };
+  };
   
   var processTaskResult = function(data) {
     switch (data.cmd) {
@@ -1498,23 +1514,11 @@ $( function() {
   }
   var updateHistogramTable = function(transformOnly) {
     var w = 384, h = 272, margin = 8;
-    var cellStyle = {
-      minWidth: (w + margin * 2) + 'px',
-      width: (w + margin * 2) + 'px',
-      height: (h + margin * 2) + 'px',
-      background:'#bbb'
-    };
-    var style = {
-      width: w + 'px',
-      height: h + 'px',
-      left: '50%',
-      top: margin + 'px',
-      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-    };
+    var styles = makeFigureStyles(w, h, margin, '#bbb');
     if (transformOnly) {
-      $('#histoTable td.fig > *').css(style);
+      $('#histoTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, style, cellStyle);
+      updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, styles.style, styles.cellStyle);
     }
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
@@ -1600,23 +1604,11 @@ $( function() {
   }
   var updateWaveformTable = function(transformOnly) {
     var w = 320, h = 256, margin = 10;
-    var cellStyle = {
-      minWidth: (w + margin * 2) + 'px',
-      width: (w + margin * 2) + 'px',
-      height: (h + margin * 2) + 'px',
-      background:'#666'
-    };
-    var style = {
-      width: w + 'px',
-      height: h + 'px',
-      left: '50%',
-      top: margin + 'px',
-      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-    };
+    var styles = makeFigureStyles(w, h, margin, '#666');
     if (transformOnly) {
-      $('#waveTable td.fig > *').css(style);
+      $('#waveTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, style, cellStyle);
+      updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, styles.style, styles.cellStyle);
     }
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
@@ -1829,23 +1821,11 @@ $( function() {
   };
   var updateVectorscopeTable = function(transformOnly) {
     var w = 320, h = 320, margin = 10;
-    var cellStyle = {
-      minWidth: (w + 20) + 'px',
-      width: (w + 20) + 'px',
-      height: (h + 20) + 'px',
-      background:'#444'
-    };
-    var style = {
-      width: w + 'px',
-      height: h + 'px',
-      left: '50%',
-      top: margin + 'px',
-      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-    };
+    var styles = makeFigureStyles(w, h, margin, '#444');
     if (transformOnly) {
-      $('#vectorscopeTable td.fig > *').css(style);
+      $('#vectorscopeTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, style, cellStyle);
+      updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, styles.style, styles.cellStyle);
     }
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
@@ -2263,17 +2243,10 @@ $( function() {
         }, attachImageDataToTask);
       }
     }
-    var figW = 320;
-    var figH = 320;
-    var figMargin = 8;
-    var cellStyle = {
-      minWidth: (figW + figMargin * 2) + 'px',
-      width: (figW + figMargin * 2) + 'px',
-      height: (figH + figMargin * 2) + 'px',
-      background:'#666'
-    };
+    var figW = 320, figH = 320, figMargin = 8;
+    var styles = makeFigureStyles(figW, figH, figMargin, '#666');
     if (toneCurveResult.result === null) {
-      $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
+      $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
     } else {
       var numComponents = toneCurveResult.type === 0 ? 3 : 1;
       var components = toneCurveResult.result.components;
@@ -2312,13 +2285,6 @@ $( function() {
         scaleDesc += 'M 32,' + y + ' l 256,0 ';
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
-      var style = {
-        width: figW + 'px',
-        height: figH + 'px',
-        left: '50%',
-        top: figMargin + 'px',
-        transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-      };
       var axes = $(
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
@@ -2326,16 +2292,16 @@ $( function() {
             '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
           '</g>' +
         '</svg>').
-        css(style);
+        css(styles.style);
       var dist = $(
           makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type).canvas
-        ).css(style).addClass('figMain');
+        ).css(styles.style).addClass('figMain');
       var curve = $(
         '<svg viewBox="' + vbox + '">' +
           curvePaths.join() +
         '</svg>').
-        css(style);
-      $('#toneCurveResult').append(dist).append(curve).append(axes).css(cellStyle);
+        css(styles.style);
+      $('#toneCurveResult').append(dist).append(curve).append(axes).css(styles.cellStyle);
     }
   };
   var updateToneCurveTable = function(transformOnly) {
