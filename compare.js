@@ -1359,7 +1359,7 @@ $( function() {
       );
     }
   };
-  var makeFigureStyles = function(w, h, margin, background) {
+  var makeFigureStyles = function(w, h, margin, background, zoomController) {
     var cellStyle = {
       minWidth: (w + margin * 2) + 'px',
       width: (w + margin * 2) + 'px',
@@ -1371,7 +1371,7 @@ $( function() {
       height: h + 'px',
       left: '50%',
       top: margin + 'px',
-      transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
+      transform: 'translate(-50%,0%) ' + (zoomController ? zoomController.makeTransform() : '')
     };
     return { cellStyle: cellStyle, style: style };
   };
@@ -1514,7 +1514,7 @@ $( function() {
   }
   var updateHistogramTable = function(transformOnly) {
     var w = 384, h = 272, margin = 8;
-    var styles = makeFigureStyles(w, h, margin, '#bbb');
+    var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
     if (transformOnly) {
       $('#histoTable td.fig > *').css(styles.style);
     } else {
@@ -1604,7 +1604,7 @@ $( function() {
   }
   var updateWaveformTable = function(transformOnly) {
     var w = 320, h = 256, margin = 10;
-    var styles = makeFigureStyles(w, h, margin, '#666');
+    var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
     if (transformOnly) {
       $('#waveTable td.fig > *').css(styles.style);
     } else {
@@ -1821,7 +1821,7 @@ $( function() {
   };
   var updateVectorscopeTable = function(transformOnly) {
     var w = 320, h = 320, margin = 10;
-    var styles = makeFigureStyles(w, h, margin, '#444');
+    var styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
     if (transformOnly) {
       $('#vectorscopeTable td.fig > *').css(styles.style);
     } else {
@@ -1986,23 +1986,10 @@ $( function() {
   };
   var updateColorDistTable = function() {
     var w = 320, h = 320, margin = 10;
-    var cellStyle = {
-      minWidth: (w + margin * 2) + 'px',
-      width: (w + margin * 2) + 'px',
-      height: (h + margin * 2) + 'px'
-    };
-    if (colorDistType === 0) { // RGB with Color
-      cellStyle.background = '#444';
-    }
+    var styles = makeFigureStyles(w, h, margin, '#444');
     var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
-    style = {
-      width: w + 'px',
-      height: h + 'px',
-      left: '50%',
-      top: margin + 'px',
-      transform: 'translate(-50%, 0%) scale(' + scale + ')'
-    };
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, style, cellStyle);
+    styles.style.transform += ' scale(' + scale + ')';
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles.style, styles.cellStyle);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
     onOpen: function() { colorDistZoom = 0; }
@@ -2244,7 +2231,7 @@ $( function() {
       }
     }
     var figW = 320, figH = 320, figMargin = 8;
-    var styles = makeFigureStyles(figW, figH, figMargin, '#666');
+    var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
     if (toneCurveResult.result === null) {
       $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
     } else {
