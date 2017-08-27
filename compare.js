@@ -2405,10 +2405,10 @@ $( function() {
       diffResult.baseWidth = isLetterBox ? figW : figH * w / h;
       diffResult.baseHeight = isLetterBox ? figW * h / w : figH;
       var style = {
-        maxWidth: figW + 'px',
-        maxHeight: figH + 'px',
+        width: diffResult.baseWidth + 'px',
+        height: diffResult.baseHeight + 'px',
         left: '50%',
-        top: figMargin + 'px',
+        top: ((figH - diffResult.baseHeight) / 2 + figMargin) + 'px',
         transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
       };
       $('#diffResult').append($(fig.canvas).css(style).addClass('figMain')).css(cellStyle);
