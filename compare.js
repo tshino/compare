@@ -1049,13 +1049,11 @@ $( function() {
     if (img.element) {
       img.boxW = boxW;
       img.boxH = boxH;
-      img.isLetterBox = boxW * img.height < boxH * img.width;
-      img.baseWidth = img.isLetterBox ? boxW : boxH * img.width / img.height;
-      img.baseHeight = img.isLetterBox ? boxW * img.height / img.width : boxH;
-      var w = img.baseWidth, h = img.baseHeight;
-      if (img.transposed) {
-        var temp = w; w = h; h = temp;
-      }
+      var rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
+      img.baseWidth = rect.width;
+      img.baseHeight = rect.height;
+      var w = img.transposed ? rect.height : rect.width;
+      var h = img.transposed ? rect.width : rect.height;
       $(img.element).css({ width: w+'px', height: h+'px' });
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
@@ -1360,22 +1358,32 @@ $( function() {
     }
   };
   var makeFigureStyles = function(w, h, margin, background, zoomController) {
-    var cellStyle = {
+    var styles = { figW: w, figH: h, figMargin: margin, baseW: w, baseH: h };
+    styles.cellStyle = {
       minWidth: (w + margin * 2) + 'px',
       width: (w + margin * 2) + 'px',
       height: (h + margin * 2) + 'px',
       background: background
     };
-    var style = {
+    styles.style = {
       width: w + 'px',
       height: h + 'px',
       left: '50%',
       top: margin + 'px',
       transform: 'translate(-50%,0%) ' + (zoomController ? zoomController.makeTransform() : '')
     };
-    return { cellStyle: cellStyle, style: style };
+    return styles;
   };
-  
+  var updateFigureStylesForActualSize = function(styles, w, h) {
+    var rect = compareUtil.calcInscribedRect(styles.figW, styles.figH, w, h);
+    styles.baseW = rect.width;
+    styles.baseH = rect.height;
+    styles.style.width = rect.width + 'px';
+    styles.style.height = rect.height + 'px';
+    styles.style.top = ((styles.figH - rect.height) / 2 + styles.figMargin) + 'px';
+    return styles;
+  };
+
   var processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
@@ -2373,14 +2381,9 @@ $( function() {
     var figW = 768;
     var figH = 400;
     var figMargin = 8;
-    var cellStyle = {
-      minWidth: (figW + figMargin * 2) + 'px',
-      width: (figW + figMargin * 2) + 'px',
-      height: (figH + figMargin * 2) + 'px',
-      background:'#000'
-    };
+    var styles = makeFigureStyles(figW, figH, figMargin, '#000');
     if (diffResult.result === null) {
-      $('#diffResult').append(makeBlankFigure(8,8).canvas).css(cellStyle);
+      $('#diffResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
       setText($('#diffSummary'), {
         en: 'calculating...',
         ja: '計算中...'
@@ -2401,17 +2404,10 @@ $( function() {
       var bits = fig.context.createImageData(w, h);
       copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
-      var isLetterBox = figW * h < figH * w;
-      diffResult.baseWidth = isLetterBox ? figW : figH * w / h;
-      diffResult.baseHeight = isLetterBox ? figW * h / w : figH;
-      var style = {
-        width: diffResult.baseWidth + 'px',
-        height: diffResult.baseHeight + 'px',
-        left: '50%',
-        top: ((figH - diffResult.baseHeight) / 2 + figMargin) + 'px',
-        transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-      };
-      $('#diffResult').append($(fig.canvas).css(style).addClass('figMain')).css(cellStyle);
+      styles = updateFigureStylesForActualSize(styles, w, h);
+      diffResult.baseWidth = styles.baseW;
+      diffResult.baseHeight = styles.baseH;
+      $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
       if (diffResult.result.summary.unmatch === 0) {
         setText($('#diffSummary'), {
           en: 'Perfect match',

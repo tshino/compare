@@ -257,6 +257,13 @@
     var y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
     return { x: x, y: y };
   };
+  var calcInscribedRect = function(outerW, outerH, innerW, innerH) {
+    var rect = {};
+    var isLetterBox = outerW * innerH < outerH * innerW;
+    rect.width = isLetterBox ? outerW : outerH * innerW / innerH;
+    rect.height = isLetterBox ? outerW * innerH / innerW : outerH;
+    return rect;
+  };
   var processKeyDownEvent = function(e, callback) {
     // '+;' (59, 187 or 107 for numpad) / PageUp (33)
     if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
@@ -754,6 +761,7 @@
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
+    calcInscribedRect:      calcInscribedRect,
     processKeyDownEvent:    processKeyDownEvent,
     processWheelEvent:      processWheelEvent,
     makeTouchEventFilter:   makeTouchEventFilter,
