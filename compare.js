@@ -1332,8 +1332,7 @@ $( function() {
         y + pos.y + lineDy + 20);
     }
   };
-  var updateFigureTable = function(target, propName, update, style, cellStyle) {
-    cellStyle = cellStyle !== undefined ? cellStyle : {};
+  var updateFigureTable = function(target, propName, update, styles) {
     $(target).find('td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img[propName]) {
@@ -1343,11 +1342,11 @@ $( function() {
       $(target).find('tr').eq(0).append(
         makeImageNameWithIndex('<td>', img)
       );
-      var figMain = $(img[propName]).css(style).addClass('figMain');
-      var fig = $('<td class="fig">').css(cellStyle).append(figMain);
+      var figMain = $(img[propName]).css(styles.style).addClass('figMain');
+      var fig = $('<td class="fig">').css(styles.cellStyle).append(figMain);
       var axes = img[propName + 'Axes'];
       if (axes) {
-        fig.append($(axes).css(style));
+        fig.append($(axes).css(styles.style));
       }
       $(target).find('tr').eq(1).append(fig);
     }
@@ -1526,7 +1525,7 @@ $( function() {
     if (transformOnly) {
       $('#histoTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, styles.style, styles.cellStyle);
+      updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, styles);
     }
   };
   var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
@@ -1616,7 +1615,7 @@ $( function() {
     if (transformOnly) {
       $('#waveTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, styles.style, styles.cellStyle);
+      updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, styles);
     }
   };
   var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
@@ -1833,7 +1832,7 @@ $( function() {
     if (transformOnly) {
       $('#vectorscopeTable td.fig > *').css(styles.style);
     } else {
-      updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, styles.style, styles.cellStyle);
+      updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, styles);
     }
   };
   var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
@@ -1997,7 +1996,7 @@ $( function() {
     var styles = makeFigureStyles(w, h, margin, '#444');
     var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
     styles.style.transform += ' scale(' + scale + ')';
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles.style, styles.cellStyle);
+    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles);
   };
   var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
     onOpen: function() { colorDistZoom = 0; }
@@ -2378,9 +2377,7 @@ $( function() {
         }, attachImageDataToTask);
       }
     }
-    var figW = 768;
-    var figH = 400;
-    var figMargin = 8;
+    var figW = 768, figH = 400, figMargin = 8;
     var styles = makeFigureStyles(figW, figH, figMargin, '#000');
     if (diffResult.result === null) {
       $('#diffResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
