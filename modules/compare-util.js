@@ -606,8 +606,10 @@
           if (selector && relSelector) {
             var index = $(selector).index(target);
             target = $(target).find(relSelector);
-            var pos = positionFromMouseEvent(e, target, index);
-            zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, pos);
+            if (target.length !== 0) {
+              var pos = positionFromMouseEvent(e, target, index);
+              zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, pos);
+            }
           } else {
             zoomRelative(-steps * ZOOM_STEP_WHEEL);
           }
