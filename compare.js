@@ -263,11 +263,8 @@ $( function() {
     //alert('keypress: '+e.which);
   });
   
-  viewZoom.enableMouse('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  viewZoom.enableTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  figureZoom.enableMouse('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
-  figureZoom.enableTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
-
+  viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
+  figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
   colorDistEnableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
   viewZoom.setPointCallback(function(e) {

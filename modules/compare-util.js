@@ -650,7 +650,7 @@
         }
       });
     };
-    var enableMouse = function(root, filter, deepFilter, selector, relSelector) {
+    var enableMouseAndTouch = function(root, filter, deepFilter, selector, relSelector) {
       $(root).on('mousedown', deepFilter, function(e) {
         return processPointMouseDown(e, selector, this);
       });
@@ -669,8 +669,6 @@
       $(root).on('wheel', filter, function(e) {
         return processWheel(e, selector, relSelector, this);
       });
-    };
-    var enableTouch = function(root, filter, deepFilter, selector, relSelector) {
       $(root).on('touchstart', filter, function(e) {
         return processTouchStart(e);
       });
@@ -708,8 +706,7 @@
     //o.processWheel = processWheel;
     //o.resetTouchState = resetTouchState;
     //o.processTouchMove = processTouchMove;
-    o.enableMouse = enableMouse;
-    o.enableTouch = enableTouch;
+    o.enableMouseAndTouch = enableMouseAndTouch;
     o.makeTransform = makeTransform;
     return o;
   };
