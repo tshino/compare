@@ -1548,13 +1548,14 @@ $( function() {
       cmd:      'calcWaveform',
       type:     waveformType,
       index:    [img.index],
-      histW:    Math.min(img.canvasWidth, 1024)
+      histW:    Math.min(img.width, 1024),
+      transposed: img.transposed
     }, attachImageDataToTask);
   }
   function updateWaveform(type, img, histW, hist)
   {
-    var w = img.canvasWidth;
-    var h = img.canvasHeight;
+    var w = img.width;
+    var h = img.height;
     img.waveform = makeFigure(type, w, h, histW, hist);
     updateWaveformTable();
     

@@ -10,9 +10,7 @@
     break;
   case 'calcWaveform':
     result.type   = data.type;
-    result.result = calcWaveform(data.imageData[0], data.histW, data.type);
-    result.w = data.imageData[0].width;
-    result.h = data.imageData[0].height;
+    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.type);
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
@@ -65,10 +63,10 @@ function calcHistogram( imageData, type )
   }
   return hist;
 }
-function calcWaveform( imageData, histW, type )
+function calcWaveform( imageData, histW, transposed, type )
 {
-  var w = imageData.width;
-  var h = imageData.height;
+  var w = transposed ? imageData.height : imageData.width;
+  var h = transposed ? imageData.width : imageData.height;
   var hist = new Uint32Array(256 * histW * (type === 0 ? 3 : 1));
   var histOff = new Uint32Array(w);
   for (var i = 0; i < hist.length; ++i) {
@@ -79,12 +77,14 @@ function calcWaveform( imageData, histW, type )
     histOff[i] = x * 256;
   }
   if (type === 0) { // RGB
+    var sx = transposed ? h * 4 : 4;
+    var sy = transposed ? 4 : w * 4;
     for (var x = 0; x < w; ++x) {
-      var i = x * 4;
+      var i = x * sx;
       var rOff = histOff[x];
       var gOff = histOff[x] + 256 * histW;
       var bOff = histOff[x] + 512 * histW;
-      for (var y = 0; y < h; ++y, i += w * 4) {
+      for (var y = 0; y < h; ++y, i += sy) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
@@ -94,10 +94,12 @@ function calcWaveform( imageData, histW, type )
       }
     }
   } else { // Luminance
+    var sx = transposed ? h * 4 : 4;
+    var sy = transposed ? 4 : w * 4;
     for (var x = 0; x < w; ++x) {
-      var i = x * 4;
+      var i = x * sx;
       var off = histOff[x];
-      for (var y = 0; y < h; ++y, i += w * 4) {
+      for (var y = 0; y < h; ++y, i += sy) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
