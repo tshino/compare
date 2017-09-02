@@ -1544,12 +1544,15 @@ $( function() {
   }
   function updateWaveformAsync(img)
   {
+    var leftTop = interpretOrientation(img, 0, 0);
+    var flipped = img.transposed ? (leftTop.y !== 0) : (leftTop.x !== 0);
     taskQueue.addTask({
       cmd:      'calcWaveform',
       type:     waveformType,
       index:    [img.index],
       histW:    Math.min(img.width, 1024),
-      transposed: img.transposed
+      transposed: img.transposed,
+      flipped:  flipped
     }, attachImageDataToTask);
   }
   function updateWaveform(type, img, histW, hist)

@@ -10,7 +10,7 @@
     break;
   case 'calcWaveform':
     result.type   = data.type;
-    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.type);
+    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.flipped, data.type);
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
@@ -63,7 +63,7 @@ function calcHistogram( imageData, type )
   }
   return hist;
 }
-function calcWaveform( imageData, histW, transposed, type )
+function calcWaveform( imageData, histW, transposed, flipped, type )
 {
   var w = transposed ? imageData.height : imageData.width;
   var h = transposed ? imageData.width : imageData.height;
@@ -74,7 +74,7 @@ function calcWaveform( imageData, histW, transposed, type )
   }
   for (var i = 0; i < w; ++i) {
     var x = Math.round((i + 0.5) / w * histW - 0.5);
-    histOff[i] = x * 256;
+    histOff[flipped ? w - 1 - i : i] = x * 256;
   }
   if (type === 0) { // RGB
     var sx = transposed ? h * 4 : 4;
