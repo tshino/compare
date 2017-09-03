@@ -1911,7 +1911,7 @@ $( function() {
         var plotx = Math.round(orgx + xr * r + xg * g);
         var ploty = Math.round(orgy + yr * r + yg * g + yb * b);
         var offset = ploty * 320 + plotx;
-        var count = counts[k]
+        var count = counts[k];
         dist[offset] += count;
         if (colorDistType === 0) { // RGB with Color
           colorMap[offset] += count * r;
