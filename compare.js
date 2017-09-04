@@ -1576,6 +1576,7 @@ $( function() {
       var fig = makeBlankFigure(histW, 256);
       var context = fig.context;
       var bits = context.createImageData(histW, 256);
+      var s = -4 * histW;
       for (var x = 0; x < histW; ++x) {
         var invMax = 1 / (histN[x] * h);
         if (type === 0) { // RGB
@@ -1583,7 +1584,6 @@ $( function() {
           var gOff = 256 * (x + histW);
           var bOff = 256 * (x + 2 * histW);
           var off = 4 * (255 * histW + x);
-          var s = -4 * histW;
           for (var y = 0; y < 256; ++y) {
             var cR = Math.round(255 * (1 - Math.pow(1 - hist[rOff + y] * invMax, 200.0)));
             var cG = Math.round(255 * (1 - Math.pow(1 - hist[gOff + y] * invMax, 200.0)));
@@ -1595,14 +1595,15 @@ $( function() {
             off += s;
           }
         } else { // Luminance
+          var cOff = x * 256;
+          var off = 4 * (255 * histW + x);
           for (var y = 0; y < 256; ++y) {
-            var a = 1 - Math.pow(1 - hist[x*256+y] * invMax, 200.0);
-            var c = Math.round(a * 255);
-            var off = ((255-y)*histW+x) * 4;
+            var c = Math.round(255 * (1 - Math.pow(1 - hist[cOff + y] * invMax, 200.0)));
             bits.data[off + 0] = c;
             bits.data[off + 1] = c;
             bits.data[off + 2] = c;
             bits.data[off + 3] = 255;
+            off += s;
           }
         }
       }
