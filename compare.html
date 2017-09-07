@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,6 +16,7 @@ var changeLang = function(lang) {
     var newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
     window.history.replaceState('', '', newURL);
     document.body.setAttribute('class', lang);
+    document.documentElement.setAttribute('lang', lang);
   }
 };
 (function() {
@@ -27,6 +28,7 @@ var changeLang = function(lang) {
     window.navigator.browserLanguage);
   if (lang && lang.match(/^ja/)) {
     document.body.setAttribute('class', 'ja');
+    document.documentElement.setAttribute('lang', 'ja');
   }
 })();
 </script>
