@@ -1,9 +1,4 @@
-﻿var NEEDS_IOS_EXIF_WORKAROUND = (function() {
-  var ua = window.navigator.userAgent.toLowerCase();
-  return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
-})();
-
-$( function() {
+﻿$( function() {
   var toggleLang = function() {
     var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
     $('#selectLang').val(lang);
@@ -284,6 +279,10 @@ $( function() {
   updateDOM();
 });
 
+  var NEEDS_IOS_EXIF_WORKAROUND = (function() {
+    var ua = window.navigator.userAgent.toLowerCase();
+    return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
+  })();
   var entries = [];
   var images = [];
   var currentImageIndex = 0;
@@ -1069,63 +1068,75 @@ $( function() {
       }
     }
   };
-  var hideDialog = function() {
-    if (dialog) {
-      dialog.element.hide();
-      dialog = null;
-      figureZoom.disable();
-    }
-  };
-  var showDialog = function(target, parent, update) {
-    dialog = { element: target, close: parent || hideDialog, update: update };
-    target.css({ display: 'block' });
-    target.children().find('.dummyFocusTarget').focus();
-  };
-  var adjustDialogPosition = function() {
-    if (dialog) {
-      var target = dialog.element, dlg = dialog.element.children();
-      var offset = dlg.offset();
-      var border = 10;
-      var left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
-      var top  = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
-      if (left !== offset.left || top !== offset.top) {
-        dlg.offset({ left: left, top: top });
+  var dialogUtil = (function() {
+    var hideDialog = function() {
+      if (dialog) {
+        dialog.element.hide();
+        dialog = null;
+        figureZoom.disable();
       }
-    }
-  };
+    };
+    var showDialog = function(target, parent, update) {
+      dialog = { element: target, close: parent || dialogUtil.hideDialog, update: update };
+      target.css({ display: 'block' });
+      target.children().find('.dummyFocusTarget').focus();
+    };
+    var adjustDialogPosition = function() {
+      if (dialog) {
+        var target = dialog.element, dlg = dialog.element.children();
+        var offset = dlg.offset();
+        var border = 10;
+        var left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
+        var top  = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
+        if (left !== offset.left || top !== offset.top) {
+          dlg.offset({ left: left, top: top });
+        }
+      }
+    };
+    var enableMouse = function(target) {
+      var dlg = target.children();
+      var draggingPoint = null;
+      var moveDialog = function(dx, dy) {
+        var offset = dlg.offset();
+        dlg.offset({ left: offset.left + dx, top: offset.top + dy });
+      };
+      target.on('mousedown', '.header', function(e) {
+        if (e.which === 1 && !$(e.target).is('a, select')) {
+          draggingPoint = { x: e.clientX, y: e.clientY };
+          return false;
+        }
+      }).on('mousemove', function(e) {
+        if (!draggingPoint || e.buttons !== 1) {
+          draggingPoint = null;
+        } else {
+          var dx = e.clientX - draggingPoint.x;
+          var dy = e.clientY - draggingPoint.y;
+          draggingPoint = { x: e.clientX, y: e.clientY };
+          moveDialog(dx, dy);
+          return false;
+        }
+      });
+    };
+    return {
+      hideDialog: hideDialog,
+      showDialog: showDialog,
+      adjustDialogPosition: adjustDialogPosition,
+      enableMouse: enableMouse
+    };
+  })();
   var defineDialog = function(target, update, parent, options) {
     options = options !== undefined ? options : {};
-    target.on('click', parent || hideDialog);
+    target.on('click', parent || dialogUtil.hideDialog);
     target.children().on('click', function(e) { e.stopPropagation(); return true; });
     var dlg = target.children();
-    var draggingPoint = null;
-    var moveDialog = function(dx, dy) {
-      var offset = dlg.offset();
-      dlg.offset({ left: offset.left + dx, top: offset.top + dy });
-    };
-    target.on('mousedown', '.header', function(e) {
-      if (e.which === 1 && !$(e.target).is('a, select')) {
-        draggingPoint = { x: e.clientX, y: e.clientY };
-        return false;
-      }
-    }).on('mousemove', function(e) {
-      if (!draggingPoint || e.buttons !== 1) {
-        draggingPoint = null;
-      } else {
-        var dx = e.clientX - draggingPoint.x;
-        var dy = e.clientY - draggingPoint.y;
-        draggingPoint = { x: e.clientX, y: e.clientY };
-        moveDialog(dx, dy);
-        return false;
-      }
-    });
-    target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
+    dialogUtil.enableMouse(target);
+    dlg.prepend($('<div class="dummyFocusTarget" tabindex="-1">').
       css({display:'inline',margin:'0px',padding:'0px',border:'0px'}));
     return function() {
       if (dialog && target.is(':visible')) {
-        hideDialog();
+        dialogUtil.hideDialog();
       } else {
-        hideDialog();
+        dialogUtil.hideDialog();
         if (options.enableZoom) {
           figureZoom.enable({
             zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
@@ -1144,7 +1155,7 @@ $( function() {
         if (update) {
           update();
         }
-        showDialog(target, parent, update);
+        dialogUtil.showDialog(target, parent, update);
         dlg.css({position:'',left:'',top:''});
       }
     };
@@ -1223,7 +1234,7 @@ $( function() {
       loading.push(entry);
     };
     var update = function() {
-      hideDialog();
+      dialogUtil.hideDialog();
       $('#loadingList > tr').remove();
       if (0 === loading.length) {
         return;
@@ -1267,7 +1278,7 @@ $( function() {
       if (finished && 0 === errors) {
         window.setTimeout( function() {
           if ($('#loading').is(':visible')) {
-            hideDialog();
+            dialogUtil.hideDialog();
           }
         }, 500);
       }
@@ -2573,7 +2584,7 @@ $( function() {
     roiMap.onUpdateLayout();
     updateSelectorButtonState();
     updateTransform();
-    adjustDialogPosition();
+    dialogUtil.adjustDialogPosition();
   }
   
   function updateTransform() {
