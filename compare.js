@@ -1077,9 +1077,23 @@
       }
     };
     var showDialog = function(target, parent, update) {
-      dialog = { element: target, close: parent || dialogUtil.hideDialog, update: update };
+      dialog = { element: target, close: parent || hideDialog, update: update };
       target.css({ display: 'block' });
       target.children().find('.dummyFocusTarget').focus();
+    };
+    var initFigureZoom = function(options) {
+      if (options.enableZoom) {
+        figureZoom.enable({
+          zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
+          getBaseSize: options.getBaseSize
+        });
+        figureZoom.setZoom(0);
+        var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
+        var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
+        figureZoom.setOffset(initX, initY);
+      } else {
+        figureZoom.disable();
+      }
     };
     var adjustDialogPosition = function() {
       if (dialog) {
@@ -1117,38 +1131,30 @@
         }
       });
     };
+    var initDialog = function(target, parent) {
+      target.on('click', parent || hideDialog);
+      target.children().on('click', function(e) { e.stopPropagation(); return true; });
+      enableMouse(target);
+      target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
+        css({display:'inline', margin:'0px', padding:'0px', border:'0px'}));
+    };
     return {
       hideDialog: hideDialog,
       showDialog: showDialog,
+      initFigureZoom: initFigureZoom,
       adjustDialogPosition: adjustDialogPosition,
-      enableMouse: enableMouse
+      initDialog: initDialog
     };
   })();
   var defineDialog = function(target, update, parent, options) {
     options = options !== undefined ? options : {};
-    target.on('click', parent || dialogUtil.hideDialog);
-    target.children().on('click', function(e) { e.stopPropagation(); return true; });
-    var dlg = target.children();
-    dialogUtil.enableMouse(target);
-    dlg.prepend($('<div class="dummyFocusTarget" tabindex="-1">').
-      css({display:'inline',margin:'0px',padding:'0px',border:'0px'}));
+    dialogUtil.initDialog(target, parent);
     return function() {
       if (dialog && target.is(':visible')) {
         dialogUtil.hideDialog();
       } else {
         dialogUtil.hideDialog();
-        if (options.enableZoom) {
-          figureZoom.enable({
-            zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
-            getBaseSize: options.getBaseSize
-          });
-          figureZoom.setZoom(0);
-          var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
-          var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
-          figureZoom.setOffset(initX, initY);
-        } else {
-          figureZoom.disable();
-        }
+        dialogUtil.initFigureZoom(options);
         if (options.onOpen) {
           options.onOpen();
         }
@@ -1156,7 +1162,7 @@
           update();
         }
         dialogUtil.showDialog(target, parent, update);
-        dlg.css({position:'',left:'',top:''});
+        target.children().css({position:'',left:'',top:''});
       }
     };
   };
