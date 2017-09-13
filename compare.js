@@ -1138,34 +1138,35 @@
       target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
         css({display:'inline', margin:'0px', padding:'0px', border:'0px'}));
     };
+    var defineDialog = function(target, update, parent, options) {
+      options = options !== undefined ? options : {};
+      initDialog(target, parent);
+      return function() {
+        if (dialog && target.is(':visible')) {
+          hideDialog();
+        } else {
+          hideDialog();
+          initFigureZoom(options);
+          if (options.onOpen) {
+            options.onOpen();
+          }
+          if (update) {
+            update();
+          }
+          showDialog(target, parent, update);
+          target.children().css({ position: '', left: '', top: '' });
+        }
+      };
+    };
     return {
       hideDialog: hideDialog,
       showDialog: showDialog,
       initFigureZoom: initFigureZoom,
       adjustDialogPosition: adjustDialogPosition,
-      initDialog: initDialog
+      initDialog: initDialog,
+      defineDialog: defineDialog
     };
   })();
-  var defineDialog = function(target, update, parent, options) {
-    options = options !== undefined ? options : {};
-    dialogUtil.initDialog(target, parent);
-    return function() {
-      if (dialog && target.is(':visible')) {
-        dialogUtil.hideDialog();
-      } else {
-        dialogUtil.hideDialog();
-        dialogUtil.initFigureZoom(options);
-        if (options.onOpen) {
-          options.onOpen();
-        }
-        if (update) {
-          update();
-        }
-        dialogUtil.showDialog(target, parent, update);
-        target.children().css({position:'',left:'',top:''});
-      }
-    };
-  };
   var openMessageBox = (function() {
     var serial = 0;
     return function(text) {
@@ -1188,7 +1189,7 @@
       return { close: close };
     };
   })();
-  var toggleHelp = defineDialog($('#shortcuts'));
+  var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
   function updateInfoTable()
   {
     $('#infoTable td:not(.prop)').remove();
@@ -1231,11 +1232,11 @@
       );
     }
   }
-  var toggleAnalysis = defineDialog($('#analysis'));
-  var toggleInfo = defineDialog($('#info'), updateInfoTable, toggleAnalysis);
+  var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
+  var toggleInfo = dialogUtil.defineDialog($('#info'), updateInfoTable, toggleAnalysis);
   var nowLoadingDialog = (function() {
     var loading = [];
-    var toggleNowLoading = defineDialog($('#loading'));
+    var toggleNowLoading = dialogUtil.defineDialog($('#loading'));
     var add = function(entry) {
       loading.push(entry);
     };
@@ -1542,9 +1543,10 @@
     var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
     updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, styles, transformOnly);
   };
-  var toggleHistogram = defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis,
-    { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
-      getBaseSize: function() { return { w: 384, h: 272 }; } });
+  var toggleHistogram = dialogUtil.defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis, {
+    enableZoom: true, zoomXOnly: true, zoomInitX: 0,
+    getBaseSize: function() { return { w: 384, h: 272 }; }
+  });
   function changeWaveformType(type)
   {
     if (waveformType !== type) {
@@ -1633,9 +1635,10 @@
     var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
     updateFigureTable('#waveTable', 'waveform', updateWaveformAsync, styles, transformOnly);
   };
-  var toggleWaveform = defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis,
-    { enableZoom: true, zoomXOnly: true, zoomInitX: 0,
-      getBaseSize: function() { return { w: 320, h: 256 }; } });
+  var toggleWaveform = dialogUtil.defineDialog($('#waveform'), updateWaveformTable, toggleAnalysis, {
+    enableZoom: true, zoomXOnly: true, zoomInitX: 0,
+    getBaseSize: function() { return { w: 320, h: 256 }; }
+  });
   var makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
     var bits = context.createImageData(w, h);
     var i = 0, k = 0;
@@ -1846,8 +1849,9 @@
     var styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
     updateFigureTable('#vectorscopeTable', 'vectorscope', updateVectorscopeAsync, styles, transformOnly);
   };
-  var toggleVectorscope = defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis,
-    { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
+  var toggleVectorscope = dialogUtil.defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis, {
+    enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
+  });
   var changeColorDistType = function(type) {
     if (colorDistType !== type) {
       colorDistType = type;
@@ -2009,7 +2013,7 @@
     styles.style.transform += ' scale(' + scale + ')';
     updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles, transformOnly);
   };
-  var toggleColorDist = defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
+  var toggleColorDist = dialogUtil.defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
     onOpen: function() { colorDistZoom = 0; }
   });
   var colorDistProcessKeyDown = function(e) {
@@ -2163,7 +2167,7 @@
       $('#aeValue').append($('<td>').text(values.ae));
     }
   }
-  var toggleMetrics = defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
+  var toggleMetrics = dialogUtil.defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
 
   var findImageIndexOtherThan = function(index) {
     for (var i = 0, img; img = images[i]; ++i) {
@@ -2320,8 +2324,9 @@
       updateToneCurveTableDOM();
     }
   };
-  var toggleToneCurve = defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis,
-    { enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; } });
+  var toggleToneCurve = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
+    enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
+  });
 
   var updateDiffTableDOM = function() {
     $('.diffDimension').css({display:'none'});
@@ -2470,12 +2475,12 @@
       updateDiffTableDOM();
     }
   };
-  var toggleDiff = defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
-      enableZoom: true,
-      getBaseSize: function() {
-        return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
-      }
-    });
+  var toggleDiff = dialogUtil.defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
+    enableZoom: true,
+    getBaseSize: function() {
+      return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
+    }
+  });
 
   var newSelectorButton = function(index) {
     var button = $('<button/>').addClass('selector').
