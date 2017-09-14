@@ -1190,8 +1190,7 @@
     };
   })();
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
-  function updateInfoTable()
-  {
+  var updateInfoTable = function() {
     $('#infoTable td:not(.prop)').remove();
     var rows = [
       $('#infoName'),
@@ -1231,7 +1230,7 @@
             text('no data')
       );
     }
-  }
+  };
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
   var toggleInfo = dialogUtil.defineDialog($('#info'), updateInfoTable, toggleAnalysis);
   var nowLoadingDialog = (function() {
@@ -1295,8 +1294,7 @@
       update: update
     };
   })();
-  function getImageData(img)
-  {
+  var getImageData = function(img) {
     if (!img.imageData) {
       var w = img.canvasWidth;
       var h = img.canvasHeight;
@@ -1313,40 +1311,47 @@
       }
     }
     return img.imageData;
-  }
-  var makeBlankFigure = function(w, h) {
-    var canvas = document.createElement('canvas');
-    canvas.width = w;
-    canvas.height = h;
-    var context = canvas.getContext('2d');
-    return { canvas: canvas, context: context };
   };
-  var copyImageBits = function(src, dest) {
-    for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
-      dest.data[i] = src.data[i];
-    }
-  };
-  var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
-    var dLen = Math.sqrt(dx * dx + dy * dy);
-    var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = '#000';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    for (var i = 0, label; label = labels[i]; ++i) {
-      var pos = { x: label.pos * dx, y: label.pos * dy };
-      var x1 = x + pos.x;
-      var y1 = y + pos.y;
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x1 + lineDx, y1 + lineDy);
-      ctx.stroke();
-      ctx.textAlign = label.align;
-      ctx.fillText(label.label,
-        x + pos.x + lineDx,
-        y + pos.y + lineDy + 20);
-    }
-  };
+  var figureUtil = (function() {
+    var makeBlankFigure = function(w, h) {
+      var canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      var context = canvas.getContext('2d');
+      return { canvas: canvas, context: context };
+    };
+    var copyImageBits = function(src, dest) {
+      for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
+        dest.data[i] = src.data[i];
+      }
+    };
+    var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
+      var dLen = Math.sqrt(dx * dx + dy * dy);
+      var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
+      ctx.font = '24px sans-serif';
+      ctx.fillStyle = '#000';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 3;
+      for (var i = 0, label; label = labels[i]; ++i) {
+        var pos = { x: label.pos * dx, y: label.pos * dy };
+        var x1 = x + pos.x;
+        var y1 = y + pos.y;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 + lineDx, y1 + lineDy);
+        ctx.stroke();
+        ctx.textAlign = label.align;
+        ctx.fillText(label.label,
+          x + pos.x + lineDx,
+          y + pos.y + lineDy + 20);
+      }
+    };
+    return {
+      makeBlankFigure: makeBlankFigure,
+      copyImageBits: copyImageBits,
+      drawAxes: drawAxes
+    };
+  })();
   var updateFigureTable = function(target, propName, update, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
@@ -1355,12 +1360,11 @@
     $(target).find('td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img[propName]) {
-        img[propName] = makeBlankFigure(8, 8).canvas;
+        img[propName] = figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
-      $(target).find('tr').eq(0).append(
-        makeImageNameWithIndex('<td>', img)
-      );
+      var label = makeImageNameWithIndex('<td>', img);
+      $(target).find('tr').eq(0).append(label);
       var figMain = $(img[propName]).css(styles.style).addClass('figMain');
       var fig = $('<td class="fig">').css(styles.cellStyle).append(figMain);
       var axes = img[propName + 'Axes'];
@@ -1370,9 +1374,8 @@
       $(target).find('tr').eq(1).append(fig);
     }
     if (k === 0) {
-      $(target).find('tr').eq(0).append(
-        $('<td rowspan="2">').text('no data')
-      );
+      var cell = $('<td rowspan="2">').text('no data');
+      $(target).find('tr').eq(0).append(cell);
     }
   };
   var makeFigureStyles = function(w, h, margin, background, zoomController) {
@@ -1501,7 +1504,7 @@
     function makeFigure(type, hist)
     {
       var margin = 32;
-      var fig = makeBlankFigure(768, 512 + margin);
+      var fig = figureUtil.makeBlankFigure(768, 512 + margin);
       var context = fig.context;
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
@@ -1526,7 +1529,7 @@
           pos: (0.5 + i) / 256, align: 'center', label: (i%64 === 0) ? ''+i : ''
         });
       }
-      drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
+      figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
       return fig.canvas;
       
       function drawHistogram(color, offset) {
@@ -1592,7 +1595,7 @@
         ++histN[x];
       }
       //
-      var fig = makeBlankFigure(histW, 256);
+      var fig = figureUtil.makeBlankFigure(histW, 256);
       var context = fig.context;
       var bits = context.createImageData(histW, 256);
       var s = -4 * histW;
@@ -1718,7 +1721,7 @@
   var updateVectorscope = function(type, img, dist) {
     var w = img.canvasWidth;
     var h = img.canvasHeight;
-    var fig = makeBlankFigure(320, 320);
+    var fig = figureUtil.makeBlankFigure(320, 320);
     function notify() {
       img.vectorscope = fig.canvas;
       updateVectorscopeTable();
@@ -1893,7 +1896,7 @@
       canvas : img.colorDist,
       context : img.colorDist.getContext('2d'),
       axes : img.colorDistAxes
-    } : makeBlankFigure(320, 320);
+    } : figureUtil.makeBlankFigure(320, 320);
     makeFigure(fig, img.colorTable);
     if (!redrawOnly) {
       img.colorDist = fig.canvas;
@@ -2220,7 +2223,7 @@
     }
   };
   var makeToneMapFigure = function(toneMapData, type) {
-    var fig = makeBlankFigure(320, 320);
+    var fig = figureUtil.makeBlankFigure(320, 320);
     var dist = toneMapData.dist;
     var max = toneMapData.max;
     var bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
@@ -2255,7 +2258,7 @@
     var figW = 320, figH = 320, figMargin = 8;
     var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
     if (toneCurveResult.result === null) {
-      $('#toneCurveResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+      $('#toneCurveResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
     } else {
       var numComponents = toneCurveResult.type === 0 ? 3 : 1;
       var components = toneCurveResult.result.components;
@@ -2396,7 +2399,7 @@
     var figW = 768, figH = 400, figMargin = 8;
     var styles = makeFigureStyles(figW, figH, figMargin, '#000');
     if (diffResult.result === null) {
-      $('#diffResult').append(makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+      $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
       setText($('#diffSummary'), {
         en: 'calculating...',
         ja: '計算中...'
@@ -2413,9 +2416,9 @@
       }
       var w = diffResult.result.image.width;
       var h = diffResult.result.image.height;
-      var fig = makeBlankFigure(w, h);
+      var fig = figureUtil.makeBlankFigure(w, h);
       var bits = fig.context.createImageData(w, h);
-      copyImageBits(diffResult.result.image, bits);
+      figureUtil.copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
       styles = updateFigureStylesForActualSize(styles, w, h);
       diffResult.baseWidth = styles.baseW;
@@ -2625,7 +2628,7 @@
       h = 150;
       entry.sizeUnknown = true;
     }
-    var fig = makeBlankFigure(w, h);
+    var fig = figureUtil.makeBlankFigure(w, h);
     fig.context.drawImage(img, 0, 0, w, h);
     //
     entry.element    = useCanvasToDisplay ? fig.canvas : img;
