@@ -46,7 +46,7 @@
   $('#helpbtn').click(toggleHelp);
 
   // Menus and dialogs
-  $('#infobtn').click(toggleInfo);
+  $('#infobtn').click(infoDialog.toggle);
   $('#histogrambtn').click(toggleHistogram);
   $('#waveformbtn').click(toggleWaveform);
   $('#vectorscopebtn').click(toggleVectorscope);
@@ -231,7 +231,7 @@
     // 'd' (100)
     100 : { global: true, func: toggleDiff },
     // 'i' (105)
-    105 : { global: true, func: toggleInfo },
+    105 : { global: true, func: infoDialog.toggle },
     // '/' (47)
     47 : { global: false, func: arrangeLayout },
     // 'o' (111)
@@ -1190,8 +1190,9 @@
     };
   })();
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
-  var updateInfoTable = function() {
-    $('#infoTable td:not(.prop)').remove();
+  var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
+  // info dialog
+  var infoDialog = (function() {
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
@@ -1201,10 +1202,9 @@
       $('#infoOrientation'),
       $('#infoFileSize'),
       $('#infoLastModified') ];
-    var val = [];
     var unknown = [null, '‐'];
-    for (var i = 0, img; img = images[i]; i++) {
-      val[i] = [
+    var makeTableValue = function(img) {
+      return [
         [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format ],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1212,7 +1212,10 @@
         img.sizeUnknown ? unknown : calcAspectRatio(img.width, img.height),
         [orientationToString(img.orientation), orientationToString(img.orientation)],
         [img.size, compareUtil.addComma(img.size) ],
-        [img.lastModified, img.lastModified.toLocaleString()] ];
+        [img.lastModified, img.lastModified.toLocaleString()]
+      ];
+    };
+    var updateTableCell = function(val, i) {
       for (var j = 0, v; v = val[i][j]; ++j) {
         var expr = val[i][j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
@@ -1223,16 +1226,25 @@
         }
         rows[j].append(e);
       }
-    }
-    if (i === 0) {
-      rows[0].append(
-        $('<td>').attr('rowspan', rows.length).
-            text('no data')
-      );
-    }
-  };
-  var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
-  var toggleInfo = dialogUtil.defineDialog($('#info'), updateInfoTable, toggleAnalysis);
+    };
+    var updateTable = function() {
+      $('#infoTable td:not(.prop)').remove();
+      var val = [];
+      for (var i = 0, img; img = images[i]; i++) {
+        val[i] = makeTableValue(img);
+        updateTableCell(val, i);
+      }
+      if (i === 0) {
+        rows[0].append(
+          $('<td>').attr('rowspan', rows.length).text('no data')
+        );
+      }
+    };
+    var toggle = dialogUtil.defineDialog($('#info'), updateTable, toggleAnalysis);
+    return {
+      toggle: toggle
+    };
+  })();
   var nowLoadingDialog = (function() {
     var loading = [];
     var toggleNowLoading = dialogUtil.defineDialog($('#loading'));
