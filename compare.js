@@ -47,7 +47,7 @@
 
   // Menus and dialogs
   $('#infobtn').click(infoDialog.toggle);
-  $('#histogrambtn').click(toggleHistogram);
+  $('#histogrambtn').click(histogramDialog.toggle);
   $('#waveformbtn').click(toggleWaveform);
   $('#vectorscopebtn').click(toggleVectorscope);
   $('#colordistbtn').click(toggleColorDist);
@@ -57,7 +57,7 @@
   $('.swapbtn').click(swapBaseAndTargetImage);
   $('#histogramType > *').click(function() {
     var index = $('#histogramType > *').index(this);
-    changeHistogramType(index);
+    histogramDialog.changeType(index);
   });
   $('#waveformType > *').click(function() {
     var index = $('#waveformType > *').index(this);
@@ -217,7 +217,7 @@
     // 'a' (97)
     97 : { global: true, func: toggleAnalysis },
     // 'h' (104)
-    104 : { global: true, func: toggleHistogram },
+    104 : { global: true, func: histogramDialog.toggle },
     // 'w' (119)
     119 : { global: true, func: toggleWaveform },
     // 'v' (118)
@@ -305,7 +305,6 @@
   }, {
     cursorMoveDelta: 0.125
   });
-  var histogramType = 0;
   var waveformType = 0;
   var vectorscopeType = 0;
   var colorDistType = 0;
@@ -1420,10 +1419,8 @@
   var processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
-      if (data.type === histogramType) {
-        var img = entries[data.index[0]];
-        updateHistogram(data.type, img, data.result);
-      }
+      var img = entries[data.index[0]];
+      histogramDialog.updateFigure(data.type, img, data.result);
       break;
     case 'calcWaveform':
       if (data.type === waveformType) {
@@ -1485,36 +1482,30 @@
   var discardTasksOfEntryByIndex = function(index) {
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
-  
-  function changeHistogramType(type)
-  {
-    if (histogramType !== type) {
-      histogramType = type;
-      discardTasksOfCommand('calcHistogram');
-      for (var i = 0, img; img = images[i]; i++) {
-        img.histogram = null;
+
+  var histogramDialog = (function() {
+    var histogramType = 0;
+    var changeType = function(type) {
+      if (histogramType !== type) {
+        histogramType = type;
+        discardTasksOfCommand('calcHistogram');
+        for (var i = 0, img; img = images[i]; i++) {
+          img.histogram = null;
+        }
+        $('#histogramType > *').
+          removeClass('current').
+          eq(type).addClass('current');
+        updateTable();
       }
-      $('#histogramType > *').
-        removeClass('current').
-        eq(type).addClass('current');
-      updateHistogramTable();
-    }
-  }
-  function updateHistogramAsync(img)
-  {
-    taskQueue.addTask({
-      cmd:      'calcHistogram',
-      type:     histogramType,
-      index:    [img.index]
-    }, attachImageDataToTask);
-  }
-  function updateHistogram(type, img, hist)
-  {
-    img.histogram = makeFigure(type, hist);
-    updateHistogramTable();
-    
-    function makeFigure(type, hist)
-    {
+    };
+    var updateAsync = function(img) {
+      taskQueue.addTask({
+        cmd:      'calcHistogram',
+        type:     histogramType,
+        index:    [img.index]
+      }, attachImageDataToTask);
+    };
+    var makeFigure = function(type, hist) {
       var margin = 32;
       var fig = figureUtil.makeBlankFigure(768, 512 + margin);
       var context = fig.context;
@@ -1522,6 +1513,13 @@
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
+      var drawHistogram = function(color, offset) {
+        context.fillStyle = color;
+        for (var i = 0; i < 256; ++i) {
+          var h = 512 * Math.pow(hist[i + offset] / max, 0.5);
+          context.fillRect(i*3, 512-h, 3, h);
+        }
+      };
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
       if (type === 0) { // RGB
@@ -1543,25 +1541,28 @@
       }
       figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
       return fig.canvas;
-      
-      function drawHistogram(color, offset) {
-        context.fillStyle = color;
-        for (var i = 0; i < 256; ++i) {
-          var h = 512 * Math.pow(hist[i + offset] / max, 0.5);
-          context.fillRect(i*3, 512-h, 3, h);
-        }
+    };
+    var updateFigure = function(type, img, hist) {
+      if (type === histogramType) {
+        img.histogram = makeFigure(type, hist);
+        updateTable();
       }
-    }
-  }
-  var updateHistogramTable = function(transformOnly) {
-    var w = 384, h = 272, margin = 8;
-    var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
-    updateFigureTable('#histoTable', 'histogram', updateHistogramAsync, styles, transformOnly);
-  };
-  var toggleHistogram = dialogUtil.defineDialog($('#histogram'), updateHistogramTable, toggleAnalysis, {
-    enableZoom: true, zoomXOnly: true, zoomInitX: 0,
-    getBaseSize: function() { return { w: 384, h: 272 }; }
-  });
+    };
+    var updateTable = function(transformOnly) {
+      var w = 384, h = 272, margin = 8;
+      var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
+      updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
+    };
+    var toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
+      enableZoom: true, zoomXOnly: true, zoomInitX: 0,
+      getBaseSize: function() { return { w: 384, h: 272 }; }
+    });
+    return {
+      changeType: changeType,
+      updateFigure: updateFigure,
+      toggle: toggle
+    };
+  })();
   function changeWaveformType(type)
   {
     if (waveformType !== type) {
