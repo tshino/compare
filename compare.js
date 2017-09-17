@@ -55,18 +55,6 @@
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
   $('.swapbtn').click(swapBaseAndTargetImage);
-  $('#histogramType > *').click(function() {
-    var index = $('#histogramType > *').index(this);
-    histogramDialog.changeType(index);
-  });
-  $('#waveformType > *').click(function() {
-    var index = $('#waveformType > *').index(this);
-    changeWaveformType(index);
-  });
-  $('#vectorscopeType > *').click(function() {
-    var index = $('#vectorscopeType > *').index(this);
-    changeVectorscopeType(index);
-  });
   $('#colorDistType > *').click(function() {
     var index = $('#colorDistType > *').index(this);
     changeColorDistType(index);
@@ -305,8 +293,6 @@
   }, {
     cursorMoveDelta: 0.125
   });
-  var waveformType = 0;
-  var vectorscopeType = 0;
   var colorDistType = 0;
   var colorDistOrientation = {
     x: 30,
@@ -1423,15 +1409,11 @@
       histogramDialog.updateFigure(data.type, img, data.result);
       break;
     case 'calcWaveform':
-      if (data.type === waveformType) {
-        var img = entries[data.index[0]];
-        updateWaveform(data.type, img, data.histW, data.result);
-      }
+      var img = entries[data.index[0]];
+      updateWaveform(data.type, img, data.histW, data.result);
       break;
     case 'calcVectorscope':
-      if (data.type === vectorscopeType) {
-        updateVectorscope(data.type, entries[data.index[0]], data.result);
-      }
+      updateVectorscope(data.type, entries[data.index[0]], data.result);
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
@@ -1483,25 +1465,35 @@
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
 
-  var histogramDialog = (function() {
-    var histogramType = 0;
+  var makeModeSwitch = function(parent, onchange) {
+    var currentType = 0;
     var changeType = function(type) {
-      if (histogramType !== type) {
-        histogramType = type;
-        discardTasksOfCommand('calcHistogram');
-        for (var i = 0, img; img = images[i]; i++) {
-          img.histogram = null;
-        }
-        $('#histogramType > *').
-          removeClass('current').
-          eq(type).addClass('current');
-        updateTable();
+      if (currentType !== type) {
+        currentType = type;
+        $(parent).children().removeClass('current').eq(type).addClass('current');
+        onchange(type);
       }
     };
+    $(parent).children().click(function() {
+      var index = $(parent).children().index(this);
+      changeType(index);
+    });
+    return {
+      current: function() { return currentType; }
+    };
+  };
+  var histogramDialog = (function() {
+    var histogramType = makeModeSwitch('#histogramType', function(type) {
+      discardTasksOfCommand('calcHistogram');
+      for (var i = 0, img; img = images[i]; i++) {
+        img.histogram = null;
+      }
+      updateTable();
+    });
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcHistogram',
-        type:     histogramType,
+        type:     histogramType.current(),
         index:    [img.index]
       }, attachImageDataToTask);
     };
@@ -1543,7 +1535,7 @@
       return fig.canvas;
     };
     var updateFigure = function(type, img, hist) {
-      if (type === histogramType) {
+      if (type === histogramType.current()) {
         img.histogram = makeFigure(type, hist);
         updateTable();
       }
@@ -1558,45 +1550,36 @@
       getBaseSize: function() { return { w: 384, h: 272 }; }
     });
     return {
-      changeType: changeType,
       updateFigure: updateFigure,
       toggle: toggle
     };
   })();
-  function changeWaveformType(type)
-  {
-    if (waveformType !== type) {
-      waveformType = type;
+  var waveformType = makeModeSwitch('#waveformType', function(type) {
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
         img.waveform = null;
       }
-      $('#waveformType > *').
-        removeClass('current').
-        eq(type).addClass('current');
       updateWaveformTable();
-    }
-  }
-  function updateWaveformAsync(img)
-  {
+  });
+  var updateWaveformAsync = function(img) {
     var leftTop = interpretOrientation(img, 0, 0);
     var flipped = img.transposed ? (leftTop.y !== 0) : (leftTop.x !== 0);
     taskQueue.addTask({
       cmd:      'calcWaveform',
-      type:     waveformType,
+      type:     waveformType.current(),
       index:    [img.index],
       histW:    Math.min(img.width, 1024),
       transposed: img.transposed,
       flipped:  flipped
     }, attachImageDataToTask);
-  }
-  function updateWaveform(type, img, histW, hist)
-  {
-    var w = img.width;
-    var h = img.height;
-    img.waveform = makeFigure(type, w, h, histW, hist);
-    updateWaveformTable();
-    
+  };
+  var updateWaveform = function(type, img, histW, hist) {
+    if (type === waveformType.current()) {
+      var w = img.width;
+      var h = img.height;
+      img.waveform = makeFigure(type, w, h, histW, hist);
+      updateWaveformTable();
+    }
     function makeFigure(type, w, h, histW, hist)
     {
       var histN = new Uint32Array(histW);
@@ -1645,7 +1628,7 @@
       context.putImageData(bits, 0, 0);
       return fig.canvas;
     }
-  }
+  };
   var updateWaveformTable = function(transformOnly) {
     var w = 320, h = 256, margin = 10;
     var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
@@ -1711,27 +1694,24 @@
     }
     return bits;
   };
-  var changeVectorscopeType = function(type) {
-    if (vectorscopeType !== type) {
-      vectorscopeType = type;
+  var vectorscopeType = makeModeSwitch('#vectorscopeType', function(type) {
       discardTasksOfCommand('calcVectorscope');
       for (var i = 0, img; img = images[i]; i++) {
         img.vectorscope = null;
       }
-      $('#vectorscopeType > *').
-        removeClass('current').
-        eq(type).addClass('current');
       updateVectorscopeTable();
-    }
-  };
+  });
   var updateVectorscopeAsync = function(img) {
     taskQueue.addTask({
       cmd:      'calcVectorscope',
-      type:     vectorscopeType,
+      type:     vectorscopeType.current(),
       index:    [img.index]
     }, attachImageDataToTask);
   };
   var updateVectorscope = function(type, img, dist) {
+    if (type !== vectorscopeType.current()) {
+      return;
+    }
     var w = img.canvasWidth;
     var h = img.canvasHeight;
     var fig = figureUtil.makeBlankFigure(320, 320);
