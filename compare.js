@@ -55,10 +55,6 @@
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
   $('.swapbtn').click(swapBaseAndTargetImage);
-  $('#colorDistType > *').click(function() {
-    var index = $('#colorDistType > *').index(this);
-    changeColorDistType(index);
-  });
   $('#toneCurveType > *').click(function() {
     var index = $('#toneCurveType > *').index(this);
     changeToneCurveType(index);
@@ -293,7 +289,6 @@
   }, {
     cursorMoveDelta: 0.125
   });
-  var colorDistType = 0;
   var colorDistOrientation = {
     x: 30,
     y: -30
@@ -1848,19 +1843,13 @@
   var toggleVectorscope = dialogUtil.defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis, {
     enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
   });
-  var changeColorDistType = function(type) {
-    if (colorDistType !== type) {
-      colorDistType = type;
-      for (var i = 0, img; img = images[i]; i++) {
-        img.colorDist = null;
-        img.colorDistAxes = null;
-      }
-      $('#colorDistType > *').
-        removeClass('current').
-        eq(type).addClass('current');
-      updateColorDistAll();
+  var colorDistType = makeModeSwitch('#colorDistType', function(type) {
+    for (var i = 0, img; img = images[i]; i++) {
+      img.colorDist = null;
+      img.colorDistAxes = null;
     }
-  };
+    updateColorDistAll();
+  });
   var updateColorDistAsync = function(img) {
     taskQueue.addTask({
       cmd:      'calcColorTable',
@@ -1905,7 +1894,7 @@
         dist[i] = 0;
       }
       var colorMap = null;
-      if (colorDistType === 0) { // RGB with Color
+      if (colorDistType.current() === 0) { // RGB with Color
         colorMap = new Float32Array(320 * 320 * 3);
         for (var i = 0; i < colorMap.length; ++i) {
           colorMap[i] = 0;
@@ -1931,13 +1920,13 @@
         var offset = ploty * 320 + plotx;
         var count = counts[k];
         dist[offset] += count;
-        if (colorDistType === 0) { // RGB with Color
+        if (colorDistType.current() === 0) { // RGB with Color
           colorMap[offset] += count * r;
           colorMap[offset + 102400] += count * g;
           colorMap[offset + 204800] += count * b;
         }
       }
-      if (colorDistType === 0) { // RGB with Color
+      if (colorDistType.current() === 0) { // RGB with Color
         var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       } else { // RGB without Color
         var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
