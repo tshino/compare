@@ -55,10 +55,6 @@
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
   $('.swapbtn').click(swapBaseAndTargetImage);
-  $('#toneCurveType > *').click(function() {
-    var index = $('#toneCurveType > *').index(this);
-    changeToneCurveType(index);
-  });
   $('#diffIgnoreAE').on('change', function(e) {
     diffOptions.ignoreAE = +this.value;
     updateDiffTable();
@@ -298,7 +294,6 @@
   var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
   var baseImageIndex = null;
   var targetImageIndex = null;
-  var toneCurveType = 1;
   var toneCurveResult = {};
   var diffResult = {};
   var diffOptions = {
@@ -1420,13 +1415,7 @@
       updateMetricsTable();
       break;
     case 'calcToneCurve':
-      if (data.type === toneCurveType &&
-          data.index[0] === toneCurveResult.base &&
-          data.index[1] === toneCurveResult.target) {
-        toneCurveResult.type = data.type;
-        toneCurveResult.result = data.result;
-      }
-      updateToneCurveTable();
+      updateToneCurve(data.type, data.index[0], data.index[1], data.result);
       break;
     case 'calcDiff':
       if (diffResult.base === data.index[0] && diffResult.target === data.index[1] &&
@@ -1460,8 +1449,8 @@
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
 
-  var makeModeSwitch = function(parent, onchange) {
-    var currentType = 0;
+  var makeModeSwitch = function(parent, initialValue, onchange) {
+    var currentType = initialValue;
     var changeType = function(type) {
       if (currentType !== type) {
         currentType = type;
@@ -1478,7 +1467,7 @@
     };
   };
   var histogramDialog = (function() {
-    var histogramType = makeModeSwitch('#histogramType', function(type) {
+    var histogramType = makeModeSwitch('#histogramType', 0, function(type) {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
         img.histogram = null;
@@ -1549,7 +1538,7 @@
       toggle: toggle
     };
   })();
-  var waveformType = makeModeSwitch('#waveformType', function(type) {
+  var waveformType = makeModeSwitch('#waveformType', 0, function(type) {
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
         img.waveform = null;
@@ -1689,7 +1678,7 @@
     }
     return bits;
   };
-  var vectorscopeType = makeModeSwitch('#vectorscopeType', function(type) {
+  var vectorscopeType = makeModeSwitch('#vectorscopeType', 0, function(type) {
       discardTasksOfCommand('calcVectorscope');
       for (var i = 0, img; img = images[i]; i++) {
         img.vectorscope = null;
@@ -1843,7 +1832,7 @@
   var toggleVectorscope = dialogUtil.defineDialog($('#vectorscope'), updateVectorscopeTable, toggleAnalysis, {
     enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
   });
-  var colorDistType = makeModeSwitch('#colorDistType', function(type) {
+  var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
     for (var i = 0, img; img = images[i]; i++) {
       img.colorDist = null;
       img.colorDistAxes = null;
@@ -2193,17 +2182,11 @@
       })
     );
   };
-  var changeToneCurveType = function(type) {
-    if (toneCurveType !== type) {
-      toneCurveType = type;
+  var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
-      $('#toneCurveType > *').
-        removeClass('current').
-        eq(type).addClass('current');
       updateToneCurveTable();
-    }
-  };
+  });
   var makeToneMapFigure = function(toneMapData, type) {
     var fig = figureUtil.makeBlankFigure(320, 320);
     var dist = toneMapData.dist;
@@ -2223,16 +2206,16 @@
     var b = entries[targetImageIndex];
     if (toneCurveResult.base !== baseImageIndex ||
         toneCurveResult.target !== targetImageIndex ||
-        toneCurveResult.type !== toneCurveType) {
+        toneCurveResult.type !== toneCurveType.current()) {
       toneCurveResult.base   = baseImageIndex;
       toneCurveResult.target = targetImageIndex;
-      toneCurveResult.type   = toneCurveType;
+      toneCurveResult.type   = toneCurveType.current();
       toneCurveResult.result = null;
       discardTasksOfCommand('calcToneCurve');
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
-          type:     toneCurveType,
+          type:     toneCurveType.current(),
           index:    [a.index, b.index]
         }, attachImageDataToTask);
       }
@@ -2309,6 +2292,15 @@
       updateToneCurveTableDOM();
     }
   };
+    var updateToneCurve = function(type, baseIndex, targetIndex, result) {
+      if (type === toneCurveType.current() &&
+          baseIndex === toneCurveResult.base &&
+          targetIndex === toneCurveResult.target) {
+        toneCurveResult.type = type;
+        toneCurveResult.result = result;
+      }
+      updateToneCurveTable();
+    };
   var toggleToneCurve = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
     enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
   });
