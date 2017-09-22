@@ -50,7 +50,7 @@
   $('#histogrambtn').click(histogramDialog.toggle);
   $('#waveformbtn').click(waveformDialog.toggle);
   $('#vectorscopebtn').click(vectorscopeDialog.toggle);
-  $('#colordistbtn').click(toggleColorDist);
+  $('#colordistbtn').click(colorDistDialog.toggle);
   $('#metricsbtn').click(toggleMetrics);
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
@@ -136,7 +136,7 @@
           }
         }
         if ($('#colorDist').is(':visible')) {
-          if (false === colorDistProcessKeyDown(e)) {
+          if (false === colorDistDialog.processKeyDown(e)) {
             return false;
           }
         }
@@ -203,7 +203,7 @@
     // 'v' (118)
     118 : { global: true, func: vectorscopeDialog.toggle },
     // 'c' (99)
-    99 : { global: true, func: toggleColorDist },
+    99 : { global: true, func: colorDistDialog.toggle },
     // 'm' (109)
     109 : { global: true, func: toggleMetrics },
     // 't' (116)
@@ -240,7 +240,7 @@
   
   viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
-  colorDistEnableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
+  colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
@@ -285,13 +285,6 @@
   }, {
     cursorMoveDelta: 0.125
   });
-  var colorDistOrientation = {
-    x: 30,
-    y: -30
-  };
-  var colorDistZoom = 0;
-  var colorDistDragState = null;
-  var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
   var baseImageIndex = null;
   var targetImageIndex = null;
   var toneCurveResult = {};
@@ -1407,7 +1400,7 @@
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
-      updateColorDist(entries[data.index[0]]);
+      colorDistDialog.updateFigure(entries[data.index[0]]);
       break;
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
@@ -1845,50 +1838,46 @@
       toggle: toggle
     };
   })();
-  var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
-    for (var i = 0, img; img = images[i]; i++) {
-      img.colorDist = null;
-      img.colorDistAxes = null;
-    }
-    updateColorDistAll();
-  });
-  var updateColorDistAsync = function(img) {
-    taskQueue.addTask({
-      cmd:      'calcColorTable',
-      index:    [img.index]
-    }, attachImageDataToTask);
-  };
-  var rotateColorDist = function(dx, dy, scale) {
-    colorDistOrientation.x += dy * scale;
-    colorDistOrientation.y += dx * scale;
-    colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
-    colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
-    updateColorDistAll(/* redrawOnly = */ true);
-  };
-  var zoomColorDist = function(delta) {
-    var MAX_ZOOM_LEVEL = 6;
-    colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
-    updateColorDistTable(/* transformOnly = */ true);
-  };
-  var updateColorDistAll = function(redrawOnly) {
-    for (var i = 0; img = images[i]; i++) {
-      updateColorDist(img, redrawOnly);
-    }
-  };
-  var updateColorDist = function(img, redrawOnly) {
-    var fig = redrawOnly ? {
-      canvas : img.colorDist,
-      context : img.colorDist.getContext('2d'),
-      axes : img.colorDistAxes
-    } : figureUtil.makeBlankFigure(320, 320);
-    makeFigure(fig, img.colorTable);
-    if (!redrawOnly) {
-      img.colorDist = fig.canvas;
-      img.colorDistAxes = fig.axes;
-      updateColorDistTable();
-    }
-
-    function makeFigure(fig, colorTable) {
+  // 3D Color Distribution
+  var colorDistDialog = (function() {
+    var colorDistOrientation = {
+      x: 30,
+      y: -30
+    };
+    var colorDistZoom = 0;
+    var colorDistDragState = null;
+    var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
+    var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
+      for (var i = 0, img; img = images[i]; i++) {
+        img.colorDist = null;
+        img.colorDistAxes = null;
+      }
+      updateFitureAll();
+    });
+    var updateAsync = function(img) {
+      taskQueue.addTask({
+        cmd:      'calcColorTable',
+        index:    [img.index]
+      }, attachImageDataToTask);
+    };
+    var rotateColorDist = function(dx, dy, scale) {
+      colorDistOrientation.x += dy * scale;
+      colorDistOrientation.y += dx * scale;
+      colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
+      colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
+      updateFitureAll(/* redrawOnly = */ true);
+    };
+    var zoomColorDist = function(delta) {
+      var MAX_ZOOM_LEVEL = 6;
+      colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
+      updateTable(/* transformOnly = */ true);
+    };
+    var updateFitureAll = function(redrawOnly) {
+      for (var i = 0; img = images[i]; i++) {
+        updateFigure(img, redrawOnly);
+      }
+    };
+    var makeFigure = function(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
@@ -1991,74 +1980,93 @@
       for (var i = 0, a; a = axesLabelsAttr[i]; ++i) {
         $(fig.axes).find('g.labels text').eq(i).attr(a);
       }
-    }
-  };
-  var updateColorDistTable = function(transformOnly) {
-    var w = 320, h = 320, margin = 10;
-    var styles = makeFigureStyles(w, h, margin, '#444');
-    var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
-    styles.style.transform += ' scale(' + scale + ')';
-    updateFigureTable('#colorDistTable', 'colorDist', updateColorDistAsync, styles, transformOnly);
-  };
-  var toggleColorDist = dialogUtil.defineDialog($('#colorDist'), updateColorDistTable, toggleAnalysis, {
-    onOpen: function() { colorDistZoom = 0; }
-  });
-  var colorDistProcessKeyDown = function(e) {
-    return compareUtil.processKeyDownEvent(e, {
-      zoomIn: function() { zoomColorDist(0.25); return false; },
-      zoomOut: function() { zoomColorDist(-0.25); return false; },
-      cursor: function() {
-        var step = e.shiftKey ? 10 : 1;
-        var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
-        rotateColorDist(d.x, d.y, step);
-        return false;
+    };
+    var updateFigure = function(img, redrawOnly) {
+      var fig = redrawOnly ? {
+        canvas : img.colorDist,
+        context : img.colorDist.getContext('2d'),
+        axes : img.colorDistAxes
+      } : figureUtil.makeBlankFigure(320, 320);
+      makeFigure(fig, img.colorTable);
+      if (!redrawOnly) {
+        img.colorDist = fig.canvas;
+        img.colorDistAxes = fig.axes;
+        updateTable();
       }
+    };
+    var updateTable = function(transformOnly) {
+      var w = 320, h = 320, margin = 10;
+      var styles = makeFigureStyles(w, h, margin, '#444');
+      var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
+      styles.style.transform += ' scale(' + scale + ')';
+      updateFigureTable('#colorDistTable', 'colorDist', updateAsync, styles, transformOnly);
+    };
+    var toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
+      onOpen: function() { colorDistZoom = 0; }
     });
-  };
-  var colorDistProcessMouseDown = function(e) {
-    if (e.which === 1) {
-      colorDistDragState = { x: e.clientX, y: e.clientY };
-      return false;
-    }
-  };
-  var colorDistProcessMouseMove = function(e) {
-    if (colorDistDragState) {
-      if (e.buttons !== 1) {
-        colorDistDragState = null;
-      } else {
-        var dx = e.clientX - colorDistDragState.x;
-        var dy = e.clientY - colorDistDragState.y;
-        colorDistDragState = { x: e.clientX, y: e.clientY };
-        rotateColorDist(dx, dy, 0.5);
-        return false;
-      }
-    }
-  };
-  var colorDistEnableMouseAndTouch = function(root, filter, deepFilter) {
-    $(root).on('mousedown', deepFilter, function(e) {
-      return colorDistProcessMouseDown(e);
-    });
-    $(root).on('mousemove', filter, function(e) {
-      return colorDistProcessMouseMove(e);
-    });
-    $(root).on('wheel', filter, function(e) {
-      return compareUtil.processWheelEvent(e, {
-        zoom: function(steps) {
-          var ZOOM_STEP_WHEEL = 0.0625;
-          zoomColorDist(-steps * ZOOM_STEP_WHEEL);
+    var processKeyDown = function(e) {
+      return compareUtil.processKeyDownEvent(e, {
+        zoomIn: function() { zoomColorDist(0.25); return false; },
+        zoomOut: function() { zoomColorDist(-0.25); return false; },
+        cursor: function() {
+          var step = e.shiftKey ? 10 : 1;
+          var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
+          rotateColorDist(d.x, d.y, step);
+          return false;
         }
       });
-    });
-    $(root).on('touchmove', filter, function(e) {
-      return colorDistTouchFilter.onTouchMove(e, {
-        move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
-        zoom: function(dx, dy, delta) { zoomColorDist(delta); }
+    };
+    var processMouseDown = function(e) {
+      if (e.which === 1) {
+        colorDistDragState = { x: e.clientX, y: e.clientY };
+        return false;
+      }
+    };
+    var processMouseMove = function(e) {
+      if (colorDistDragState) {
+        if (e.buttons !== 1) {
+          colorDistDragState = null;
+        } else {
+          var dx = e.clientX - colorDistDragState.x;
+          var dy = e.clientY - colorDistDragState.y;
+          colorDistDragState = { x: e.clientX, y: e.clientY };
+          rotateColorDist(dx, dy, 0.5);
+          return false;
+        }
+      }
+    };
+    var enableMouseAndTouch = function(root, filter, deepFilter) {
+      $(root).on('mousedown', deepFilter, function(e) {
+        return processMouseDown(e);
       });
-    });
-    $(root).on('touchend', filter, function(e) {
-      colorDistTouchFilter.resetState();
-    });
-  };
+      $(root).on('mousemove', filter, function(e) {
+        return processMouseMove(e);
+      });
+      $(root).on('wheel', filter, function(e) {
+        return compareUtil.processWheelEvent(e, {
+          zoom: function(steps) {
+            var ZOOM_STEP_WHEEL = 0.0625;
+            zoomColorDist(-steps * ZOOM_STEP_WHEEL);
+          }
+        });
+      });
+      $(root).on('touchmove', filter, function(e) {
+        return colorDistTouchFilter.onTouchMove(e, {
+          move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
+          zoom: function(dx, dy, delta) { zoomColorDist(delta); }
+        });
+      });
+      $(root).on('touchend', filter, function(e) {
+        colorDistTouchFilter.resetState();
+      });
+    };
+    return {
+      updateFigure: updateFigure,
+      toggle: toggle,
+      processKeyDown: processKeyDown,
+      enableMouseAndTouch: enableMouseAndTouch
+    };
+  })();
   var metricsToString = function(metrics, imgA) {
     if (typeof metrics === 'string') {
       return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
