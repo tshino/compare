@@ -51,7 +51,7 @@
   $('#waveformbtn').click(waveformDialog.toggle);
   $('#vectorscopebtn').click(vectorscopeDialog.toggle);
   $('#colordistbtn').click(colorDistDialog.toggle);
-  $('#metricsbtn').click(toggleMetrics);
+  $('#metricsbtn').click(metricsDialog.toggle);
   $('#tonecurvebtn').click(toggleToneCurve);
   $('#diffbtn').click(toggleDiff);
   $('.swapbtn').click(swapBaseAndTargetImage);
@@ -131,7 +131,7 @@
               baseImageIndex !== null &&
               baseImageIndex !== num - 1) {
             baseImageIndex = num - 1;
-            updateMetricsTable();
+            metricsDialog.updateTable();
             return false;
           }
         }
@@ -205,7 +205,7 @@
     // 'c' (99)
     99 : { global: true, func: colorDistDialog.toggle },
     // 'm' (109)
-    109 : { global: true, func: toggleMetrics },
+    109 : { global: true, func: metricsDialog.toggle },
     // 't' (116)
     116 : { global: true, func: toggleToneCurve },
     // 'd' (100)
@@ -1405,7 +1405,7 @@
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
       entries[data.index[1]].metrics[data.index[0]] = data.result;
-      updateMetricsTable();
+      metricsDialog.updateTable();
       break;
     case 'calcToneCurve':
       updateToneCurve(data.type, data.index[0], data.index[1], data.result);
@@ -2067,10 +2067,29 @@
       enableMouseAndTouch: enableMouseAndTouch
     };
   })();
-  var metricsToString = function(metrics, imgA) {
-    if (typeof metrics === 'string') {
-      return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
-    } else {
+  var makeImageNameSelector = function(selectedIndex, onchange) {
+    var select = $('<select>').on('change', function(e) {
+      var index = parseInt(this.options[this.selectedIndex].value);
+      onchange(index);
+      return false;
+    });
+    for (var i = 0, img; img = images[i]; i++) {
+      var option = $('<option>').text(img.name).attr('value', img.index);
+      select.append(option);
+      if (img.index === selectedIndex) {
+        option.attr('selected','');
+      }
+    }
+    return $('<span>').append(
+      $('<span class="imageIndex"/>').text(selectedIndex + 1),
+      select
+    );
+  };
+  var metricsDialog = (function() {
+    var metricsToString = function(metrics, imgA) {
+      if (typeof metrics === 'string') {
+        return { psnr: metrics, rmse: metrics, mse: metrics, ncc: metrics, ae: metrics };
+      }
       return {
         psnr:
             isNaN(metrics.psnr) ? '‐' :
@@ -2090,49 +2109,33 @@
             compareUtil.addComma(metrics.ae) +
                 ' (' + compareUtil.toPercent(metrics.ae/imgA.width/imgA.height) + ')'
       };
-    }
-  };
-  var makeImageNameSelector = function(selectedIndex, onchange) {
-    var select = $('<select>').on('change', function(e) {
-      var index = parseInt(this.options[this.selectedIndex].value);
-      onchange(index);
-      return false;
-    });
-    for (var i = 0, img; img = images[i]; i++) {
-      var option = $('<option>').text(img.name).attr('value', img.index);
-      select.append(option);
-      if (img.index === selectedIndex) {
-        option.attr('selected','');
+    };
+    var updateTable = function() {
+      $('#metricsTable td:not(.prop)').remove();
+      var rowCount = $('#metricsTable tr').length;
+      if (images.length === 0) {
+        $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
+        return;
       }
-    }
-    return $('<span>').append(
-      $('<span class="imageIndex"/>').text(selectedIndex + 1),
-      select
-    );
-  };
-  function updateMetricsTable()
-  {
-    $('#metricsTable td:not(.prop)').remove();
-    var rowCount = $('#metricsTable tr').length;
-    if (images.length === 0) {
-      $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
-      return;
-    }
-    if (images.length === 1) {
-      $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
-    }
-    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-    $('#metricsBaseName').append(
-      $('<td>').attr('colspan', images.length - 1).append(
-        makeImageNameSelector(baseImageIndex, function(index) {
-          baseImageIndex = index;
-          updateMetricsTable();
-        })
-      )
-    );
-    for (var i = 0, img; img = images[i]; i++) {
+      if (images.length === 1) {
+        $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
+      }
+      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+      $('#metricsBaseName').append(
+        $('<td>').attr('colspan', images.length - 1).append(
+          makeImageNameSelector(baseImageIndex, function(index) {
+            baseImageIndex = index;
+            updateTable();
+          })
+        )
+      );
+      for (var i = 0, img; img = images[i]; i++) {
+        updateTableCell(img);
+      }
+    };
+    var updateTableCell = function(img) {
       if (img.index === baseImageIndex) {
-        continue;
+        return;
       }
       var a = entries[baseImageIndex];
       var b = img;
@@ -2150,7 +2153,7 @@
           '&nbsp;',
           $('<button>').text('↑').click(b.index, function(e) {
             baseImageIndex = e.data;
-            updateMetricsTable();
+            updateTable();
           })
         )
       );
@@ -2160,10 +2163,13 @@
       $('#mseValue').append($('<td>').text(values.mse));
       $('#nccValue').append($('<td>').text(values.ncc));
       $('#aeValue').append($('<td>').text(values.ae));
-    }
-  }
-  var toggleMetrics = dialogUtil.defineDialog($('#metrics'), updateMetricsTable, toggleAnalysis);
-
+    };
+    var toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
+    return {
+      updateTable: updateTable,
+      toggle: toggle
+    };
+  })();
   var findImageIndexOtherThan = function(index) {
     for (var i = 0, img; img = images[i]; ++i) {
       if (img.index !== index) {
