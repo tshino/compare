@@ -52,7 +52,7 @@
   $('#vectorscopebtn').click(vectorscopeDialog.toggle);
   $('#colordistbtn').click(colorDistDialog.toggle);
   $('#metricsbtn').click(metricsDialog.toggle);
-  $('#tonecurvebtn').click(toggleToneCurve);
+  $('#tonecurvebtn').click(toneCurveDialog.toggle);
   $('#diffbtn').click(toggleDiff);
   $('.swapbtn').click(swapBaseAndTargetImage);
   $('#diffIgnoreAE').on('change', function(e) {
@@ -207,7 +207,7 @@
     // 'm' (109)
     109 : { global: true, func: metricsDialog.toggle },
     // 't' (116)
-    116 : { global: true, func: toggleToneCurve },
+    116 : { global: true, func: toneCurveDialog.toggle },
     // 'd' (100)
     100 : { global: true, func: toggleDiff },
     // 'i' (105)
@@ -2085,6 +2085,7 @@
       select
     );
   };
+  // Image Quality Metrics
   var metricsDialog = (function() {
     var metricsToString = function(metrics, imgA) {
       if (typeof metrics === 'string') {
@@ -2209,6 +2210,7 @@
       })
     );
   };
+  // Tone Curve Estimation
   var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
@@ -2328,10 +2330,14 @@
       }
       updateToneCurveTable();
     };
-  var toggleToneCurve = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
-    enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
-  });
-
+  var toneCurveDialog = (function() {
+    var toggle = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
+      enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
+    });
+    return {
+      toggle: toggle
+    };
+  })();
   var updateDiffTableDOM = function() {
     $('.diffDimension').css({display:'none'});
     $('#diffDimensionReport *').remove();
