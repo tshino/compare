@@ -1408,7 +1408,7 @@
       metricsDialog.updateTable();
       break;
     case 'calcToneCurve':
-      updateToneCurve(data.type, data.index[0], data.index[1], data.result);
+      toneCurveDialog.updateFigure(data.type, data.index[0], data.index[1], data.result);
       break;
     case 'calcDiff':
       if (diffResult.base === data.index[0] && diffResult.target === data.index[1] &&
@@ -2321,7 +2321,8 @@
       updateToneCurveTableDOM();
     }
   };
-    var updateToneCurve = function(type, baseIndex, targetIndex, result) {
+  var toneCurveDialog = (function() {
+    var updateFigure = function(type, baseIndex, targetIndex, result) {
       if (type === toneCurveType.current() &&
           baseIndex === toneCurveResult.base &&
           targetIndex === toneCurveResult.target) {
@@ -2330,11 +2331,11 @@
       }
       updateToneCurveTable();
     };
-  var toneCurveDialog = (function() {
     var toggle = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     return {
+      updateFigure: updateFigure,
       toggle: toggle
     };
   })();
