@@ -119,7 +119,7 @@
             baseImageIndex = targetImageIndex;
             targetImageIndex = num - 1;
             if ($('#toneCurve').is(':visible')) {
-              updateToneCurveTable();
+              toneCurveDialog.updateTable();
             } else if ($('#diff').is(':visible')) {
               updateDiffTable();
             }
@@ -1030,7 +1030,7 @@
       targetImageIndex = baseImageIndex;
       baseImageIndex = temp;
       if ($('#toneCurve').is(':visible')) {
-        updateToneCurveTable();
+        toneCurveDialog.updateTable();
       } else if ($('#diff').is(':visible')) {
         updateDiffTable();
       }
@@ -2214,7 +2214,7 @@
   var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
-      updateToneCurveTable();
+      toneCurveDialog.updateTable();
   });
   var makeToneMapFigure = function(toneMapData, type) {
     var fig = figureUtil.makeBlankFigure(320, 320);
@@ -2228,7 +2228,7 @@
   };
   var updateToneCurveTableDOM = function() {
     $('#toneCurveResult *').remove();
-    if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateToneCurveTable)) {
+    if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', toneCurveDialog.updateTable)) {
       return;
     }
     var a = entries[baseImageIndex];
@@ -2310,18 +2310,18 @@
       $('#toneCurveResult').append(dist).append(curve).append(axes).css(styles.cellStyle);
     }
   };
-  var updateToneCurveTable = function(transformOnly) {
-    if (transformOnly) {
-      if (toneCurveResult.result !== null) {
-        $('#toneCurveResult > *').css({
-          transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-        });
-      }
-    } else {
-      updateToneCurveTableDOM();
-    }
-  };
   var toneCurveDialog = (function() {
+    var updateTable = function(transformOnly) {
+      if (transformOnly) {
+        if (toneCurveResult.result !== null) {
+          $('#toneCurveResult > *').css({
+            transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
+          });
+        }
+      } else {
+        updateToneCurveTableDOM();
+      }
+    };
     var updateFigure = function(type, baseIndex, targetIndex, result) {
       if (type === toneCurveType.current() &&
           baseIndex === toneCurveResult.base &&
@@ -2329,12 +2329,13 @@
         toneCurveResult.type = type;
         toneCurveResult.result = result;
       }
-      updateToneCurveTable();
+      updateTable();
     };
-    var toggle = dialogUtil.defineDialog($('#toneCurve'), updateToneCurveTable, toggleAnalysis, {
+    var toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     return {
+      updateTable: updateTable,
       updateFigure: updateFigure,
       toggle: toggle
     };
