@@ -1852,7 +1852,7 @@
         img.colorDist = null;
         img.colorDistAxes = null;
       }
-      updateFitureAll();
+      updateFigureAll();
     });
     var updateAsync = function(img) {
       taskQueue.addTask({
@@ -1865,14 +1865,14 @@
       colorDistOrientation.y += dx * scale;
       colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
       colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
-      updateFitureAll(/* redrawOnly = */ true);
+      updateFigureAll(/* redrawOnly = */ true);
     };
     var zoomColorDist = function(delta) {
       var MAX_ZOOM_LEVEL = 6;
       colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
       updateTable(/* transformOnly = */ true);
     };
-    var updateFitureAll = function(redrawOnly) {
+    var updateFigureAll = function(redrawOnly) {
       for (var i = 0; img = images[i]; i++) {
         updateFigure(img, redrawOnly);
       }
