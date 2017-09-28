@@ -2211,49 +2211,23 @@
     );
   };
   // Tone Curve Estimation
-  var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
+  var toneCurveDialog = (function() {
+    var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
-      toneCurveDialog.updateTable();
-  });
-  var makeToneMapFigure = function(toneMapData, type) {
-    var fig = figureUtil.makeBlankFigure(320, 320);
-    var dist = toneMapData.dist;
-    var max = toneMapData.max;
-    var bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
-    fig.context.fillStyle = '#000';
-    fig.context.fillRect(0, 0, 320, 320);
-    fig.context.putImageData(bits, 32, 32);
-    return fig;
-  };
-  var updateToneCurveTableDOM = function() {
-    $('#toneCurveResult *').remove();
-    if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', toneCurveDialog.updateTable)) {
-      return;
-    }
-    var a = entries[baseImageIndex];
-    var b = entries[targetImageIndex];
-    if (toneCurveResult.base !== baseImageIndex ||
-        toneCurveResult.target !== targetImageIndex ||
-        toneCurveResult.type !== toneCurveType.current()) {
-      toneCurveResult.base   = baseImageIndex;
-      toneCurveResult.target = targetImageIndex;
-      toneCurveResult.type   = toneCurveType.current();
-      toneCurveResult.result = null;
-      discardTasksOfCommand('calcToneCurve');
-      if (baseImageIndex !== targetImageIndex) {
-        taskQueue.addTask({
-          cmd:      'calcToneCurve',
-          type:     toneCurveType.current(),
-          index:    [a.index, b.index]
-        }, attachImageDataToTask);
-      }
-    }
-    var figW = 320, figH = 320, figMargin = 8;
-    var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
-    if (toneCurveResult.result === null) {
-      $('#toneCurveResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
-    } else {
+      updateTable();
+    });
+    var makeToneMapFigure = function(toneMapData, type) {
+      var fig = figureUtil.makeBlankFigure(320, 320);
+      var dist = toneMapData.dist;
+      var max = toneMapData.max;
+      var bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
+      fig.context.fillStyle = '#000';
+      fig.context.fillRect(0, 0, 320, 320);
+      fig.context.putImageData(bits, 32, 32);
+      return fig;
+    };
+    var makeFigure = function(styles) {
       var numComponents = toneCurveResult.type === 0 ? 3 : 1;
       var components = toneCurveResult.result.components;
       var vbox = '0 0 ' + 320 + ' ' + 320;
@@ -2308,9 +2282,38 @@
         '</svg>').
         css(styles.style);
       $('#toneCurveResult').append(dist).append(curve).append(axes).css(styles.cellStyle);
-    }
-  };
-  var toneCurveDialog = (function() {
+    };
+    var updateTableDOM = function() {
+      $('#toneCurveResult *').remove();
+      if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateTable)) {
+        return;
+      }
+      var a = entries[baseImageIndex];
+      var b = entries[targetImageIndex];
+      if (toneCurveResult.base !== baseImageIndex ||
+          toneCurveResult.target !== targetImageIndex ||
+          toneCurveResult.type !== toneCurveType.current()) {
+        toneCurveResult.base   = baseImageIndex;
+        toneCurveResult.target = targetImageIndex;
+        toneCurveResult.type   = toneCurveType.current();
+        toneCurveResult.result = null;
+        discardTasksOfCommand('calcToneCurve');
+        if (baseImageIndex !== targetImageIndex) {
+          taskQueue.addTask({
+            cmd:      'calcToneCurve',
+            type:     toneCurveType.current(),
+            index:    [a.index, b.index]
+          }, attachImageDataToTask);
+        }
+      }
+      var figW = 320, figH = 320, figMargin = 8;
+      var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
+      if (toneCurveResult.result === null) {
+        $('#toneCurveResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+      } else {
+        makeFigure(styles);
+      }
+    };
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (toneCurveResult.result !== null) {
@@ -2319,7 +2322,7 @@
           });
         }
       } else {
-        updateToneCurveTableDOM();
+        updateTableDOM();
       }
     };
     var updateFigure = function(type, baseIndex, targetIndex, result) {
