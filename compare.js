@@ -2343,7 +2343,7 @@
       toggle: toggle
     };
   })();
-  var updateDiffTableDOM = function() {
+  var updateDiffOptionsDOM = function() {
     $('.diffDimension').css({display:'none'});
     $('#diffDimensionReport *').remove();
     $('#diffDetectedMaxAE').text('');
@@ -2363,7 +2363,7 @@
     $('#diffOffsetY').val(diffOptions.offsetY);
     $('#diffIgnoreAE').val(diffOptions.ignoreAE);
     if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateDiffTable)) {
-      return;
+      return false;
     }
     var a = entries[baseImageIndex];
     var b = entries[targetImageIndex];
@@ -2376,13 +2376,9 @@
         ja: '画像サイズが異なります'
       });
     }
-    if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
-        diffResult.ignoreAE !== diffOptions.ignoreAE ||
-        diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
-        diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
-        diffResult.resizeMethod !== diffOptions.resizeMethod ||
-        diffResult.offsetX !== diffOptions.offsetX ||
-        diffResult.offsetY !== diffOptions.offsetY) {
+    return true;
+  };
+  var updateDiffAsync = function() {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
@@ -2396,7 +2392,7 @@
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
           cmd:      'calcDiff',
-          index:    [a.index, b.index],
+          index:    [baseImageIndex, targetImageIndex],
           options:  {
             ignoreAE:   diffOptions.ignoreAE,
             ignoreRemainder: diffOptions.ignoreRemainder,
@@ -2407,16 +2403,8 @@
           }
         }, attachImageDataToTask);
       }
-    }
-    var figW = 768, figH = 400, figMargin = 8;
-    var styles = makeFigureStyles(figW, figH, figMargin, '#000');
-    if (diffResult.result === null) {
-      $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
-      setText($('#diffSummary'), {
-        en: 'calculating...',
-        ja: '計算中...'
-      });
-    } else {
+  };
+  var updateDiffReport = function(styles) {
       if (diffResult.result.summary.maxAE !== 0) {
         var e = diffResult.result.summary.maxAE;
         $('#diffDetectedMaxAE').text(e);
@@ -2479,6 +2467,30 @@
         }
         return false;
       });
+  };
+  var updateDiffTableDOM = function() {
+    if (false === updateDiffOptionsDOM()) {
+      return;
+    }
+    if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
+        diffResult.ignoreAE !== diffOptions.ignoreAE ||
+        diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
+        diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
+        diffResult.resizeMethod !== diffOptions.resizeMethod ||
+        diffResult.offsetX !== diffOptions.offsetX ||
+        diffResult.offsetY !== diffOptions.offsetY) {
+      updateDiffAsync();
+    }
+    var figW = 768, figH = 400, figMargin = 8;
+    var styles = makeFigureStyles(figW, figH, figMargin, '#000');
+    if (diffResult.result === null) {
+      $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+      setText($('#diffSummary'), {
+        en: 'calculating...',
+        ja: '計算中...'
+      });
+    } else {
+      updateDiffReport(styles);
     }
   };
   var updateDiffTable = function(transformOnly) {
