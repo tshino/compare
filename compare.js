@@ -53,33 +53,33 @@
   $('#colordistbtn').click(colorDistDialog.toggle);
   $('#metricsbtn').click(metricsDialog.toggle);
   $('#tonecurvebtn').click(toneCurveDialog.toggle);
-  $('#diffbtn').click(toggleDiff);
+  $('#diffbtn').click(diffDialog.toggle);
   $('.swapbtn').click(swapBaseAndTargetImage);
   $('#diffIgnoreAE').on('change', function(e) {
     diffOptions.ignoreAE = +this.value;
-    updateDiffTable();
+    diffDialog.updateTable();
     return false;
   });
   $('.diffDimensionOption').on('change', function(e) {
     var o = this.options[this.selectedIndex].value;
     diffOptions.resizeToLarger = o === 'resize';
     diffOptions.ignoreRemainder = o === 'min';
-    updateDiffTable();
+    diffDialog.updateTable();
     return false;
   });
   $('#diffResizeMethod').on('change', function(e) {
     diffOptions.resizeMethod = this.options[this.selectedIndex].value;
-    updateDiffTable();
+    diffDialog.updateTable();
     return false;
   });
   $('#diffOffsetX').on('change', function(e) {
     diffOptions.offsetX = +this.value;
-    updateDiffTable();
+    diffDialog.updateTable();
     return false;
   });
   $('#diffOffsetY').on('change', function(e) {
     diffOptions.offsetY = +this.value;
-    updateDiffTable();
+    diffDialog.updateTable();
     return false;
   });
 
@@ -121,7 +121,7 @@
             if ($('#toneCurve').is(':visible')) {
               toneCurveDialog.updateTable();
             } else if ($('#diff').is(':visible')) {
-              updateDiffTable();
+              diffDialog.updateTable();
             }
             return false;
           }
@@ -209,7 +209,7 @@
     // 't' (116)
     116 : { global: true, func: toneCurveDialog.toggle },
     // 'd' (100)
-    100 : { global: true, func: toggleDiff },
+    100 : { global: true, func: diffDialog.toggle },
     // 'i' (105)
     105 : { global: true, func: infoDialog.toggle },
     // '/' (47)
@@ -1032,7 +1032,7 @@
       if ($('#toneCurve').is(':visible')) {
         toneCurveDialog.updateTable();
       } else if ($('#diff').is(':visible')) {
-        updateDiffTable();
+        diffDialog.updateTable();
       }
     }
   };
@@ -1420,7 +1420,7 @@
           diffResult.offsetY === data.options.offsetY) {
         diffResult.result = data.result;
       }
-      updateDiffTable();
+      diffDialog.updateTable();
       break;
     }
   };
@@ -2343,42 +2343,44 @@
       toggle: toggle
     };
   })();
-  var updateDiffOptionsDOM = function() {
-    $('.diffDimension').css({display:'none'});
-    $('#diffDimensionReport *').remove();
-    $('#diffDetectedMaxAE').text('');
-    $('#diffIgnoreAEResult').text('');
-    $('#diffResult *').remove();
-    $('#diffSummary *').remove();
-    $('#diffSaveFigure').hide();
-    $('.diffDimensionOption').
-      prop('value',
-        diffOptions.resizeToLarger ? 'resize' :
-        diffOptions.ignoreRemainder ? 'min' : 'max');
-    $('#diffResizeMethod').
-      prop('value', diffOptions.resizeMethod).
-      prop('disabled', !diffOptions.resizeToLarger).
-      parent().css({opacity: !diffOptions.resizeToLarger ? '0.5' : ''});
-    $('#diffOffsetX').val(diffOptions.offsetX);
-    $('#diffOffsetY').val(diffOptions.offsetY);
-    $('#diffIgnoreAE').val(diffOptions.ignoreAE);
-    if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateDiffTable)) {
-      return false;
-    }
-    var a = entries[baseImageIndex];
-    var b = entries[targetImageIndex];
-    if (a.width === b.width && a.height === b.height) {
+  // Image Diff
+  var diffDialog = (function() {
+    var updateOptionsDOM = function() {
       $('.diffDimension').css({display:'none'});
-    } else {
-      $('.diffDimension').css({display:''});
-      setText($('#diffDimensionReport'), {
-        en: 'dimensions are different',
-        ja: '画像サイズが異なります'
-      });
-    }
-    return true;
-  };
-  var updateDiffAsync = function() {
+      $('#diffDimensionReport *').remove();
+      $('#diffDetectedMaxAE').text('');
+      $('#diffIgnoreAEResult').text('');
+      $('#diffResult *').remove();
+      $('#diffSummary *').remove();
+      $('#diffSaveFigure').hide();
+      $('.diffDimensionOption').
+        prop('value',
+          diffOptions.resizeToLarger ? 'resize' :
+          diffOptions.ignoreRemainder ? 'min' : 'max');
+      $('#diffResizeMethod').
+        prop('value', diffOptions.resizeMethod).
+        prop('disabled', !diffOptions.resizeToLarger).
+        parent().css({opacity: !diffOptions.resizeToLarger ? '0.5' : ''});
+      $('#diffOffsetX').val(diffOptions.offsetX);
+      $('#diffOffsetY').val(diffOptions.offsetY);
+      $('#diffIgnoreAE').val(diffOptions.ignoreAE);
+      if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
+        return false;
+      }
+      var a = entries[baseImageIndex];
+      var b = entries[targetImageIndex];
+      if (a.width === b.width && a.height === b.height) {
+        $('.diffDimension').css({display:'none'});
+      } else {
+        $('.diffDimension').css({display:''});
+        setText($('#diffDimensionReport'), {
+          en: 'dimensions are different',
+          ja: '画像サイズが異なります'
+        });
+      }
+      return true;
+    };
+    var updateAsync = function() {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
@@ -2403,8 +2405,8 @@
           }
         }, attachImageDataToTask);
       }
-  };
-  var updateDiffReport = function(styles) {
+    };
+    var updateReport = function(styles) {
       if (diffResult.result.summary.maxAE !== 0) {
         var e = diffResult.result.summary.maxAE;
         $('#diffDetectedMaxAE').text(e);
@@ -2467,48 +2469,52 @@
         }
         return false;
       });
-  };
-  var updateDiffTableDOM = function() {
-    if (false === updateDiffOptionsDOM()) {
-      return;
-    }
-    if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
-        diffResult.ignoreAE !== diffOptions.ignoreAE ||
-        diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
-        diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
-        diffResult.resizeMethod !== diffOptions.resizeMethod ||
-        diffResult.offsetX !== diffOptions.offsetX ||
-        diffResult.offsetY !== diffOptions.offsetY) {
-      updateDiffAsync();
-    }
-    var figW = 768, figH = 400, figMargin = 8;
-    var styles = makeFigureStyles(figW, figH, figMargin, '#000');
-    if (diffResult.result === null) {
-      $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
-      setText($('#diffSummary'), {
-        en: 'calculating...',
-        ja: '計算中...'
-      });
-    } else {
-      updateDiffReport(styles);
-    }
-  };
-  var updateDiffTable = function(transformOnly) {
-    if (transformOnly) {
-      if (diffResult.result !== null) {
-        $('#diffResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+    };
+    var updateTableDOM = function() {
+      if (false === updateOptionsDOM()) {
+        return;
       }
-    } else {
-      updateDiffTableDOM();
-    }
-  };
-  var toggleDiff = dialogUtil.defineDialog($('#diff'), updateDiffTable, toggleAnalysis, {
-    enableZoom: true,
-    getBaseSize: function() {
-      return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
-    }
-  });
-
+      if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
+          diffResult.ignoreAE !== diffOptions.ignoreAE ||
+          diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
+          diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
+          diffResult.resizeMethod !== diffOptions.resizeMethod ||
+          diffResult.offsetX !== diffOptions.offsetX ||
+          diffResult.offsetY !== diffOptions.offsetY) {
+        updateAsync();
+      }
+      var figW = 768, figH = 400, figMargin = 8;
+      var styles = makeFigureStyles(figW, figH, figMargin, '#000');
+      if (diffResult.result === null) {
+        $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+        setText($('#diffSummary'), {
+          en: 'calculating...',
+          ja: '計算中...'
+        });
+      } else {
+        updateReport(styles);
+      }
+    };
+    var updateTable = function(transformOnly) {
+      if (transformOnly) {
+        if (diffResult.result !== null) {
+          $('#diffResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+        }
+      } else {
+        updateTableDOM();
+      }
+    };
+    var toggle = dialogUtil.defineDialog($('#diff'), updateTable, toggleAnalysis, {
+      enableZoom: true,
+      getBaseSize: function() {
+        return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
+      }
+    });
+    return {
+      updateTable: updateTable,
+      toggle: toggle
+    };
+  })();
   var newSelectorButton = function(index) {
     var button = $('<button/>').addClass('selector').
         text(index + 1).
