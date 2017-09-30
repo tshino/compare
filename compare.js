@@ -116,13 +116,8 @@
               entries[num - 1].ready() &&
               baseImageIndex !== null && targetImageIndex !== null &&
               targetImageIndex !== num - 1) {
-            baseImageIndex = targetImageIndex;
-            targetImageIndex = num - 1;
-            if ($('#toneCurve').is(':visible')) {
-              toneCurveDialog.updateTable();
-            } else if ($('#diff').is(':visible')) {
-              diffDialog.updateTable();
-            }
+            setBaseAndTargetImage(targetImageIndex, num - 1);
+            dialog.update();
             return false;
           }
           if ($('#metrics').is(':visible') &&
@@ -130,8 +125,8 @@
               entries[num - 1].ready() &&
               baseImageIndex !== null &&
               baseImageIndex !== num - 1) {
-            baseImageIndex = num - 1;
-            metricsDialog.updateTable();
+            setBaseAndTargetImage(num - 1, null);
+            dialog.update();
             return false;
           }
         }
@@ -348,6 +343,32 @@
       resetLayoutState();
       discardTasksOfEntryByIndex(index);
       updateDOM();
+    }
+  };
+  var findImageIndexOtherThan = function(index) {
+    for (var i = 0, img; img = images[i]; ++i) {
+      if (img.index !== index) {
+        return img.index;
+      }
+    }
+    return null;
+  };
+  var setBaseAndTargetImage = function(baseIndex, targetIndex) {
+    if (baseIndex === null && targetIndex === null) {
+      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+      if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
+        targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+      }
+    } else {
+      baseImageIndex = baseIndex !== null ? baseIndex : baseImageIndex;
+      targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
+      if (baseImageIndex === targetImageIndex) {
+        if (targetIndex === null) {
+          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+        } else if (baseIndex === null) {
+          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
+        }
+      }
     }
   };
   function calcAspectRatio(w, h) {
@@ -1026,13 +1047,9 @@
   };
   var swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
-      var temp = targetImageIndex;
-      targetImageIndex = baseImageIndex;
-      baseImageIndex = temp;
-      if ($('#toneCurve').is(':visible')) {
-        toneCurveDialog.updateTable();
-      } else if ($('#diff').is(':visible')) {
-        diffDialog.updateTable();
+      setBaseAndTargetImage(targetImageIndex, baseImageIndex);
+      if (dialog) {
+        dialog.update();
       }
     }
   };
@@ -2171,14 +2188,6 @@
       toggle: toggle
     };
   })();
-  var findImageIndexOtherThan = function(index) {
-    for (var i = 0, img; img = images[i]; ++i) {
-      if (img.index !== index) {
-        return img.index;
-      }
-    }
-    return null;
-  };
   var setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
     $(baseSelector).children().remove();
     $(targetSelector).children().remove();
@@ -2187,25 +2196,16 @@
       $(targetSelector).append($('<span>').text('no data'));
       return false;
     }
-    baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-    if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
-      targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-    }
+    setBaseAndTargetImage(null, null);
     $(baseSelector).append(
       makeImageNameSelector(baseImageIndex, function(index) {
-        baseImageIndex = index;
-        if (baseImageIndex === targetImageIndex) {
-          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-        }
+        setBaseAndTargetImage(index, null);
         onUpdate();
       })
     );
     $(targetSelector).append(
       makeImageNameSelector(targetImageIndex, function(index) {
-        targetImageIndex = index;
-        if (targetImageIndex === baseImageIndex) {
-          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
-        }
+        setBaseAndTargetImage(null, index);
         onUpdate();
       })
     );
