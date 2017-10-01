@@ -1424,16 +1424,7 @@
       toneCurveDialog.updateFigure(data.type, data.index[0], data.index[1], data.result);
       break;
     case 'calcDiff':
-      if (diffResult.base === data.index[0] && diffResult.target === data.index[1] &&
-          diffResult.ignoreAE === data.options.ignoreAE &&
-          diffResult.ignoreRemainder === data.options.ignoreRemainder &&
-          diffResult.resizeToLarger === data.options.resizeToLarger &&
-          diffResult.resizeMethod === data.options.resizeMethod &&
-          diffResult.offsetX === data.options.offsetX &&
-          diffResult.offsetY === data.options.offsetY) {
-        diffResult.result = data.result;
-      }
-      diffDialog.updateTable();
+      diffDialog.updateFigure(data.index[0], data.index[1], data.options, data.result);
       break;
     }
   };
@@ -2508,6 +2499,18 @@
         updateTableDOM();
       }
     };
+    var updateFigure = function(baseIndex, targetIndex, options, result) {
+      if (diffResult.base === baseIndex && diffResult.target === targetIndex &&
+          diffResult.ignoreAE === options.ignoreAE &&
+          diffResult.ignoreRemainder === options.ignoreRemainder &&
+          diffResult.resizeToLarger === options.resizeToLarger &&
+          diffResult.resizeMethod === options.resizeMethod &&
+          diffResult.offsetX === options.offsetX &&
+          diffResult.offsetY === options.offsetY) {
+        diffResult.result = result;
+      }
+      updateTable();
+    };
     var toggle = dialogUtil.defineDialog($('#diff'), updateTable, toggleAnalysis, {
       enableZoom: true,
       getBaseSize: function() {
@@ -2516,6 +2519,7 @@
     });
     return {
       updateTable: updateTable,
+      updateFigure: updateFigure,
       toggle: toggle
     };
   })();
