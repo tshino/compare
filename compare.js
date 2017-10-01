@@ -282,7 +282,6 @@
   });
   var baseImageIndex = null;
   var targetImageIndex = null;
-  var toneCurveResult = {};
   var diffResult = {};
   var diffOptions = {
     ignoreAE: 0,
@@ -324,10 +323,7 @@
       if (targetImageIndex === index) {
         targetImageIndex = null;
       }
-      if (toneCurveResult.base === index || toneCurveResult.target === index) {
-        $('#toneCurveResult *').remove();
-        toneCurveResult.result = null;
-      }
+      toneCurveDialog.onRemoveEntry(index);
       if (diffResult.base === index || diffResult.target === index) {
         $('#diffResult *').remove();
         diffResult.result = null;
@@ -2138,11 +2134,11 @@
       if (images.length === 1) {
         $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
       }
-      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+      setBaseAndTargetImage(null, null);
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
           makeImageNameSelector(baseImageIndex, function(index) {
-            baseImageIndex = index;
+            setBaseAndTargetImage(index, null);
             updateTable();
           })
         )
@@ -2212,11 +2208,18 @@
   };
   // Tone Curve Estimation
   var toneCurveDialog = (function() {
+    var toneCurveResult = {};
     var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
       updateTable();
     });
+    var onRemoveEntry = function(index) {
+      if (toneCurveResult.base === index || toneCurveResult.target === index) {
+        $('#toneCurveResult *').remove();
+        toneCurveResult.result = null;
+      }
+    };
     var makeToneMapFigure = function(toneMapData, type) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       var dist = toneMapData.dist;
@@ -2338,6 +2341,7 @@
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     return {
+      onRemoveEntry: onRemoveEntry,
       updateTable: updateTable,
       updateFigure: updateFigure,
       toggle: toggle
