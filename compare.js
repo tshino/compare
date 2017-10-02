@@ -55,33 +55,6 @@
   $('#tonecurvebtn').click(toneCurveDialog.toggle);
   $('#diffbtn').click(diffDialog.toggle);
   $('.swapbtn').click(swapBaseAndTargetImage);
-  $('#diffIgnoreAE').on('change', function(e) {
-    diffOptions.ignoreAE = +this.value;
-    diffDialog.updateTable();
-    return false;
-  });
-  $('.diffDimensionOption').on('change', function(e) {
-    var o = this.options[this.selectedIndex].value;
-    diffOptions.resizeToLarger = o === 'resize';
-    diffOptions.ignoreRemainder = o === 'min';
-    diffDialog.updateTable();
-    return false;
-  });
-  $('#diffResizeMethod').on('change', function(e) {
-    diffOptions.resizeMethod = this.options[this.selectedIndex].value;
-    diffDialog.updateTable();
-    return false;
-  });
-  $('#diffOffsetX').on('change', function(e) {
-    diffOptions.offsetX = +this.value;
-    diffDialog.updateTable();
-    return false;
-  });
-  $('#diffOffsetY').on('change', function(e) {
-    diffOptions.offsetY = +this.value;
-    diffDialog.updateTable();
-    return false;
-  });
 
   $(window).resize(function() { layoutMode = null; updateLayout(); });
   $(window).keydown(function(e) {
@@ -282,15 +255,6 @@
   });
   var baseImageIndex = null;
   var targetImageIndex = null;
-  var diffResult = {};
-  var diffOptions = {
-    ignoreAE: 0,
-    resizeToLarger: true,
-    resizeMethod: 'lanczos3',
-    ignoreRemainder: false,
-    offsetX: 0,
-    offsetY: 0
-  };
 
   var setText = function(target, text) {
     for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
@@ -324,10 +288,7 @@
         targetImageIndex = null;
       }
       toneCurveDialog.onRemoveEntry(index);
-      if (diffResult.base === index || diffResult.target === index) {
-        $('#diffResult *').remove();
-        diffResult.result = null;
-      }
+      diffDialog.onRemoveEntry(index);
       ent.asCanvas = null;
       ent.imageData = null;
       ent.histogram = null;
@@ -2340,6 +2301,48 @@
   })();
   // Image Diff
   var diffDialog = (function() {
+    var diffResult = {};
+    var diffOptions = {
+      ignoreAE: 0,
+      resizeToLarger: true,
+      resizeMethod: 'lanczos3',
+      ignoreRemainder: false,
+      offsetX: 0,
+      offsetY: 0
+    };
+    $('#diffIgnoreAE').on('change', function(e) {
+      diffOptions.ignoreAE = +this.value;
+      updateTable();
+      return false;
+    });
+    $('.diffDimensionOption').on('change', function(e) {
+      var o = this.options[this.selectedIndex].value;
+      diffOptions.resizeToLarger = o === 'resize';
+      diffOptions.ignoreRemainder = o === 'min';
+      updateTable();
+      return false;
+    });
+    $('#diffResizeMethod').on('change', function(e) {
+      diffOptions.resizeMethod = this.options[this.selectedIndex].value;
+      updateTable();
+      return false;
+    });
+    $('#diffOffsetX').on('change', function(e) {
+      diffOptions.offsetX = +this.value;
+      updateTable();
+      return false;
+    });
+    $('#diffOffsetY').on('change', function(e) {
+      diffOptions.offsetY = +this.value;
+      updateTable();
+      return false;
+    });
+    var onRemoveEntry = function(index) {
+      if (diffResult.base === index || diffResult.target === index) {
+        $('#diffResult *').remove();
+        diffResult.result = null;
+      }
+    };
     var updateOptionsDOM = function() {
       $('.diffDimension').css({display:'none'});
       $('#diffDimensionReport *').remove();
@@ -2518,6 +2521,7 @@
       }
     });
     return {
+      onRemoveEntry: onRemoveEntry,
       updateTable: updateTable,
       updateFigure: updateFigure,
       toggle: toggle
