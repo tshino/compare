@@ -447,22 +447,6 @@
       updateLayout();
     }
   }
-  var updateOverlayModeIndicator = function() {
-    if (overlayMode) {
-      var baseIndex = overlayBaseIndex + 1;
-      var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
-            baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
-      setText($('#mode'), {
-        en: 'OVERLAY MODE : ' + modeDesc,
-        ja: 'オーバーレイモード : ' + modeDesc });
-      $('#mode').css({ display : 'block' });
-      $('#overlay').addClass('current');
-    } else {
-      $('#mode > span').text('');
-      $('#mode').css({ display : '' });
-      $('#overlay').removeClass('current');
-    }
-  };
 
   // ROI map
   var roiMap = (function() {
@@ -2527,8 +2511,9 @@
       toggle: toggle
     };
   })();
-  var newSelectorButton = function(index) {
-    var button = $('<button/>').addClass('selector').
+  var sideBar = (function() {
+    var newSelectorButton = function(index) {
+      var button = $('<button/>').addClass('selector').
         text(index + 1).
         append(
           setText($('<span class="tooltip"/>'), {
@@ -2537,27 +2522,57 @@
           })
         ).
         click(function(e) { toggleSingleView(index + 1); });
-    if (index < 9) {
-      button.find('span.tooltip span').addClass('keys flat').
-          append($('<span/>').text(index + 1));
-    }
-    return button;
-  };
-  var updateSelectorButtonState = function() {
-    if (isSingleView) {
-      $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
+      if (index < 9) {
+        button.find('span.tooltip span').addClass('keys flat').
+            append($('<span/>').text(index + 1));
+      }
+      $('#overlay').before(button);
+      return button;
+    };
+    var updateArrangeButton = function() {
+      $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
+    };
+    var updateSelectorButtonState = function() {
+      if (isSingleView) {
+        $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
+        if (overlayMode) {
+          $('.selector').eq(overlayBaseIndex).addClass('current');
+        }
+      } else {
+        $('.selector').removeClass('current');
+      }
+      $('.selector').each(function(index) {
+        if (index < entries.length && !entries[index].visible) {
+          $(this).css({ display : 'none' });
+        }
+      });
+    };
+    var updateOverlayModeIndicator = function() {
       if (overlayMode) {
-        $('.selector').eq(overlayBaseIndex).addClass('current');
+        var baseIndex = overlayBaseIndex + 1;
+        var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
+              baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
+        setText($('#mode'), {
+          en: 'OVERLAY MODE : ' + modeDesc,
+          ja: 'オーバーレイモード : ' + modeDesc });
+        $('#mode').css({ display : 'block' });
+        $('#overlay').addClass('current');
+      } else {
+        $('#mode > span').text('');
+        $('#mode').css({ display : '' });
+        $('#overlay').removeClass('current');
       }
-    } else {
-      $('.selector').removeClass('current');
-    }
-    $('.selector').each(function(index) {
-      if (index < entries.length && !entries[index].visible) {
-        $(this).css({ display : 'none' });
-      }
-    });
-  };
+    };
+    var onUpdateLayout = function() {
+      updateArrangeButton();
+      updateSelectorButtonState();
+      updateOverlayModeIndicator();
+    };
+    return {
+      newSelectorButton: newSelectorButton,
+      onUpdateLayout: onUpdateLayout
+    };
+  })();
   function updateDOM()
   {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
@@ -2585,8 +2600,7 @@
           ent.visible = false;
         }
         if (!ent.button) {
-          ent.button = newSelectorButton(i);
-          $('#overlay').before(ent.button);
+          ent.button = sideBar.newSelectorButton(i);
         }
     }
     resetMouseDrag();
@@ -2610,7 +2624,6 @@
       layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
     }
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
-    $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     var param = makeImageLayoutParam();
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 !== currentImageIndex;
@@ -2636,9 +2649,8 @@
       var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
       $(this).css({ display : (hide ? 'none' : '') });
     });
-    updateOverlayModeIndicator();
+    sideBar.onUpdateLayout();
     roiMap.onUpdateLayout();
-    updateSelectorButtonState();
     updateTransform();
     dialogUtil.adjustDialogPosition();
   }
