@@ -4,16 +4,11 @@
     $('#selectLang').val(lang);
     changeLang(lang);
   };
-  var toggleFullscreen = function() {
-    resetMouseDrag();
-    compareUtil.toggleFullscreen($('#viewroot').get(0));
-  };
 
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
     alert('The File APIs are not fully supported in this browser.');
   }
-
   // Drag & Drop and file selection
   $(document.body).on('dragover', function(e) {
     e.originalEvent.dataTransfer.dropEffect = 'copy';
@@ -27,23 +22,9 @@
     addFiles(e.target.files);
     e.target.value = null;
   });
-  $('#add').click(function() {
-    $('#file').click();
-  });
   $('#view .dropHere').click(function() {
     $('#file').click();
   });
-
-  // Side bar buttons
-  $('#analysisbtn').click(toggleAnalysis);
-  $('#zoomIn').click(viewZoom.zoomIn);
-  $('#zoomOut').click(viewZoom.zoomOut);
-  $('#arrange').click(arrangeLayout);
-  $('#overlay').click(toggleOverlay);
-  $('#gridbtn').click(grid.toggle);
-  $('#pickerbtn').click(crossCursor.toggle);
-  $('#fullscreen').click(toggleFullscreen);
-  $('#helpbtn').click(toggleHelp);
 
   // Menus and dialogs
   $('#infobtn').click(infoDialog.toggle);
@@ -2511,7 +2492,27 @@
       toggle: toggle
     };
   })();
+  var resetMouseDrag = function() {
+    viewZoom.resetDragState();
+  }
+  var toggleFullscreen = function() {
+    resetMouseDrag();
+    compareUtil.toggleFullscreen($('#viewroot').get(0));
+  };
+  // Side Bar
   var sideBar = (function() {
+    $('#add').click(function() {
+      $('#file').click();
+    });
+    $('#analysisbtn').click(toggleAnalysis);
+    $('#zoomIn').click(viewZoom.zoomIn);
+    $('#zoomOut').click(viewZoom.zoomOut);
+    $('#arrange').click(arrangeLayout);
+    $('#overlay').click(toggleOverlay);
+    $('#gridbtn').click(grid.toggle);
+    $('#pickerbtn').click(crossCursor.toggle);
+    $('#fullscreen').click(toggleFullscreen);
+    $('#helpbtn').click(toggleHelp);
     var newSelectorButton = function(index) {
       var button = $('<button/>').addClass('selector').
         text(index + 1).
@@ -2605,11 +2606,6 @@
     }
     resetMouseDrag();
     updateLayout();
-  }
-
-  function resetMouseDrag()
-  {
-    viewZoom.resetDragState();
   }
 
   function updateLayout()
