@@ -309,27 +309,55 @@
       }
     }
   };
-  function calcAspectRatio(w, h) {
-    var gcd = compareUtil.calcGCD(w, h);
-    var w0 = w / gcd, h0 = h / gcd;
-    var ratio = w0 / h0;  // use gcd to avoid comparison error
-    var result = compareUtil.addComma(w0) + ':' + compareUtil.addComma(h0);
-    if (w0 <= 50 || h0 <= 50) {
-      return [ratio, result];
-    } else {
-      for (var i = 1; i <= 10; ++i) {
-        var a = w / h * i, b = h / w * i;
-        var aa = Math.round(a), bb = Math.round(b);
-        if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
-          return [ratio, result + '\n(approx. ' + compareUtil.addComma(aa) + ':' + i + ')'];
-        }
-        if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
-          return [ratio, result + '\n(approx. ' + i + ':' + compareUtil.addComma(bb) + ')'];
+  var aspectRatioUtil = (function() {
+    var calcAspectRatio = function(w, h) {
+      var gcd = compareUtil.calcGCD(w, h);
+      var w0 = w / gcd, h0 = h / gcd;
+      return {
+        w: w0,
+        h: h0,
+        ratio: w0 / h0    // use gcd to avoid comparison error
+      };
+    };
+    var findApproxAspectRatio = function(exact) {
+      if (exact.w > 50 && exact.h > 50) {
+        for (var i = 1; i <= 10; ++i) {
+          var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
+          var aa = Math.round(a), bb = Math.round(b);
+          if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
+            return {
+              w: aa,
+              h: i
+            };
+          }
+          if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
+            return {
+              w: i,
+              h: bb
+            };
+          }
         }
       }
-      return [ratio, result];
+      return null;
+    };
+    var toString = function(ratio) {
+      return compareUtil.addComma(ratio.w) + ':' + compareUtil.addComma(ratio.h);
+    };
+    return {
+      calcAspectRatio: calcAspectRatio,
+      findApproxAspectRatio: findApproxAspectRatio,
+      toString: toString
+    };
+  })();
+  var makeAspectRatioInfo = function(w, h) {
+    var exact = aspectRatioUtil.calcAspectRatio(w, h);
+    var approx = aspectRatioUtil.findApproxAspectRatio(exact);
+    if (approx) {
+      return [exact.ratio, aspectRatioUtil.toString(exact) + '\n(approx. ' + aspectRatioUtil.toString(approx) + ')'];
+    } else {
+      return [exact.ratio, aspectRatioUtil.toString(exact)];
     }
-  }
+  };
   function orientationToString(orientation) {
     var table = [
       'Undefined',
@@ -1116,7 +1144,7 @@
         [null, img.format ],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
-        img.sizeUnknown ? unknown : calcAspectRatio(img.width, img.height),
+        img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
         [orientationToString(img.orientation), orientationToString(img.orientation)],
         [img.size, compareUtil.addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()]
