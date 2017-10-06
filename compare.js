@@ -312,12 +312,9 @@
   var aspectRatioUtil = (function() {
     var calcAspectRatio = function(w, h) {
       var gcd = compareUtil.calcGCD(w, h);
-      var w0 = w / gcd, h0 = h / gcd;
-      return {
-        w: w0,
-        h: h0,
-        ratio: w0 / h0    // use gcd to avoid comparison error
-      };
+      w /= gcd;
+      h /= gcd;
+      return { w: w, h: h, ratio: w / h };
     };
     var findApproxAspectRatio = function(exact) {
       if (exact.w > 50 && exact.h > 50) {
@@ -325,16 +322,10 @@
           var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
           var aa = Math.round(a), bb = Math.round(b);
           if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
-            return {
-              w: aa,
-              h: i
-            };
+            return { w: aa, h: i };
           }
           if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
-            return {
-              w: i,
-              h: bb
-            };
+            return { w: i, h: bb };
           }
         }
       }
@@ -349,15 +340,6 @@
       toString: toString
     };
   })();
-  var makeAspectRatioInfo = function(w, h) {
-    var exact = aspectRatioUtil.calcAspectRatio(w, h);
-    var approx = aspectRatioUtil.findApproxAspectRatio(exact);
-    if (approx) {
-      return [exact.ratio, aspectRatioUtil.toString(exact) + '\n(approx. ' + aspectRatioUtil.toString(approx) + ')'];
-    } else {
-      return [exact.ratio, aspectRatioUtil.toString(exact)];
-    }
-  };
   function orientationToString(orientation) {
     var table = [
       'Undefined',
@@ -1126,8 +1108,19 @@
   })();
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
-  // info dialog
+  // Image Information
   var infoDialog = (function() {
+    var makeAspectRatioInfo = function(w, h) {
+      var exact = aspectRatioUtil.calcAspectRatio(w, h);
+      var approx = aspectRatioUtil.findApproxAspectRatio(exact);
+      var exactLabel = aspectRatioUtil.toString(exact);
+      if (approx) {
+        var approxLabel = aspectRatioUtil.toString(approx);
+        return [exact.ratio, exactLabel + '\n(approx. ' + approxLabel + ')'];
+      } else {
+        return [exact.ratio, exactLabel];
+      }
+    };
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
