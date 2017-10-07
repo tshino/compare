@@ -340,15 +340,12 @@
       toString: toString
     };
   })();
-  function orientationToString(orientation) {
-    var table = [
+  var orientationUtil = (function() {
+    var stringTable = [
       'Undefined',
       'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
       'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
-    return orientation ? (table[orientation] || 'Invalid') : '‐';
-  }
-  function applyExifOrientation(entry) {
-    var table = {
+    var cssTable = {
       2: { transposed: false, transform: ' scale(-1,1)' },
       3: { transposed: false, transform: ' rotate(180deg)' },
       4: { transposed: false, transform: ' scale(-1,1) rotate(180deg)' },
@@ -357,25 +354,35 @@
       7: { transposed: true,  transform: ' scale(-1,1) rotate(-90deg)' },
       8: { transposed: true,  transform: ' rotate(-90deg)' }
     };
-    var o = table[entry.orientation] || { transposed: false, transform: '' };
-    var w = entry.width, h = entry.height;
-    entry.width = o.transposed ? h : w;
-    entry.height = o.transposed ? w : h;
-    entry.transposed = o.transposed;
-    entry.orientationAsCSS = o.transform;
-  }
-  var interpretOrientation = function(ent, x, y) {
-    var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
-    if (ent.orientation === 2) { return { x: w-x, y: y };
-    } else if (ent.orientation === 3) { return { x: w-x, y: h-y };
-    } else if (ent.orientation === 4) { return { x: x, y: h-y };
-    } else if (ent.orientation === 5) { return { x: y, y: x };
-    } else if (ent.orientation === 6) { return { x: y, y: h-x };
-    } else if (ent.orientation === 7) { return { x: w-y, y: h-x };
-    } else if (ent.orientation === 8) { return { x: w-y, y: x };
-    } else { return { x: x, y: y };
-    }
-  };
+    var toString = function(orientation) {
+      return orientation ? (stringTable[orientation] || 'Invalid') : '‐';
+    };
+    var applyExifOrientation = function(entry) {
+      var o = cssTable[entry.orientation] || { transposed: false, transform: '' };
+      var w = entry.width, h = entry.height;
+      entry.width = o.transposed ? h : w;
+      entry.height = o.transposed ? w : h;
+      entry.transposed = o.transposed;
+      entry.orientationAsCSS = o.transform;
+    };
+    var interpretXY = function(ent, x, y) {
+      var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
+      if (ent.orientation === 2) { return { x: w-x, y: y };
+      } else if (ent.orientation === 3) { return { x: w-x, y: h-y };
+      } else if (ent.orientation === 4) { return { x: x, y: h-y };
+      } else if (ent.orientation === 5) { return { x: y, y: x };
+      } else if (ent.orientation === 6) { return { x: y, y: h-x };
+      } else if (ent.orientation === 7) { return { x: w-y, y: h-x };
+      } else if (ent.orientation === 8) { return { x: w-y, y: x };
+      } else { return { x: x, y: y };
+      }
+    };
+    return {
+      toString: toString,
+      applyExifOrientation: applyExifOrientation,
+      interpretXY: interpretXY
+    };
+  })();
   var makeImageNameWithIndex = function(tag, img) {
     return $(tag).
         css({ wordBreak : 'break-all' }).
@@ -632,7 +639,7 @@
       return fixedPosition;
     };
     var makePathDesc = function(img, x, y) {
-      var pos = interpretOrientation(img, x, y);
+      var pos = orientationUtil.interpretXY(img, x, y);
       var desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
       desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
@@ -862,7 +869,7 @@
       };
       var cursor = crossCursor.getPosition(img.index);
       var x = cursor.x, y = cursor.y;
-      var pos = interpretOrientation(img, x, y);
+      var pos = orientationUtil.interpretXY(img, x, y);
       if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
         img.colorHUD.find('.colorXY span, .colorCSS, .colorRGB span').text('');
         img.colorHUD.find('.colorSample, .colorBar').hide();
@@ -1138,7 +1145,7 @@
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
-        [orientationToString(img.orientation), orientationToString(img.orientation)],
+        [orientationUtil.toString(img.orientation), orientationUtil.toString(img.orientation)],
         [img.size, compareUtil.addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()]
       ];
@@ -1493,7 +1500,7 @@
       updateTable();
     });
     var updateAsync = function(img) {
-      var leftTop = interpretOrientation(img, 0, 0);
+      var leftTop = orientationUtil.interpretXY(img, 0, 0);
       var flipped = img.transposed ? (leftTop.y !== 0) : (leftTop.x !== 0);
       taskQueue.addTask({
         cmd:      'calcWaveform',
@@ -2712,7 +2719,7 @@
     entry.loading    = false;
     entry.progress   = 100;
     //
-    applyExifOrientation(entry);
+    orientationUtil.applyExifOrientation(entry);
     updateDOM();
     nowLoadingDialog.update();
   };
