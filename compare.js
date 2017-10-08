@@ -97,8 +97,7 @@
       }
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
-          (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey))
-      {
+          (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
         toggleSingleView(e.keyCode % 48);
         return false;
       }
@@ -389,7 +388,6 @@
         append($('<span class="imageIndex"/>').text(img.index + 1)).
         append($('<span/>').text(img.name));
   };
-
   var toggleSingleView = function(targetIndex) {
     if (targetIndex === 0 ||
         targetIndex === currentImageIndex ||
@@ -419,8 +417,7 @@
       return false;
     }
   };
-  function arrangeLayout()
-  {
+  var arrangeLayout = function() {
     if (isSingleView) {
       currentImageIndex = 0;
     } else if (layoutMode === 'x') {
@@ -429,9 +426,8 @@
       layoutMode = 'x';
     }
     updateLayout();
-  }
-  function toggleOverlay()
-  {
+  };
+  var toggleOverlay = function() {
     if (!overlayMode && 2 <= images.length) {
       if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
         currentImageIndex = images[1].index + 1;
@@ -444,7 +440,7 @@
       overlayMode = false;
       updateLayout();
     }
-  }
+  };
 
   // ROI map
   var roiMap = (function() {
