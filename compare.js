@@ -98,7 +98,7 @@
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
           (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
-        toggleSingleView(e.keyCode % 48);
+        viewManagement.toggleSingleView(e.keyCode % 48);
         return false;
       }
       // Cross cursor (cursor key)
@@ -111,7 +111,7 @@
       }
       // TAB (9)
       if (e.keyCode === 9) {
-        if (false == flipSingleView(!e.shiftKey)) {
+        if (false == viewManagement.flipSingleView(!e.shiftKey)) {
           return false;
         }
       }
@@ -120,7 +120,7 @@
         if (crossCursor.isEnabled()) {
           crossCursor.disable();
         } else {
-          resetLayoutState();
+          viewManagement.resetLayoutState();
           resetMouseDrag();
           updateLayout();
         }
@@ -161,9 +161,9 @@
     // 'i' (105)
     105 : { global: true, func: infoDialog.toggle },
     // '/' (47)
-    47 : { global: false, func: arrangeLayout },
+    47 : { global: false, func: viewManagement.arrangeLayout },
     // 'o' (111)
-    111: { global: false, func: toggleOverlay },
+    111: { global: false, func: viewManagement.toggleOverlay },
     // 'n' (110)
     110 : { global: false, func: roiMap.toggle },
     // 'g' (103)
@@ -247,12 +247,75 @@
     }
     return target;
   };
-  var resetLayoutState = function() {
-    currentImageIndex = 0;
-    viewZoom.setZoom(0);
-    viewZoom.setOffset(0.5, 0.5);
-    overlayMode = false;
-  };
+  // View management functions
+  var viewManagement = (function() {
+    var resetLayoutState = function() {
+      currentImageIndex = 0;
+      viewZoom.setZoom(0);
+      viewZoom.setOffset(0.5, 0.5);
+      overlayMode = false;
+    };
+    var toggleSingleView = function(targetIndex) {
+      if (targetIndex === 0 ||
+          targetIndex === currentImageIndex ||
+          targetIndex > entries.length ||
+          !entries[targetIndex - 1].visible) {
+        currentImageIndex = 0;
+      } else {
+        currentImageIndex = targetIndex;
+      }
+      updateLayout();
+    };
+    var flipSingleView = function(forward) {
+      if (0 < images.length) {
+        var k = forward ? 0 : images.length - 1;
+        for (var i = 0, img; img = images[i]; i++) {
+          if (currentImageIndex === 1 + img.index) {
+            if (forward) {
+              k = (i + 1) % images.length;
+            } else {
+              k = (i + images.length - 1) % images.length;
+            }
+            break;
+          }
+        }
+        currentImageIndex = 1 + images[k].index;
+        updateLayout();
+        return false;
+      }
+    };
+    var arrangeLayout = function() {
+      if (isSingleView) {
+        currentImageIndex = 0;
+      } else if (layoutMode === 'x') {
+        layoutMode = 'y';
+      } else {
+        layoutMode = 'x';
+      }
+      updateLayout();
+    };
+    var toggleOverlay = function() {
+      if (!overlayMode && 2 <= images.length) {
+        if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
+          currentImageIndex = images[1].index + 1;
+        }
+        overlayMode = true;
+        overlayBaseIndex = images[0].index;
+        updateLayout();
+      } else if (overlayMode) {
+        currentImageIndex = overlayBaseIndex + 1;
+        overlayMode = false;
+        updateLayout();
+      }
+    };
+    return {
+      resetLayoutState: resetLayoutState,
+      toggleSingleView: toggleSingleView,
+      flipSingleView: flipSingleView,
+      arrangeLayout: arrangeLayout,
+      toggleOverlay: toggleOverlay
+    };
+  })();
   var removeEntry = function(index) {
     var ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
@@ -277,7 +340,7 @@
       ent.colorTable = null;
       ent.colorDist = null;
       ent.colorDistAxes = null;
-      resetLayoutState();
+      viewManagement.resetLayoutState();
       discardTasksOfEntryByIndex(index);
       updateDOM();
     }
@@ -387,59 +450,6 @@
         css({ wordBreak : 'break-all' }).
         append($('<span class="imageIndex"/>').text(img.index + 1)).
         append($('<span/>').text(img.name));
-  };
-  var toggleSingleView = function(targetIndex) {
-    if (targetIndex === 0 ||
-        targetIndex === currentImageIndex ||
-        targetIndex > entries.length ||
-        !entries[targetIndex - 1].visible) {
-      currentImageIndex = 0;
-    } else {
-      currentImageIndex = targetIndex;
-    }
-    updateLayout();
-  };
-  var flipSingleView = function(forward) {
-    if (0 < images.length) {
-      var k = forward ? 0 : images.length - 1;
-      for (var i = 0, img; img = images[i]; i++) {
-        if (currentImageIndex === 1 + img.index) {
-          if (forward) {
-            k = (i + 1) % images.length;
-          } else {
-            k = (i + images.length - 1) % images.length;
-          }
-          break;
-        }
-      }
-      currentImageIndex = 1 + images[k].index;
-      updateLayout();
-      return false;
-    }
-  };
-  var arrangeLayout = function() {
-    if (isSingleView) {
-      currentImageIndex = 0;
-    } else if (layoutMode === 'x') {
-      layoutMode = 'y';
-    } else {
-      layoutMode = 'x';
-    }
-    updateLayout();
-  };
-  var toggleOverlay = function() {
-    if (!overlayMode && 2 <= images.length) {
-      if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
-        currentImageIndex = images[1].index + 1;
-      }
-      overlayMode = true;
-      overlayBaseIndex = images[0].index;
-      updateLayout();
-    } else if (overlayMode) {
-      currentImageIndex = overlayBaseIndex + 1;
-      overlayMode = false;
-      updateLayout();
-    }
   };
 
   // ROI map
@@ -2531,8 +2541,8 @@
     $('#analysisbtn').click(toggleAnalysis);
     $('#zoomIn').click(viewZoom.zoomIn);
     $('#zoomOut').click(viewZoom.zoomOut);
-    $('#arrange').click(arrangeLayout);
-    $('#overlay').click(toggleOverlay);
+    $('#arrange').click(viewManagement.arrangeLayout);
+    $('#overlay').click(viewManagement.toggleOverlay);
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
     $('#fullscreen').click(toggleFullscreen);
@@ -2546,7 +2556,7 @@
             ja: '画像を選択 '
           })
         ).
-        click(function(e) { toggleSingleView(index + 1); });
+        click(function(e) { viewManagement.toggleSingleView(index + 1); });
       if (index < 9) {
         button.find('span.tooltip span').addClass('keys flat').
             append($('<span/>').text(index + 1));
@@ -2610,7 +2620,7 @@
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>').append(
             makeImageNameWithIndex('<span class="imageName">', ent).
-              click({index : i}, function(e) { toggleSingleView(e.data.index + 1); }).
+              click({index : i}, function(e) { viewManagement.toggleSingleView(e.data.index + 1); }).
               append(
                 $('<button>').addClass('remove').text('×').
                   click({index : i}, function(e) { removeEntry(e.data.index); }))
