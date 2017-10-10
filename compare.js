@@ -37,7 +37,7 @@
   $('#diffbtn').click(diffDialog.toggle);
   $('.swapbtn').click(swapBaseAndTargetImage);
 
-  $(window).resize(function() { layoutMode = null; updateLayout(); });
+  $(window).resize(viewManagement.resetLayoutMode);
   $(window).keydown(function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
         return true;
@@ -284,6 +284,10 @@
         return false;
       }
     };
+    var resetLayoutMode = function() {
+      layoutMode = null;
+      updateLayout();
+    };
     var arrangeLayout = function() {
       if (isSingleView) {
         currentImageIndex = 0;
@@ -323,6 +327,7 @@
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
+      resetLayoutMode: resetLayoutMode,
       arrangeLayout: arrangeLayout,
       toggleOverlay: toggleOverlay,
       update: update
