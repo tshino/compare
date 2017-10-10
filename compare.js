@@ -308,12 +308,24 @@
         updateLayout();
       }
     };
+    var update = function() {
+      isSingleView =
+              currentImageIndex !== 0 &&
+              currentImageIndex <= entries.length;
+      if (!isSingleView && overlayMode) {
+        overlayMode = false;
+      }
+      if (layoutMode === null) {
+        layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
+      }
+    };
     return {
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
       arrangeLayout: arrangeLayout,
-      toggleOverlay: toggleOverlay
+      toggleOverlay: toggleOverlay,
+      update: update
     };
   })();
   var removeEntry = function(index) {
@@ -2608,8 +2620,7 @@
       onUpdateLayout: onUpdateLayout
     };
   })();
-  function updateDOM()
-  {
+  var updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
     if (images.length === 0) {
       viewZoom.disable();
@@ -2640,19 +2651,9 @@
     }
     resetMouseDrag();
     updateLayout();
-  }
-
-  function updateLayout()
-  {
-    isSingleView =
-            currentImageIndex !== 0 &&
-            currentImageIndex <= entries.length;
-    if (!isSingleView && overlayMode) {
-      overlayMode = false;
-    }
-    if (layoutMode === null) {
-      layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
-    }
+  };
+  var updateLayout = function() {
+    viewManagement.update();
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
     var param = makeImageLayoutParam();
     $('#view > div.imageBox').each(function(index) {
@@ -2683,7 +2684,7 @@
     roiMap.onUpdateLayout();
     updateTransform();
     dialogUtil.adjustDialogPosition();
-  }
+  };
   
   function updateTransform() {
     for (var i = 0, ent; ent = entries[i]; i++) {
