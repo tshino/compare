@@ -37,7 +37,7 @@
   $('#diffbtn').click(diffDialog.toggle);
   $('.swapbtn').click(swapBaseAndTargetImage);
 
-  $(window).resize(viewManagement.resetLayoutMode);
+  $(window).resize(viewManagement.onResize);
   $(window).keydown(function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
         return true;
@@ -128,7 +128,7 @@
       }
       // Delete (46)
       if (e.keyCode === 46 && !e.shiftKey && 0 < images.length) {
-        var index = isSingleView ? currentImageIndex - 1 : images[0].index;
+        var index = viewManagement.getCurrentIndexOr(images[0].index);
         removeEntry(index);
         return false;
       }
@@ -284,7 +284,7 @@
         return false;
       }
     };
-    var resetLayoutMode = function() {
+    var onResize = function() {
       layoutMode = null;
       updateLayout();
     };
@@ -323,14 +323,18 @@
         layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
       }
     };
+    var getCurrentIndexOr = function(defaultIndex) {
+      return isSingleView ? currentImageIndex - 1 : defaultIndex;
+    };
     return {
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
-      resetLayoutMode: resetLayoutMode,
+      onResize: onResize,
       arrangeLayout: arrangeLayout,
       toggleOverlay: toggleOverlay,
-      update: update
+      update: update,
+      getCurrentIndexOr: getCurrentIndexOr
     };
   })();
   var removeEntry = function(index) {
@@ -504,7 +508,7 @@
     };
     var onUpdateTransform = function() {
       if (enableMap && images.length) {
-        var index = isSingleView ? currentImageIndex - 1 : 0;
+        var index = viewManagement.getCurrentIndexOr(0);
         var img = entries[index].ready() ? entries[index] : images[0];
         updateMap(img);
       }
@@ -616,7 +620,7 @@
       onRemoveCallback = onRemove;
     };
     var enable = function() {
-      var index = isSingleView ? currentImageIndex - 1 : 0 < images.length ? images[0].index : -1;
+      var index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
       if (!enableCrossCursor && 0 <= index) {
         enableCrossCursor = true;
         primaryIndex = index;
@@ -733,7 +737,7 @@
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
-          var index = isSingleView ? currentImageIndex - 1 : primaryIndex;
+          var index = viewManagement.getCurrentIndexOr(primaryIndex);
           if (index < 0 || !positions[index]) {
             index = primaryIndex;
           }
