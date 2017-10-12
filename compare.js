@@ -2443,6 +2443,7 @@
       styles = updateFigureStylesForActualSize(styles, w, h);
       diffResult.baseWidth = styles.baseW;
       diffResult.baseHeight = styles.baseH;
+      styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
       if (diffResult.result.summary.unmatch === 0) {
         setText($('#diffSummary'), {
