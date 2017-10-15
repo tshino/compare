@@ -119,6 +119,9 @@
       if (e.keyCode === 27 && !e.shiftKey) {
         if (crossCursor.isEnabled()) {
           crossCursor.disable();
+        } else if (altViewMode) {
+          altViewMode = null;
+          updateDOM();
         } else {
           viewManagement.resetLayoutState();
           resetMouseDrag();
@@ -169,7 +172,10 @@
     // 'g' (103)
     103 : { global: false, func: grid.toggle },
     // 'p' (112)
-    112 : { global: false, func: crossCursor.toggle }
+    112 : { global: false, func: crossCursor.toggle },
+    // 'q' (113)
+    113 : { global: false, func: changeAltViewMode }
+
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
@@ -353,6 +359,8 @@
       }
       toneCurveDialog.onRemoveEntry(index);
       diffDialog.onRemoveEntry(index);
+      ent.altView = null;
+      ent.mainImage = null;
       ent.asCanvas = null;
       ent.imageData = null;
       ent.histogram = null;
@@ -2630,6 +2638,46 @@
       onUpdateLayout: onUpdateLayout
     };
   })();
+  var altViewMode = null;
+  var makeAltView = function(ent) {
+    if (altViewMode === null) {
+      ent.altView = null;
+      return null;
+    }
+    var imageData = getImageData(ent);
+    if (!imageData) {
+      ent.altView = null;
+      return null;
+    }
+    var w = imageData.width, h = imageData.height;
+    var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
+    figureUtil.copyImageBits(imageData, altImageData);
+    var getChannel = altViewMode === 'r' ?
+      function(data, offset) {
+        return data[offset + 0];
+      } : altViewMode === 'g' ?
+      function(data, offset) {
+        return data[offset + 1];
+      } : altViewMode === 'b' ?
+      function(data, offset) {
+        return data[offset + 2];
+      } : //altViewMode === 'a' ?
+      function(data, offset) {
+        return data[offset + 3];
+      };
+    for (var i = 0, n = 4 * w * h; i < n; i += 4) {
+      var x = getChannel(altImageData.data, i);
+      altImageData.data[i + 0] = x;
+      altImageData.data[i + 1] = x;
+      altImageData.data[i + 2] = x;
+      altImageData.data[i + 3] = 255;
+    }
+    if (!ent.altView) {
+      ent.altView = figureUtil.makeBlankFigure(w, h);
+    }
+    ent.altView.context.putImageData(altImageData, 0, 0);
+    return ent.altView.canvas;
+  };
   var updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
     if (images.length === 0) {
@@ -2648,8 +2696,17 @@
           );
           $('#drop').before(ent.view);
         }
-        if (ent.element && 0 === ent.view.find('.image').length) {
-          ent.view.prepend(ent.element);
+        if (ent.element) {
+          if (ent.altViewMode !== altViewMode) {
+            ent.view.find('.image').remove();
+            var altView = makeAltView(ent);
+            ent.element = altView || ent.mainImage;
+            ent.altViewMode = altView ? altViewMode : null;
+          }
+          if (0 === ent.view.find('.image').length) {
+            $(ent.element).addClass('image');
+            ent.view.prepend(ent.element);
+          }
         }
         if (ent.error) {
           ent.view.addClass('error');
@@ -2715,6 +2772,20 @@
     crossCursor.onUpdateTransform();
   }
 
+  var changeAltViewMode = function() {
+    if (altViewMode === null) {
+      altViewMode = 'r';
+    } else if (altViewMode === 'r') {
+      altViewMode = 'g';
+    } else if (altViewMode === 'g') {
+      altViewMode = 'b';
+    } else if (altViewMode === 'b') {
+    //  altViewMode = 'a';
+    //} else if (altViewMode === 'a') {
+      altViewMode = null;
+    }
+    updateDOM();
+  };
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
     var w = img.naturalWidth;
     var h = img.naturalHeight;
@@ -2726,8 +2797,10 @@
     var fig = figureUtil.makeBlankFigure(w, h);
     fig.context.drawImage(img, 0, 0, w, h);
     //
-    entry.element    = useCanvasToDisplay ? fig.canvas : img;
-    $(entry.element).addClass('image');
+    entry.altViewMode = null;
+    entry.altView    = null;
+    entry.mainImage  = useCanvasToDisplay ? fig.canvas : img;
+    entry.element    = entry.mainImage;
     entry.asCanvas   = fig.canvas;
     entry.width      = w;
     entry.height     = h;
