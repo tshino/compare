@@ -2612,6 +2612,21 @@
         }
       });
     };
+    var updateAltViewModeIndicator = function() {
+      if (altViewMode) {
+        channelDesc =
+            altViewMode === 'r' ? 'R' :
+            altViewMode === 'g' ? 'G' :
+            altViewMode === 'b' ? 'B' :
+            altViewMode === 'a' ? 'A' : '??';
+        setText($('#altViewMode'), {
+          en: 'CHANNEL : ' + channelDesc,
+          ja: 'チャンネル : ' + channelDesc });
+        $('#altViewMode').css({ display : 'block' });
+      } else {
+        $('#altViewMode').css({ display : '' });
+      }
+    };
     var updateOverlayModeIndicator = function() {
       if (overlayMode) {
         var baseIndex = overlayBaseIndex + 1;
@@ -2631,6 +2646,7 @@
     var onUpdateLayout = function() {
       updateArrangeButton();
       updateSelectorButtonState();
+      updateAltViewModeIndicator();
       updateOverlayModeIndicator();
     };
     return {
