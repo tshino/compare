@@ -119,9 +119,8 @@
       if (e.keyCode === 27 && !e.shiftKey) {
         if (crossCursor.isEnabled()) {
           crossCursor.disable();
-        } else if (altViewMode) {
-          altViewMode = null;
-          updateDOM();
+        } else if (altView.active()) {
+          altView.reset();
         } else {
           viewManagement.resetLayoutState();
           resetMouseDrag();
@@ -174,7 +173,7 @@
     // 'p' (112)
     112 : { global: false, func: crossCursor.toggle },
     // 'q' (113)
-    113 : { global: false, func: changeAltViewMode }
+    113 : { global: false, func: altView.toggle }
 
   };
   $(window).keypress(function(e) {
@@ -2563,6 +2562,87 @@
     resetMouseDrag();
     compareUtil.toggleFullscreen($('#viewroot').get(0));
   };
+  // Alt View
+  var altView = (function() {
+    var currentMode = null;
+    var reset = function() {
+      if (currentMode) {
+        currentMode = null;
+        updateDOM();
+      }
+    };
+    var toggle = function() {
+      currentMode =
+          currentMode === null ? 'r' :
+          currentMode === 'r' ? 'g' :
+          currentMode === 'g' ? 'b' :
+          //currentMode === 'b' ? 'a' :
+          null;
+      updateDOM();
+    };
+    var updateModeIndicator = function() {
+      if (currentMode) {
+        channelDesc =
+            currentMode === 'r' ? 'R' :
+            currentMode === 'g' ? 'G' :
+            currentMode === 'b' ? 'B' :
+            currentMode === 'a' ? 'A' : '??';
+        setText($('#altViewMode'), {
+          en: 'CHANNEL : ' + channelDesc,
+          ja: 'チャンネル : ' + channelDesc });
+        $('#altViewMode').css({ display : 'block' });
+      } else {
+        $('#altViewMode').css({ display : '' });
+      }
+    };
+    var getAltImage = function(ent) {
+      if (currentMode === null) {
+        ent.altView = null;
+        return null;
+      }
+      var imageData = getImageData(ent);
+      if (!imageData) {
+        ent.altView = null;
+        return null;
+      }
+      var w = imageData.width, h = imageData.height;
+      var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
+      figureUtil.copyImageBits(imageData, altImageData);
+      var getChannelValue =
+          currentMode === 'r' ? function(data, offset) {
+            return data[offset + 0];
+          } :
+          currentMode === 'g' ? function(data, offset) {
+            return data[offset + 1];
+          } :
+          currentMode === 'b' ? function(data, offset) {
+            return data[offset + 2];
+          } :
+          /* currentMode === 'a' ? */ function(data, offset) {
+            return data[offset + 3];
+          };
+      for (var i = 0, n = 4 * w * h; i < n; i += 4) {
+        var x = getChannelValue(altImageData.data, i);
+        altImageData.data[i + 0] = x;
+        altImageData.data[i + 1] = x;
+        altImageData.data[i + 2] = x;
+        altImageData.data[i + 3] = 255;
+      }
+      if (!ent.altView) {
+        ent.altView = figureUtil.makeBlankFigure(w, h);
+      }
+      ent.altView.context.putImageData(altImageData, 0, 0);
+      return ent.altView.canvas;
+    };
+    return {
+      reset: reset,
+      toggle: toggle,
+      updateModeIndicator: updateModeIndicator,
+      getAltImage: getAltImage,
+      active: function() { return null !== currentMode; },
+      currentMode: function() { return currentMode; }
+    };
+  })();
   // Side Bar
   var sideBar = (function() {
     $('#add').click(function() {
@@ -2612,21 +2692,6 @@
         }
       });
     };
-    var updateAltViewModeIndicator = function() {
-      if (altViewMode) {
-        channelDesc =
-            altViewMode === 'r' ? 'R' :
-            altViewMode === 'g' ? 'G' :
-            altViewMode === 'b' ? 'B' :
-            altViewMode === 'a' ? 'A' : '??';
-        setText($('#altViewMode'), {
-          en: 'CHANNEL : ' + channelDesc,
-          ja: 'チャンネル : ' + channelDesc });
-        $('#altViewMode').css({ display : 'block' });
-      } else {
-        $('#altViewMode').css({ display : '' });
-      }
-    };
     var updateOverlayModeIndicator = function() {
       if (overlayMode) {
         var baseIndex = overlayBaseIndex + 1;
@@ -2646,7 +2711,7 @@
     var onUpdateLayout = function() {
       updateArrangeButton();
       updateSelectorButtonState();
-      updateAltViewModeIndicator();
+      altView.updateModeIndicator();
       updateOverlayModeIndicator();
     };
     return {
@@ -2654,46 +2719,6 @@
       onUpdateLayout: onUpdateLayout
     };
   })();
-  var altViewMode = null;
-  var makeAltView = function(ent) {
-    if (altViewMode === null) {
-      ent.altView = null;
-      return null;
-    }
-    var imageData = getImageData(ent);
-    if (!imageData) {
-      ent.altView = null;
-      return null;
-    }
-    var w = imageData.width, h = imageData.height;
-    var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
-    figureUtil.copyImageBits(imageData, altImageData);
-    var getChannel = altViewMode === 'r' ?
-      function(data, offset) {
-        return data[offset + 0];
-      } : altViewMode === 'g' ?
-      function(data, offset) {
-        return data[offset + 1];
-      } : altViewMode === 'b' ?
-      function(data, offset) {
-        return data[offset + 2];
-      } : //altViewMode === 'a' ?
-      function(data, offset) {
-        return data[offset + 3];
-      };
-    for (var i = 0, n = 4 * w * h; i < n; i += 4) {
-      var x = getChannel(altImageData.data, i);
-      altImageData.data[i + 0] = x;
-      altImageData.data[i + 1] = x;
-      altImageData.data[i + 2] = x;
-      altImageData.data[i + 3] = 255;
-    }
-    if (!ent.altView) {
-      ent.altView = figureUtil.makeBlankFigure(w, h);
-    }
-    ent.altView.context.putImageData(altImageData, 0, 0);
-    return ent.altView.canvas;
-  };
   var updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
     if (images.length === 0) {
@@ -2713,11 +2738,11 @@
           $('#drop').before(ent.view);
         }
         if (ent.element) {
-          if (ent.altViewMode !== altViewMode) {
+          if (ent.altViewMode !== altView.currentMode()) {
             ent.view.find('.image').remove();
-            var altView = makeAltView(ent);
-            ent.element = altView || ent.mainImage;
-            ent.altViewMode = altView ? altViewMode : null;
+            var altImage = altView.getAltImage(ent);
+            ent.element = altImage || ent.mainImage;
+            ent.altViewMode = altImage ? altView.currentMode() : null;
           }
           if (0 === ent.view.find('.image').length) {
             $(ent.element).addClass('image');
@@ -2788,20 +2813,6 @@
     crossCursor.onUpdateTransform();
   }
 
-  var changeAltViewMode = function() {
-    if (altViewMode === null) {
-      altViewMode = 'r';
-    } else if (altViewMode === 'r') {
-      altViewMode = 'g';
-    } else if (altViewMode === 'g') {
-      altViewMode = 'b';
-    } else if (altViewMode === 'b') {
-    //  altViewMode = 'a';
-    //} else if (altViewMode === 'a') {
-      altViewMode = null;
-    }
-    updateDOM();
-  };
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
     var w = img.naturalWidth;
     var h = img.naturalHeight;
