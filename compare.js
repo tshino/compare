@@ -121,6 +121,7 @@
           crossCursor.disable();
         } else if (altView.active()) {
           altView.reset();
+          updateDOM();
         } else {
           viewManagement.resetLayoutState();
           resetMouseDrag();
@@ -368,8 +369,9 @@
       ent.colorTable = null;
       ent.colorDist = null;
       ent.colorDistAxes = null;
-      viewManagement.resetLayoutState();
       discardTasksOfEntryByIndex(index);
+      viewManagement.resetLayoutState();
+      altView.reset();
       updateDOM();
     }
   };
@@ -2564,31 +2566,57 @@
   };
   // Alt View
   var altView = (function() {
+    var colorSpace = 'rgb';
     var currentMode = null;
+    $('#altViewColorSpace').on('change', function(e) {
+      colorSpace = this.options[this.selectedIndex].value;
+      currentMode =
+          colorSpace === 'rgb' ? 'r' :
+          /*colorSpace === 'ycbcr601' ? */ 'y';
+      updateDOM();
+      return false;
+    });
     var reset = function() {
       if (currentMode) {
         currentMode = null;
-        updateDOM();
       }
     };
     var toggle = function() {
-      currentMode =
+      if (images.length === 0) {
+        return;
+      }
+      if (colorSpace === 'rgb') {
+        currentMode =
           currentMode === null ? 'r' :
           currentMode === 'r' ? 'g' :
           currentMode === 'g' ? 'b' :
           //currentMode === 'b' ? 'a' :
           null;
+      } else { // 'ycbcr601'
+        currentMode =
+          currentMode === null ? 'y' :
+          currentMode === 'y' ? 'cb' :
+          currentMode === 'cb' ? 'cr' :
+          null;
+      }
       updateDOM();
     };
     var updateModeIndicator = function() {
       if (currentMode) {
-        channelDesc =
+        if (colorSpace === 'rgb') {
+          channelDesc =
             currentMode === 'r' ? 'R' :
             currentMode === 'g' ? 'G' :
             currentMode === 'b' ? 'B' :
             currentMode === 'a' ? 'A' : '??';
-        setText($('#altViewMode'), {
-          en: 'CHANNEL : ' + channelDesc,
+        } else { // 'ycbcr601'
+          channelDesc =
+            currentMode === 'y' ? 'Y' :
+            currentMode === 'cb' ? 'Cb' :
+            currentMode === 'cr' ? 'Cr' : '??';
+        }
+        setText($('#altViewModeDesc'), {
+          en: 'Channel : ' + channelDesc,
           ja: 'チャンネル : ' + channelDesc });
         $('#altViewMode').css({ display : 'block' });
       } else {
@@ -2618,7 +2646,19 @@
           currentMode === 'b' ? function(data, offset) {
             return data[offset + 2];
           } :
-          /* currentMode === 'a' ? */ function(data, offset) {
+          currentMode === 'y' ? function(data, offset) {
+            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
+            return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+          } :
+          currentMode === 'cb' ? function(data, offset) {
+            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
+            return Math.round(127.5 - 0.1687 * r - 0.3313 * g + 0.5000 * b);
+          } :
+          currentMode === 'cr' ? function(data, offset) {
+            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
+            return Math.round(127.5 + 0.5000 * r - 0.4187 * g - 0.0813 * b);
+          } :
+          /*currentMode === 'a'*/ function(data, offset) {
             return data[offset + 3];
           };
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {

@@ -94,14 +94,24 @@ var changeLang = function(lang) {
 	<div id="view">
 		<div class="hudContainer">
 			<div id="altViewMode" class="light hud">
+				<div id="altViewModeDesc">
+					<span class="en"></span>
+					<span class="ja"></span>
+				</div>
+				<div>
+					<span class="en">Color Space :</span>
+					<span class="ja">色空間 :</span>
+					<select id="altViewColorSpace">
+						<option value="rgb">RGB</option>
+						<option value="ycbcr601">YCbCr (JPEG / BT.601)</option>
+					</select>
+				</div>
+			</div>
+			<div id="mode" class="transparent light hud">
 				<span class="en"></span>
 				<span class="ja"></span>
 			</div>
-			<div id="mode" class="light hud">
-				<span class="en"></span>
-				<span class="ja"></span>
-			</div>
-			<div id="map" class="dark hud">
+			<div id="map" class="transparent dark hud">
 				<svg>
 					<clipPath id="mapClip">
 						<rect x="0" y="0" width="100%" height="100%"></rect>
