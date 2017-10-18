@@ -2511,7 +2511,8 @@
           diffResult.offsetY !== diffOptions.offsetY) {
         updateAsync();
       }
-      var figW = 768, figH = 400, figMargin = 8;
+      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
+      var figH = Math.max(320, Math.round($('#view').height() * 0.60)), figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (diffResult.result === null) {
         $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
