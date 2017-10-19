@@ -589,7 +589,7 @@ var changeLang = function(lang) {
 				</h3>
 			</div>
 			<div>
-				<table id="diffTable">
+				<table>
 					<tr>
 						<td class="prop">
 							<span class="en">Base Image</span>
@@ -605,90 +605,8 @@ var changeLang = function(lang) {
 						</td>
 						<td id="diffTargetName" colspan="2"></td>
 					</tr>
-					<tr class="num diffDimension">
-						<td class="prop" rowspan="3">
-							<span class="en">Dimension</span>
-							<span class="ja">画像サイズ</span>
-						</td>
-						<td class="output" colspan="3">
-							&nbsp;<span id="diffDimensionReport"></span>
-						</td>
-					</tr>
-					<tr class="diffDimension">
-						<td class="input" colspan="1">
-							<span class="en">dimension option:</span>
-							<span class="ja">画像サイズオプション:</span>
-						</td>
-						<td class="input" colspan="2">
-							<select class="diffDimensionOption en">
-								<option value="resize">resize to fit to larger one</option>
-								<option value="max">no resize (compare in larger dimension)</option>
-								<option value="min">no resize (compare in smaller dimension)</option>
-							</select>
-							<select class="diffDimensionOption ja">
-								<option value="resize">大きい方に合わせてリサイズ</option>
-								<option value="max">リサイズなし（大きいサイズで比較）</option>
-								<option value="min">リサイズなし（小さいサイズで比較）</option>
-							</select>
-						</td>
-					</tr>
-					<tr class="diffDimension">
-						<td class="input" colspan="1">
-							<span class="en">resize method:</span>
-							<span class="ja">リサイズ方法:</span>
-						</td>
-						<td class="input" colspan="2">
-							<select id="diffResizeMethod">
-								<option value="lanczos3">Lanczos3</option>
-								<option value="lanczos2">Lanczos2</option>
-								<option value="bilinear">Bilinear</option>
-								<option value="nn">Nearest neighbor</option>
-							</select>
-						</td>
-					</tr>
 					<tr>
-						<td class="prop" rowspan="2">
-							<span class="en">Offset</span>
-							<span class="ja">オフセット</span>
-						</td>
-						<td class="input" colspan="1">
-							<span class="en">horizontal offset [px]</span>
-							<span class="ja">水平オフセット [px]</span>
-						</td>
-						<td class="input" colspan="2" style="min-width:auto"><input id="diffOffsetX" type="number" min="-9999" max="9999" value="0"></td>
-					</tr>
-					<tr class="num">
-						<td class="input">
-							<span class="en">vertical offset [px]</span>
-							<span class="ja">垂直オフセット [px]</span>
-						</td>
-						<td class="input" colspan="2" style="min-width:auto"><input id="diffOffsetY" type="number" min="-9999" max="9999" value="0"></td>
-					</tr>
-					<tr>
-						<td class="prop" rowspan="3">
-							<span class="en">RGBA error</span>
-							<span class="ja">RGBA誤差</span>
-						</td>
-						<td class="output" colspan="1">
-							<span class="en">detected maximum error value:</span>
-							<span class="ja">検出した最大誤差:</span>
-						</td>
-						<td class="output" colspan="2" id="diffDetectedMaxAE"></td>
-					</tr>
-					<tr class="num">
-						<td class="input" colspan="1">
-							<span class="en">maximum error to ignore</span>
-							<span class="ja">無視する誤差の大きさ</span>
-							(0 - 255)
-						</td>
-						<td class="input" colspan="2" style="min-width:auto"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
-					</tr>
-					<tr class="prop">
-						<td class="output" colspan="1">
-							<span class="en">ignored unmatched pixels:</span>
-							<span class="ja">無視した不一致ピクセル:</span>
-						</td>
-						<td class="output" colspan="2" id="diffIgnoreAEResult"></td>
+						<td id="diffResult" class="fig" colspan="4"></td>
 					</tr>
 					<tr>
 						<td class="output" colspan="4" style="text-align:center">
@@ -702,9 +620,6 @@ var changeLang = function(lang) {
 							</span>
 						</td>
 					</tr>
-					<tr>
-						<td id="diffResult" class="fig" colspan="4"></td>
-					</tr>
 				</table>
 				<div class="footnote">
 					<span class="en">
@@ -714,6 +629,93 @@ var changeLang = function(lang) {
 						※ 2つの画像の異なる部分を色で示しています
 					</span>
 				</div>
+				<table>
+					<tr class="num diffDimension">
+						<td class="prop" rowspan="3">
+							<span class="en">Dimension</span>
+							<span class="ja">画像サイズ</span>
+						</td>
+						<td class="output" colspan="2">
+							&nbsp;<span id="diffDimensionReport"></span>
+						</td>
+					</tr>
+					<tr class="diffDimension">
+						<td class="input">
+							<span class="en">dimension option:</span>
+							<span class="ja">画像サイズオプション:</span>
+						</td>
+						<td class="input">
+							<select class="diffDimensionOption en">
+								<option value="resize">resize to fit to larger one</option>
+								<option value="max">no resize (compare in larger dimension)</option>
+								<option value="min">no resize (compare in smaller dimension)</option>
+							</select>
+							<select class="diffDimensionOption ja">
+								<option value="resize">大きい方に合わせてリサイズ</option>
+								<option value="max">リサイズなし（大きいサイズで比較）</option>
+								<option value="min">リサイズなし（小さいサイズで比較）</option>
+							</select>
+						</td>
+					</tr>
+					<tr class="diffDimension">
+						<td class="input">
+							<span class="en">resize method:</span>
+							<span class="ja">リサイズ方法:</span>
+						</td>
+						<td class="input">
+							<select id="diffResizeMethod">
+								<option value="lanczos3">Lanczos3</option>
+								<option value="lanczos2">Lanczos2</option>
+								<option value="bilinear">Bilinear</option>
+								<option value="nn">Nearest neighbor</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="prop" rowspan="2">
+							<span class="en">Offset</span>
+							<span class="ja">オフセット</span>
+						</td>
+						<td class="input">
+							<span class="en">horizontal offset [px]</span>
+							<span class="ja">水平オフセット [px]</span>
+						</td>
+						<td class="input" style="min-width:auto"><input id="diffOffsetX" type="number" min="-9999" max="9999" value="0"></td>
+					</tr>
+					<tr class="num">
+						<td class="input">
+							<span class="en">vertical offset [px]</span>
+							<span class="ja">垂直オフセット [px]</span>
+						</td>
+						<td class="input" style="min-width:auto"><input id="diffOffsetY" type="number" min="-9999" max="9999" value="0"></td>
+					</tr>
+					<tr>
+						<td class="prop" rowspan="3">
+							<span class="en">RGBA error</span>
+							<span class="ja">RGBA誤差</span>
+						</td>
+						<td class="output">
+							<span class="en">detected maximum error value:</span>
+							<span class="ja">検出した最大誤差:</span>
+						</td>
+						<td class="output" id="diffDetectedMaxAE"></td>
+					</tr>
+					<tr class="num">
+						<td class="input">
+							<span class="en">maximum error to ignore</span>
+							<span class="ja">無視する誤差の大きさ</span>
+							(0 - 255)
+						</td>
+						<td class="input" style="min-width:auto"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
+					</tr>
+					<tr class="prop">
+						<td class="output">
+							<span class="en">ignored unmatched pixels:</span>
+							<span class="ja">無視した不一致ピクセル:</span>
+						</td>
+						<td class="output" id="diffIgnoreAEResult"></td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>
