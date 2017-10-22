@@ -94,11 +94,25 @@ var changeLang = function(lang) {
 	<div id="view">
 		<div class="hudContainer">
 			<div id="altViewMode" class="light hud">
-				<div id="altViewModeDesc">
-					<span class="en"></span>
-					<span class="ja"></span>
+				<div class="header">
+					<h3 id="altViewModeDesc">
+						<span class="en">Channel View</span>
+						<span class="ja">チャンネルビュー</span>
+					</h3>
 				</div>
-				<div>
+				<div style="display:inline-block">
+					<div id="altViewModeSwRGB" class="mode-sw">
+						<button>R</button>
+						<button>G</button>
+						<button>B</button>
+					</div>
+					<div id="altViewModeSwYCbCr601" class="mode-sw">
+						<button>Y</button>
+						<button>Cb</button>
+						<button>Cr</button>
+					</div>
+				</div>
+				<div style="display:inline-block">
 					<span class="en">Color Space :</span>
 					<span class="ja">色空間 :</span>
 					<select id="altViewColorSpace">
@@ -108,8 +122,12 @@ var changeLang = function(lang) {
 				</div>
 			</div>
 			<div id="mode" class="transparent light hud">
-				<span class="en"></span>
-				<span class="ja"></span>
+				<div class="header">
+					<h3>
+						<span class="en"></span>
+						<span class="ja"></span>
+					</h3>
+				</div>
 			</div>
 			<div id="map" class="transparent dark hud">
 				<svg>

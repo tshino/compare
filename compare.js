@@ -2577,6 +2577,13 @@
       updateDOM();
       return false;
     });
+    $('#altViewMode .mode-sw button').on('click', function(e) {
+      var index = $(this).parent().children().index(this);
+      currentMode =
+        colorSpace === 'rgb' ? ['r', 'g', 'b'][index] :
+        colorSpace === 'ycbcr601' ? ['y', 'cb', 'cr'][index] : null;
+      updateDOM();
+    });
     var reset = function() {
       if (currentMode) {
         currentMode = null;
@@ -2604,21 +2611,16 @@
     };
     var updateModeIndicator = function() {
       if (currentMode) {
-        if (colorSpace === 'rgb') {
-          channelDesc =
-            currentMode === 'r' ? 'R' :
-            currentMode === 'g' ? 'G' :
-            currentMode === 'b' ? 'B' :
-            currentMode === 'a' ? 'A' : '??';
-        } else { // 'ycbcr601'
-          channelDesc =
-            currentMode === 'y' ? 'Y' :
-            currentMode === 'cb' ? 'Cb' :
-            currentMode === 'cr' ? 'Cr' : '??';
-        }
-        setText($('#altViewModeDesc'), {
-          en: 'Channel : ' + channelDesc,
-          ja: 'チャンネル : ' + channelDesc });
+        var index =
+          colorSpace === 'rgb' ? ['r', 'g', 'b'].indexOf(currentMode) :
+          colorSpace === 'ycbcr601' ? ['y', 'cb', 'cr'].indexOf(currentMode) :
+          null;
+        $('#altViewModeSwRGB').css({
+            display : (colorSpace === 'rgb' ? '' : 'none')
+        }).find('button').removeClass('current').eq(index).addClass('current');
+        $('#altViewModeSwYCbCr601').css({
+            display : (colorSpace === 'ycbcr601' ? '' : 'none')
+        }).find('button').removeClass('current').eq(index).addClass('current');
         $('#altViewMode').css({ display : 'block' });
       } else {
         $('#altViewMode').css({ display : '' });
@@ -2738,13 +2740,13 @@
         var baseIndex = overlayBaseIndex + 1;
         var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
               baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
-        setText($('#mode'), {
+        setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
           ja: 'オーバーレイモード : ' + modeDesc });
         $('#mode').css({ display : 'block' });
         $('#overlay').addClass('current');
       } else {
-        $('#mode > span').text('');
+        $('#mode h3 span').text('');
         $('#mode').css({ display : '' });
         $('#overlay').removeClass('current');
       }
