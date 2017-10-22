@@ -2567,21 +2567,24 @@
   };
   // Alt View
   var altView = (function() {
-    var colorSpace = 'rgb';
+    var colorSpace = $('#altViewColorSpace').val();
     var component = null;
     $('#altViewColorSpace').on('change', function(e) {
       colorSpace = this.options[this.selectedIndex].value;
       component = 0;
+      updateModeIndicator();
       updateDOM();
       return false;
     });
     $('#altViewMode .mode-sw button').on('click', function(e) {
       component = $(this).parent().children().index(this);
+      updateModeIndicator();
       updateDOM();
     });
     var reset = function() {
       if (component !== null) {
         component = null;
+        updateModeIndicator();
       }
     };
     var toggle = function() {
@@ -2595,6 +2598,7 @@
         component === null ? 0 :
         component + 1 < numComponents ? component + 1 :
         null;
+      updateModeIndicator();
       updateDOM();
     };
     var updateModeIndicator = function() {
@@ -2663,7 +2667,6 @@
     return {
       reset: reset,
       toggle: toggle,
-      updateModeIndicator: updateModeIndicator,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
       currentMode: function() { return component === null ? null : colorSpace + '/' + component; }
@@ -2737,7 +2740,6 @@
     var onUpdateLayout = function() {
       updateArrangeButton();
       updateSelectorButtonState();
-      altView.updateModeIndicator();
       updateOverlayModeIndicator();
     };
     return {
