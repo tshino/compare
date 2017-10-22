@@ -2568,66 +2568,50 @@
   // Alt View
   var altView = (function() {
     var colorSpace = 'rgb';
-    var currentMode = null;
+    var component = null;
     $('#altViewColorSpace').on('change', function(e) {
       colorSpace = this.options[this.selectedIndex].value;
-      currentMode =
-          colorSpace === 'rgb' ? 'r' :
-          /*colorSpace === 'ycbcr601' ? */ 'y';
+      component = 0;
       updateDOM();
       return false;
     });
     $('#altViewMode .mode-sw button').on('click', function(e) {
-      var index = $(this).parent().children().index(this);
-      currentMode =
-        colorSpace === 'rgb' ? ['r', 'g', 'b'][index] :
-        colorSpace === 'ycbcr601' ? ['y', 'cb', 'cr'][index] : null;
+      component = $(this).parent().children().index(this);
       updateDOM();
     });
     var reset = function() {
-      if (currentMode) {
-        currentMode = null;
+      if (component !== null) {
+        component = null;
       }
     };
     var toggle = function() {
       if (images.length === 0) {
         return;
       }
-      if (colorSpace === 'rgb') {
-        currentMode =
-          currentMode === null ? 'r' :
-          currentMode === 'r' ? 'g' :
-          currentMode === 'g' ? 'b' :
-          //currentMode === 'b' ? 'a' :
-          null;
-      } else { // 'ycbcr601'
-        currentMode =
-          currentMode === null ? 'y' :
-          currentMode === 'y' ? 'cb' :
-          currentMode === 'cb' ? 'cr' :
-          null;
-      }
+      var numComponents =
+        colorSpace === 'rgb' ? 3 :
+        /*colorSpace === 'ycbcr601' ?*/ 3;
+      component =
+        component === null ? 0 :
+        component + 1 < numComponents ? component + 1 :
+        null;
       updateDOM();
     };
     var updateModeIndicator = function() {
-      if (currentMode) {
-        var index =
-          colorSpace === 'rgb' ? ['r', 'g', 'b'].indexOf(currentMode) :
-          colorSpace === 'ycbcr601' ? ['y', 'cb', 'cr'].indexOf(currentMode) :
-          null;
+      if (component !== null) {
         $('#altViewModeSwRGB').css({
             display : (colorSpace === 'rgb' ? '' : 'none')
-        }).find('button').removeClass('current').eq(index).addClass('current');
+        }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewModeSwYCbCr601').css({
             display : (colorSpace === 'ycbcr601' ? '' : 'none')
-        }).find('button').removeClass('current').eq(index).addClass('current');
+        }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewMode').css({ display : 'block' });
       } else {
         $('#altViewMode').css({ display : '' });
       }
     };
     var getAltImage = function(ent) {
-      if (currentMode === null) {
+      if (component === null) {
         ent.altView = null;
         return null;
       }
@@ -2640,29 +2624,28 @@
       var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
       figureUtil.copyImageBits(imageData, altImageData);
       var getChannelValue =
-          currentMode === 'r' ? function(data, offset) {
+        colorSpace === 'rgb' ?
+          component === 0 ? function(data, offset) { // R
             return data[offset + 0];
           } :
-          currentMode === 'g' ? function(data, offset) {
+          component === 1 ? function(data, offset) { // G
             return data[offset + 1];
           } :
-          currentMode === 'b' ? function(data, offset) {
+          /*component === 2 ?*/ function(data, offset) { // B
             return data[offset + 2];
           } :
-          currentMode === 'y' ? function(data, offset) {
+        // 'ycbcr601'
+          component === 0 ? function(data, offset) { // Y
             var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
             return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
           } :
-          currentMode === 'cb' ? function(data, offset) {
+          component === 1 ? function(data, offset) { // Cb
             var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
             return Math.round(127.5 - 0.1687 * r - 0.3313 * g + 0.5000 * b);
           } :
-          currentMode === 'cr' ? function(data, offset) {
+          /*component === 2 ?*/ function(data, offset) { // Cr
             var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
             return Math.round(127.5 + 0.5000 * r - 0.4187 * g - 0.0813 * b);
-          } :
-          /*currentMode === 'a'*/ function(data, offset) {
-            return data[offset + 3];
           };
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
         var x = getChannelValue(altImageData.data, i);
@@ -2682,8 +2665,8 @@
       toggle: toggle,
       updateModeIndicator: updateModeIndicator,
       getAltImage: getAltImage,
-      active: function() { return null !== currentMode; },
-      currentMode: function() { return currentMode; }
+      active: function() { return null !== component; },
+      currentMode: function() { return component === null ? null : colorSpace + '/' + component; }
     };
   })();
   // Side Bar
