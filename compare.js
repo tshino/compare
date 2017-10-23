@@ -2569,6 +2569,26 @@
   var altView = (function() {
     var colorSpace = $('#altViewColorSpace').val();
     var component = null;
+    var colorSpaces = {
+      'rgb': {
+        modeSwitch: '#altViewModeSwRGB',
+        numComponents: 3,
+        coef: [
+          [ 1, 0, 0, 0 ],
+          [ 0, 1, 0, 0 ],
+          [ 0, 0, 1, 0 ]
+        ]
+      },
+      'ycbcr601': {
+        modeSwitch: '#altViewModeSwYCbCr601',
+        numComponents: 3,
+        coef: [
+          [ 0.299, 0.587, 0.114, 0 ],
+          [ -0.1687, -0.3313, 0.5000, 127.5 ],
+          [ 0.5000, -0.4187, -0.0813, 127.5 ]
+        ]
+      }
+    };
     $('#altViewColorSpace').on('change', function(e) {
       colorSpace = this.options[this.selectedIndex].value;
       component = 0;
@@ -2591,9 +2611,7 @@
       if (images.length === 0) {
         return;
       }
-      var numComponents =
-        colorSpace === 'rgb' ? 3 :
-        /*colorSpace === 'ycbcr601' ?*/ 3;
+      var numComponents = colorSpaces[colorSpace].numComponents;
       component =
         component === null ? 0 :
         component + 1 < numComponents ? component + 1 :
@@ -2603,11 +2621,9 @@
     };
     var updateModeIndicator = function() {
       if (component !== null) {
-        $('#altViewModeSwRGB').css({
-            display : (colorSpace === 'rgb' ? '' : 'none')
-        }).find('button').removeClass('current').eq(component).addClass('current');
-        $('#altViewModeSwYCbCr601').css({
-            display : (colorSpace === 'ycbcr601' ? '' : 'none')
+        $('#altViewMode .mode-sw').css({ display: 'none' });
+        $(colorSpaces[colorSpace].modeSwitch).css({
+          display: ''
         }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewMode').css({ display : 'block' });
       } else {
@@ -2626,23 +2642,8 @@
       }
       var w = imageData.width, h = imageData.height;
       var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
-      if (colorSpace === 'rgb') {
-        if (component === 0) {
-          var c = 0, r = 1, g = 0, b = 0;
-        } else if (component === 1) {
-          var c = 0, r = 0, g = 1, b = 0;
-        } else {
-          var c = 0, r = 0, g = 0, b = 1;
-        }
-      } else { // ycbcr601
-        if (component === 0) {
-          var c = 0, r = 0.299, g = 0.587, b = 0.114;
-        } else if (component === 1) {
-          var c = 127.5, r = -0.1687, g = -0.3313, b = 0.5000;
-        } else {
-          var c = 127.5, r = 0.5000, g = -0.4187, b = -0.0813;
-        }
-      }
+      var coef = colorSpaces[colorSpace].coef[component];
+      var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
       var src = imageData.data;
       var dest = altImageData.data;
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
