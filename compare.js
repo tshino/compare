@@ -2626,37 +2626,31 @@
       }
       var w = imageData.width, h = imageData.height;
       var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
-      figureUtil.copyImageBits(imageData, altImageData);
-      var getChannelValue =
-        colorSpace === 'rgb' ?
-          component === 0 ? function(data, offset) { // R
-            return data[offset + 0];
-          } :
-          component === 1 ? function(data, offset) { // G
-            return data[offset + 1];
-          } :
-          /*component === 2 ?*/ function(data, offset) { // B
-            return data[offset + 2];
-          } :
-        // 'ycbcr601'
-          component === 0 ? function(data, offset) { // Y
-            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
-            return Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-          } :
-          component === 1 ? function(data, offset) { // Cb
-            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
-            return Math.round(127.5 - 0.1687 * r - 0.3313 * g + 0.5000 * b);
-          } :
-          /*component === 2 ?*/ function(data, offset) { // Cr
-            var r = data[offset + 0], g = data[offset + 1], b = data[offset + 2];
-            return Math.round(127.5 + 0.5000 * r - 0.4187 * g - 0.0813 * b);
-          };
+      if (colorSpace === 'rgb') {
+        if (component === 0) {
+          var c = 0, r = 1, g = 0, b = 0;
+        } else if (component === 1) {
+          var c = 0, r = 0, g = 1, b = 0;
+        } else {
+          var c = 0, r = 0, g = 0, b = 1;
+        }
+      } else { // ycbcr601
+        if (component === 0) {
+          var c = 0, r = 0.299, g = 0.587, b = 0.114;
+        } else if (component === 1) {
+          var c = 127.5, r = -0.1687, g = -0.3313, b = 0.5000;
+        } else {
+          var c = 127.5, r = 0.5000, g = -0.4187, b = -0.0813;
+        }
+      }
+      var src = imageData.data;
+      var dest = altImageData.data;
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
-        var x = getChannelValue(altImageData.data, i);
-        altImageData.data[i + 0] = x;
-        altImageData.data[i + 1] = x;
-        altImageData.data[i + 2] = x;
-        altImageData.data[i + 3] = 255;
+        var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2]);
+        dest[i + 0] = x;
+        dest[i + 1] = x;
+        dest[i + 2] = x;
+        dest[i + 3] = 255;
       }
       if (!ent.altView) {
         ent.altView = figureUtil.makeBlankFigure(w, h);
