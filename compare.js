@@ -2580,12 +2580,21 @@
         ]
       },
       'ycbcr601': {
-        modeSwitch: '#altViewModeSwYCbCr601',
+        modeSwitch: '#altViewModeSwYCbCr',
         numComponents: 3,
         coef: [
           [ 0.299, 0.587, 0.114, 0 ],
           [ -0.1687, -0.3313, 0.5000, 127.5 ],
           [ 0.5000, -0.4187, -0.0813, 127.5 ]
+        ]
+      },
+      'ycbcr709': {
+        modeSwitch: '#altViewModeSwYCbCr',
+        numComponents: 3,
+        coef: [
+          [ 0.2126, 0.7152, 0.0722, 0 ],
+          [ -0.1146, -0.3854, 0.5000, 127.5 ],
+          [ 0.5000, -0.4542, -0.0458, 127.5 ]
         ]
       }
     };
