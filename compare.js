@@ -2598,6 +2598,10 @@
         ]
       }
     };
+    $('#altViewMode .close').on('click', function(e) {
+      reset();
+      updateDOM();
+    });
     $('#altViewColorSpace').on('change', function(e) {
       colorSpace = this.options[this.selectedIndex].value;
       component = 0;
