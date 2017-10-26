@@ -174,7 +174,9 @@
     // 'p' (112)
     112 : { global: false, func: crossCursor.toggle },
     // 'q' (113)
-    113 : { global: false, func: altView.toggle }
+    113 : { global: false, func: altView.toggle },
+    // 'Q' (81)
+    81 : { global: false, func: altView.toggleReverse }
 
   };
   $(window).keypress(function(e) {
@@ -2620,17 +2622,19 @@
         updateModeIndicator();
       }
     };
-    var toggle = function() {
+    var toggle = function(reverse) {
       if (images.length === 0) {
         return;
       }
       var numComponents = colorSpaces[colorSpace].numComponents;
       component =
-        component === null ? 0 :
-        component + 1 < numComponents ? component + 1 :
-        null;
+        component === null ? reverse ? numComponents - 1 : 0 :
+        (reverse ? component + numComponents - 1 : component + 1) % numComponents;
       updateModeIndicator();
       updateDOM();
+    };
+    var toggleReverse = function() {
+      toggle(/* reverse= */ true);
     };
     var updateModeIndicator = function() {
       if (component !== null) {
@@ -2675,6 +2679,7 @@
     return {
       reset: reset,
       toggle: toggle,
+      toggleReverse: toggleReverse,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
       currentMode: function() { return component === null ? null : colorSpace + '/' + component; }
