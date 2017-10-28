@@ -2626,10 +2626,10 @@
       if (images.length === 0) {
         return;
       }
-      var numComponents = colorSpaces[colorSpace].numComponents;
+      var numOptions = colorSpaces[colorSpace].numComponents + 1;
       component =
-        component === null ? reverse ? numComponents - 1 : 0 :
-        (reverse ? component + numComponents - 1 : component + 1) % numComponents;
+        component === null ? 0 :
+        (reverse ? component + numOptions - 1 : component + 1) % numOptions;
       updateModeIndicator();
       updateDOM();
     };
@@ -2648,7 +2648,7 @@
       }
     };
     var getAltImage = function(ent) {
-      if (component === null) {
+      if (component === null || component === 0) {
         ent.altView = null;
         return null;
       }
@@ -2659,7 +2659,7 @@
       }
       var w = imageData.width, h = imageData.height;
       var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
-      var coef = colorSpaces[colorSpace].coef[component];
+      var coef = colorSpaces[colorSpace].coef[component - 1];
       var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
       var src = imageData.data;
       var dest = altImageData.data;
