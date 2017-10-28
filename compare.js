@@ -2820,6 +2820,7 @@
           display   : '',
           position  : overlayMode ? 'absolute' : '',
           width     : overlayMode ? $('#view').width() + 'px' : '',
+          height    : overlayMode ? $('#view').height() + 'px' : '',
           opacity   : isOverlay ? '0.5' : '',
           background : overlayMode ? '#000' : ''
         });

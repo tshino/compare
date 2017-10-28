@@ -91,15 +91,50 @@ var changeLang = function(lang) {
 			</button>
 		</div>
 	</div>
-	<div id="view">
-		<div class="hudContainer">
+	<div id="viewContainer">
+		<div id="view">
+			<div class="hudContainer">
+				<div id="mode" class="transparent light hud">
+					<div class="header">
+						<h3>
+							<span class="en"></span>
+							<span class="ja"></span>
+						</h3>
+					</div>
+				</div>
+				<div id="map" class="transparent dark hud">
+					<svg>
+						<clipPath id="mapClip">
+							<rect x="0" y="0" width="100%" height="100%"></rect>
+						</clipPath>
+						<g stroke="none" fill="none" stroke-width="0.5" opacity="0.4">
+							<rect id="mapROI" fill="gray" width="100%" height="100%" clip-path="url(#mapClip)"></rect>
+							<rect id="mapFrame" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
+						</g>
+					</svg>
+				</div>
+			</div>
+			<div class="emptyBox" id="drop">
+				<div class="dropHere">
+					<span class="en">Drop image files here</span>
+					<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+				</div>
+			</div>
+			<div class="emptyBox">
+				<div class="dropHere">
+					<span class="en">Drop image files here</span>
+					<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+				</div>
+			</div>
+		</div>
+		<div id="statusbar">
 			<div id="altViewMode" class="light hud">
 				<button class="close">×</button>
 				<div class="header">
-					<h3 id="altViewModeDesc">
+					<h4 id="altViewModeDesc">
 						<span class="en">Channel View</span>
 						<span class="ja">チャンネルビュー</span>
-					</h3>
+					</h4>
 				</div>
 				<div style="display:inline-block">
 					<div id="altViewModeSwRGB" class="mode-sw">
@@ -122,37 +157,6 @@ var changeLang = function(lang) {
 						<option value="ycbcr709">YCbCr (BT.709 HD)</option>
 					</select>
 				</div>
-			</div>
-			<div id="mode" class="transparent light hud">
-				<div class="header">
-					<h3>
-						<span class="en"></span>
-						<span class="ja"></span>
-					</h3>
-				</div>
-			</div>
-			<div id="map" class="transparent dark hud">
-				<svg>
-					<clipPath id="mapClip">
-						<rect x="0" y="0" width="100%" height="100%"></rect>
-					</clipPath>
-					<g stroke="none" fill="none" stroke-width="0.5" opacity="0.4">
-						<rect id="mapROI" fill="gray" width="100%" height="100%" clip-path="url(#mapClip)"></rect>
-						<rect id="mapFrame" stroke="white" x="0" y="0" width="100%" height="100%"></rect>
-					</g>
-				</svg>
-			</div>
-		</div>
-		<div class="emptyBox" id="drop">
-			<div class="dropHere">
-				<span class="en">Drop image files here</span>
-				<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
-			</div>
-		</div>
-		<div class="emptyBox">
-			<div class="dropHere">
-				<span class="en">Drop image files here</span>
-				<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
 			</div>
 		</div>
 	</div>

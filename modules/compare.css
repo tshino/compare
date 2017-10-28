@@ -87,6 +87,29 @@ button:hover span.tooltip
     transition-delay    : 300ms;
     opacity             : 1.0;
 }
+#viewContainer
+{
+    flex            : 1 1 auto;
+    flex-direction  : column;
+    display         : flex;
+}
+#statusbar
+{
+    overflow        : scroll hidden;
+    background      : #ccc;
+    color           : #444;
+}
+#statusbar > *
+{
+    display         : none;
+    margin          : 0px;
+    padding         : 5px 5px;
+}
+button.close
+{
+    float           : right;
+    background      : #ddd;
+}
 #view
 {
     flex            : 1 1 auto;
@@ -225,11 +248,6 @@ button:hover span.tooltip
 #view .hudContainer .hud:not(.transparent)
 {
     pointer-events  : auto;
-}
-#view .hudContainer button.close
-{
-    float           : right;
-    background      : #ccc;
 }
 div.dialog
 {
