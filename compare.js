@@ -361,7 +361,6 @@
       }
       toneCurveDialog.onRemoveEntry(index);
       diffDialog.onRemoveEntry(index);
-      ent.altView = null;
       ent.mainImage = null;
       ent.asCanvas = null;
       ent.imageData = null;
@@ -2649,16 +2648,15 @@
     };
     var getAltImage = function(ent) {
       if (component === null || component === 0) {
-        ent.altView = null;
         return null;
       }
       var imageData = getImageData(ent);
       if (!imageData) {
-        ent.altView = null;
         return null;
       }
       var w = imageData.width, h = imageData.height;
-      var altImageData = ent.asCanvas.getContext('2d').createImageData(w, h);
+      var altView = figureUtil.makeBlankFigure(w, h);
+      var altImageData = altView.context.createImageData(w, h);
       var coef = colorSpaces[colorSpace].coef[component - 1];
       var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
       var src = imageData.data;
@@ -2670,11 +2668,8 @@
         dest[i + 2] = x;
         dest[i + 3] = 255;
       }
-      if (!ent.altView) {
-        ent.altView = figureUtil.makeBlankFigure(w, h);
-      }
-      ent.altView.context.putImageData(altImageData, 0, 0);
-      return ent.altView.canvas;
+      altView.context.putImageData(altImageData, 0, 0);
+      return altView.canvas;
     };
     return {
       reset: reset,
@@ -2867,7 +2862,6 @@
     fig.context.drawImage(img, 0, 0, w, h);
     //
     entry.altViewMode = null;
-    entry.altView    = null;
     entry.mainImage  = useCanvasToDisplay ? fig.canvas : img;
     entry.element    = entry.mainImage;
     entry.asCanvas   = fig.canvas;
