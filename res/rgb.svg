@@ -12,19 +12,19 @@
    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
   </g>
   <g>
-   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2100,2500 C 2200,2500 2200,2500 2300,2500 2300,2800 2200,2903 2100,2900 1900,2900 2100,2900 1900,2900 1800,2900 1700,2700 1700,2600 1700,2500 1700,2477 1700,2400 1700,2300 1800,2100 1900,2100 2100,2100 2300,2100 2300,2100"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 2100,2500 C 2200,2500 2200,2500 2300,2500 2300,2800 2200,2903 2100,2900 1900,2900 2100,2900 1900,2900 1800,2900 1700,2700 1700,2600 1700,2500 1700,2477 1700,2400 1700,2300 1800,2100 1900,2100 2100,2100 2300,2100 2300,2100"/>
   </g>
   <g>
-   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 800,2900 L 800,2100 C 800,2100 933,2100 1200,2100 1300,2100 1400,2206 1400,2300 1400,2394 1300,2500 1200,2500 1033,2500 800,2500 800,2500"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 800,2900 L 800,2100 C 800,2100 933,2100 1200,2100 1300,2100 1400,2206 1400,2300 1400,2394 1300,2500 1200,2500 1033,2500 800,2500 800,2500"/>
   </g>
   <g>
-   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_4_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1400,2900 C 1400,2700 1300,2500 1200,2500"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_4_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 1400,2900 C 1400,2700 1300,2500 1200,2500"/>
   </g>
   <g>
-   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2600,2900 L 2600,2100 C 2600,2100 2733,2100 3000,2100 3100,2100 3200,2206 3200,2300 3200,2394 3100,2500 3000,2500 2833,2500 2600,2500 2600,2500"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 2600,2900 L 2600,2100 C 2600,2100 2733,2100 3000,2100 3100,2100 3200,2206 3200,2300 3200,2394 3100,2500 3000,2500 2833,2500 2600,2500 2600,2500"/>
   </g>
   <g>
-   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_6_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 3000,2500 C 3100,2500 3200,2606 3200,2700 3200,2794 3100,2900 3000,2900 2833,2900 2600,2900 2600,2900"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_6_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" d="M 3000,2500 C 3100,2500 3200,2606 3200,2700 3200,2794 3100,2900 3000,2900 2833,2900 2600,2900 2600,2900"/>
   </g>
   <g>
    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_7_0" stroke-width="100" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="197,197" d="M 500,1500 L 3500,1500"/>

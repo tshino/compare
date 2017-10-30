@@ -174,9 +174,9 @@
     // 'p' (112)
     112 : { global: false, func: crossCursor.toggle },
     // 'q' (113)
-    113 : { global: false, func: altView.toggle },
+    113 : { global: false, func: altView.changeMode },
     // 'Q' (81)
-    81 : { global: false, func: altView.toggleReverse }
+    81 : { global: false, func: altView.changeModeReverse }
 
   };
   $(window).keypress(function(e) {
@@ -372,7 +372,6 @@
       ent.colorDistAxes = null;
       discardTasksOfEntryByIndex(index);
       viewManagement.resetLayoutState();
-      altView.reset();
       updateDOM();
     }
   };
@@ -2621,10 +2620,12 @@
         updateModeIndicator();
       }
     };
-    var toggle = function(reverse) {
-      if (images.length === 0) {
-        return;
-      }
+    var toggle = function() {
+      component = component === null ? 0 : null;
+      updateModeIndicator();
+      updateDOM();
+    };
+    var changeMode = function(reverse) {
       var numOptions = colorSpaces[colorSpace].numComponents + 1;
       component =
         component === null ? 0 :
@@ -2632,8 +2633,8 @@
       updateModeIndicator();
       updateDOM();
     };
-    var toggleReverse = function() {
-      toggle(/* reverse= */ true);
+    var changeModeReverse = function() {
+      changeMode(/* reverse= */ true);
     };
     var updateModeIndicator = function() {
       if (component !== null) {
@@ -2642,8 +2643,10 @@
           display: ''
         }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewMode').css({ display : 'block' });
+        $('#channelbtn').addClass('current');
       } else {
         $('#altViewMode').css({ display : '' });
+        $('#channelbtn').removeClass('current');
       }
     };
     var getAltImage = function(ent) {
@@ -2674,7 +2677,8 @@
     return {
       reset: reset,
       toggle: toggle,
-      toggleReverse: toggleReverse,
+      changeMode: changeMode,
+      changeModeReverse: changeModeReverse,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
       currentMode: function() { return component === null ? null : colorSpace + '/' + component; }
@@ -2692,6 +2696,7 @@
     $('#overlay').click(viewManagement.toggleOverlay);
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
+    $('#channelbtn').click(altView.toggle);
     $('#fullscreen').click(toggleFullscreen);
     $('#helpbtn').click(toggleHelp);
     var newSelectorButton = function(index) {
