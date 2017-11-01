@@ -2568,6 +2568,7 @@
   // Alt View
   var altView = (function() {
     var colorSpace = $('#altViewColorSpace').val();
+    var mapping = $('.altViewMapping').val();
     var component = null;
     var colorSpaces = {
       'rgb': {
@@ -2614,6 +2615,12 @@
       updateModeIndicator();
       updateDOM();
     });
+    $('.altViewMapping').on('change', function(e) {
+      mapping = this.options[this.selectedIndex].value;
+      updateModeIndicator();
+      updateDOM();
+      return false;
+    });
     var reset = function() {
       if (component !== null) {
         component = null;
@@ -2643,6 +2650,7 @@
           display: ''
         }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewMode').css({ display : 'block' });
+        $('.altViewMapping').val(mapping);
         $('#channelbtn').addClass('current');
       } else {
         $('#altViewMode').css({ display : '' });
@@ -2664,15 +2672,32 @@
       var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
       var src = imageData.data;
       var dest = altImageData.data;
+      var colorMap = new Uint8Array(3 * 256);
+      if (mapping === 'grayscale') {
+        for (var i = 0; i < 256; ++i) {
+          colorMap[i + 0] = i;
+          colorMap[i + 256] = i;
+          colorMap[i + 512] = i;
+        }
+      } else { // 'pseudocolor'
+        for (var i = 0; i < 256; ++i) {
+          colorMap[i + 0] = i < 128 ? 0 : i * 2 - 255;
+          colorMap[i + 256] = i < 128 ? i * 2 + 1 : 511 - i * 2;
+          colorMap[i + 512] = i < 128 ? 255 - i * 2 : 0;
+        }
+      }
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
         var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2]);
-        dest[i + 0] = x;
-        dest[i + 1] = x;
-        dest[i + 2] = x;
+        dest[i + 0] = colorMap[x];
+        dest[i + 1] = colorMap[x + 256];
+        dest[i + 2] = colorMap[x + 512];
         dest[i + 3] = 255;
       }
       altView.context.putImageData(altImageData, 0, 0);
       return altView.canvas;
+    };
+    var currentMode = function() {
+      return component === null ? null : colorSpace + '/' + component + '/' + mapping;
     };
     return {
       reset: reset,
@@ -2681,7 +2706,7 @@
       changeModeReverse: changeModeReverse,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
-      currentMode: function() { return component === null ? null : colorSpace + '/' + component; }
+      currentMode: currentMode
     };
   })();
   // Side Bar
