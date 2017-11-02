@@ -2680,10 +2680,16 @@
           colorMap[i + 512] = i;
         }
       } else { // 'pseudocolor'
+        var tone = function(a) {
+          return Math.round(255 * Math.pow(a, 1/2.2));
+        };
         for (var i = 0; i < 256; ++i) {
-          colorMap[i + 0] = i < 128 ? 0 : i * 2 - 255;
-          colorMap[i + 256] = i < 128 ? i * 2 + 1 : 511 - i * 2;
-          colorMap[i + 512] = i < 128 ? 255 - i * 2 : 0;
+          var a = (i - 40) * 5.8 / 255;
+          a = a - Math.floor(a);
+          a = a * a * (3 - 2 * a);
+          colorMap[i + 0] = tone(i < 128 ? 0 : i < 172 ? a : i < 216 ? 1 : 1 - a);
+          colorMap[i + 256] = tone(i < 40 ? 0 : i < 84 ? a : i < 172 ? 1 : i < 216 ? 1 - a : 0);
+          colorMap[i + 512] = tone(i < 40 ? a : i < 84 ? 1 : i < 128 ? 1 - a : 0);
         }
       }
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
