@@ -2599,6 +2599,32 @@
         ]
       }
     };
+    var colorMaps = {
+      'grayscale': (function() {
+        var colorMap = new Uint8Array(3 * 256);
+        for (var i = 0; i < 256; ++i) {
+          colorMap[i + 0] = i;
+          colorMap[i + 256] = i;
+          colorMap[i + 512] = i;
+        }
+        return colorMap;
+      })(),
+      'pseudocolor': (function() {
+        var colorMap = new Uint8Array(3 * 256);
+        var tone = function(a) {
+          return Math.round(255 * Math.pow(a, 1/2.2));
+        };
+        for (var i = 0; i < 256; ++i) {
+          var a = (i - 40) * 5.8 / 255;
+          a = a - Math.floor(a);
+          a = a * a * (3 - 2 * a);
+          colorMap[i + 0] = tone(i < 128 ? 0 : i < 172 ? a : i < 216 ? 1 : 1 - a);
+          colorMap[i + 256] = tone(i < 40 ? 0 : i < 84 ? a : i < 172 ? 1 : i < 216 ? 1 - a : 0);
+          colorMap[i + 512] = tone(i < 40 ? a : i < 84 ? 1 : i < 128 ? 1 - a : 0);
+        }
+        return colorMap;
+      })()
+    };
     $('#altViewMode .close').on('click', function(e) {
       reset();
       updateDOM();
@@ -2672,26 +2698,7 @@
       var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
       var src = imageData.data;
       var dest = altImageData.data;
-      var colorMap = new Uint8Array(3 * 256);
-      if (mapping === 'grayscale') {
-        for (var i = 0; i < 256; ++i) {
-          colorMap[i + 0] = i;
-          colorMap[i + 256] = i;
-          colorMap[i + 512] = i;
-        }
-      } else { // 'pseudocolor'
-        var tone = function(a) {
-          return Math.round(255 * Math.pow(a, 1/2.2));
-        };
-        for (var i = 0; i < 256; ++i) {
-          var a = (i - 40) * 5.8 / 255;
-          a = a - Math.floor(a);
-          a = a * a * (3 - 2 * a);
-          colorMap[i + 0] = tone(i < 128 ? 0 : i < 172 ? a : i < 216 ? 1 : 1 - a);
-          colorMap[i + 256] = tone(i < 40 ? 0 : i < 84 ? a : i < 172 ? 1 : i < 216 ? 1 - a : 0);
-          colorMap[i + 512] = tone(i < 40 ? a : i < 84 ? 1 : i < 128 ? 1 - a : 0);
-        }
-      }
+      var colorMap = colorMaps[mapping];
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
         var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2]);
         dest[i + 0] = colorMap[x];
