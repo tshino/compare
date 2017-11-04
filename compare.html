@@ -141,7 +141,7 @@ var changeLang = function(lang) {
 						<span class="ja">チャンネルビュー</span>
 					</h4>
 				</div>
-				<div style="display:inline-block">
+				<div class="toolbarElement" style="vertical-align: bottom;">
 					<div id="altViewModeSwRGB" class="mode-sw">
 						<button>RGB</button>
 						<button>R</button>
@@ -155,7 +155,9 @@ var changeLang = function(lang) {
 						<button>Cr</button>
 					</div>
 				</div>
-				<div style="display:inline-block">
+				<div id="altViewColorBar" class="toolbarElement" style="vertical-align: bottom;">
+				</div>
+				<div class="toolbarElement">
 					<span class="en">Color Space :</span>
 					<span class="ja">色空間 :</span>
 					<select id="altViewColorSpace">
@@ -164,7 +166,7 @@ var changeLang = function(lang) {
 						<option value="ycbcr709">YCbCr (BT.709 HD)</option>
 					</select>
 				</div>
-				<div style="display:inline-block">
+				<div class="toolbarElement">
 					<span class="en">Representation :</span>
 					<span class="ja">表示方法 :</span>
 					<select class="en altViewMapping">

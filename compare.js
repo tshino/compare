@@ -1308,13 +1308,13 @@
         dest.data[i] = src.data[i];
       }
     };
-    var drawAxes = function(ctx, x, y, dx, dy, lineLen, labels) {
+    var drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
       var dLen = Math.sqrt(dx * dx + dy * dy);
       var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
       ctx.font = '24px sans-serif';
-      ctx.fillStyle = '#000';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 3;
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
       for (var i = 0, label; label = labels[i]; ++i) {
         var pos = { x: label.pos * dx, y: label.pos * dy };
         var x1 = x + pos.x;
@@ -1503,7 +1503,7 @@
           pos: (0.5 + i) / 256, align: 'center', label: (i%64 === 0) ? ''+i : ''
         });
       }
-      figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, axes);
+      figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
       return fig.canvas;
     };
     var updateFigure = function(type, img, hist) {
@@ -2625,6 +2625,24 @@
         return colorMap;
       })()
     };
+    var makeColorbar = function(colorMap) {
+      var fig = figureUtil.makeBlankFigure(512 + 2, 44);
+      for (var i = 0; i < 256; ++i) {
+        var color = 'rgb(' + colorMap[i] + ',' +
+                colorMap[i + 256] + ',' + colorMap[i + 512] + ')';
+        fig.context.fillStyle = color;
+        fig.context.fillRect(1 + i * 2, 0, 2, 44);
+      }
+      var axes = [
+        { pos: 0.5,   align: 'left',   label: '0' },
+        { pos: 64.5,  align: 'center', label: '64' },
+        { pos: 128.5, align: 'center', label: '128' },
+        { pos: 192.5, align: 'center', label: '192' },
+        { pos: 255.5, align: 'right',  label: '255' }
+      ];
+      figureUtil.drawAxes(fig.context, 1, 0, 2, 0, 12, 1, '#fff', axes);
+      return fig.canvas;
+    };
     $('#altViewMode .close').on('click', function(e) {
       reset();
       updateDOM();
@@ -2675,6 +2693,9 @@
         $(colorSpaces[colorSpace].modeSwitch).css({
           display: ''
         }).find('button').removeClass('current').eq(component).addClass('current');
+        $('#altViewColorBar *').remove();
+        var colorBar = $(makeColorbar(colorMaps[mapping])).width(256);
+        $('#altViewColorBar').append(colorBar.addClass('colorbar'));
         $('#altViewMode').css({ display : 'block' });
         $('.altViewMapping').val(mapping);
         $('#channelbtn').addClass('current');

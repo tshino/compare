@@ -105,6 +105,18 @@ button:hover span.tooltip
     margin          : 0px;
     padding         : 5px 5px;
 }
+div.toolbarElement
+{
+    display         : inline-block;
+}
+canvas.colorbar
+{
+    display         : inline-block;
+    vertical-align  : bottom;
+    background      : #666;
+    border-radius   : 4px;
+    padding         : 5px;
+}
 button.close
 {
     float           : right;
