@@ -528,7 +528,24 @@
       onUpdateTransform: onUpdateTransform
     };
   })();
-
+  var makeImageOverlayOnUpdateLayout = function(key, make) {
+      return function(enable, img, w, h) {
+        if (enable) {
+          if (img.element && !img[key]) {
+            img[key] = make(img.canvasWidth, img.canvasHeight);
+            img.view.append(img[key]);
+          }
+          if (img[key]) {
+            $(img[key]).css({ width: w+'px', height: h+'px' });
+          }
+        } else {
+          if (img[key]) {
+            $(img[key]).remove();
+            img[key] = null;
+          }
+        }
+      };
+  };
   // Grid
   var grid = (function() {
     var enableGrid = false;
@@ -549,37 +566,21 @@
       }
       return desc;
     };
-    var addGrid = function(img) {
-      var size = { w: img.canvasWidth, h: img.canvasHeight };
-      var vbox = '0 0 ' + size.w + ' ' + size.h;
+    var makeGrid = function(w, h) {
+      var size = { w: w, h: h };
+      var vbox = '0 0 ' + w + ' ' + h;
       var grid100 = makePathDesc(size, 100);
       var grid10 = makePathDesc(size, 10, 100);
-      img.grid = $(
+      return $(
         '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
           '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid100 + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid10 + '"></path>' +
-        '</svg>').
-        width(size.w).
-        height(size.h);
-      img.view.append(img.grid);
+        '</svg>'
+      ).width(w).height(h);
     };
-    var removeGrid = function(img) {
-      if (img.grid) {
-        $(img.grid).remove();
-        img.grid = null;
-      }
-    };
+    var onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
     var onUpdateLayout = function(img, w, h) {
-      if (enableGrid) {
-        if (img.element && 0 === img.view.find('.grid').length) {
-          addGrid(img);
-        }
-      } else {
-        removeGrid(img);
-      }
-      if (img.grid) {
-        $(img.grid).css({ width: w+'px', height: h+'px' });
-      }
+      onUpdateLayoutImpl(enableGrid, img, w, h);
     };
     var updateGridStyle = function(ent, commonStyle) {
       var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
