@@ -1016,6 +1016,7 @@
       var w = img.transposed ? rect.height : rect.width;
       var h = img.transposed ? rect.width : rect.height;
       $(img.element).css({ width: w+'px', height: h+'px' });
+      altView.onUpdateLayout(img, w, h);
       grid.onUpdateLayout(img, w, h);
       crossCursor.onUpdateLayout(img, w, h);
       hud.onUpdateLayout(img);
@@ -2571,6 +2572,7 @@
     var colorSpace = $('#altViewColorSpace').val();
     var mapping = $('.altViewMapping').val();
     var component = null;
+    var enableContour = false;
     var colorSpaces = {
       'rgb': {
         modeSwitch: '#altViewModeSwRGB',
@@ -2706,7 +2708,25 @@
       } else {
         $('#altViewMode').css({ display : '' });
         $('#channelbtn').removeClass('current');
+        $('#view div.imageBox .contour').remove();
       }
+    };
+    // WIP
+    var makeContour = function(imageData) {
+      var w = imageData.width;
+      var h = imageData.height;
+      var paths = [];
+      paths.push('M 0,0 L 100,200');
+      var vbox = '0 0 ' + w + ' ' + h;
+      var contour = $(
+        '<svg class="imageOverlay contour" viewBox="' + vbox + '">' +
+          '<g stroke="white" stroke-width="1" fill="none">' +
+            '<path d="' + paths.join('"></path><path d="') + '"></path>' +
+          '</g>' +
+        '</svg>').
+        width(w).
+        height(h);
+      return contour;
     };
     var getAltImage = function(ent) {
       if (component === null || component === 0) {
@@ -2732,7 +2752,27 @@
         dest[i + 3] = 255;
       }
       altView.context.putImageData(altImageData, 0, 0);
-      return altView.canvas;
+      var contour = enableContour ? makeContour(imageData) : null;
+      return {
+        image: altView.canvas,
+        contour: contour
+      };
+    };
+    var onUpdateLayout = function(img, w, h) {
+      if (img.view && component !== null) {
+        if (img.contour) {
+          $(img.view).find('.contour').remove();
+          $(img.view).append(img.contour);
+          $(img.contour).css({ width: w+'px', height: h+'px' });
+        } else {
+          $(img.view).find('.contour').remove();
+        }
+      }
+    };
+    var onUpdateTransform = function(ent, commonStyle) {
+      if (ent.contour) {
+        $(ent.contour).css(commonStyle);
+      }
     };
     var currentMode = function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping;
@@ -2744,6 +2784,8 @@
       changeModeReverse: changeModeReverse,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
+      onUpdateLayout: onUpdateLayout,
+      onUpdateTransform: onUpdateTransform,
       currentMode: currentMode
     };
   })();
@@ -2845,7 +2887,8 @@
           if (ent.altViewMode !== altView.currentMode()) {
             ent.view.find('.image').remove();
             var altImage = altView.getAltImage(ent);
-            ent.element = altImage || ent.mainImage;
+            ent.element = altImage ? altImage.image : ent.mainImage;
+            ent.contour = altImage ? altImage.contour : null;
             ent.altViewMode = altImage ? altView.currentMode() : null;
           }
           if (0 === ent.view.find('.image').length) {
@@ -2910,6 +2953,7 @@
                         ent.orientationAsCSS
         };
         $(ent.element).css(style);
+        altView.onUpdateTransform(ent, style);
         grid.onUpdateTransform(ent, style);
         crossCursor.onUpdateTransformEach(ent, style);
       }
