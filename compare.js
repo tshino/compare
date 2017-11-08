@@ -2626,7 +2626,8 @@
         return colorMap;
       })()
     };
-    var makeColorbar = function(colorMap) {
+    var colorBars = {};
+    var makeColorBar = function(colorMap) {
       var fig = figureUtil.makeBlankFigure(512 + 2, 44);
       for (var i = 0; i < 256; ++i) {
         var color = 'rgb(' + colorMap[i] + ',' +
@@ -2642,7 +2643,7 @@
         { pos: 255.5, align: 'right',  label: '255' }
       ];
       figureUtil.drawAxes(fig.context, 1, 0, 2, 0, 12, 1, '#fff', axes);
-      return fig.canvas;
+      return $(fig.canvas).width(256).addClass('colorbar');
     };
     $('#altViewMode .close').on('click', function(e) {
       reset();
@@ -2695,8 +2696,10 @@
           display: ''
         }).find('button').removeClass('current').eq(component).addClass('current');
         $('#altViewColorBar *').remove();
-        var colorBar = $(makeColorbar(colorMaps[mapping])).width(256);
-        $('#altViewColorBar').append(colorBar.addClass('colorbar'));
+        if (!colorBars[mapping]) {
+          colorBars[mapping] = makeColorBar(colorMaps[mapping]);
+        }
+        $('#altViewColorBar').append(colorBars[mapping]);
         $('#altViewMode').css({ display : 'block' });
         $('.altViewMapping').val(mapping);
         $('#channelbtn').addClass('current');
