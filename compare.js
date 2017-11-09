@@ -2583,6 +2583,16 @@
           [ 0, 0, 1, 0 ]
         ]
       },
+      'rgba': {
+        modeSwitch: '#altViewModeSwRGBA',
+        numComponents: 4,
+        coef: [
+          [ 1, 0, 0, 0 ],
+          [ 0, 1, 0, 0 ],
+          [ 0, 0, 1, 0 ],
+          [ 0, 0, 0, 1 ]
+        ]
+      },
       'ycbcr601': {
         modeSwitch: '#altViewModeSwYCbCr',
         numComponents: 3,

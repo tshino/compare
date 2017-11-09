@@ -219,6 +219,15 @@
                 binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
         return 'PNG (APNG)';
       }
+      //var hasTRNS = detectPNGChunk(
+      //          binary, 0x74524e53 /* tRNS */, 0x49444154 /* IDAT */);
+      var colorInfo = binary.big16(24);
+      if (colorInfo === 0x0802) {
+        return 'PNG (24bit)';
+      }
+      if (colorInfo === 0x0806) {
+        return 'PNG (32bit)';
+      }
       return 'PNG';
     }
     if (magic === 0x47494638) { return 'GIF'; }
