@@ -2578,37 +2578,37 @@
         modeSwitch: '#altViewModeSwRGB',
         numComponents: 3,
         coef: [
-          [ 1, 0, 0, 0 ],
-          [ 0, 1, 0, 0 ],
-          [ 0, 0, 1, 0 ]
+          [ 1, 0, 0, 0, 0 ],
+          [ 0, 1, 0, 0, 0 ],
+          [ 0, 0, 1, 0, 0 ]
         ]
       },
       'rgba': {
         modeSwitch: '#altViewModeSwRGBA',
         numComponents: 4,
         coef: [
-          [ 1, 0, 0, 0 ],
-          [ 0, 1, 0, 0 ],
-          [ 0, 0, 1, 0 ],
-          [ 0, 0, 0, 1 ]
+          [ 1, 0, 0, 0, 0 ],
+          [ 0, 1, 0, 0, 0 ],
+          [ 0, 0, 1, 0, 0 ],
+          [ 0, 0, 0, 1, 0 ]
         ]
       },
       'ycbcr601': {
         modeSwitch: '#altViewModeSwYCbCr',
         numComponents: 3,
         coef: [
-          [ 0.299, 0.587, 0.114, 0 ],
-          [ -0.1687, -0.3313, 0.5000, 127.5 ],
-          [ 0.5000, -0.4187, -0.0813, 127.5 ]
+          [ 0.299, 0.587, 0.114, 0, 0 ],
+          [ -0.1687, -0.3313, 0.5000, 0, 127.5 ],
+          [ 0.5000, -0.4187, -0.0813, 0, 127.5 ]
         ]
       },
       'ycbcr709': {
         modeSwitch: '#altViewModeSwYCbCr',
         numComponents: 3,
         coef: [
-          [ 0.2126, 0.7152, 0.0722, 0 ],
-          [ -0.1146, -0.3854, 0.5000, 127.5 ],
-          [ 0.5000, -0.4542, -0.0458, 127.5 ]
+          [ 0.2126, 0.7152, 0.0722, 0, 0 ],
+          [ -0.1146, -0.3854, 0.5000, 0, 127.5 ],
+          [ 0.5000, -0.4542, -0.0458, 0, 127.5 ]
         ]
       }
     };
@@ -2750,12 +2750,12 @@
       var altView = figureUtil.makeBlankFigure(w, h);
       var altImageData = altView.context.createImageData(w, h);
       var coef = colorSpaces[colorSpace].coef[component - 1];
-      var r = coef[0], g = coef[1], b = coef[2], c = coef[3];
+      var r = coef[0], g = coef[1], b = coef[2], a = coef[3], c = coef[4];
       var src = imageData.data;
       var dest = altImageData.data;
       var colorMap = colorMaps[mapping];
       for (var i = 0, n = 4 * w * h; i < n; i += 4) {
-        var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2]);
+        var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
         dest[i + 0] = colorMap[x];
         dest[i + 1] = colorMap[x + 256];
         dest[i + 2] = colorMap[x + 512];
