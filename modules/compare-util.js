@@ -209,36 +209,74 @@
     return null;
   };
 
+  var formatInfo = function(desc, color) {
+    return {
+      toString: function() { return desc; },
+      color: color
+    };
+  };
   var detectImageFormat = function(binary) {
     var magic = binary.length < 4 ? 0 : binary.big32(0);
     var magic2 = binary.length < 8 ? 0 : binary.big32(4);
 
     if (magic === 0x89504e47) {
       // PNG
+      var desc = 'PNG';
       if (detectPNGChunk(
                 binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
-        return 'PNG (APNG)';
+        desc += ' (APNG)';
       }
-      //var hasTRNS = detectPNGChunk(
-      //          binary, 0x74524e53 /* tRNS */, 0x49444154 /* IDAT */);
-      var colorInfo = binary.big16(24);
-      if (colorInfo === 0x0802) {
-        return 'PNG (24bit)';
+      var color = null;
+      var hasTRNS = detectPNGChunk(
+                binary, 0x74524e53 /* tRNS */, 0x49444154 /* IDAT */);
+      var depth = binary.at(24);
+      var colorMode = binary.at(25);
+      switch (colorMode) {
+        case 0:
+          color = 'Grayscale' + (hasTRNS ? '+Transparent' : '');
+          if (0 <= [1, 2, 4, 8, 16].indexOf(depth)) {
+            color += ' (' + depth + 'bit)';
+          }
+          break;
+        case 2:
+          color = 'RGB' + (hasTRNS ? '+Transparent' : '');;
+          if (0 <= [8, 16].indexOf(depth)) {
+            color += ' (' + 3 * depth + 'bit)';
+          }
+          break;
+        case 3:
+          color = 'Indexed ' + (hasTRNS ? ' RGBA' : ' RGB');
+          if (0 <= [1, 2, 4, 8].indexOf(depth)) {
+            color += ' (' + depth + 'bit)';
+          }
+          break;
+        case 4:
+          color = 'Grayscale+A';
+          if (0 <= [8, 16].indexOf(depth)) {
+            color += ' (' + 2 * depth + 'bit)';
+          }
+          break;
+        case 6:
+          color = 'RGBA';
+          if (0 <= [8, 16].indexOf(depth)) {
+            color += ' (' + 4 * depth + 'bit)';
+          }
+          break;
+        default:
+          color = 'unknown';
+          break;
       }
-      if (colorInfo === 0x0806) {
-        return 'PNG (32bit)';
-      }
-      return 'PNG';
+      return formatInfo(desc, color);
     }
-    if (magic === 0x47494638) { return 'GIF'; }
-    if ((magic & 0xffff0000) === 0x424d0000) { return 'BMP'; }
+    if (magic === 0x47494638) { return formatInfo('GIF'); }
+    if ((magic & 0xffff0000) === 0x424d0000) { return formatInfo('BMP'); }
     if ((magic - (magic & 255)) === 0xffd8ff00) {
       if (detectMPFIdentifier(binary)) {
-        return 'JPEG (MPF)';
+        return formatInfo('JPEG (MPF)');
       }
-      return 'JPEG';
+      return formatInfo('JPEG');
     }
-    if (magic === 0x4d4d002a || magic === 0x49492a00) { return 'TIFF'; }
+    if (magic === 0x4d4d002a || magic === 0x49492a00) { return formatInfo('TIFF'); }
     if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||
         (magic === 0x3c3f786d /* '<?xm' */ &&
@@ -253,7 +291,7 @@
         }
         var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
         if (sig1 === 0x3c737667 /* <svg */) {
-          return 'SVG';
+          return formatInfo('SVG');
         }
     }
     //alert(magic);

@@ -1169,6 +1169,7 @@
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
+      $('#infoColor'),
       $('#infoWidth'),
       $('#infoHeight'),
       $('#infoAspect'),
@@ -1180,6 +1181,7 @@
       return [
         [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format ],
+        [null, img.color ],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
@@ -3006,10 +3008,13 @@
   };
   var setEntryDataURI = function(entry, dataURI) {
     var binary = compareUtil.binaryFromDataURI(dataURI);
-    var format = compareUtil.detectImageFormat(binary);
+    var formatInfo = compareUtil.detectImageFormat(binary);
+    var format = formatInfo ? formatInfo.toString() : null;
     var isPNG  = format && 0 <= format.indexOf('PNG');
     var isJPEG = format && 0 <= format.indexOf('JPEG');
+    entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
+    entry.color = (formatInfo && formatInfo.color) || '';
     if (isJPEG) {
       entry.orientation = compareUtil.detectExifOrientation(binary);
     }
@@ -3036,6 +3041,7 @@
             size            : file.size,
             fileType        : file.type,
             lastModified    : new Date(file.lastModified || file.lastModifiedDate),
+            formatInfo      : null,
             format          : '',
             width           : 0,
             height          : 0,
