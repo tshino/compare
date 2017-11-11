@@ -233,33 +233,35 @@
       var colorMode = binary.at(25);
       switch (colorMode) {
         case 0:
-          color = 'Grayscale' + (hasTRNS ? '+Transparent' : '');
+          color = 'Grayscale';
           if (0 <= [1, 2, 4, 8, 16].indexOf(depth)) {
-            color += ' (' + depth + 'bit)';
+            color += ' (' + depth + 'bpp)';
           }
+          color += hasTRNS ? ' + Transparent' : '';
           break;
         case 2:
-          color = 'RGB' + (hasTRNS ? '+Transparent' : '');;
+          color = 'RGB';
           if (0 <= [8, 16].indexOf(depth)) {
-            color += ' (' + 3 * depth + 'bit)';
+            color += ' (' + 3 * depth + 'bpp)';
           }
+          color += hasTRNS ? ' + Transparent' : '';
           break;
         case 3:
           color = 'Indexed ' + (hasTRNS ? ' RGBA' : ' RGB');
           if (0 <= [1, 2, 4, 8].indexOf(depth)) {
-            color += ' (' + depth + 'bit)';
+            color += ' (' + depth + 'bpp)';
           }
           break;
         case 4:
-          color = 'Grayscale+A';
+          color = 'Grayscale+Alpha';
           if (0 <= [8, 16].indexOf(depth)) {
-            color += ' (' + 2 * depth + 'bit)';
+            color += ' (' + 2 * depth + 'bpp)';
           }
           break;
         case 6:
           color = 'RGBA';
           if (0 <= [8, 16].indexOf(depth)) {
-            color += ' (' + 4 * depth + 'bit)';
+            color += ' (' + 4 * depth + 'bpp)';
           }
           break;
         default:
