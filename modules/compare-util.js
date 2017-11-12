@@ -173,40 +173,70 @@
     return null;
   };
 
-  var detectMPFIdentifier = function(binary) {
+  var findJPEGSegment = function(binary, callback) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
       if (m === 0xffda /* SOS */) { break; }
-      if (m === 0xffe2 /* APP2 */) {
-        if (binary.big32(p + 4) === 0x4d504600 /* 'MPF\0' */) {
-          return p;
-        }
-      }
+      var res = callback(p, m);
+      if (res !== undefined) { return res; }
       p += 2 + (m === 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
     }
     return null;
   };
-
-  var detectExifOrientation = function(binary) {
-    for (var p = 0; p + 4 <= binary.length; ) {
-      var m = binary.big16(p);
-      if (m === 0xffda /* SOS */) { break; }
-      if (m === 0xffe1 /* APP1 */) {
-        if (p + 20 > binary.length) { break; }
-        var big = binary.big16(p + 10) === 0x4d4d; /* MM */
-        var read16 = big ? binary.big16 : binary.little16;
-        var fields = read16(p + 18);
-        if (p + 20 + fields * 12 > binary.length) { break; }
-        for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
-          if (read16(f) === 0x0112 /* ORIENTATION */) {
-            return read16(f + 8);
-          }
+  var findAPPnSegment = function(binary, n, name, callback) {
+    return findJPEGSegment(binary, function(p, marker) {
+      if (marker === 0xffe0 + n && p + 4 + name.length <= binary.length) {
+        var i = 0;
+        for (; i < name.length; ++i) {
+          if (binary.at(p + 4 + i) !== name[i]) { break; }
         }
-        break;
+        if (i === name.length) { return callback ? callback(p) : p; }
       }
-      p += 2 + (m === 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
-    }
-    return null;
+    });
+  };
+  var detectSOFnSegment = function(binary) {
+    return findJPEGSegment(binary, function(p, marker) {
+      if (0 <= [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15].indexOf(marker - 0xffc0) &&
+          p + 10 <= binary.length) {
+        return {
+          nf: binary.at(p + 9)
+        };
+      }
+    });
+  };
+  var detectJFIFIdentifier = function(binary) {
+    var name = [0x4a, 0x46, 0x49, 0x46, 0x00]; // JFIF\0
+    return findAPPnSegment(binary, 0 /* APP0 */, name);
+  };
+  var detectExifOrientation = function(binary) {
+    var name = [0x45, 0x78, 0x69, 0x66, 0x00]; // Exif\0
+    return findAPPnSegment(binary, 1 /* APP1 */, name, function(p) {
+      if (p + 20 > binary.length) { return null; }
+      var big = binary.big16(p + 10) === 0x4d4d; /* MM */
+      var read16 = big ? binary.big16 : binary.little16;
+      var fields = read16(p + 18);
+      if (p + 20 + fields * 12 > binary.length) { return null; }
+      for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
+        if (read16(f) === 0x0112 /* ORIENTATION */) {
+          return read16(f + 8);
+        }
+      }
+      return null;
+    });
+  };
+  var detectMPFIdentifier = function(binary) {
+    var name = [0x4d, 0x50, 0x46, 0x00]; // MPF\0
+    return findAPPnSegment(binary, 2 /* APP2 */, name);
+  };
+  var detectAdobeIdentifier = function(binary) {
+    var name = [0x41, 0x64, 0x6f, 0x62, 0x65]; // Adobe
+    return findAPPnSegment(binary, 14 /* APP14 */, name, function(p) {
+      if (p + 16 <= binary.length) {
+        return {
+          tr: binary.at(p + 15)
+        };
+      }
+    });
   };
 
   var formatInfo = function(desc, color) {
@@ -273,10 +303,26 @@
     if (magic === 0x47494638) { return formatInfo('GIF'); }
     if ((magic & 0xffff0000) === 0x424d0000) { return formatInfo('BMP'); }
     if ((magic - (magic & 255)) === 0xffd8ff00) {
+      // JPEG
+      var desc = 'JPEG';
+      var color = null;
       if (detectMPFIdentifier(binary)) {
-        return formatInfo('JPEG (MPF)');
+        desc += ' (MPF)';
       }
-      return formatInfo('JPEG');
+      var hasJFIF = detectJFIFIdentifier(binary);
+      var hasAdobe = detectAdobeIdentifier(binary);
+      var sof = detectSOFnSegment(binary);
+      var nf = sof ? sof.nf : null;
+      if (!hasJFIF && hasAdobe) {
+        color = (hasAdobe.tr === 1 && nf === 3) ? 'YCbCr' : null;
+      }
+      if (!color) {
+        color = nf === 1 ? 'Grayscale' : nf === 3 ? 'YCbCr' : 'unknown';
+      }
+      //console.log(hasJFIF);
+      //console.log(hasAdobe);
+      //console.log(sof);
+      return formatInfo(desc, color);
     }
     if (magic === 0x4d4d002a || magic === 0x49492a00) { return formatInfo('TIFF'); }
     if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
