@@ -198,9 +198,16 @@
     return findJPEGSegment(binary, function(p, marker) {
       if (0 <= [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15].indexOf(marker - 0xffc0) &&
           p + 10 <= binary.length) {
-        return {
-          nf: binary.at(p + 9)
-        };
+        var nf = binary.at(p + 9);
+        if (nf === 3 && p + 10 + 9 <= binary.length) {
+          var c1 = binary.at(p + 11);
+          var c2 = binary.at(p + 14);
+          var c3 = binary.at(p + 17);
+          var sampling = c1 * 65536 + c2 * 256 + c3;
+          return { nf: nf, sampling: sampling };
+        } else {
+          return { nf: nf };
+        }
       }
     });
   };
@@ -318,6 +325,16 @@
       }
       if (!color) {
         color = nf === 1 ? 'Grayscale' : nf === 3 ? 'YCbCr' : 'unknown';
+      }
+      switch (sof.sampling) {
+        case 0x111111: color += ' (4:4:4)'; break;
+        case 0x211111: color += ' (4:2:2)'; break;
+        case 0x121111: color += ' (4:4:0)'; break;
+        case 0x221111: color += ' (4:2:0)'; break;
+        case 0x411111: color += ' (4:1:1)'; break;
+        case 0x311111: color += ' (3:1:1)'; break;
+        case 0x421111: color += ' (4:1:0)'; break;
+        default: color += ' (uncommon chroma subsampling)'; break;
       }
       //console.log(hasJFIF);
       //console.log(hasAdobe);
