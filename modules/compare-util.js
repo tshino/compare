@@ -152,13 +152,17 @@
     var readBig32 = function(addr) {
       return readBig16(addr) * 65536 + readBig16(addr + 2);
     };
+    var readLittle32 = function(addr) {
+      return readLittle16(addr) + readLittle16(addr + 2) * 65536;
+    };
 
     return {
       length:   len,
       at:       read,
       big16:    readBig16,
       little16: readLittle16,
-      big32:    readBig32
+      big32:    readBig32,
+      little32: readLittle32
     };
   };
 
@@ -308,7 +312,41 @@
       return formatInfo(desc, color);
     }
     if (magic === 0x47494638) { return formatInfo('GIF'); }
-    if ((magic & 0xffff0000) === 0x424d0000) { return formatInfo('BMP'); }
+    if ((magic & 0xffff0000) === 0x424d0000) {
+      // BMP
+      var color = null;
+      if (26 <= binary.length) {
+        var biSize = binary.little32(14);
+        var os2 = 12 === biSize || binary.length < 54;
+        var bitCount = os2 ? binary.little16(24) : binary.little16(28);
+        //console.log(biSize);
+        //console.log(bitCount);
+        switch (bitCount) {
+          case 1:
+            color = 'Indexed RGB (1bpp)';
+            break;
+          case 4:
+            color = 'Indexed RGB (4bpp)';
+            break;
+          case 8:
+            color = 'Indexed RGB (8bpp)';
+            break;
+          case 16:
+            color = 'RGB (16bpp)';
+            break;
+          case 24:
+            color = 'RGB (24bpp)';
+            break;
+          case 32:
+            color = 'RGB (32bpp)';
+            break;
+          default:
+            color = 'unknown';
+            break;
+        }
+      }
+      return formatInfo('BMP', color);
+    }
     if ((magic - (magic & 255)) === 0xffd8ff00) {
       // JPEG
       var desc = 'JPEG';
