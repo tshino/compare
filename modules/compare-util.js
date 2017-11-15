@@ -288,7 +288,7 @@
           color += hasTRNS ? ' + Transparent' : '';
           break;
         case 3:
-          color = 'Indexed ' + (hasTRNS ? ' RGBA' : ' RGB');
+          color = 'Indexed ' + (hasTRNS ? '32bit RGBA' : '24bit RGB');
           if (0 <= [1, 2, 4, 8].indexOf(depth)) {
             color += ' (' + depth + 'bpp)';
           }
