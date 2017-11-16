@@ -316,11 +316,47 @@
       // BMP
       var color = null;
       if (26 <= binary.length) {
+        var offBits = binary.little32(10);
         var biSize = binary.little32(14);
         var os2 = 12 === biSize || binary.length < 54;
         var bitCount = os2 ? binary.little16(24) : binary.little16(28);
+        var compression = os2 ? 0 : binary.little32(30);
+        var mask = [];
+        var calcMaskBits = function(mask) {
+          var nlz = 0, ntz = 0, bit = 1;
+          while (bit < mask && (mask & bit) === 0) {
+            ntz += 1;
+            bit = bit << 1;
+          }
+          while (nlz < 32 && (mask >>> (31 - nlz)) === 0) {
+            nlz += 1;
+          }
+          return 32 - nlz - ntz;
+        };
+        if (compression === 3 /* BI_BITFIELDS */ &&
+            (bitCount === 16 || bitCount === 32)) {
+          if (56 <= biSize && 70 <= binary.length) {
+            mask = [
+              calcMaskBits(binary.little32(54)),
+              calcMaskBits(binary.little32(54 + 4)),
+              calcMaskBits(binary.little32(54 + 8)),
+              calcMaskBits(binary.little32(54 + 12))
+            ];
+            if (mask[3] === 0) {
+              mask.pop();
+            }
+          } else if (14 + biSize + 4 * 3 <= offBits && biSize + 26 <= binary.length) {
+            mask = [
+              calcMaskBits(binary.little32(14 + biSize)),
+              calcMaskBits(binary.little32(14 + biSize + 4)),
+              calcMaskBits(binary.little32(14 + biSize + 8))
+            ];
+          }
+        }
         //console.log(biSize);
         //console.log(bitCount);
+        //console.log(compression);
+        //console.log(mask);
         switch (bitCount) {
           case 1:
             color = 'Indexed RGB (1bpp)';
@@ -332,13 +368,25 @@
             color = 'Indexed RGB (8bpp)';
             break;
           case 16:
-            color = 'RGB (16bpp)';
+            switch (mask.length) {
+              case 0: color = 'RGB 5.5.5'; break;
+              case 3: color = 'RGB ' + mask.join('.'); break;
+              case 4: color = 'RGBA ' + mask.join('.'); break;
+              default: color = 'RGB'; break;
+            }
+            color += ' (16bpp)';
             break;
           case 24:
-            color = 'RGB (24bpp)';
+            color = 'RGB 8.8.8 (24bpp)';
             break;
           case 32:
-            color = 'RGB (32bpp)';
+            switch (mask.length) {
+              case 0: color = 'RGB 8.8.8'; break;
+              case 3: color = 'RGB ' + mask.join('.'); break;
+              case 4: color = 'RGBA ' + mask.join('.'); break;
+              default: color = 'RGB'; break;
+            }
+            color += ' (32bpp)';
             break;
           default:
             color = 'unknown';
