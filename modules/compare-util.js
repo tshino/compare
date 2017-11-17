@@ -288,7 +288,7 @@
           color += hasTRNS ? ' + Transparent' : '';
           break;
         case 3:
-          color = 'Indexed ' + (hasTRNS ? '32bit RGBA' : '24bit RGB');
+          color = 'Indexed ' + (hasTRNS ? 'RGBA 8.8.8.8' : 'RGB 8.8.8');
           if (0 <= [1, 2, 4, 8].indexOf(depth)) {
             color += ' (' + depth + 'bpp)';
           }
@@ -359,13 +359,13 @@
         //console.log(mask);
         switch (bitCount) {
           case 1:
-            color = 'Indexed RGB (1bpp)';
+            color = 'Indexed RGB 8.8.8 (1bpp)';
             break;
           case 4:
-            color = 'Indexed RGB (4bpp)';
+            color = 'Indexed RGB 8.8.8 (4bpp)';
             break;
           case 8:
-            color = 'Indexed RGB (8bpp)';
+            color = 'Indexed RGB 8.8.8 (8bpp)';
             break;
           case 16:
             switch (mask.length) {
