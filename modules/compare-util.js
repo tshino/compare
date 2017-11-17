@@ -276,6 +276,7 @@
         case 0:
           color = 'Grayscale';
           if (0 <= [1, 2, 4, 8, 16].indexOf(depth)) {
+            color += ' ' + depth;
             color += ' (' + depth + 'bpp)';
           }
           color += hasTRNS ? ' + Transparent' : '';
@@ -283,6 +284,7 @@
         case 2:
           color = 'RGB';
           if (0 <= [8, 16].indexOf(depth)) {
+            color += ' ' + [depth, depth, depth].join('.');
             color += ' (' + 3 * depth + 'bpp)';
           }
           color += hasTRNS ? ' + Transparent' : '';
@@ -296,12 +298,14 @@
         case 4:
           color = 'Grayscale+Alpha';
           if (0 <= [8, 16].indexOf(depth)) {
+            color += ' ' + [depth, depth].join('.');
             color += ' (' + 2 * depth + 'bpp)';
           }
           break;
         case 6:
           color = 'RGBA';
           if (0 <= [8, 16].indexOf(depth)) {
+            color += ' ' + [depth, depth, depth, depth].join('.');
             color += ' (' + 4 * depth + 'bpp)';
           }
           break;
@@ -407,20 +411,26 @@
       var sof = detectSOFnSegment(binary);
       var nf = sof ? sof.nf : null;
       if (!hasJFIF && hasAdobe) {
-        color = (hasAdobe.tr === 1 && nf === 3) ? 'YCbCr' : null;
+        color = (hasAdobe.tr === 1 && nf === 3) ? 'YCbCr 8.8.8' : null;
       }
       if (!color) {
-        color = nf === 1 ? 'Grayscale' : nf === 3 ? 'YCbCr' : 'unknown';
+        color = nf === 1 ? 'Grayscale 8' : nf === 3 ? 'YCbCr 8.8.8' : 'unknown';
       }
       switch (sof.sampling) {
-        case 0x111111: color += ' (4:4:4)'; break;
-        case 0x211111: color += ' (4:2:2)'; break;
-        case 0x121111: color += ' (4:4:0)'; break;
-        case 0x221111: color += ' (4:2:0)'; break;
-        case 0x411111: color += ' (4:1:1)'; break;
-        case 0x311111: color += ' (3:1:1)'; break;
-        case 0x421111: color += ' (4:1:0)'; break;
-        default: color += ' (uncommon chroma subsampling)'; break;
+        case 0x111111: color += ' (24bpp 4:4:4)'; break;
+        case 0x211111: color += ' (16bpp 4:2:2)'; break;
+        case 0x121111: color += ' (16bpp 4:4:0)'; break;
+        case 0x221111: color += ' (12bpp 4:2:0)'; break;
+        case 0x411111: color += ' (12bpp 4:1:1)'; break;
+        case 0x311111: color += ' (40/3 bpp 3:1:1)'; break;
+        case 0x421111: color += ' (10bpp 4:1:0)'; break;
+        default:
+         if (nf === 1) {
+           color += ' (8bpp)';
+         } else if (nf === 3) {
+           color += ' (uncommon chroma subsampling)';
+         }
+         break;
       }
       //console.log(hasJFIF);
       //console.log(hasAdobe);
