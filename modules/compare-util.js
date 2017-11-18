@@ -315,7 +315,57 @@
       }
       return formatInfo(desc, color);
     }
-    if (magic === 0x47494638) { return formatInfo('GIF'); }
+    if (magic === 0x47494638) {
+      var desc = 'GIF';
+      var color = null;
+      if (13 <= binary.length) {
+        //console.log('sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
+        var bitfield = binary.at(10);
+        var gctFlag = bitfield >> 7;
+        var colorRes = (bitfield >> 4) & 0x07;
+        var gctLength = bitfield & 0x07;
+        var bgIndex = binary.at(11);
+        //console.log('gct', gctFlag, colorRes, gctLength);
+        //console.log('bg', bgIndex);
+        var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
+        while (block + 3 <= binary.length) {
+          var initial = binary.at(block);
+          if (initial === 0x21) {
+            var label = binary.at(block + 1);
+            //console.log('ext', '0x' + label.toString(16));
+            if (label === 0xf9 /* Graphic Control Extension */ &&
+                block + 8 <= binary.length) {
+              //console.log('transparent', binary.at(block + 3) & 0x01, binary.at(block + 6));
+            } else if (label === 0xff /* Application Extension */ &&
+                block + 14 <= binary.length) {
+              var app0 = binary.big32(block + 3);
+              var app1 = binary.big32(block + 7);
+              //console.log(app0.toString(16), app1.toString(16));
+              if (app0 === 0x4e455453 && app1 == 0x43415045 /* NETS CAPE */) {
+                desc += ' (Animated)';
+              }
+            }
+            for (var off = 2; block + off < binary.length; ) {
+              var size = binary.at(block + off);
+              if (size === 0 /* Block Terminator */) {
+                block += off + 1;
+                break;
+              }
+              off += 1 + size;
+            }
+            continue;
+          } else if (initial === 0x2c /* Image Separator */ &&
+                block + 10 <= binary.length) {
+            var localFlags = binary.at(block + 9);
+            var lctFlag = localFlags >> 7;
+            var lctLength = localFlags & 0x07;
+            //console.log('lct', lctFlag, lctLength);
+          }
+          break;
+        }
+      }
+      return formatInfo(desc, color);
+    }
     if ((magic & 0xffff0000) === 0x424d0000) {
       // BMP
       var color = null;
