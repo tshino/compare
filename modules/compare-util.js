@@ -505,7 +505,26 @@
       //console.log(sof);
       return formatInfo(desc, color);
     }
-    if (magic === 0x4d4d002a || magic === 0x49492a00) { return formatInfo('TIFF'); }
+    if (magic === 0x4d4d002a || magic === 0x49492a00) {
+      /*
+      console.log('TIFF');
+      var read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
+      var read32 = magic === 0x4d4d002a ? binary.big32 : binary.little32;
+      var readIFDValue = function(type, data) {
+        ...
+      };
+      if (8 <= binary.length) {
+        var ifd = read32(4);
+        var count = ifd + 2 <= binary.length ? read16(ifd) : 0;
+        if (ifd + 2 + count * 12 <= binary.length) {
+          for (var i = 0; i < count; ++i) {
+            var tag = read16(ifd + 2 + i * 12);
+            console.log(' tag', '0x' + tag.toString(16));
+          }
+        }
+      }*/
+      return formatInfo('TIFF');
+    }
     if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||
         (magic === 0x3c3f786d /* '<?xm' */ &&
