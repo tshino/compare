@@ -319,14 +319,17 @@
       var desc = 'GIF';
       var color = null;
       if (13 <= binary.length) {
-        //console.log('sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
+        //console.log('GIF sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
+        var size = [binary.little16(6), binary.little16(8)];
         var bitfield = binary.at(10);
         var gctFlag = bitfield >> 7;
         var colorRes = (bitfield >> 4) & 0x07;
         var gctLength = bitfield & 0x07;
         var bgIndex = binary.at(11);
+        //console.log('size', size.join('x'));
         //console.log('gct', gctFlag, colorRes, gctLength);
         //console.log('bg', bgIndex);
+        var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
         while (block + 3 <= binary.length) {
           var initial = binary.at(block);
@@ -335,7 +338,9 @@
             //console.log('ext', '0x' + label.toString(16));
             if (label === 0xf9 /* Graphic Control Extension */ &&
                 block + 8 <= binary.length) {
-              //console.log('transparent', binary.at(block + 3) & 0x01, binary.at(block + 6));
+              transparent = binary.at(block + 3) & 0x01;
+              transparentIndex = binary.at(block + 6);
+              //console.log('transparent', transparent, transparentIndex);
             } else if (label === 0xff /* Application Extension */ &&
                 block + 14 <= binary.length) {
               var app0 = binary.big32(block + 3);
@@ -356,14 +361,27 @@
             continue;
           } else if (initial === 0x2c /* Image Separator */ &&
                 block + 10 <= binary.length) {
+            var rect = [
+              binary.little16(block + 1),
+              binary.little16(block + 3),
+              binary.little16(block + 5),
+              binary.little16(block + 7)
+            ];
             var localFlags = binary.at(block + 9);
             var lctFlag = localFlags >> 7;
             var lctLength = localFlags & 0x07;
+            //console.log('rect', rect.join(' '));
             //console.log('lct', lctFlag, lctLength);
+            var bpp = lctFlag ? (lctLength + 1) : (gctLength + 1);
+            color = 'Indexed RGB 8.8.8 (' + bpp + 'bpp)';
+            if (transparent && transparentIndex < Math.pow(2, bpp)) {
+              color += ' + Transparent';
+            }
           }
           break;
         }
       }
+      color = color || 'unknown';
       return formatInfo(desc, color);
     }
     if ((magic & 0xffff0000) === 0x424d0000) {
