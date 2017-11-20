@@ -506,24 +506,77 @@
       return formatInfo(desc, color);
     }
     if (magic === 0x4d4d002a || magic === 0x49492a00) {
-      /*
-      console.log('TIFF');
+      //console.log('TIFF');
+      var color = null;
       var read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
       var read32 = magic === 0x4d4d002a ? binary.big32 : binary.little32;
-      var readIFDValue = function(type, data) {
-        ...
+      var readIFDValue = function(type, count, offset) {
+        if (type < 1 || 5 < type) {
+          return [];
+        }
+        var bytes = [1, 1, 2, 4, 8][type - 1] * count;
+        if (4 < bytes) {
+          offset = read32(offset);
+          if (offset + bytes > binary.length) {
+            return [];
+          }
+        }
+        var value = [];
+        for (var i = 0; i < count; ++i) {
+          switch (type) {
+            case 1: case 2:
+              value[i] = binary.at(offset + i); break;
+            case 3:
+              value[i] = read16(offset + i * 2); break;
+            case 4:
+              value[i] = read32(offset + i * 4); break;
+            case 5:
+              value[i] = read32(offset + i * 8) / read32(offset + i * 8 + 4); break;
+          }
+        }
+        if (type === 2 /* ASCII */) {
+          var string = '';
+          for (var i = 0; i < count - 1; ++i) {
+            string += String.fromCharCode(value[i]);
+          }
+          value = [ string ];
+        }
+        return value;
       };
       if (8 <= binary.length) {
         var ifd = read32(4);
-        var count = ifd + 2 <= binary.length ? read16(ifd) : 0;
-        if (ifd + 2 + count * 12 <= binary.length) {
-          for (var i = 0; i < count; ++i) {
-            var tag = read16(ifd + 2 + i * 12);
-            console.log(' tag', '0x' + tag.toString(16));
+        var ifdCount = ifd + 2 <= binary.length ? read16(ifd) : 0;
+        if (ifd + 2 + ifdCount * 12 <= binary.length) {
+          var photometricInterpretation = null;
+          var bitsPerSample = 1;
+          var samplesPerPixel = 1;
+          for (var i = 0; i < ifdCount; ++i) {
+            var offset = ifd + 2 + i * 12;
+            var tag = read16(offset);
+            var type = read16(offset + 2);
+            var count = read32(offset + 4);
+            var value = readIFDValue(type, count, offset + 8);
+            //console.log(' tag', '0x' + tag.toString(16), type, value);
+            switch (tag) {
+              case 262: /* PhotometricInterpretation */
+                photometricInterpretation = value[0]; break;
+              case 277: /* SamplesPerPixel */
+                samplesPerPixel = value[0]; break;
+              case 258: /* BitsPerSample */
+                bitsPerSample = value[0]; break;
+            }
+          }
+          switch (photometricInterpretation) {
+            case 0: case 1:
+              if (0 <= [1, 4, 8].indexOf(bitsPerSample)) {
+                color = 'Grayscale ' + bitsPerSample + ' (' + bitsPerSample + 'bpp)';
+              }
+              break;
           }
         }
-      }*/
-      return formatInfo('TIFF');
+      }
+      //console.log('color', color);
+      return formatInfo('TIFF', color);
     }
     if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||
