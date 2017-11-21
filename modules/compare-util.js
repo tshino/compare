@@ -548,8 +548,9 @@
         var ifdCount = ifd + 2 <= binary.length ? read16(ifd) : 0;
         if (ifd + 2 + ifdCount * 12 <= binary.length) {
           var photometricInterpretation = null;
-          var bitsPerSample = 1;
+          var bitsPerSample = [1];
           var samplesPerPixel = 1;
+          var colorMap = [];
           for (var i = 0; i < ifdCount; ++i) {
             var offset = ifd + 2 + i * 12;
             var tag = read16(offset);
@@ -563,13 +564,31 @@
               case 277: /* SamplesPerPixel */
                 samplesPerPixel = value[0]; break;
               case 258: /* BitsPerSample */
-                bitsPerSample = value[0]; break;
+                bitsPerSample = value; break;
+              case 320: /* ColorMap */
+                colorMap = value; break;
             }
           }
           switch (photometricInterpretation) {
             case 0: case 1:
-              if (0 <= [1, 4, 8].indexOf(bitsPerSample)) {
-                color = 'Grayscale ' + bitsPerSample + ' (' + bitsPerSample + 'bpp)';
+              if (0 <= [1, 4, 8].indexOf(bitsPerSample[0])) {
+                color = 'Grayscale ' + bitsPerSample[0] + ' (' + bitsPerSample[0] + 'bpp)';
+              }
+              break;
+            case 2:
+              // todo: detect RGBA
+              if (samplesPerPixel >= 3 &&
+                  bitsPerSample.length === samplesPerPixel &&
+                  bitsPerSample[0] === 8 &&
+                  bitsPerSample[1] === 8 &&
+                  bitsPerSample[2] === 8) {
+                color = 'RGB 8.8.8 (24bpp)';
+              }
+              break;
+            case 3:
+              if (0 <= [4, 8].indexOf(bitsPerSample[0])) {
+                //console.log('colorMap', colorMap);
+                color = 'Indexed RGB 16.16.16 (' + bitsPerSample[0] + 'bpp)';
               }
               break;
           }
