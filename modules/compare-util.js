@@ -551,6 +551,7 @@
           var bitsPerSample = [1];
           var samplesPerPixel = 1;
           var colorMap = [];
+          var extraSamples = [];
           for (var i = 0; i < ifdCount; ++i) {
             var offset = ifd + 2 + i * 12;
             var tag = read16(offset);
@@ -567,8 +568,28 @@
                 bitsPerSample = value; break;
               case 320: /* ColorMap */
                 colorMap = value; break;
+              case 338: /* ExtraSamples */
+                extraSamples = value; break;
             }
           }
+          var alphaIndex = extraSamples.indexOf(1 /* Associated alpha data */);
+          var maskIndex = extraSamples.indexOf(2 /* Unassociated alpha data */);
+          var makeAlphaNotation = function(baseName, baseIndices, withAlphaName) {
+            //console.log('extraSamples', extraSamples);
+            var baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
+            var totalBaseBits = baseBits.reduce(function(a, b) { return a + b; }, 0);
+            if (0 <= alphaIndex && alphaIndex < bitsPerSample.length) {
+              var alphaBits = bitsPerSample[alphaIndex];
+              var name = withAlphaName + ' (pre-multiplied) ' + baseBits.join('.') + '.' + alphaBits;
+              return name + ' (' + (totalBaseBits + alphaBits) +  'bpp)';
+            } else if (0 <= maskIndex && maskIndex < bitsPerSample.length) {
+              var maskBits = bitsPerSample[maskIndex];
+              var name = withAlphaName + ' ' + baseBits.join('.') + '.' + maskBits;
+              return name + ' (' + (totalBaseBits + maskBits) +  'bpp)';
+            } else {
+              return baseName + ' ' + baseBits.join('.') + ' (' + totalBaseBits + 'bpp)';
+            }
+          };
           switch (photometricInterpretation) {
             case 0: case 1:
               if (0 <= [1, 4, 8].indexOf(bitsPerSample[0])) {
@@ -576,13 +597,12 @@
               }
               break;
             case 2:
-              // todo: detect RGBA
               if (samplesPerPixel >= 3 &&
                   bitsPerSample.length === samplesPerPixel &&
                   bitsPerSample[0] === 8 &&
                   bitsPerSample[1] === 8 &&
                   bitsPerSample[2] === 8) {
-                color = 'RGB 8.8.8 (24bpp)';
+                color = makeAlphaNotation('RGB', [0, 1, 2], 'RGBA');
               }
               break;
             case 3:
