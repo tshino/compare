@@ -256,12 +256,8 @@
       color: color
     };
   };
-  var detectImageFormat = function(binary) {
-    var magic = binary.length < 4 ? 0 : binary.big32(0);
-    var magic2 = binary.length < 8 ? 0 : binary.big32(4);
-
-    if (magic === 0x89504e47) {
-      // PNG
+  var formatReader = (function() {
+    var detectPNG = function(binary) {
       var desc = 'PNG';
       if (detectPNGChunk(
                 binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
@@ -314,8 +310,8 @@
           break;
       }
       return formatInfo(desc, color);
-    }
-    if (magic === 0x47494638) {
+    };
+    var detectGIF = function(binary, magic, magic2) {
       var desc = 'GIF';
       var color = null;
       if (13 <= binary.length) {
@@ -383,8 +379,8 @@
       }
       color = color || 'unknown';
       return formatInfo(desc, color);
-    }
-    if ((magic & 0xffff0000) === 0x424d0000) {
+    };
+    var detectBMP = function(binary, magic, magic2) {
       // BMP
       var color = null;
       if (26 <= binary.length) {
@@ -466,8 +462,8 @@
         }
       }
       return formatInfo('BMP', color);
-    }
-    if ((magic - (magic & 255)) === 0xffd8ff00) {
+    };
+    var detectJPEG = function(binary, magic, magic2) {
       // JPEG
       var desc = 'JPEG';
       var color = null;
@@ -504,8 +500,8 @@
       //console.log(hasAdobe);
       //console.log(sof);
       return formatInfo(desc, color);
-    }
-    if (magic === 0x4d4d002a || magic === 0x49492a00) {
+    };
+    var detectTIFF = function(binary, magic, magic2) {
       //console.log('TIFF');
       var color = null;
       var read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
@@ -616,6 +612,32 @@
       }
       //console.log('color', color);
       return formatInfo('TIFF', color);
+    };
+    return {
+      detectPNG: detectPNG,
+      detectGIF: detectGIF,
+      detectBMP: detectBMP,
+      detectJPEG: detectJPEG,
+      detectTIFF: detectTIFF
+    };
+  })();
+  var detectImageFormat = function(binary) {
+    var magic = binary.length < 4 ? 0 : binary.big32(0);
+    var magic2 = binary.length < 8 ? 0 : binary.big32(4);
+    if (magic === 0x89504e47) { // PNG
+      return formatReader.detectPNG(binary);
+    }
+    if (magic === 0x47494638) { // GIF
+      return formatReader.detectGIF(binary, magic, magic2);
+    }
+    if ((magic & 0xffff0000) === 0x424d0000) { // BMP
+      return formatReader.detectBMP(binary, magic, magic2);
+    }
+    if ((magic - (magic & 255)) === 0xffd8ff00) { // JPEG
+      return formatReader.detectJPEG(binary, magic, magic2);
+    }
+    if (magic === 0x4d4d002a || magic === 0x49492a00) { // TIFF
+      return formatReader.detectTIFF(binary, magic, magic2);
     }
     if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||

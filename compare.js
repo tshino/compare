@@ -3012,6 +3012,8 @@
     var format = formatInfo ? formatInfo.toString() : null;
     var isPNG  = format && 0 <= format.indexOf('PNG');
     var isJPEG = format && 0 <= format.indexOf('JPEG');
+    var isGIF  = format && 0 <= format.indexOf('GIF');
+    var isBMP  = format && 0 <= format.indexOf('BMP');
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
@@ -3027,7 +3029,7 @@
         var message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
-        } else if (!isPNG && !isJPEG && entry.format !== 'GIF' && entry.format !== 'BMP') {
+        } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
           message += ' Maybe unsupported format for the browser.';
         }
         setEntryError(entry, message);
