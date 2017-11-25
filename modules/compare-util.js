@@ -588,7 +588,7 @@
           };
           switch (photometricInterpretation) {
             case 0: case 1:
-              if (0 <= [1, 2, 4, 8].indexOf(bitsPerSample[0])) {
+              if (0 <= [1, 2, 4, 8, 16].indexOf(bitsPerSample[0])) {
                 color = makeAlphaNotation('Grayscale', [0], 'Grayscale+Alpha');
               }
               break;
