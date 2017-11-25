@@ -556,15 +556,15 @@
             var value = readIFDValue(type, count, offset + 8);
             //console.log(' tag', '0x' + tag.toString(16), type, value);
             switch (tag) {
-              case 262: /* PhotometricInterpretation */
+              case 262: /* 0x106 PhotometricInterpretation */
                 photometricInterpretation = value[0]; break;
-              case 277: /* SamplesPerPixel */
+              case 277: /* 0x115 SamplesPerPixel */
                 samplesPerPixel = value[0]; break;
-              case 258: /* BitsPerSample */
+              case 258: /* 0x102 BitsPerSample */
                 bitsPerSample = value; break;
-              case 320: /* ColorMap */
+              case 320: /* 0x140 ColorMap */
                 colorMap = value; break;
-              case 338: /* ExtraSamples */
+              case 338: /* 0x152 ExtraSamples */
                 extraSamples = value; break;
             }
           }
@@ -588,7 +588,7 @@
           };
           switch (photometricInterpretation) {
             case 0: case 1:
-              if (0 <= [1, 4, 8].indexOf(bitsPerSample[0])) {
+              if (0 <= [1, 2, 4, 8].indexOf(bitsPerSample[0])) {
                 color = makeAlphaNotation('Grayscale', [0], 'Grayscale+Alpha');
               }
               break;
@@ -602,7 +602,7 @@
               }
               break;
             case 3:
-              if (0 <= [4, 8].indexOf(bitsPerSample[0])) {
+              if (0 <= [1, 2, 4, 8].indexOf(bitsPerSample[0])) {
                 //console.log('colorMap', colorMap);
                 color = 'Indexed RGB 16.16.16 (' + bitsPerSample[0] + 'bpp)';
               }
