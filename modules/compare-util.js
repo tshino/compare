@@ -250,13 +250,13 @@
     });
   };
 
-  var formatInfo = function(desc, color) {
-    return {
-      toString: function() { return desc; },
-      color: color
-    };
-  };
   var formatReader = (function() {
+     var formatInfo = function(desc, color) {
+       return {
+         toString: function() { return desc; },
+         color: color
+       };
+     };
     var detectPNG = function(binary) {
       var desc = 'PNG';
       if (detectPNGChunk(
@@ -613,12 +613,33 @@
       //console.log('color', color);
       return formatInfo('TIFF', color);
     };
+    var detectSVG = function(binary, magic, magic2) {
+      if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
+            magic2 === 0x3f786d6c /* '?xml' */) ||
+        (magic === 0x3c3f786d /* '<?xm' */ &&
+            (magic2 & 0xff000000) === 0x6c000000 /* 'l' */)) {
+        // XML
+        var i = 4;
+        for (var x; x = binary.at(i); ++i) {
+          if (x === 0x3c /* '<' */) {
+            var y = binary.at(i + 1);
+            if (y !== 0x3f /* '?' */ && y !== 0x21 /* '!' */) { break; }
+          }
+        }
+        var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
+        if (sig1 === 0x3c737667 /* <svg */) {
+          return formatInfo('SVG');
+        }
+      }
+      return null;
+    };
     return {
       detectPNG: detectPNG,
       detectGIF: detectGIF,
       detectBMP: detectBMP,
       detectJPEG: detectJPEG,
-      detectTIFF: detectTIFF
+      detectTIFF: detectTIFF,
+      detectSVG: detectSVG
     };
   })();
   var detectImageFormat = function(binary) {
@@ -639,22 +660,9 @@
     if (magic === 0x4d4d002a || magic === 0x49492a00) { // TIFF
       return formatReader.detectTIFF(binary, magic, magic2);
     }
-    if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
-            magic2 === 0x3f786d6c /* '?xml' */) ||
-        (magic === 0x3c3f786d /* '<?xm' */ &&
-            (magic2 & 0xff000000) === 0x6c000000 /* 'l' */)) {
-        // XML
-        var i = 4;
-        for (var x; x = binary.at(i); ++i) {
-          if (x === 0x3c /* '<' */) {
-            var y = binary.at(i + 1);
-            if (y !== 0x3f /* '?' */ && y !== 0x21 /* '!' */) { break; }
-          }
-        }
-        var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
-        if (sig1 === 0x3c737667 /* <svg */) {
-          return formatInfo('SVG');
-        }
+    var svg = formatReader.detectSVG(binary, magic, magic2);
+    if (svg != null) {
+      return svg;
     }
     //alert(magic);
     return null;
