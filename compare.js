@@ -2663,11 +2663,14 @@
       reset();
       updateDOM();
     });
-    $('#altViewColorSpace').on('change', function(e) {
-      colorSpace = this.options[this.selectedIndex].value;
+    var changeColorSpace = function(cs) {
+      colorSpace = cs;
       component = 0;
       updateModeIndicator();
       updateDOM();
+    };
+    $('#altViewColorSpace').on('change', function(e) {
+      changeColorSpace(this.options[this.selectedIndex].value);
       return false;
     });
     $('#altViewMode .mode-sw button').on('click', function(e) {
@@ -2703,6 +2706,11 @@
     var changeModeReverse = function() {
       changeMode(/* reverse= */ true);
     };
+    var enableAlpha = function() {
+      if (colorSpace === 'rgb') {
+        changeColorSpace('rgba');
+      }
+    };
     var updateModeIndicator = function() {
       if (component !== null) {
         $('#altViewMode .mode-sw').css({ display: 'none' });
@@ -2717,6 +2725,7 @@
         $('#altViewMode').css({ display : 'block' });
         $('.altViewMapping').val(mapping);
         $('#channelbtn').addClass('current');
+        $('#altViewColorSpace').val(colorSpace);
       } else {
         $('#altViewMode').css({ display : '' });
         $('#channelbtn').removeClass('current');
@@ -2794,6 +2803,7 @@
       toggle: toggle,
       changeMode: changeMode,
       changeModeReverse: changeModeReverse,
+      enableAlpha: enableAlpha,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
       onUpdateLayout: onUpdateLayout,
@@ -3017,6 +3027,11 @@
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
+    if (0 <= entry.color.indexOf('RGBA') ||
+        0 <= entry.color.indexOf('Alpha') ||
+        0 <= entry.color.indexOf('Transparent')) {
+      altView.enableAlpha();
+    }
     if (isJPEG) {
       entry.orientation = compareUtil.detectExifOrientation(binary);
     }
