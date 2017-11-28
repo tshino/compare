@@ -2578,7 +2578,7 @@
     var colorSpaces = {
       'rgb': {
         modeSwitch: '#altViewModeSwRGB',
-        numComponents: 3,
+        components: [ 'R', 'G', 'B' ],
         coef: [
           [ 1, 0, 0, 0, 0 ],
           [ 0, 1, 0, 0, 0 ],
@@ -2587,7 +2587,7 @@
       },
       'rgba': {
         modeSwitch: '#altViewModeSwRGBA',
-        numComponents: 4,
+        components: [ 'R', 'G', 'B', 'A' ],
         coef: [
           [ 1, 0, 0, 0, 0 ],
           [ 0, 1, 0, 0, 0 ],
@@ -2597,7 +2597,7 @@
       },
       'ycbcr601': {
         modeSwitch: '#altViewModeSwYCbCr',
-        numComponents: 3,
+        components: [ 'Y', 'Cb', 'Cr' ],
         coef: [
           [ 0.299, 0.587, 0.114, 0, 0 ],
           [ -0.1687, -0.3313, 0.5000, 0, 127.5 ],
@@ -2606,7 +2606,7 @@
       },
       'ycbcr709': {
         modeSwitch: '#altViewModeSwYCbCr',
-        numComponents: 3,
+        components: [ 'Y', 'Cb', 'Cr' ],
         coef: [
           [ 0.2126, 0.7152, 0.0722, 0, 0 ],
           [ -0.1146, -0.3854, 0.5000, 0, 127.5 ],
@@ -2664,9 +2664,16 @@
       updateDOM();
     });
     var changeColorSpace = function(cs) {
+      var lastComponent = (component === null || component === 0) ? null :
+                            colorSpaces[colorSpace].components[component - 1];
       colorSpace = cs;
       if (component !== null) {
-        component = 0;
+        var sameComponent = colorSpaces[colorSpace].components.indexOf(lastComponent);
+        if (0 <= sameComponent) {
+          component = sameComponent + 1;
+        } else {
+          component = 0;
+        }
         updateModeIndicator();
         updateDOM();
       }
@@ -2698,7 +2705,7 @@
       updateDOM();
     };
     var changeMode = function(reverse) {
-      var numOptions = colorSpaces[colorSpace].numComponents + 1;
+      var numOptions = colorSpaces[colorSpace].components.length + 1;
       component =
         component === null ? 0 :
         (reverse ? component + numOptions - 1 : component + 1) % numOptions;
