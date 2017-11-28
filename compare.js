@@ -2665,9 +2665,11 @@
     });
     var changeColorSpace = function(cs) {
       colorSpace = cs;
-      component = 0;
-      updateModeIndicator();
-      updateDOM();
+      if (component !== null) {
+        component = 0;
+        updateModeIndicator();
+        updateDOM();
+      }
     };
     $('#altViewColorSpace').on('change', function(e) {
       changeColorSpace(this.options[this.selectedIndex].value);
