@@ -2742,16 +2742,38 @@
       }
     };
     // WIP
-    var makeContour = function(imageData) {
-      var w = imageData.width;
-      var h = imageData.height;
+    var makeContour = function(channelImage) {
+      var w = channelImage.width;
+      var h = channelImage.height;
+      var ch = channelImage.data;
       var paths = [];
-      paths.push('M 0,0 L 100,200');
+      for (var y = 0, i = 0; y < h; ++y) {
+        if (y  + 1 < h) {
+          for (var x = 0, j = i; x < w; ++x, ++j) {
+            var v1 = ch[j] >> 4;
+            var v2 = ch[j + w] >> 4;
+            if (v1 !== v2) {
+              paths.push([x, y + 1, x + 1, y + 1]);
+            }
+          }
+        }
+        var v1 = ch[i] >> 4;
+        i += 1;
+        for (var x = 1; x < w; ++x, ++i) {
+          var v2 = ch[i] >> 4;
+          if (v1 !== v2) {
+            paths.push([x, y, x, y + 1]);
+            v1 = v2;
+          }
+        }
+      }
       var vbox = '0 0 ' + w + ' ' + h;
       var contour = $(
         '<svg class="imageOverlay contour" viewBox="' + vbox + '">' +
-          '<g stroke="white" stroke-width="1" fill="none">' +
-            '<path d="' + paths.join('"></path><path d="') + '"></path>' +
+          '<g stroke="#ff00ff" stroke-width="0.2" fill="none">' +
+            '<path d="' + paths.map(function(p) {
+              return 'M ' + p[0] + ',' + p[1] + ' L ' + p[2] + ',' + p[3] + ' ';
+            }) + '"></path>' +
           '</g>' +
         '</svg>').
         width(w).
@@ -2774,15 +2796,32 @@
       var src = imageData.data;
       var dest = altImageData.data;
       var colorMap = colorMaps[mapping];
-      for (var i = 0, n = 4 * w * h; i < n; i += 4) {
-        var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
-        dest[i + 0] = colorMap[x];
-        dest[i + 1] = colorMap[x + 256];
-        dest[i + 2] = colorMap[x + 512];
-        dest[i + 3] = 255;
+      var contour = null;
+      if (enableContour) {
+        var channelImage = { data: new Uint8Array(w * h), width: w, height: h };
+        var ch = channelImage.data;
+        for (var i = 0, j = 0, n = 4 * w * h; i < n; i += 4, j++) {
+          var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
+          ch[j] = x;
+        }
+        contour = makeContour(channelImage);
+        for (var i = 0, j = 0, n = w * h; j < n; i += 4, j++) {
+          var x = ch[j];
+          dest[i + 0] = colorMap[x];
+          dest[i + 1] = colorMap[x + 256];
+          dest[i + 2] = colorMap[x + 512];
+          dest[i + 3] = 255;
+        }
+      } else {
+        for (var i = 0, n = 4 * w * h; i < n; i += 4) {
+          var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
+          dest[i + 0] = colorMap[x];
+          dest[i + 1] = colorMap[x + 256];
+          dest[i + 2] = colorMap[x + 512];
+          dest[i + 3] = 255;
+        }
       }
       altView.context.putImageData(altImageData, 0, 0);
-      var contour = enableContour ? makeContour(imageData) : null;
       return {
         image: altView.canvas,
         contour: contour
