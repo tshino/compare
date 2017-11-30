@@ -482,6 +482,7 @@
       }
       switch (sof.sampling) {
         case 0x111111: color += ' (24bpp 4:4:4)'; break;
+        case 0x121212: color += ' (24bpp 4:4:4 1x2)'; break;
         case 0x211111: color += ' (16bpp 4:2:2)'; break;
         case 0x121111: color += ' (16bpp 4:4:0)'; break;
         case 0x221111: color += ' (12bpp 4:2:0)'; break;
