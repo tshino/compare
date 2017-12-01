@@ -208,7 +208,18 @@
           var c2 = binary.at(p + 14);
           var c3 = binary.at(p + 17);
           var sampling = c1 * 65536 + c2 * 256 + c3;
-          return { nf: nf, sampling: sampling };
+          var horizontalGCD = calcGCD(c1 >> 4, calcGCD(c2 >> 4, c3 >> 4));
+          var verticalGCD = calcGCD(c1 % 16, calcGCD(c2 % 16, c3 % 16));
+          var coprime = 1 >= horizontalGCD && 1 >= verticalGCD;
+          var samplingPattern = [
+            (c1 >> 4) + 'x' + (c1 % 16),
+            (c2 >> 4) + 'x' + (c2 % 16),
+            (c3 >> 4) + 'x' + (c3 % 16)
+          ];
+          if (!coprime) {
+            sampling = (sampling & 0xf0f0f0) / horizontalGCD + (sampling & 0x0f0f0f) / verticalGCD;
+          }
+          return { nf: nf, sampling: sampling, samplingPattern: samplingPattern, coprime: coprime };
         } else {
           return { nf: nf };
         }
@@ -480,20 +491,33 @@
       if (!color) {
         color = nf === 1 ? 'Grayscale 8' : nf === 3 ? 'YCbCr 8.8.8' : 'unknown';
       }
+      var samplingPattern = function(components) {
+        var s = [];
+        for (var i = 0; i < components.length; ++i) {
+          s.push(components[i] + '=' + sof.samplingPattern[i]);
+        }
+        return s.join(' ');
+      };
+      var sampling = function(s) {
+        if (!sof.coprime) {
+          return s + '-variant ' + samplingPattern(['Y', 'Cb', 'Cr']);
+        } else {
+          return s;
+        }
+      };
       switch (sof.sampling) {
-        case 0x111111: color += ' (24bpp 4:4:4)'; break;
-        case 0x121212: color += ' (24bpp 4:4:4 1x2)'; break;
-        case 0x211111: color += ' (16bpp 4:2:2)'; break;
-        case 0x121111: color += ' (16bpp 4:4:0)'; break;
-        case 0x221111: color += ' (12bpp 4:2:0)'; break;
-        case 0x411111: color += ' (12bpp 4:1:1)'; break;
-        case 0x311111: color += ' (40/3 bpp 3:1:1)'; break;
-        case 0x421111: color += ' (10bpp 4:1:0)'; break;
+        case 0x111111: color += ' (24bpp ' + sampling('4:4:4') + ')'; break;
+        case 0x211111: color += ' (16bpp ' + sampling('4:2:2') + ')'; break;
+        case 0x121111: color += ' (16bpp ' + sampling('4:4:0') + ')'; break;
+        case 0x221111: color += ' (12bpp ' + sampling('4:2:0') + ')'; break;
+        case 0x411111: color += ' (12bpp ' + sampling('4:1:1') + ')'; break;
+        case 0x311111: color += ' (40/3 bpp ' + sampling('3:1:1') + ')'; break;
+        case 0x421111: color += ' (10bpp ' + sampling('4:1:0') + ')'; break;
         default:
          if (nf === 1) {
            color += ' (8bpp)';
          } else if (nf === 3) {
-           color += ' (uncommon chroma subsampling)';
+           color += ' (uncommon sampling ' + samplingPattern(['Y', 'Cb', 'Cr']) + ')';
          }
          break;
       }
