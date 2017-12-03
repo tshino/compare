@@ -2743,41 +2743,51 @@
     };
     // WIP
     var makeContour = function(channelImage) {
+      //console.time('makeConcour');
       var w = channelImage.width;
       var h = channelImage.height;
       var ch = channelImage.data;
+      for (var i = 0, n = w * h; i < n; ++i) {
+        ch[i] = ch[i] >> 5;
+      }
       var paths = [];
       for (var y = 0, i = 0; y < h; ++y) {
         if (y  + 1 < h) {
+          var start = null;
           for (var x = 0, j = i; x < w; ++x, ++j) {
-            var v1 = ch[j] >> 4;
-            var v2 = ch[j + w] >> 4;
-            if (v1 !== v2) {
-              paths.push([x, y + 1, x + 1, y + 1]);
+            if (ch[j] !== ch[j + w]) {
+              if (start === null) {
+                paths.push([x, y + 1, x + 1, y + 1])
+                start = paths.length - 1;
+              } else {
+                paths[start][2] = x + 1;
+              }
+            } else {
+              start = null;
             }
           }
         }
-        var v1 = ch[i] >> 4;
         i += 1;
         for (var x = 1; x < w; ++x, ++i) {
-          var v2 = ch[i] >> 4;
-          if (v1 !== v2) {
+          if (ch[i - 1] !== ch[i]) {
             paths.push([x, y, x, y + 1]);
-            v1 = v2;
           }
         }
       }
       var vbox = '0 0 ' + w + ' ' + h;
+      var pathDesc = paths.map(function(p) {
+        return 'M ' + p[0] + ',' + p[1] + ' L ' + p[2] + ',' + p[3] + ' ';
+      });
+      //console.log('pathDesc.length', pathDesc.length);
       var contour = $(
         '<svg class="imageOverlay contour" viewBox="' + vbox + '">' +
           '<g stroke="#ff00ff" stroke-width="0.2" fill="none">' +
-            '<path d="' + paths.map(function(p) {
-              return 'M ' + p[0] + ',' + p[1] + ' L ' + p[2] + ',' + p[3] + ' ';
-            }) + '"></path>' +
+            '<path d="' + pathDesc + '"></path>' +
           '</g>' +
         '</svg>').
         width(w).
         height(h);
+      //console.timeEnd('makeConcour');
       return contour;
     };
     var getAltImage = function(ent) {
@@ -2804,7 +2814,6 @@
           var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
           ch[j] = x;
         }
-        contour = makeContour(channelImage);
         for (var i = 0, j = 0, n = w * h; j < n; i += 4, j++) {
           var x = ch[j];
           dest[i + 0] = colorMap[x];
@@ -2812,6 +2821,7 @@
           dest[i + 2] = colorMap[x + 512];
           dest[i + 3] = 255;
         }
+        contour = makeContour(channelImage);
       } else {
         for (var i = 0, n = 4 * w * h; i < n; i += 4) {
           var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
