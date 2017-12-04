@@ -2751,26 +2751,33 @@
         ch[i] = ch[i] >> 5;
       }
       var paths = [];
-      for (var y = 0, i = 0; y < h; ++y) {
-        if (y  + 1 < h) {
-          var start = null;
-          for (var x = 0, j = i; x < w; ++x, ++j) {
-            if (ch[j] !== ch[j + w]) {
-              if (start === null) {
-                paths.push([x, y + 1, x + 1, y + 1])
-                start = paths.length - 1;
-              } else {
-                paths[start][2] = x + 1;
-              }
+      for (var y = 0, i = 0; y + 1 < h; ++y) {
+        var start = null;
+        for (var x = 0; x < w; ++x, ++i) {
+          if (ch[i] !== ch[i + w]) {
+            if (start === null) {
+              paths.push([x, y + 1, x + 1, y + 1])
+              start = paths.length - 1;
             } else {
-              start = null;
+              paths[start][2] = x + 1;
             }
+          } else {
+            start = null;
           }
         }
-        i += 1;
-        for (var x = 1; x < w; ++x, ++i) {
-          if (ch[i - 1] !== ch[i]) {
-            paths.push([x, y, x, y + 1]);
+      }
+      for (var x = 0; x + 1 < w; ++x) {
+        var start = null;
+        for (var y = 0, i = x; y < h; ++y, i += w) {
+          if (ch[i] !== ch[i + 1]) {
+            if (start === null) {
+              paths.push([x + 1, y, x + 1, y + 1])
+              start = paths.length - 1;
+            } else {
+              paths[start][3] = y + 1;
+            }
+          } else {
+            start = null;
           }
         }
       }
