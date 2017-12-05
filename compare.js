@@ -2783,13 +2783,19 @@
       }
       var vbox = '0 0 ' + w + ' ' + h;
       var pathDesc = paths.map(function(p) {
-        return 'M ' + p[0] + ',' + p[1] + ' L ' + p[2] + ',' + p[3] + ' ';
+        if (p[0] === p[2]) {
+          return 'M' + p[0] + ' ' + p[1] + 'v' + (p[3] - p[1]);
+        } else if (p[1] === p[3]) {
+          return 'M' + p[0] + ' ' + p[1] + 'h' + (p[2] - p[0]);
+        }
+        return 'M' + p[0] + ' ' + p[1] + 'l' + (p[2] - p[0]) + ' ' + (p[3] - p[1]);
       });
       //console.log('pathDesc.length', pathDesc.length);
+      //console.log('pathDesc.join().length', pathDesc.join('').length);
       var contour = $(
         '<svg class="imageOverlay contour" viewBox="' + vbox + '">' +
           '<g stroke="#ff00ff" stroke-width="0.2" fill="none">' +
-            '<path d="' + pathDesc + '"></path>' +
+            '<path d="' + pathDesc.join('') + '"></path>' +
           '</g>' +
         '</svg>').
         width(w).
