@@ -176,7 +176,9 @@
     // 'q' (113)
     113 : { global: false, func: altView.changeMode },
     // 'Q' (81)
-    81 : { global: false, func: altView.changeModeReverse }
+    81 : { global: false, func: altView.changeModeReverse },
+    // 'l' (108)
+    108 : { global: false, func: altView.toggleContour }
 
   };
   $(window).keypress(function(e) {
@@ -2704,6 +2706,12 @@
       updateModeIndicator();
       updateDOM();
     };
+    var toggleContour = function() {
+      enableContour = !enableContour;
+      if (component !== null && component !== 0) {
+        updateDOM();
+      }
+    };
     var changeMode = function(reverse) {
       var numOptions = colorSpaces[colorSpace].components.length + 1;
       component =
@@ -2867,11 +2875,12 @@
       }
     };
     var currentMode = function() {
-      return component === null ? null : colorSpace + '/' + component + '/' + mapping;
+      return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
     return {
       reset: reset,
       toggle: toggle,
+      toggleContour: toggleContour,
       changeMode: changeMode,
       changeModeReverse: changeModeReverse,
       enableAlpha: enableAlpha,
