@@ -3167,8 +3167,7 @@
       };
       return entry;
   };
-  function addFile(file)
-  {
+  var addFile = function(file) {
       var entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
@@ -3188,9 +3187,8 @@
         setEntryError(entry, 'Failed. File could not be read. (' + reader.error.name + ')');
       };
       reader.readAsDataURL(file);
-  }
-  function addFiles(files)
-  {
+  };
+  var addFiles = function(files) {
     var sorted = Array.prototype.slice.call(files);
     sorted.sort(function(a, b) {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
@@ -3201,4 +3199,4 @@
     currentImageIndex = 0;
     updateDOM();
     nowLoadingDialog.update();
-  }
+  };
