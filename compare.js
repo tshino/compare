@@ -336,6 +336,18 @@
     var getCurrentIndexOr = function(defaultIndex) {
       return isSingleView ? currentImageIndex - 1 : defaultIndex;
     };
+    var makeImageLayoutParam = function() {
+      var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
+      var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
+      var numColumns = layoutMode === 'x' ? numSlots : 1;
+      var numRows    = layoutMode !== 'x' ? numSlots : 1;
+      var boxW = $('#view').width() / numColumns;
+      var boxH = $('#view').height() / numRows;
+      var MARGIN = 6, MIN_SIZE = 32;
+      boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
+      boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
+      return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
+    };
     return {
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
@@ -344,7 +356,8 @@
       arrangeLayout: arrangeLayout,
       toggleOverlay: toggleOverlay,
       update: update,
-      getCurrentIndexOr: getCurrentIndexOr
+      getCurrentIndexOr: getCurrentIndexOr,
+      makeImageLayoutParam: makeImageLayoutParam
     };
   })();
   var removeEntry = function(index) {
@@ -996,18 +1009,6 @@
       initialize: initialize
     };
   })();
-  var makeImageLayoutParam = function() {
-    var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
-    var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
-    var numColumns = layoutMode === 'x' ? numSlots : 1;
-    var numRows    = layoutMode !== 'x' ? numSlots : 1;
-    var boxW = $('#view').width() / numColumns;
-    var boxH = $('#view').height() / numRows;
-    var MARGIN = 6, MIN_SIZE = 32;
-    boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
-    boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
-    return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
-  };
   var updateImageBox = function(img, boxW, boxH) {
     if (img.element) {
       img.boxW = boxW;
@@ -3011,8 +3012,8 @@
   };
   var updateLayout = function() {
     viewManagement.update();
+    var param = viewManagement.makeImageLayoutParam();
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
-    var param = makeImageLayoutParam();
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 !== currentImageIndex;
       if (overlayMode) {
