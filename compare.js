@@ -348,6 +348,22 @@
       boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
       return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
     };
+    var updateImageBox = function(img, boxW, boxH) {
+      if (img.element) {
+        img.boxW = boxW;
+        img.boxH = boxH;
+        var rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
+        img.baseWidth = rect.width;
+        img.baseHeight = rect.height;
+        var w = img.transposed ? rect.height : rect.width;
+        var h = img.transposed ? rect.width : rect.height;
+        $(img.element).css({ width: w+'px', height: h+'px' });
+        altView.onUpdateImageBox(img, w, h);
+        grid.onUpdateImageBox(img, w, h);
+        crossCursor.onUpdateImageBox(img, w, h);
+        hud.onUpdateImageBox(img);
+      }
+    };
     return {
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
@@ -357,7 +373,8 @@
       toggleOverlay: toggleOverlay,
       update: update,
       getCurrentIndexOr: getCurrentIndexOr,
-      makeImageLayoutParam: makeImageLayoutParam
+      makeImageLayoutParam: makeImageLayoutParam,
+      updateImageBox: updateImageBox
     };
   })();
   var removeEntry = function(index) {
@@ -594,7 +611,7 @@
       ).width(w).height(h);
     };
     var onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
-    var onUpdateLayout = function(img, w, h) {
+    var onUpdateImageBox = function(img, w, h) {
       onUpdateLayoutImpl(enableGrid, img, w, h);
     };
     var updateGridStyle = function(ent, commonStyle) {
@@ -618,7 +635,7 @@
     };
     return {
       toggle: toggle,
-      onUpdateLayout: onUpdateLayout,
+      onUpdateImageBox: onUpdateImageBox,
       onUpdateTransform: onUpdateTransform
     };
   })();
@@ -802,7 +819,7 @@
         }
       }
     };
-    var onUpdateLayout = function(img, w, h) {
+    var onUpdateImageBox = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
         var x = pos ? (pos.x || 0) : 0;
@@ -843,7 +860,7 @@
       processKeyDown: processKeyDown,
       processClick: processClick,
       processMouseMove: processMouseMove,
-      onUpdateLayout: onUpdateLayout,
+      onUpdateImageBox: onUpdateImageBox,
       onUpdateTransformEach: onUpdateTransformEach,
       onUpdateTransform: onUpdateTransform
     };
@@ -893,7 +910,7 @@
         container.append(hud);
       }
     };
-    var onUpdateLayout = function(img) {
+    var onUpdateImageBox = function(img) {
       if (onUpdateLayoutCallback) {
         onUpdateLayoutCallback(img);
       }
@@ -903,7 +920,7 @@
       setObserver: setObserver,
       adjustPlacement: adjustPlacement,
       append: append,
-      onUpdateLayout: onUpdateLayout
+      onUpdateImageBox: onUpdateImageBox
     };
   })();
 
@@ -1009,22 +1026,6 @@
       initialize: initialize
     };
   })();
-  var updateImageBox = function(img, boxW, boxH) {
-    if (img.element) {
-      img.boxW = boxW;
-      img.boxH = boxH;
-      var rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
-      img.baseWidth = rect.width;
-      img.baseHeight = rect.height;
-      var w = img.transposed ? rect.height : rect.width;
-      var h = img.transposed ? rect.width : rect.height;
-      $(img.element).css({ width: w+'px', height: h+'px' });
-      altView.onUpdateLayout(img, w, h);
-      grid.onUpdateLayout(img, w, h);
-      crossCursor.onUpdateLayout(img, w, h);
-      hud.onUpdateLayout(img);
-    }
-  };
   var swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
       setBaseAndTargetImage(targetImageIndex, baseImageIndex);
@@ -2859,7 +2860,7 @@
         contour: contour
       };
     };
-    var onUpdateLayout = function(img, w, h) {
+    var onUpdateImageBox = function(img, w, h) {
       if (img.view && component !== null) {
         if (img.contour) {
           $(img.view).find('.contour').remove();
@@ -2887,7 +2888,7 @@
       enableAlpha: enableAlpha,
       getAltImage: getAltImage,
       active: function() { return null !== component; },
-      onUpdateLayout: onUpdateLayout,
+      onUpdateImageBox: onUpdateImageBox,
       onUpdateTransform: onUpdateTransform,
       currentMode: currentMode
     };
@@ -3023,7 +3024,7 @@
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        updateImageBox(img, param.boxW, param.boxH);
+        viewManagement.updateImageBox(img, param.boxW, param.boxH);
         var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
         $(this).css({
           display   : '',
