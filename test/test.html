@@ -4,8 +4,48 @@
 	<meta charset="UTF-8">
 	<script src="../modules/jquery-3.2.1.min.js"></script>
 	<script src="../modules/compare-util.js"></script>
+	<style>
+		#output { font-size: 0.8em; background: #def; }
+		p { margin : 2px; }
+		p.error { background: #fdd; white-space: pre-wrap; }
+		p.red { color: red; }
+		p.green { color: green; }
+	</style>
+</head>
+<body>
+	<div id="output"></div>
 	<script>
-		var TEST = console.assert;
+	//---------------------------------------------------------------
+	var LOG = function(type, text) {
+		$('#output').append($('<p>').addClass(type).text(text));
+	};
+	var fallback = false, testCount = 0, errorCount = 0;
+	var TEST = function(expr) {
+		testCount += 1;
+		if (!expr) {
+			errorCount += 1;
+			var stack;
+			if (typeof Error.captureStackTrace == 'function') {
+				Error.captureStackTrace(this, TEST);
+				stack = this.stack;
+			} else {
+				try {
+					throw new Error('');
+				} catch (e) {
+					stack = e.stack;
+				}
+			}
+			if (stack === undefined) {
+				fallback = true;
+				return;
+			}
+			LOG('error', '#' + errorCount + ' Test Failed:' + stack);
+		}
+	};
+	LOG('log', 'TEST STARTED!');
+	for (;;) {
+		fallback = false;
+		//---------------------------------------------------------------
 		
 		TEST( compareUtil.clamp(0, 0, 0) === 0 );
 		TEST( compareUtil.clamp(0, -1, 1) === 0 );
@@ -57,10 +97,20 @@
 		TEST( compareUtil.toPercent(0.99999) === '99.999000%' );
 		TEST( compareUtil.toPercent(1)       === '100%' );
 		
-		console.log('END OF TEST');
+		//---------------------------------------------------------------
+		if (fallback) {
+			LOG('error', 'Test Failed: See console for details; press F12');
+			TEST = console.assert;
+			continue;
+		}
+		break;
+	}
+	if (errorCount === 0) {
+		LOG('green', testCount + ' TESTS PASSED!  (no error)');
+	} else {
+		LOG('red', errorCount + ' TESTS FAILED!  (' + (testCount - errorCount) + ' tests passed)');
+	}
+	//---------------------------------------------------------------
 	</script>
-</head>
-<body>
-	See console for the test result (Press F12)
 </body>
 </html>
