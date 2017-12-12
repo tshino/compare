@@ -7,6 +7,7 @@
 	<style>
 		#output { font-size: 0.8em; background: #def; }
 		p { margin : 2px; }
+		p.section { font-weight: bold; }
 		p.error { background: #fdd; white-space: pre-wrap; }
 		p.red { color: red; }
 		p.green { color: green; }
@@ -36,17 +37,60 @@
 				}
 			}
 			if (stack === undefined) {
+				stack = 'See console for details; press F12';
 				fallback = true;
-				return;
 			}
+			stack = stack.split('\n');
+			for (var i = 0; i < stack.length; i += 1) {
+				if (null !== stack[i].match(/\bTEST\b/)) {
+					stack.splice(0, i + 1);
+					break;
+				}
+			}
+			for (var i = 0; i < stack.length; i += 1) {
+				if (null !== stack[i].match(/\RUN_TESTS\b/)) {
+					stack.splice(i);
+					break;
+				}
+			}
+			stack = stack.filter(function(s) {
+				return s.trim() !== '';
+			}).join('\n');
 			LOG('error', '#' + errorCount + ' Test Failed:' + stack);
 		}
 	};
-	LOG('log', 'TEST STARTED!');
-	for (;;) {
-		fallback = false;
-		//---------------------------------------------------------------
-		
+	var testFunctions = [];
+	function DEF_TEST(name, test) {
+		testFunctions.push({ name: name, test: test });
+	};
+	function RUN_TESTS() {
+		LOG('log', 'TEST STARTED!');
+		var initialLoop = true;
+		for (;;) {
+			fallback = false;
+			for (var i = 0; i < testFunctions.length; ++i) {
+				var test = testFunctions[i];
+				if (initialLoop) {
+					LOG('section', test.name + '...');
+				}
+				var func = test.test;
+				func();
+			}
+			if (fallback) {
+				TEST = console.assert;
+				initialLoop = false;
+				continue;
+			}
+			break;
+		}
+		if (errorCount === 0) {
+			LOG('green', testCount + ' TESTS PASSED!  (no error)');
+		} else {
+			LOG('red', errorCount + ' TESTS FAILED!  (' + (testCount - errorCount) + ' tests passed)');
+		}
+	}
+	//---------------------------------------------------------------
+	DEF_TEST( 'compareUtil clamp', function test() {
 		TEST( compareUtil.clamp(0, 0, 0) === 0 );
 		TEST( compareUtil.clamp(0, -1, 1) === 0 );
 		TEST( compareUtil.clamp(5, 1, 2) === 2 );
@@ -55,14 +99,16 @@
 		TEST( compareUtil.clamp(5, 5, 5) === 5 );
 		TEST( compareUtil.clamp(5, 5, 10) === 5 );
 		TEST( compareUtil.clamp(5, 8, 10) === 8 );
-		
+	});
+	DEF_TEST( 'compareUtil calcGCD', function test() {
 		TEST( compareUtil.calcGCD(1, 1) === 1 );
 		TEST( compareUtil.calcGCD(1, 10) === 1 );
 		TEST( compareUtil.calcGCD(1, 10) === 1 );
 		TEST( compareUtil.calcGCD(10, 8) === 2 );
 		TEST( compareUtil.calcGCD(60, 75) === 15 );
 		TEST( compareUtil.calcGCD(1920, 1080) === 120 );
-		
+	});
+	DEF_TEST( 'compareUtil addComma', function test() {
 		TEST( compareUtil.addComma(0) === '0' );
 		TEST( compareUtil.addComma(1) === '1' );
 		TEST( compareUtil.addComma(100) === '100' );
@@ -72,7 +118,8 @@
 		TEST( compareUtil.addComma(123456) === '123,456' );
 		TEST( compareUtil.addComma(-876543) === '-876,543' );
 		TEST( compareUtil.addComma(1234567890) === '1,234,567,890' );
-		
+	});
+	DEF_TEST( 'compareUtil toPercent', function test() {
 		TEST( compareUtil.toPercent(0)       === '0%' );
 		TEST( compareUtil.toPercent(0.00001) === '0.00100%' );
 		TEST( compareUtil.toPercent(0.00005) === '0.00500%' );
@@ -96,21 +143,8 @@
 		TEST( compareUtil.toPercent(0.99995) === '99.99500%' );
 		TEST( compareUtil.toPercent(0.99999) === '99.999000%' );
 		TEST( compareUtil.toPercent(1)       === '100%' );
-		
-		//---------------------------------------------------------------
-		if (fallback) {
-			LOG('error', 'Test Failed: See console for details; press F12');
-			TEST = console.assert;
-			continue;
-		}
-		break;
-	}
-	if (errorCount === 0) {
-		LOG('green', testCount + ' TESTS PASSED!  (no error)');
-	} else {
-		LOG('red', errorCount + ' TESTS FAILED!  (' + (testCount - errorCount) + ' tests passed)');
-	}
-	//---------------------------------------------------------------
+	});
+	RUN_TESTS();
 	</script>
 </body>
 </html>
