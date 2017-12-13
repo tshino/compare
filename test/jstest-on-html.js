@@ -1,19 +1,19 @@
 ﻿var jsTestOnHTML = (function() {
   var testFunctions = [];
   var fallback = false, testCount = 0, errorCount = 0;
-  var LOG = function(type, text) {
+  var log = function(type, text) {
     $('#output').append($('<p>').addClass(type).text(text));
   };
-  var DEF_TEST = function(name, test) {
+  var defTest = function(name, test) {
     testFunctions.push({ name: name, test: test });
   };
-  var TEST = function(expr) {
+  var TEST_IMPL = function(expr) {
     testCount += 1;
     if (!expr) {
       errorCount += 1;
       var stack;
       if (typeof Error.captureStackTrace == 'function') {
-        Error.captureStackTrace(this, TEST);
+        Error.captureStackTrace(this, TEST_IMPL);
         stack = this.stack;
       } else {
         try {
@@ -28,7 +28,7 @@
       }
       stack = stack.split('\n');
       for (var i = 0; i < stack.length; i += 1) {
-        if (null !== stack[i].match(/\bTEST\b/)) {
+        if (null !== stack[i].match(/\bTEST_IMPL\b/)) {
           stack.splice(0, i + 1);
           break;
         }
@@ -42,18 +42,18 @@
       stack = stack.filter(function(s) {
         return s.trim() !== '';
       }).join('\n');
-      LOG('error', '#' + errorCount + ' Test Failed:' + stack);
+      log('error', '#' + errorCount + ' Test Failed:' + stack);
     }
   };
   var RUN_TESTS = function() {
-    LOG('info', 'TEST STARTED!');
+    log('info', 'TEST STARTED!');
     var initialLoop = true;
     for (;;) {
       fallback = false;
       for (var i = 0; i < testFunctions.length; ++i) {
         var test = testFunctions[i];
         if (initialLoop) {
-          LOG('section', test.name + '...');
+          log('section', test.name + '...');
         }
         var func = test.test;
         func();
@@ -66,20 +66,20 @@
       break;
     }
     if (errorCount === 0) {
-      LOG('green', testCount + ' TESTS PASSED!  (no error)');
+      log('green', testCount + ' TESTS PASSED!  (no error)');
     } else {
-      LOG('red', errorCount + ' TESTS FAILED!  (' + (testCount - errorCount) + ' tests passed)');
+      log('red', errorCount + ' TESTS FAILED!  (' + (testCount - errorCount) + ' tests passed)');
     }
   };
   return {
-    LOG: LOG,
-    DEF_TEST: DEF_TEST,
-    TEST: TEST,
-    RUN_TESTS: RUN_TESTS
+    log: log,
+    defTest: defTest,
+    test: TEST_IMPL,
+    runTests: RUN_TESTS
   };
 })();
 
-var LOG = jsTestOnHTML.LOG;
-var DEF_TEST = jsTestOnHTML.DEF_TEST;
-var TEST = jsTestOnHTML.TEST;
-var RUN_TESTS = jsTestOnHTML.RUN_TESTS;
+var LOG = jsTestOnHTML.log;
+var DEF_TEST = jsTestOnHTML.defTest;
+var TEST = jsTestOnHTML.test;
+var RUN_TESTS = jsTestOnHTML.runTests;
