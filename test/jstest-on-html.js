@@ -4,16 +4,16 @@
   var log = function(type, text) {
     $('#output').append($('<p>').addClass(type).text(text));
   };
-  var defTest = function(name, test) {
-    testFunctions.push({ name: name, test: test });
+  var defineTest = function(name, func) {
+    testFunctions.push({ name: name, func: func });
   };
-  var TEST_IMPL = function(expr) {
+  var EXPECT_IMPL = function(expr) {
     testCount += 1;
     if (!expr) {
       errorCount += 1;
       var stack;
       if (typeof Error.captureStackTrace == 'function') {
-        Error.captureStackTrace(this, TEST_IMPL);
+        Error.captureStackTrace(this, EXPECT_IMPL);
         stack = this.stack;
       } else {
         try {
@@ -28,13 +28,13 @@
       }
       stack = stack.split('\n');
       for (var i = 0; i < stack.length; i += 1) {
-        if (null !== stack[i].match(/\bTEST_IMPL\b/)) {
+        if (null !== stack[i].match(/\bEXPECT_IMPL\b/)) {
           stack.splice(0, i + 1);
           break;
         }
       }
       for (var i = 0; i < stack.length; i += 1) {
-        if (null !== stack[i].match(/\RUN_TESTS\b/)) {
+        if (null !== stack[i].match(/\bRUN_ALL_TESTS\b/)) {
           stack.splice(i);
           break;
         }
@@ -45,7 +45,7 @@
       log('error', '#' + errorCount + ' Test Failed:' + stack);
     }
   };
-  var RUN_TESTS = function() {
+  var RUN_ALL_TESTS = function() {
     log('info', 'TEST STARTED!');
     var initialLoop = true;
     for (;;) {
@@ -55,11 +55,11 @@
         if (initialLoop) {
           log('section', test.name + '...');
         }
-        var func = test.test;
+        var func = test.func;
         func();
       }
       if (fallback) {
-        TEST = console.assert;
+        EXPECT = console.assert;
         initialLoop = false;
         continue;
       }
@@ -73,13 +73,13 @@
   };
   return {
     log: log,
-    defTest: defTest,
-    test: TEST_IMPL,
-    runTests: RUN_TESTS
+    defineTest: defineTest,
+    expect: EXPECT_IMPL,
+    runAllTests: RUN_ALL_TESTS
   };
 })();
 
 var LOG = jsTestOnHTML.log;
-var DEF_TEST = jsTestOnHTML.defTest;
-var TEST = jsTestOnHTML.test;
-var RUN_TESTS = jsTestOnHTML.runTests;
+var TEST = jsTestOnHTML.defineTest;
+var EXPECT = jsTestOnHTML.expect;
+var RUN_ALL_TESTS = jsTestOnHTML.runAllTests;
