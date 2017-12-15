@@ -71,7 +71,14 @@
 		EXPECT( compareUtil.toPercent(0.99999) === '99.999000%' );
 		EXPECT( compareUtil.toPercent(1)       === '100%' );
 	});
-	RUN_ALL_TESTS();
+	TEST( 'test of async test', function test(done) {
+		window.setTimeout(function() {
+			EXPECT( true );
+			//EXPECT( false );
+			done();
+		}, 0);
+	});
+	START_TESTS();
 	</script>
 </body>
 </html>
