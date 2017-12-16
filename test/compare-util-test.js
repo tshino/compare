@@ -10,7 +10,7 @@
 });
 
 TEST( 'compareUtil calcGCD', function test() {
-  EXPECT( compareUtil.calcGCD(1, 1) === 1 );
+  EXPECT( compareUtil.calcGCD(1, 1) === 2 /* intended error */ );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(10, 8) === 2 );
@@ -59,7 +59,7 @@ TEST( 'compareUtil toPercent', function test() {
 TEST( 'test of async test', function test(done) {
   window.setTimeout(function() {
     EXPECT( true );
-    //EXPECT( false );
+    EXPECT( false );
     done();
   }, 0);
 });
@@ -102,4 +102,62 @@ TEST( 'compareUtil binaryFromDataURI', function test() {
   EXPECT( binary.little32(0) === 0x6c6c6548 /* lleH */ );
   EXPECT( binary.little32(1) === 0x6f6c6c65 /* olle */ );
   EXPECT( binary.little32(2) === 0x2c6f6c6c /* ,oll */ );
+});
+
+TEST( 'compareUtil cursorKeyCodeToXY', function test() {
+  EXPECT( compareUtil.cursorKeyCodeToXY(99).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(99).y === 0 );
+
+  EXPECT( compareUtil.cursorKeyCodeToXY(37).x === -1 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(37).y === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(38).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(38).y === -1 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(39).x === 1 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(39).y === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(40).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(40).y === 1 );
+
+  EXPECT( compareUtil.cursorKeyCodeToXY(99, 10).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(99, 10).y === 0 );
+
+  EXPECT( compareUtil.cursorKeyCodeToXY(37, 10).x === -10 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(37, 10).y === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(38, 10).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(38, 10).y === -10 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(39, 10).x === 10 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(39, 10).y === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(40, 10).x === 0 );
+  EXPECT( compareUtil.cursorKeyCodeToXY(40, 10).y === 10 );
+});
+
+TEST( 'compareUtil calcInscribedRect', function test() {
+  //EXPECT( compareUtil.calcInscribedRect(0, 0, 0, 0).width === 0 );
+  EXPECT( compareUtil.calcInscribedRect(1, 1, 1, 1).width === 1 );
+  EXPECT( compareUtil.calcInscribedRect(1, 1, 1, 1).height === 1 );
+  EXPECT( compareUtil.calcInscribedRect(1, 1, 10, 10).width === 1 );
+  EXPECT( compareUtil.calcInscribedRect(1, 1, 10, 10).height === 1 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 1, 1).width === 100 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 1, 1).height === 100 );
+
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 10, 10).width === 100 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 10, 10).height === 100 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 20, 10).width === 100 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 20, 10).height === 50 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 10, 20).width === 50 );
+  EXPECT( compareUtil.calcInscribedRect(100, 100, 10, 20).height === 100 );
+
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 10).width === 100 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 10).height === 100 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 15, 10).width === 150 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 15, 10).height === 100 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 20, 10).width === 200 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 20, 10).height === 100 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 25, 10).width === 200 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 25, 10).height === 80 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 40, 10).width === 200 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 40, 10).height === 50 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 20).width === 50 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 20).height === 100 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 25).width === 40 );
+  EXPECT( compareUtil.calcInscribedRect(200, 100, 10, 25).height === 100 );
 });
