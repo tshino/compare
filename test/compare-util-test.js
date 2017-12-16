@@ -10,7 +10,7 @@
 });
 
 TEST( 'compareUtil calcGCD', function test() {
-  EXPECT( compareUtil.calcGCD(1, 1) === 2 );
+  EXPECT( compareUtil.calcGCD(1, 1) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(10, 8) === 2 );
@@ -59,7 +59,47 @@ TEST( 'compareUtil toPercent', function test() {
 TEST( 'test of async test', function test(done) {
   window.setTimeout(function() {
     EXPECT( true );
-    EXPECT( false );
+    //EXPECT( false );
     done();
   }, 0);
+});
+
+TEST( 'compareUtil binaryFromDataURI', function test() {
+  // Hello, world!\n
+  var datauri = 'data:;base64,SGVsbG8sIHdvcmxkIQo=';
+  var binary = compareUtil.binaryFromDataURI(datauri);
+
+  EXPECT( binary.length === 14 );
+  EXPECT( binary.at(0) === 0x48 /* H */ );
+  EXPECT( binary.at(1) === 0x65 /* e */ );
+  EXPECT( binary.at(2) === 0x6c /* l */ );
+  EXPECT( binary.at(3) === 0x6c /* l */ );
+  EXPECT( binary.at(4) === 0x6f /* o */ );
+  EXPECT( binary.at(5) === 0x2c /* , */ );
+  EXPECT( binary.at(6) === 0x20 /*   */ );
+  EXPECT( binary.at(7) === 0x77 /* w */ );
+  EXPECT( binary.at(8) === 0x6f /* o */ );
+  EXPECT( binary.at(9) === 0x72 /* r */ );
+  EXPECT( binary.at(10) === 0x6c /* l */ );
+  EXPECT( binary.at(11) === 0x64 /* d */ );
+  EXPECT( binary.at(12) === 0x21 /* ! */ );
+  EXPECT( binary.at(13) === 0x0a /* \n */ );
+
+  EXPECT( binary.at(14) === null );
+  // EXPECT( binary.at(-1) === null );
+
+  EXPECT( binary.big16(0) === 0x4865 /* He */ );
+  EXPECT( binary.big16(1) === 0x656c /* el */ );
+  EXPECT( binary.big16(2) === 0x6c6c /* ll */ );
+  EXPECT( binary.big16(3) === 0x6c6f /* lo */ );
+  EXPECT( binary.little16(0) === 0x6548 /* eH */ );
+  EXPECT( binary.little16(1) === 0x6c65 /* le */ );
+  EXPECT( binary.little16(2) === 0x6c6c /* ll */ );
+  EXPECT( binary.little16(3) === 0x6f6c /* ol */ );
+  EXPECT( binary.big32(0) === 0x48656c6c /* Hell */ );
+  EXPECT( binary.big32(1) === 0x656c6c6f /* ello */ );
+  EXPECT( binary.big32(2) === 0x6c6c6f2c /* llo, */ );
+  EXPECT( binary.little32(0) === 0x6c6c6548 /* lleH */ );
+  EXPECT( binary.little32(1) === 0x6f6c6c65 /* olle */ );
+  EXPECT( binary.little32(2) === 0x2c6f6c6c /* ,oll */ );
 });
