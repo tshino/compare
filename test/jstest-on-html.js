@@ -42,16 +42,25 @@
   var REPORT_ERROR = function(testerName, message) {
     errorCount += 1;
     var stack = getStackTrace(testerName);
-    log('error', '#' + errorCount + ' ' + message + ':\n' + stack);
+    log('error', '#' + errorCount + ' ' + message + '\n' + stack);
   };
   var ERROR_IMPL = function(message) {
     testCount += 1;
-    REPORT_ERROR('ERROR_IMPL', message);
+    REPORT_ERROR('ERROR_IMPL', message + ':');
   };
   var EXPECT_IMPL = function(expr) {
     testCount += 1;
     if (!expr) {
-      REPORT_ERROR('EXPECT_IMPL', 'Test Failed');
+      REPORT_ERROR('EXPECT_IMPL', 'Test Failed:');
+    }
+  };
+  var EXPECT_EQ_IMPL = function(expected, actual) {
+    testCount += 1;
+    if (!(expected === actual)) {
+      var values =
+          '    expected: ' + expected + '\n' +
+          '    actual: ' + actual;
+      REPORT_ERROR('EXPECT_EQ_IMPL', 'Test Failed:\n' + values);
     }
   };
   var initialLoop = true;
@@ -101,6 +110,7 @@
     if (fallback) {
       ERROR = console.error;
       EXPECT = console.assert;
+      EXPECT_EQ = function(a, b) { if (!(a === b)) throw new Error('EXPECT_EQ failed'); };
       CONTINUE_TESTS();
       return;
     }
@@ -117,6 +127,7 @@
     defineTest: defineTest,
     error: ERROR_IMPL,
     expect: EXPECT_IMPL,
+    expectEQ: EXPECT_EQ_IMPL,
     runAllTests: START_TESTS
   };
 })();
@@ -125,4 +136,5 @@ var LOG = jsTestOnHTML.log;
 var TEST = jsTestOnHTML.defineTest;
 var ERROR = jsTestOnHTML.error;
 var EXPECT = jsTestOnHTML.expect;
+var EXPECT_EQ = jsTestOnHTML.expectEQ;
 var START_TESTS = jsTestOnHTML.runAllTests;
