@@ -1,6 +1,6 @@
 ﻿var jsTestOnHTML = (function() {
   var testFunctions = [];
-  var fallback = false, testCount = 0, errorCount = 0;
+  var fallback = false, testCount = 0, errorCount = 0, warnCount = 0;
   var log = function(type, text) {
     $('#output').append($('<p>').addClass(type).text(text));
   };
@@ -47,6 +47,10 @@
   var ERROR_IMPL = function(message) {
     testCount += 1;
     REPORT_ERROR('ERROR_IMPL', message + ':');
+  };
+  var WARN_IMPL = function(message) {
+    warnCount += 1;
+    log('warn', 'W#' + warnCount + ' ' + message);
   };
   var EXPECT_IMPL = function(expr) {
     testCount += 1;
@@ -101,6 +105,9 @@
     loopStarted = false;
     if (initialLoop) {
       initialLoop = false;
+      if (warnCount !== 0) {
+        log('yellow', warnCount + ' WARNINGS REPORTED');
+      }
       if (errorCount === 0) {
         log('green', testCount + ' TESTS PASSED!  (no error)');
       } else {
@@ -109,6 +116,7 @@
     }
     if (fallback) {
       ERROR = console.error;
+      WARN = console.warn;
       EXPECT = console.assert;
       EXPECT_EQ = function(a, b) { if (!(a === b)) throw new Error('EXPECT_EQ failed'); };
       CONTINUE_TESTS();
@@ -126,6 +134,7 @@
     log: log,
     defineTest: defineTest,
     error: ERROR_IMPL,
+    warn: WARN_IMPL,
     expect: EXPECT_IMPL,
     expectEQ: EXPECT_EQ_IMPL,
     runAllTests: START_TESTS
@@ -135,6 +144,7 @@
 var LOG = jsTestOnHTML.log;
 var TEST = jsTestOnHTML.defineTest;
 var ERROR = jsTestOnHTML.error;
+var WARN = jsTestOnHTML.warn;
 var EXPECT = jsTestOnHTML.expect;
 var EXPECT_EQ = jsTestOnHTML.expectEQ;
 var START_TESTS = jsTestOnHTML.runAllTests;
