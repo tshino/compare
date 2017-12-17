@@ -58,13 +58,13 @@
       REPORT_ERROR('EXPECT_IMPL', 'Test Failed:');
     }
   };
-  var EXPECT_EQ_IMPL = function(expected, actual) {
+  var EXPECT_EQ_IMPL = function(expected, actual, desc) {
     testCount += 1;
     if (!(expected === actual)) {
       var values =
           '    expected: ' + expected + '\n' +
           '    actual: ' + actual;
-      REPORT_ERROR('EXPECT_EQ_IMPL', 'Test Failed:\n' + values);
+      REPORT_ERROR('EXPECT_EQ_IMPL', 'Test Failed: ' + (desc || '') + '\n' + values);
     }
   };
   var initialLoop = true;
@@ -118,7 +118,7 @@
       ERROR = console.error;
       WARN = console.warn;
       EXPECT = console.assert;
-      EXPECT_EQ = function(a, b) { if (!(a === b)) throw new Error('EXPECT_EQ failed'); };
+      EXPECT_EQ = function(a, b, desc) { if (!(a === b)) throw new Error('EXPECT_EQ failed (' + (desc || '') + ')'); };
       CONTINUE_TESTS();
       return;
     }
