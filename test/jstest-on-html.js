@@ -7,42 +7,51 @@
   var defineTest = function(name, func) {
     testFunctions.push({ name: name, func: func });
   };
+  var getStackTrace = function(testerName) {
+    var stack;
+    try {
+      throw new Error('');
+    } catch (e) {
+      stack = e.stack;
+    }
+    if (stack === undefined) {
+      stack = 'See console for details; press F12';
+      fallback = true;
+    }
+    stack = stack.split('\n');
+    var regexpTester = new RegExp('\\b' + testerName + '\\b');
+    for (var i = 0; i < stack.length; i += 1) {
+      if (null !== stack[i].match(regexpTester)) {
+        stack.splice(0, i + 1);
+        break;
+      }
+    }
+    for (var i = 0; i < stack.length; i += 1) {
+      if (null !== stack[i].match(/\b(START_TESTS|CONTINUE_TESTS)\b/)) {
+        stack.splice(i);
+        break;
+      }
+    }
+    stack = '  ' + stack.map(
+      function(s) { return s.trim(); }
+    ).filter(
+      function(s) { return s !== ''; }
+    ).join('\n  ');
+    return stack;
+  };
+  var REPORT_ERROR = function(testerName, message) {
+    errorCount += 1;
+    var stack = getStackTrace(testerName);
+    log('error', '#' + errorCount + ' ' + message + ':\n' + stack);
+  };
+  var ERROR_IMPL = function(message) {
+    testCount += 1;
+    REPORT_ERROR('ERROR_IMPL', message);
+  };
   var EXPECT_IMPL = function(expr) {
     testCount += 1;
     if (!expr) {
-      errorCount += 1;
-      var stack;
-      if (typeof Error.captureStackTrace == 'function') {
-        Error.captureStackTrace(this, EXPECT_IMPL);
-        stack = this.stack;
-      } else {
-        try {
-          throw new Error('');
-        } catch (e) {
-          stack = e.stack;
-        }
-      }
-      if (stack === undefined) {
-        stack = 'See console for details; press F12';
-        fallback = true;
-      }
-      stack = stack.split('\n');
-      for (var i = 0; i < stack.length; i += 1) {
-        if (null !== stack[i].match(/\bEXPECT_IMPL\b/)) {
-          stack.splice(0, i + 1);
-          break;
-        }
-      }
-      for (var i = 0; i < stack.length; i += 1) {
-        if (null !== stack[i].match(/\b(START_TESTS|CONTINUE_TESTS)\b/)) {
-          stack.splice(i);
-          break;
-        }
-      }
-      stack = stack.filter(function(s) {
-        return s.trim() !== '';
-      }).join('\n');
-      log('error', '#' + errorCount + ' Test Failed:' + stack);
+      REPORT_ERROR('EXPECT_IMPL', 'Test Failed');
     }
   };
   var initialLoop = true;
@@ -65,10 +74,8 @@
       if (func.length === 0) {
         func();
       } else {
-        var done = CONTINUE_TESTS;
         loopCount += 1;
         var doneID = waitingDoneID;
-        func(done);
         var timeout = 2000;
         window.setTimeout(function() {
           if (doneID === waitingDoneID) {
@@ -78,6 +85,7 @@
             return;
           }
         }, timeout);
+        func(CONTINUE_TESTS);
         return;
       }
     }
@@ -91,6 +99,7 @@
       }
     }
     if (fallback) {
+      ERROR = console.error;
       EXPECT = console.assert;
       CONTINUE_TESTS();
       return;
@@ -106,6 +115,7 @@
   return {
     log: log,
     defineTest: defineTest,
+    error: ERROR_IMPL,
     expect: EXPECT_IMPL,
     runAllTests: START_TESTS
   };
@@ -113,5 +123,6 @@
 
 var LOG = jsTestOnHTML.log;
 var TEST = jsTestOnHTML.defineTest;
+var ERROR = jsTestOnHTML.error;
 var EXPECT = jsTestOnHTML.expect;
 var START_TESTS = jsTestOnHTML.runAllTests;
