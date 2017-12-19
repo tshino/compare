@@ -33,8 +33,8 @@
     ).join('');
     return 'data:application/octet-stream;base64,' + btoa(str);
   };
-  var makeSelfTest = function(done) {
-    var run = function() {
+  var makeSelfTest = function() {
+    var run = function(done) {
       readFile('data/hello.txt', {
         onsuccess: function(response) {
           var view = new Uint8Array(response);
@@ -60,44 +60,41 @@
     };
     return { run: run };
   };
-  var makeFileBasedTestRunner = function(done) {
-    var totalXHR = 0;
+  var makeFileBasedTestRunner = function() {
     var doneXHR = 0;
     var failXHR = 0;
-    var startedXHR = false;
-    var checkFinish = function() {
-      if (startedXHR && totalXHR === doneXHR) {
-        done();
-      }
-    };
+    var tests = [];
     var readFileAndTest = function(url, callback) {
-      if (readFileUnavailable) {
-        return;
-      }
-      totalXHR += 1;
-      readFile(url, {
-        onsuccess : function(response) {
-          callback(response, function() {
-            doneXHR += 1;
-            checkFinish();
-          });
-        },
-        onfail: function(message) {
-          ERROR('File cannot be read (' + message + '): "' + url + '" ');
-          failXHR += 1;
-          doneXHR += 1;
-          checkFinish();
-        }
-      });
+      var test = function(done) {
+        readFile(url, {
+          onsuccess : function(response) {
+            callback(response, function() {
+              done();
+            });
+          },
+          onfail: function(message) {
+            ERROR('File cannot be read (' + message + '): "' + url + '" ');
+            failXHR += 1;
+            done();
+          }
+        });
+      };
+      tests.push(test);
     };
-    var run = function() {
+    var run = function(done) {
       if (readFileUnavailable) {
         WARN('skipped');
         done();
         return;
       }
-      startedXHR = true;
-      checkFinish();
+      for (var i = 0; i < tests.length; i++) {
+        tests[i](function() {
+          doneXHR += 1;
+          if (tests.length === doneXHR) {
+            done();
+          }
+        });
+      }
     };
     return {
       readFileAndTest: readFileAndTest,
