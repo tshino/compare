@@ -98,20 +98,15 @@
     return { run: run };
   };
   var makeFileBasedTestRunner = function() {
-    var doneXHR = 0;
-    var failXHR = 0;
     var tests = [];
     var readFileAndTest = function(url, callback) {
       var test = function(done) {
         readFile(url, {
           onsuccess : function(response) {
-            callback(response, function() {
-              done();
-            });
+            callback(response, done);
           },
           onfail: function(message) {
             ERROR('File cannot be read (' + message + '): "' + url + '" ');
-            failXHR += 1;
             done();
           }
         });
@@ -124,14 +119,8 @@
         done();
         return;
       }
-      for (var i = 0; i < tests.length; i++) {
-        tests[i](function() {
-          doneXHR += 1;
-          if (tests.length === doneXHR) {
-            done();
-          }
-        });
-      }
+      var allTests = makeSequentialTest(tests);
+      allTests(done);
     };
     return {
       readFileAndTest: readFileAndTest,
