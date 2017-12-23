@@ -52,6 +52,42 @@
     return 'data:application/octet-stream;base64,' + btoa(str);
   };
   var makeSelfTest = function() {
+    var asyncTestTest = function(done) {
+      window.setTimeout(function() {
+        EXPECT( true );
+        EXPECT( false );
+        done();
+      }, 0);
+    };
+    var counter = 0;
+    var sequentialTestTest = function(done) {
+      var seq = makeSequentialTest([
+        function() {
+          EXPECT_EQ( 0, counter );
+          counter = 1;
+        },
+        function(done) {
+          EXPECT_EQ( 1, counter );
+          counter = 2;
+          done();
+        },
+        function(done) {
+          window.setTimeout(
+            function() {
+              EXPECT_EQ( 2, counter );
+              counter = 3;
+              done();
+            },
+            10
+          );
+        },
+        function() {
+          EXPECT_EQ( 3, counter );
+          counter = 0;
+        }
+      ]);
+      seq(done);
+    };
     var readFileTest = function(done) {
       readFile('data/hello.txt', {
         onsuccess: function(response) {
@@ -91,11 +127,12 @@
       var datauri = dataURIFromArrayBuffer(ab);
       EXPECT_EQ( 'data:application/octet-stream;base64,SGVsbG8sIHdvcmxkIQo=', datauri );
     };
-    var run = makeSequentialTest([
+    return makeSequentialTest([
+      asyncTestTest,
+      sequentialTestTest,
       readFileTest,
       dataURIFromArrayBufferTest,
     ]);
-    return { run: run };
   };
   var makeFileBasedTestRunner = function() {
     var tests = [];

@@ -56,14 +56,6 @@ TEST( 'compareUtil toPercent', function test() {
   EXPECT( compareUtil.toPercent(1)       === '100%' );
 });
 
-TEST( 'test of async test', function test(done) {
-  window.setTimeout(function() {
-    EXPECT( true );
-    EXPECT( false );
-    done();
-  }, 0);
-});
-
 TEST( 'compareUtil binaryFromDataURI', function test() {
   // Hello, world!\n
   var datauri = 'data:;base64,SGVsbG8sIHdvcmxkIQo=';

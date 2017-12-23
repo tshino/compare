@@ -137,14 +137,16 @@
     warn: WARN_IMPL,
     expect: EXPECT_IMPL,
     expectEQ: EXPECT_EQ_IMPL,
-    runAllTests: START_TESTS
+    startTests: START_TESTS
   };
 })();
 
-var LOG = jsTestOnHTML.log;
 var TEST = jsTestOnHTML.defineTest;
-var ERROR = jsTestOnHTML.error;
+
+var LOG = jsTestOnHTML.log;
 var WARN = jsTestOnHTML.warn;
+var ERROR = jsTestOnHTML.error;
 var EXPECT = jsTestOnHTML.expect;
 var EXPECT_EQ = jsTestOnHTML.expectEQ;
-var START_TESTS = jsTestOnHTML.runAllTests;
+
+var START_TESTS = jsTestOnHTML.startTests;
