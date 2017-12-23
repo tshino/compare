@@ -4,8 +4,12 @@
   var log = function(type, text) {
     $('#output').append($('<p>').addClass(type).text(text));
   };
-  var defineTest = function(name, func) {
-    testFunctions.push({ name: name, func: func });
+  var defineTest = function(name /* [, opt], func */) {
+    if (typeof arguments[1] == 'function') {
+      testFunctions.push({ name: name, opt: {}, func: arguments[1] });
+    } else {
+      testFunctions.push({ name: name, opt: arguments[1], func: arguments[2] });
+    }
   };
   var getStackTrace = function(testerName) {
     var stack;
@@ -100,7 +104,7 @@
       } else {
         loopCount += 1;
         var doneID = waitingDoneID;
-        var timeout = 2000;
+        var timeout = test.opt.timeout === undefined ? 2000 : test.opt.timeout;
         window.setTimeout(function() {
           if (doneID === waitingDoneID) {
             errorCount += 1;
