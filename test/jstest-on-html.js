@@ -85,7 +85,15 @@
       }
       var func = test.func;
       if (func.length === 0) {
-        func();
+        try {
+          func();
+        } catch(e) {
+          loopCount += 1;
+          errorCount += 1;
+          log('error', '#' + errorCount + ' ' + e.name + ': ' + e.message + '\n' + e.stack );
+          CONTINUE_TESTS();
+          return;
+        }
       } else {
         loopCount += 1;
         var doneID = waitingDoneID;
