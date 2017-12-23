@@ -71,7 +71,10 @@
   var loopStarted = false;
   var loopCount = 0;
   var waitingDoneID = 0;
-  var CONTINUE_TESTS = function() {
+  var CONTINUE_TESTS = function(doneID) {
+    if (doneID !== waitingDoneID) {
+      return;
+    }
     waitingDoneID += 1;
     if (!loopStarted) {
       loopStarted = true;
@@ -91,7 +94,7 @@
           loopCount += 1;
           errorCount += 1;
           log('error', '#' + errorCount + ' ' + e.name + ': ' + e.message + '\n' + e.stack );
-          CONTINUE_TESTS();
+          CONTINUE_TESTS(waitingDoneID);
           return;
         }
       } else {
@@ -102,11 +105,11 @@
           if (doneID === waitingDoneID) {
             errorCount += 1;
             log('error', '#' + errorCount + ' Timeout ' + timeout + 'msec');
-            CONTINUE_TESTS();
+            CONTINUE_TESTS(waitingDoneID);
             return;
           }
         }, timeout);
-        func(CONTINUE_TESTS);
+        func(function() { CONTINUE_TESTS(doneID); });
         return;
       }
     }
@@ -127,7 +130,7 @@
       WARN = console.warn;
       EXPECT = console.assert;
       EXPECT_EQ = function(a, b, desc) { if (!(a === b)) throw new Error('EXPECT_EQ failed (' + (desc || '') + ')'); };
-      CONTINUE_TESTS();
+      CONTINUE_TESTS(waitingDoneID);
       return;
     }
   };
@@ -135,7 +138,7 @@
     log('info', 'TEST STARTED!');
     initialLoop = true;
     loopStarted = false;
-    CONTINUE_TESTS();
+    CONTINUE_TESTS(waitingDoneID);
     return;
   };
   return {
