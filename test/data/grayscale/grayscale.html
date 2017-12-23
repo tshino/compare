@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<script>
+			document.body.appendChild(
+				CreateImage(
+					256, 256,
+					function(x, y) {
+						var grayscale = Math.floor(0.5 + (x + y) / 2);
+						return [grayscale, grayscale, grayscale];
+					}
+				)
+			);
+			function CreateImage(w, h, getRGBA) {
+				var canvas = document.createElement('canvas');
+				canvas.width = w;
+				canvas.height = h;
+				var context = canvas.getContext('2d');
+				var imageData = context.createImageData(w, h);
+				var i = 0;
+				for (var y = 0; y < h; ++y) {
+					for (var x = 0; x < w; ++x) {
+						var rgba = getRGBA(x, y);
+						imageData.data[i + 0] = rgba[0];
+						imageData.data[i + 1] = rgba[1];
+						imageData.data[i + 2] = rgba[2];
+						imageData.data[i + 3] = rgba[3] !== undefined ? rgba[3] : 255;
+						i += 4;
+					}
+				}
+				context.putImageData(imageData, 0, 0);
+				console.log(canvas.toDataURL());
+				return canvas;
+			}
+		</script>
+		<style>
+			body {
+				/* chekcer pattern */
+				background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAQMAAABJtOi3AAAABlBMVEW1tbXp6entsvuTAAAACXBIWXMAABJ0AAASdAHeZh94AAAAFElEQVQI12NgYPj/n4GKBHVNYwAA7b0/wfSyzYsAAAAASUVORK5CYII=');
+			}
+		</style>
+	</body>
+</html>
