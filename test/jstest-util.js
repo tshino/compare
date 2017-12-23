@@ -45,17 +45,17 @@
   };
   var dataURIFromArrayBuffer = function(ab) {
     var array = new Uint8Array(ab);
-    var str = Array.from(
-        array,
-        function(code) { return String.fromCharCode(code); }
-    ).join('');
+    var str = '';
+    for (var i = 0; i < array.length; ++i) {
+      str += String.fromCharCode(array[i]);
+    }
     return 'data:application/octet-stream;base64,' + btoa(str);
   };
   var makeSelfTest = function() {
     var asyncTestTest = function(done) {
       window.setTimeout(function() {
         EXPECT( true );
-        EXPECT( false );
+        //EXPECT( false );
         done();
       }, 0);
     };
@@ -172,3 +172,5 @@
     makeFileBasedTestRunner: makeFileBasedTestRunner
   };
 })();
+
+TEST( 'jsTestUtil self test', jsTestUtil.makeSelfTest() );
