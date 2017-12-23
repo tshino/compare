@@ -1,11 +1,28 @@
-﻿TEST( 'compareUtil detectImageFormat', function test(done) {
+﻿(function() {
   var detectImageFormat = function(content) {
     var datauri = jsTestUtil.dataURIFromArrayBuffer(content);
     var binary = compareUtil.binaryFromDataURI(datauri);
     var format = compareUtil.detectImageFormat(binary);
     return format;
   };
-  var samples = [
+  var imageFormatDetectionTest = function(done, samples) {
+    var runner = jsTestUtil.makeFileBasedTestRunner();
+    for (var i = 0, sample; sample = samples[i]; i++) {
+      runner.readFileAndTest(sample[0], (function(sample) {
+        var url = sample[0];
+        var fileFormat = sample[1];
+        var colorFormat = sample[2];
+        return function(content, done) {
+          var format = detectImageFormat(content);
+          EXPECT_EQ( fileFormat, format.toString(), 'detected file format of ' + url );
+          EXPECT_EQ( colorFormat, format.color, 'detected color format of ' + url );
+          done();
+        }
+      })(sample));
+    }
+    runner.run(done);
+  };
+  var grayscalePerfectSamples = [
     [ 'data/grayscale/perfect/grayscale_idx8.bmp', 'BMP', 'Indexed RGB 8.8.8 (8bpp)' ],
     [ 'data/grayscale/perfect/grayscale_idx8.gif', 'GIF', 'Indexed RGB 8.8.8 (8bpp)' ],
     [ 'data/grayscale/perfect/grayscale_idx8.png', 'PNG', 'Indexed RGB 8.8.8 (8bpp)' ],
@@ -27,7 +44,8 @@
     [ 'data/grayscale/perfect/grayscale_rgba8888.tif', 'TIFF', 'RGBA 8.8.8.8 (32bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgba8888_pma.tif', 'TIFF', 'RGBA (pre-multiplied) 8.8.8.8 (32bpp)' ],
     [ 'data/grayscale/perfect/grayscale_ycbcr888.jpg', 'JPEG', 'YCbCr 8.8.8 (24bpp 4:4:4)' ],
-    
+  ];
+  var grayscaleReducedSamples = [
     [ 'data/grayscale/reduced/grayscale_idx1.bmp', 'BMP', 'Indexed RGB 8.8.8 (1bpp)' ],
     [ 'data/grayscale/reduced/grayscale_idx1.gif', 'GIF', 'Indexed RGB 8.8.8 (1bpp)' ],
     [ 'data/grayscale/reduced/grayscale_idx1.png', 'PNG', 'Indexed RGB 8.8.8 (1bpp)' ],
@@ -47,19 +65,10 @@
     [ 'data/grayscale/reduced/grayscale_y4.tif', 'TIFF', 'Grayscale 4 (4bpp)' ],
     [ 'data/grayscale/reduced/grayscale_rgb555.bmp', 'BMP', 'RGB 5.5.5 (16bpp)' ],
   ];
-  var runner = jsTestUtil.makeFileBasedTestRunner();
-  for (var i = 0, sample; sample = samples[i]; i++) {
-    runner.readFileAndTest(sample[0], (function(sample) {
-      var url = sample[0];
-      var fileFormat = sample[1];
-      var colorFormat = sample[2];
-      return function(content, done) {
-        var format = detectImageFormat(content);
-        EXPECT_EQ( fileFormat, format.toString(), 'detected file format of ' + url );
-        EXPECT_EQ( colorFormat, format.color, 'detected color format of ' + url );
-        done();
-      }
-    })(sample));
-  }
-  runner.run(done);
-});
+  TEST( 'compareUtil detectImageFormat grayscale perfect', { timeout: 5000 }, function test(done) {
+    imageFormatDetectionTest(done, grayscalePerfectSamples);
+  });
+  TEST( 'compareUtil detectImageFormat grayscale reduced', { timeout: 5000 }, function test(done) {
+    imageFormatDetectionTest(done, grayscaleReducedSamples);
+  });
+})();
