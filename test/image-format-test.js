@@ -6,6 +6,7 @@
     return format;
   };
   var imageFormatDetectionTest = function(done, samples) {
+    LOG('info', '... testing ' + samples.length + ' image files');
     var runner = jsTestUtil.makeFileBasedTestRunner();
     for (var i = 0, sample; sample = samples[i]; i++) {
       runner.readFileAndTest(sample[0], (function(sample) {
@@ -44,6 +45,9 @@
     [ 'data/grayscale/perfect/grayscale_rgba8888.tif', 'TIFF', 'RGBA 8.8.8.8 (32bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgba8888_pma.tif', 'TIFF', 'RGBA (pre-multiplied) 8.8.8.8 (32bpp)' ],
     [ 'data/grayscale/perfect/grayscale_ycbcr888.jpg', 'JPEG', 'YCbCr 8.8.8 (24bpp 4:4:4)' ],
+    [ 'data/grayscale/perfect/grayscale_ycbcr888_440.jpg', 'JPEG', 'YCbCr 8.8.8 (16bpp 4:4:0)' ],
+    [ 'data/grayscale/perfect/grayscale_ycbcr888_422.jpg', 'JPEG', 'YCbCr 8.8.8 (16bpp 4:2:2)' ],
+    [ 'data/grayscale/perfect/grayscale_ycbcr888_420.jpg', 'JPEG', 'YCbCr 8.8.8 (12bpp 4:2:0)' ],
   ];
   var grayscaleReducedSamples = [
     [ 'data/grayscale/reduced/grayscale_idx1.bmp', 'BMP', 'Indexed RGB 8.8.8 (1bpp)' ],
