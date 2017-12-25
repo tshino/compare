@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<script>
+			var colorSpots = [
+				{ x: 0.2,  y: 0.0,  rgb: [0, 0, 0] },
+				{ x: 0.0,  y: 0.2,  rgb: [0, 0, 0] },
+				{ x: 0.55, y: 0.0,  rgb: [1, 0, 0] },
+				{ x: 1.0,  y: 0.0,  rgb: [1, 0, 1] },
+				{ x: 0.8,  y: 0.45, rgb: [1, 1, 0] },
+				{ x: 0.4,  y: 0.4,  rgb: [0, 1, 0] },
+				{ x: 0.45, y: 0.8,  rgb: [0, 1, 1] },
+				{ x: 0.0,  y: 0.55, rgb: [0, 0, 1] },
+				{ x: 0.0,  y: 1.0,  rgb: [1, 0, 1] },
+				{ x: 0.9,  y: 0.9,  rgb: [1, 1, 1] }
+			];
+			var weight = function(distance) {
+				return Math.exp(-240 * distance * distance * distance * distance);
+			};
+			document.body.appendChild(
+				CreateImage(
+					256, 256,
+					function(x, y) {
+						x /= 255;
+						y /= 255;
+						var r = 0, g = 0, b = 0, ww = 0;
+						for (var i = 0, s; s = colorSpots[i]; ++i) {
+							var dx = x - s.x, dy = y - s.y;
+							var d = Math.sqrt(dx * dx + dy * dy);
+							var w = weight(d);
+							r += w * s.rgb[0];
+							g += w * s.rgb[1];
+							b += w * s.rgb[2];
+							ww += w;
+						}
+						r /= ww;
+						g /= ww;
+						b /= ww;
+						return [
+							Math.round(Math.pow(r, 1/2.2) * 255),
+							Math.round(Math.pow(g, 1/2.2) * 255),
+							Math.round(Math.pow(b, 1/2.2) * 255)
+						];
+					}
+				)
+			);
+			function CreateImage(w, h, getRGBA) {
+				var canvas = document.createElement('canvas');
+				canvas.width = w;
+				canvas.height = h;
+				var context = canvas.getContext('2d');
+				var imageData = context.createImageData(w, h);
+				var i = 0;
+				for (var y = 0; y < h; ++y) {
+					for (var x = 0; x < w; ++x) {
+						var rgba = getRGBA(x, y);
+						imageData.data[i + 0] = rgba[0];
+						imageData.data[i + 1] = rgba[1];
+						imageData.data[i + 2] = rgba[2];
+						imageData.data[i + 3] = rgba[3] !== undefined ? rgba[3] : 255;
+						i += 4;
+					}
+				}
+				context.putImageData(imageData, 0, 0);
+				console.log(canvas.toDataURL());
+				return canvas;
+			}
+		</script>
+		<style>
+			body {
+				/* chekcer pattern */
+				background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAQMAAABJtOi3AAAABlBMVEW1tbXp6entsvuTAAAACXBIWXMAABJ0AAASdAHeZh94AAAAFElEQVQI12NgYPj/n4GKBHVNYwAA7b0/wfSyzYsAAAAASUVORK5CYII=');
+			}
+		</style>
+	</body>
+</html>

@@ -79,4 +79,17 @@
   TEST( 'compareUtil detectImageFormat grayscale reduced', { timeout: 5000 }, function test(done) {
     imageFormatDetectionTest(done, grayscaleReducedSamples);
   });
+  var fullcolorPerfectSamples = [
+    [ 'data/fullcolor/perfect/fullcolor_rgb888.bmp', 'BMP', 'RGB 8.8.8 (24bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgb888.png', 'PNG', 'RGB 8.8.8 (24bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgb888.tif', 'TIFF', 'RGB 8.8.8 (24bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgbx8888.bmp', 'BMP', 'RGB 8.8.8 (32bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgba8888.bmp', 'BMP', 'RGBA 8.8.8.8 (32bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgba8888.png', 'PNG', 'RGBA 8.8.8.8 (32bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgba8888.tif', 'TIFF', 'RGBA 8.8.8.8 (32bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgba8888_pma.tif', 'TIFF', 'RGBA (pre-multiplied) 8.8.8.8 (32bpp)' ],
+  ];
+  TEST( 'compareUtil detectImageFormat fullcolor perfect', { timeout: 5000 }, function test(done) {
+    imageFormatDetectionTest(done, fullcolorPerfectSamples);
+  });
 })();
