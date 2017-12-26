@@ -89,7 +89,35 @@
     [ 'data/fullcolor/perfect/fullcolor_rgba8888.tif', 'TIFF', 'RGBA 8.8.8.8 (32bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgba8888_pma.tif', 'TIFF', 'RGBA (pre-multiplied) 8.8.8.8 (32bpp)' ],
   ];
+  var fullcolorReducedSamples = [
+    [ 'data/fullcolor/reduced/fullcolor_idx1.bmp', 'BMP', 'Indexed RGB 8.8.8 (1bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx1.gif', 'GIF', 'Indexed RGB 8.8.8 (1bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx1.png', 'PNG', 'Indexed RGB 8.8.8 (1bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx1.tif', 'TIFF', 'Indexed RGB 16.16.16 (1bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx2.gif', 'GIF', 'Indexed RGB 8.8.8 (2bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx2.png', 'PNG', 'Indexed RGB 8.8.8 (2bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx2.tif', 'TIFF', 'Indexed RGB 16.16.16 (2bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx3.gif', 'GIF', 'Indexed RGB 8.8.8 (3bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx4.bmp', 'BMP', 'Indexed RGB 8.8.8 (4bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx4.gif', 'GIF', 'Indexed RGB 8.8.8 (4bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx4.png', 'PNG', 'Indexed RGB 8.8.8 (4bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx4.tif', 'TIFF', 'Indexed RGB 16.16.16 (4bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx5.gif', 'GIF', 'Indexed RGB 8.8.8 (5bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx6.gif', 'GIF', 'Indexed RGB 8.8.8 (6bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx7.gif', 'GIF', 'Indexed RGB 8.8.8 (7bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx8.bmp', 'BMP', 'Indexed RGB 8.8.8 (8bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx8.gif', 'GIF', 'Indexed RGB 8.8.8 (8bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx8.png', 'PNG', 'Indexed RGB 8.8.8 (8bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_idx8.tif', 'TIFF', 'Indexed RGB 16.16.16 (8bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_rgb555.bmp', 'BMP', 'RGB 5.5.5 (16bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_rgb565.bmp', 'BMP', 'RGB 5.6.5 (16bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_rgba5551.bmp', 'BMP', 'RGBA 5.5.5.1 (16bpp)' ],
+    [ 'data/fullcolor/reduced/fullcolor_ycbcr888.jpg', 'JPEG', 'YCbCr 8.8.8 (24bpp 4:4:4)' ],
+  ];
   TEST( 'compareUtil detectImageFormat fullcolor perfect', { timeout: 5000 }, function test(done) {
     imageFormatDetectionTest(done, fullcolorPerfectSamples);
+  });
+  TEST( 'compareUtil detectImageFormat fullcolor reduced', { timeout: 5000 }, function test(done) {
+    imageFormatDetectionTest(done, fullcolorReducedSamples);
   });
 })();
