@@ -72,6 +72,7 @@
     [ 'data/grayscale/reduced/grayscale_y4.png', 'PNG', 'Grayscale 4 (4bpp)' ],
     [ 'data/grayscale/reduced/grayscale_y4.tif', 'TIFF', 'Grayscale 4 (4bpp)' ],
     [ 'data/grayscale/reduced/grayscale_rgb555.bmp', 'BMP', 'RGB 5.5.5 (16bpp)' ],
+    [ 'data/grayscale/reduced/grayscale_rgba5551.bmp', 'BMP', 'RGBA 5.5.5.1 (16bpp)' ],
   ];
   TEST( 'compareUtil detectImageFormat grayscale perfect', { timeout: 5000 }, function test(done) {
     imageFormatDetectionTest(done, grayscalePerfectSamples);
