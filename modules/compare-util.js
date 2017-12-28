@@ -620,9 +620,9 @@
             case 2:
               if (samplesPerPixel >= 3 &&
                   bitsPerSample.length === samplesPerPixel &&
-                  bitsPerSample[0] === 8 &&
-                  bitsPerSample[1] === 8 &&
-                  bitsPerSample[2] === 8) {
+                  bitsPerSample[0] === bitsPerSample[1] &&
+                  bitsPerSample[0] === bitsPerSample[2] &&
+                  0 <= [8, 16].indexOf(bitsPerSample[0])) {
                 color = makeAlphaNotation('RGB', [0, 1, 2], 'RGBA');
               }
               break;
