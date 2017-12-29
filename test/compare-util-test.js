@@ -10,7 +10,7 @@
 });
 
 TEST( 'compareUtil calcGCD', function test() {
-  EXPECT( compareUtil.calcGCD(1, 1) === 2 /* intended error */ );
+  EXPECT( compareUtil.calcGCD(1, 1) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
   EXPECT( compareUtil.calcGCD(10, 8) === 2 );
