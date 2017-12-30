@@ -1,10 +1,4 @@
 ﻿$( function() {
-  var toggleLang = function() {
-    var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
-    $('#selectLang').val(lang);
-    changeLang(lang);
-  };
-
   // Check for the various File API support.
   if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
     alert('The File APIs are not fully supported in this browser.');
@@ -140,7 +134,7 @@
   
   var keypressMap = {
     // '@' (64)
-    64 : { global: true, func: toggleLang },
+    64 : { global: true, func: textUtil.toggleLang },
     // '?' (63)
     63 : { global: true, func: toggleHelp },
     // 'f' (102)
@@ -246,17 +240,28 @@
   var baseImageIndex = null;
   var targetImageIndex = null;
 
-  var setText = function(target, text) {
-    for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
-      var e = target.find('.' + lang);
-      if (0 === e.length) {
-        e = $('<span>').addClass(lang);
-        target.append(e);
+  var textUtil = (function() {
+    var toggleLang = function() {
+      var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
+      $('#selectLang').val(lang);
+      changeLang(lang);
+    };
+    var setText = function(target, text) {
+      for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
+        var e = target.find('.' + lang);
+        if (0 === e.length) {
+          e = $('<span>').addClass(lang);
+          target.append(e);
+        }
+        e.text(text[lang]);
       }
-      e.text(text[lang]);
-    }
-    return target;
-  };
+      return target;
+    };
+    return {
+      toggleLang: toggleLang,
+      setText: setText
+    };
+  })();
   // View management functions
   var viewManagement = (function() {
     var resetLayoutState = function() {
@@ -1139,7 +1144,7 @@
       serial += 1;
       var mySerial = serial;
       $('#messageBox').css('display', 'block');
-      setText($('#messageBoxBody'), text);
+      textUtil.setText($('#messageBoxBody'), text);
       var close = function(delay) {
         var doClose = function() {
           if (serial === mySerial) {
@@ -1260,7 +1265,7 @@
       if (finished) {
         loading = [];
       }
-      setText($('#loadingStatus'),
+      textUtil.setText($('#loadingStatus'),
         !finished ? {
           en: 'Now loading...',
           ja: 'ロード中...'
@@ -2408,7 +2413,7 @@
         $('.diffDimension').css({display:'none'});
       } else {
         $('.diffDimension').css({display:''});
-        setText($('#diffDimensionReport'), {
+        textUtil.setText($('#diffDimensionReport'), {
           en: 'dimensions are different',
           ja: '画像サイズが異なります'
         });
@@ -2463,14 +2468,14 @@
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
       if (diffResult.result.summary.unmatch === 0) {
-        setText($('#diffSummary'), {
+        textUtil.setText($('#diffSummary'), {
           en: 'Perfect match',
           ja: '完全に一致しました'
         });
       } else {
         var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
         var percent = compareUtil.toPercent(matchRate);
-        setText($('#diffSummary'), {
+        textUtil.setText($('#diffSummary'), {
           en: percent + ' pixels are match',
           ja: percent + ' のピクセルが一致しました'
         });
@@ -2524,7 +2529,7 @@
       var styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (diffResult.result === null) {
         $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
-        setText($('#diffSummary'), {
+        textUtil.setText($('#diffSummary'), {
           en: 'calculating...',
           ja: '計算中...'
         });
@@ -2912,7 +2917,7 @@
       var button = $('<button/>').addClass('selector').
         text(index + 1).
         append(
-          setText($('<span class="tooltip"/>'), {
+          textUtil.setText($('<span class="tooltip"/>'), {
             en: 'Select picture ',
             ja: '画像を選択 '
           })
@@ -2948,7 +2953,7 @@
         var baseIndex = overlayBaseIndex + 1;
         var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
               baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
-        setText($('#mode h3'), {
+        textUtil.setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
           ja: 'オーバーレイモード : ' + modeDesc });
         $('#mode').css({ display : 'block' });
