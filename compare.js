@@ -486,13 +486,22 @@
     var toString = function(orientation) {
       return orientation ? (stringTable[orientation] || 'Invalid') : '‐';
     };
+    var isTransposed = function(orientation) {
+      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      return o.transposed;
+    };
+    var getCSSTransform = function(orientation) {
+      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      return o.transform;
+    };
     var applyExifOrientation = function(entry) {
-      var o = cssTable[entry.orientation] || { transposed: false, transform: '' };
+      var transposed = isTransposed(entry.orientation);
+      var transform = getCSSTransform(entry.orientation);
       var w = entry.width, h = entry.height;
-      entry.width = o.transposed ? h : w;
-      entry.height = o.transposed ? w : h;
-      entry.transposed = o.transposed;
-      entry.orientationAsCSS = o.transform;
+      entry.width = transposed ? h : w;
+      entry.height = transposed ? w : h;
+      entry.transposed = transposed;
+      entry.orientationAsCSS = transform;
     };
     var interpretXY = function(ent, x, y) {
       var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
