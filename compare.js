@@ -494,15 +494,15 @@
       var o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transform;
     };
-    var interpretXY = function(ent, x, y) {
-      var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
-      if (ent.orientation === 2) { return { x: w-x, y: y };
-      } else if (ent.orientation === 3) { return { x: w-x, y: h-y };
-      } else if (ent.orientation === 4) { return { x: x, y: h-y };
-      } else if (ent.orientation === 5) { return { x: y, y: x };
-      } else if (ent.orientation === 6) { return { x: y, y: h-x };
-      } else if (ent.orientation === 7) { return { x: w-y, y: h-x };
-      } else if (ent.orientation === 8) { return { x: w-y, y: x };
+    var interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
+      var w = canvasWidth - 1, h = canvasHeight - 1;
+      if (orientation === 2) { return { x: w-x, y: y };
+      } else if (orientation === 3) { return { x: w-x, y: h-y };
+      } else if (orientation === 4) { return { x: x, y: h-y };
+      } else if (orientation === 5) { return { x: y, y: x };
+      } else if (orientation === 6) { return { x: y, y: h-x };
+      } else if (orientation === 7) { return { x: w-y, y: h-x };
+      } else if (orientation === 8) { return { x: w-y, y: x };
       } else { return { x: x, y: y };
       }
     };
@@ -714,7 +714,7 @@
       return fixedPosition;
     };
     var makePathDesc = function(img, x, y) {
-      var pos = orientationUtil.interpretXY(img, x, y);
+      var pos = img.interpretXY(x, y);
       var desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
       desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
@@ -944,7 +944,7 @@
       };
       var cursor = crossCursor.getPosition(img.index);
       var x = cursor.x, y = cursor.y;
-      var pos = orientationUtil.interpretXY(img, x, y);
+      var pos = img.interpretXY(x, y);
       if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
         img.colorHUD.find('.colorXY span, .colorCSS, .colorRGB span').text('');
         img.colorHUD.find('.colorSample, .colorBar').hide();
@@ -1550,7 +1550,7 @@
       updateTable();
     });
     var updateAsync = function(img) {
-      var leftTop = orientationUtil.interpretXY(img, 0, 0);
+      var leftTop = img.interpretXY(0, 0);
       var flipped = img.transposed ? (leftTop.y !== 0) : (leftTop.x !== 0);
       taskQueue.addTask({
         cmd:      'calcWaveform',
@@ -3095,6 +3095,9 @@
     entry.height = entry.transposed ? w : h;
     entry.loading    = false;
     entry.progress   = 100;
+    entry.interpretXY = function(x, y) {
+      return orientationUtil.interpretXY(entry.orientation, w, h, x, y);
+    };
     //
     updateDOM();
     nowLoadingDialog.update();
