@@ -96,6 +96,69 @@ TEST( 'compareUtil binaryFromDataURI', function test() {
   EXPECT( binary.little32(2) === 0x2c6f6c6c /* ,oll */ );
 });
 
+TEST( 'compareUtil orientationUtil toString', function test() {
+  var toString = compareUtil.orientationUtil.toString;
+  EXPECT_EQ( 'TopLeft', toString(1) );
+  EXPECT_EQ( 'TopRight', toString(2) );
+  EXPECT_EQ( 'BottomRight', toString(3) );
+  EXPECT_EQ( 'BottomLeft', toString(4) );
+  EXPECT_EQ( 'LeftTop', toString(5) );
+  EXPECT_EQ( 'RightTop', toString(6) );
+  EXPECT_EQ( 'RightBottom', toString(7) );
+  EXPECT_EQ( 'LeftBottom', toString(8) );
+  EXPECT_EQ( 'Invalid', toString(9) );
+  EXPECT_EQ( '‐', toString(null) );
+});
+TEST( 'compareUtil orientationUtil isTransposed', function test() {
+  var isTransposed = compareUtil.orientationUtil.isTransposed;
+  EXPECT_EQ( false, isTransposed(1) );
+  EXPECT_EQ( false, isTransposed(2) );
+  EXPECT_EQ( false, isTransposed(3) );
+  EXPECT_EQ( false, isTransposed(4) );
+  EXPECT_EQ( true, isTransposed(5) );
+  EXPECT_EQ( true, isTransposed(6) );
+  EXPECT_EQ( true, isTransposed(7) );
+  EXPECT_EQ( true, isTransposed(8) );
+  EXPECT_EQ( false, isTransposed(9) );
+  EXPECT_EQ( false, isTransposed(null) );
+});
+TEST( 'compareUtil orientationUtil getCSSTransform', function test() {
+  var getCSSTransform = compareUtil.orientationUtil.getCSSTransform;
+  EXPECT_EQ( '', getCSSTransform(1) );
+  EXPECT_EQ( ' scale(-1,1)', getCSSTransform(2) );
+  EXPECT_EQ( ' rotate(180deg)', getCSSTransform(3) );
+  EXPECT_EQ( ' scale(-1,1) rotate(180deg)', getCSSTransform(4) );
+  EXPECT_EQ( ' scale(-1,1) rotate(90deg)', getCSSTransform(5) );
+  EXPECT_EQ( ' rotate(90deg)', getCSSTransform(6) );
+  EXPECT_EQ( ' scale(-1,1) rotate(-90deg)', getCSSTransform(7) );
+  EXPECT_EQ( ' rotate(-90deg)', getCSSTransform(8) );
+  EXPECT_EQ( '', getCSSTransform(9) );
+  EXPECT_EQ( '', getCSSTransform(null) );
+});
+TEST( 'compareUtil orientationUtil interpretXY', function test() {
+  var interpretXY = compareUtil.orientationUtil.interpretXY;
+  EXPECT_EQ( 10, interpretXY(1, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY(1, 40, 30, 10, 5).y );
+  EXPECT_EQ( 29, interpretXY(2, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY(2, 40, 30, 10, 5).y );
+  EXPECT_EQ( 29, interpretXY(3, 40, 30, 10, 5).x );
+  EXPECT_EQ( 24, interpretXY(3, 40, 30, 10, 5).y );
+  EXPECT_EQ( 10, interpretXY(4, 40, 30, 10, 5).x );
+  EXPECT_EQ( 24, interpretXY(4, 40, 30, 10, 5).y );
+  EXPECT_EQ( 5, interpretXY(5, 30, 40, 10, 5).x );
+  EXPECT_EQ( 10, interpretXY(5, 30, 40, 10, 5).y );
+  EXPECT_EQ( 5, interpretXY(6, 30, 40, 10, 5).x );
+  EXPECT_EQ( 29, interpretXY(6, 30, 40, 10, 5).y );
+  EXPECT_EQ( 24, interpretXY(7, 30, 40, 10, 5).x );
+  EXPECT_EQ( 29, interpretXY(7, 30, 40, 10, 5).y );
+  EXPECT_EQ( 24, interpretXY(8, 30, 40, 10, 5).x );
+  EXPECT_EQ( 10, interpretXY(8, 30, 40, 10, 5).y );
+  EXPECT_EQ( 10, interpretXY(9, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY(9, 40, 30, 10, 5).y );
+  EXPECT_EQ( 10, interpretXY(null, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY(null, 40, 30, 10, 5).y );
+});
+
 TEST( 'compareUtil cursorKeyCodeToXY', function test() {
   var cursorKeyCodeToXY = compareUtil.cursorKeyCodeToXY;
   EXPECT( cursorKeyCodeToXY(99).x === 0 );
