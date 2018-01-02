@@ -692,7 +692,50 @@
     //alert(magic);
     return null;
   };
-
+  var orientationUtil = (function() {
+    var stringTable = [
+      'Undefined',
+      'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
+      'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
+    var cssTable = {
+      2: { transposed: false, transform: ' scale(-1,1)' },
+      3: { transposed: false, transform: ' rotate(180deg)' },
+      4: { transposed: false, transform: ' scale(-1,1) rotate(180deg)' },
+      5: { transposed: true,  transform: ' scale(-1,1) rotate(90deg)' },
+      6: { transposed: true,  transform: ' rotate(90deg)' },
+      7: { transposed: true,  transform: ' scale(-1,1) rotate(-90deg)' },
+      8: { transposed: true,  transform: ' rotate(-90deg)' }
+    };
+    var toString = function(orientation) {
+      return orientation ? (stringTable[orientation] || 'Invalid') : '‐';
+    };
+    var isTransposed = function(orientation) {
+      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      return o.transposed;
+    };
+    var getCSSTransform = function(orientation) {
+      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      return o.transform;
+    };
+    var interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
+      var w = canvasWidth - 1, h = canvasHeight - 1;
+      if (orientation === 2) { return { x: w-x, y: y };
+      } else if (orientation === 3) { return { x: w-x, y: h-y };
+      } else if (orientation === 4) { return { x: x, y: h-y };
+      } else if (orientation === 5) { return { x: y, y: x };
+      } else if (orientation === 6) { return { x: y, y: h-x };
+      } else if (orientation === 7) { return { x: w-y, y: h-x };
+      } else if (orientation === 8) { return { x: w-y, y: x };
+      } else { return { x: x, y: y };
+      }
+    };
+    return {
+      toString: toString,
+      isTransposed: isTransposed,
+      getCSSTransform: getCSSTransform,
+      interpretXY: interpretXY
+    };
+  })();
   var cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
     var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
@@ -1201,6 +1244,7 @@
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
+    orientationUtil:        orientationUtil,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
     calcInscribedRect:      calcInscribedRect,
     processKeyDownEvent:    processKeyDownEvent,

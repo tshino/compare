@@ -469,50 +469,6 @@
       toString: toString
     };
   })();
-  var orientationUtil = (function() {
-    var stringTable = [
-      'Undefined',
-      'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
-      'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
-    var cssTable = {
-      2: { transposed: false, transform: ' scale(-1,1)' },
-      3: { transposed: false, transform: ' rotate(180deg)' },
-      4: { transposed: false, transform: ' scale(-1,1) rotate(180deg)' },
-      5: { transposed: true,  transform: ' scale(-1,1) rotate(90deg)' },
-      6: { transposed: true,  transform: ' rotate(90deg)' },
-      7: { transposed: true,  transform: ' scale(-1,1) rotate(-90deg)' },
-      8: { transposed: true,  transform: ' rotate(-90deg)' }
-    };
-    var toString = function(orientation) {
-      return orientation ? (stringTable[orientation] || 'Invalid') : '‐';
-    };
-    var isTransposed = function(orientation) {
-      var o = cssTable[orientation] || { transposed: false, transform: '' };
-      return o.transposed;
-    };
-    var getCSSTransform = function(orientation) {
-      var o = cssTable[orientation] || { transposed: false, transform: '' };
-      return o.transform;
-    };
-    var interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
-      var w = canvasWidth - 1, h = canvasHeight - 1;
-      if (orientation === 2) { return { x: w-x, y: y };
-      } else if (orientation === 3) { return { x: w-x, y: h-y };
-      } else if (orientation === 4) { return { x: x, y: h-y };
-      } else if (orientation === 5) { return { x: y, y: x };
-      } else if (orientation === 6) { return { x: y, y: h-x };
-      } else if (orientation === 7) { return { x: w-y, y: h-x };
-      } else if (orientation === 8) { return { x: w-y, y: x };
-      } else { return { x: x, y: y };
-      }
-    };
-    return {
-      toString: toString,
-      isTransposed: isTransposed,
-      getCSSTransform: getCSSTransform,
-      interpretXY: interpretXY
-    };
-  })();
   var makeImageNameWithIndex = function(tag, img) {
     return $(tag).
         css({ wordBreak : 'break-all' }).
@@ -1195,7 +1151,7 @@
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
-        [orientationUtil.toString(img.orientation), orientationUtil.toString(img.orientation)],
+        [compareUtil.orientationUtil.toString(img.orientation), compareUtil.orientationUtil.toString(img.orientation)],
         [img.size, compareUtil.addComma(img.size) ],
         [img.lastModified, img.lastModified.toLocaleString()]
       ];
@@ -3089,14 +3045,14 @@
     entry.asCanvas   = fig.canvas;
     entry.canvasWidth   = w;
     entry.canvasHeight  = h;
-    entry.orientationAsCSS = orientationUtil.getCSSTransform(entry.orientation);
-    entry.transposed = orientationUtil.isTransposed(entry.orientation);
+    entry.orientationAsCSS = compareUtil.orientationUtil.getCSSTransform(entry.orientation);
+    entry.transposed = compareUtil.orientationUtil.isTransposed(entry.orientation);
     entry.width = entry.transposed ? h : w;
     entry.height = entry.transposed ? w : h;
     entry.loading    = false;
     entry.progress   = 100;
     entry.interpretXY = function(x, y) {
-      return orientationUtil.interpretXY(entry.orientation, w, h, x, y);
+      return compareUtil.orientationUtil.interpretXY(entry.orientation, w, h, x, y);
     };
     //
     updateDOM();
