@@ -494,15 +494,6 @@
       var o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transform;
     };
-    var applyExifOrientation = function(entry) {
-      var transposed = isTransposed(entry.orientation);
-      var transform = getCSSTransform(entry.orientation);
-      var w = entry.width, h = entry.height;
-      entry.width = transposed ? h : w;
-      entry.height = transposed ? w : h;
-      entry.transposed = transposed;
-      entry.orientationAsCSS = transform;
-    };
     var interpretXY = function(ent, x, y) {
       var w = ent.canvasWidth - 1, h = ent.canvasHeight - 1;
       if (ent.orientation === 2) { return { x: w-x, y: y };
@@ -517,7 +508,8 @@
     };
     return {
       toString: toString,
-      applyExifOrientation: applyExifOrientation,
+      isTransposed: isTransposed,
+      getCSSTransform: getCSSTransform,
       interpretXY: interpretXY
     };
   })();
@@ -3095,14 +3087,15 @@
     entry.mainImage  = useCanvasToDisplay ? fig.canvas : img;
     entry.element    = entry.mainImage;
     entry.asCanvas   = fig.canvas;
-    entry.width      = w;
-    entry.height     = h;
     entry.canvasWidth   = w;
     entry.canvasHeight  = h;
+    entry.orientationAsCSS = orientationUtil.getCSSTransform(entry.orientation);
+    entry.transposed = orientationUtil.isTransposed(entry.orientation);
+    entry.width = entry.transposed ? h : w;
+    entry.height = entry.transposed ? w : h;
     entry.loading    = false;
     entry.progress   = 100;
     //
-    orientationUtil.applyExifOrientation(entry);
     updateDOM();
     nowLoadingDialog.update();
   };
