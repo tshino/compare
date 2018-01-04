@@ -43,7 +43,7 @@
     } catch (e) {
       // With this standard method:
       // - local Chrome throws an exception (Failed to construct 'Worker'),
-      // - local Firefox doesn't throw but the worker doesn't work.
+      // - local Firefox doesn't throw but if the path includes '..' the worker doesn't work.
       return new Worker(relativePath);
     }
   };
