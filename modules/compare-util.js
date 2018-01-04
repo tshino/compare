@@ -28,14 +28,25 @@
   };
 
   var newWorker = function(relativePath) {
-    try {
-      return new Worker(relativePath);
-    } catch (e) {
+    var newWorkerViaBlob = function(relativePath) {
       var baseURL = window.location.href.
                         replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
       var array = ['importScripts("' + baseURL + relativePath + '");'];
       var blob = new Blob(array, {type: 'text/javascript'});
       return new Worker(createObjectURL(blob));
+    };
+    if (0 <= relativePath.indexOf('..')) {
+      try {
+        return newWorkerViaBlob(relativePath);
+      } catch (e) {
+        return new Worker(relativePath);
+      }
+    } else {
+      try {
+        return new Worker(relativePath);
+      } catch (e) {
+        return newWorkerViaBlob(relativePath);
+      }
     }
   };
 
