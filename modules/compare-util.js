@@ -33,20 +33,18 @@
                         replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
       var array = ['importScripts("' + baseURL + relativePath + '");'];
       var blob = new Blob(array, {type: 'text/javascript'});
-      return new Worker(createObjectURL(blob));
+      var url = createObjectURL(blob);
+      return new Worker(url);
     };
-    if (0 <= relativePath.indexOf('..')) {
-      try {
-        return newWorkerViaBlob(relativePath);
-      } catch (e) {
-        return new Worker(relativePath);
-      }
-    } else {
-      try {
-        return new Worker(relativePath);
-      } catch (e) {
-        return newWorkerViaBlob(relativePath);
-      }
+    try {
+      // With this special method:
+      // - local MSIE throws an exception (SecurityError).
+      return newWorkerViaBlob(relativePath);
+    } catch (e) {
+      // With this standard method:
+      // - local Chrome throws an exception (Failed to construct 'Worker'),
+      // - local Firefox doesn't throw but the worker doesn't work.
+      return new Worker(relativePath);
     }
   };
 
