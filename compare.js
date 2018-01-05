@@ -438,37 +438,6 @@
       }
     }
   };
-  var aspectRatioUtil = (function() {
-    var calcAspectRatio = function(w, h) {
-      var gcd = compareUtil.calcGCD(w, h);
-      w /= gcd;
-      h /= gcd;
-      return { w: w, h: h, ratio: w / h };
-    };
-    var findApproxAspectRatio = function(exact) {
-      if (exact.w > 50 && exact.h > 50) {
-        for (var i = 1; i <= 10; ++i) {
-          var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
-          var aa = Math.round(a), bb = Math.round(b);
-          if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
-            return { w: aa, h: i };
-          }
-          if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
-            return { w: i, h: bb };
-          }
-        }
-      }
-      return null;
-    };
-    var toString = function(ratio) {
-      return compareUtil.addComma(ratio.w) + ':' + compareUtil.addComma(ratio.h);
-    };
-    return {
-      calcAspectRatio: calcAspectRatio,
-      findApproxAspectRatio: findApproxAspectRatio,
-      toString: toString
-    };
-  })();
   var makeImageNameWithIndex = function(tag, img) {
     return $(tag).
         css({ wordBreak : 'break-all' }).
@@ -1122,11 +1091,11 @@
   // Image Information
   var infoDialog = (function() {
     var makeAspectRatioInfo = function(w, h) {
-      var exact = aspectRatioUtil.calcAspectRatio(w, h);
-      var approx = aspectRatioUtil.findApproxAspectRatio(exact);
-      var exactLabel = aspectRatioUtil.toString(exact);
+      var exact = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
+      var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(exact);
+      var exactLabel = compareUtil.aspectRatioUtil.toString(exact);
       if (approx) {
-        var approxLabel = aspectRatioUtil.toString(approx);
+        var approxLabel = compareUtil.aspectRatioUtil.toString(approx);
         return [exact.ratio, exactLabel + '\n(approx. ' + approxLabel + ')'];
       } else {
         return [exact.ratio, exactLabel];

@@ -159,6 +159,58 @@ TEST( 'compareUtil orientationUtil interpretXY', function test() {
   EXPECT_EQ( 5, interpretXY(null, 40, 30, 10, 5).y );
 });
 
+(function(){
+  // aspectRatioUtil
+  var testCases = [
+    { inW: 1, inH: 1, expectW: 1, expectH: 1 },
+    { inW: 100, inH: 100, expectW: 1, expectH: 1 },
+    { inW: 100, inH: 200, expectW: 1, expectH: 2 },
+    { inW: 500, inH: 200, expectW: 5, expectH: 2 },
+    { inW: 640, inH: 480, expectW: 4, expectH: 3 },
+    { inW: 1920, inH: 1080, expectW: 16, expectH: 9 },
+    { inW: 1080, inH: 1920, expectW: 9, expectH: 16 },
+    { inW: 1920, inH: 1200, expectW: 8, expectH: 5 },
+    { inW: 1296, inH: 972, expectW: 4, expectH: 3 },
+    { inW: 2432, inH: 3648, expectW: 2, expectH: 3 },
+    { inW: 3648, inH: 2056, expectW: 456, expectH: 257 },
+    { inW: 15578, inH: 7783, expectW: 15578, expectH: 7783 },
+  ];
+  TEST( 'compareUtil aspectRatioUtil calcAspectRatio', function test() {
+    for (var i = 0, t; t = testCases[i]; i++) {
+      var desc = 'calcAspectRatio(' + t.inW + ', ' + t.inH + ')';
+      var a = compareUtil.aspectRatioUtil.calcAspectRatio(t.inW, t.inH);
+      EXPECT_EQ( t.expectW, a.w, desc + '.w' );
+      EXPECT_EQ( t.expectH, a.h, desc + '.h');
+    }
+  });
+  TEST( 'compareUtil aspectRatioUtil toString', function test() {
+    var toString = compareUtil.aspectRatioUtil.toString;
+    EXPECT_EQ( '1:1', toString({ w:1, h:1 }) );
+    EXPECT_EQ( '1:2', toString({ w:1, h:2 }) );
+    EXPECT_EQ( '5:2', toString({ w:5, h:2 }) );
+    EXPECT_EQ( '16:9', toString({ w:16, h:9 }) );
+    EXPECT_EQ( '9:16', toString({ w:9, h:16 }) );
+    EXPECT_EQ( '456:257', toString({ w:456, h:257 }) );
+    EXPECT_EQ( '15,578:7,783', toString({ w:15578, h:7783 }) );
+  });
+  TEST( 'compareUtil aspectRatioUtil findApproxAspectRatio', function test() {
+    var findApprox = function(w, h) {
+      var a = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
+      var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(a);
+      return approx ? compareUtil.aspectRatioUtil.toString(approx) : null;
+    };
+    EXPECT_EQ( null, findApprox(1, 1) );
+    EXPECT_EQ( null, findApprox(100, 100) );
+    EXPECT_EQ( null, findApprox(100, 200) );
+    EXPECT_EQ( null, findApprox(1920, 1080) );
+    EXPECT_EQ( '16:9', findApprox(3648, 2056) );
+    EXPECT_EQ( '9:16', findApprox(2056, 3648) );
+    EXPECT_EQ( '16:9', findApprox(960, 541) );
+    EXPECT_EQ( '2:1', findApprox(15578, 7783) );
+    EXPECT_EQ( '2:1', findApprox(1001, 500) );
+  });
+})();
+
 TEST( 'compareUtil cursorKeyCodeToXY', function test() {
   var cursorKeyCodeToXY = compareUtil.cursorKeyCodeToXY;
   EXPECT( cursorKeyCodeToXY(99).x === 0 );

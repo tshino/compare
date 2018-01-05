@@ -745,6 +745,37 @@
       interpretXY: interpretXY
     };
   })();
+  var aspectRatioUtil = (function() {
+    var calcAspectRatio = function(w, h) {
+      var gcd = calcGCD(w, h);
+      w /= gcd;
+      h /= gcd;
+      return { w: w, h: h, ratio: w / h };
+    };
+    var findApproxAspectRatio = function(exact) {
+      if (exact.w > 50 && exact.h > 50) {
+        for (var i = 1; i <= 10; ++i) {
+          var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
+          var aa = Math.round(a), bb = Math.round(b);
+          if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
+            return { w: aa, h: i };
+          }
+          if (Math.abs(bb - b) < Math.min(i, bb) * 0.004) {
+            return { w: i, h: bb };
+          }
+        }
+      }
+      return null;
+    };
+    var toString = function(ratio) {
+      return addComma(ratio.w) + ':' + addComma(ratio.h);
+    };
+    return {
+      calcAspectRatio: calcAspectRatio,
+      findApproxAspectRatio: findApproxAspectRatio,
+      toString: toString
+    };
+  })();
   var cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
     var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
@@ -1254,6 +1285,7 @@
     detectExifOrientation:  detectExifOrientation,
     detectImageFormat:      detectImageFormat,
     orientationUtil:        orientationUtil,
+    aspectRatioUtil:        aspectRatioUtil,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
     calcInscribedRect:      calcInscribedRect,
     processKeyDownEvent:    processKeyDownEvent,
