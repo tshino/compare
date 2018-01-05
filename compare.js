@@ -353,7 +353,7 @@
       boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
       return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
     };
-    var updateImageBox = function(img, boxW, boxH) {
+    var updateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
         img.boxW = boxW;
         img.boxH = boxH;
@@ -368,6 +368,16 @@
         crossCursor.onUpdateImageBox(img, w, h);
         hud.onUpdateImageBox(img);
       }
+      var index = img.index;
+      var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
+      $(box).css({
+        display : '',
+        position : overlayMode ? 'absolute' : '',
+        width : overlayMode ? $('#view').width() + 'px' : '',
+        height : overlayMode ? $('#view').height() + 'px' : '',
+        opacity : isOverlay ? '0.5' : '',
+        background : overlayMode ? '#000' : ''
+      });
     };
     return {
       resetLayoutState: resetLayoutState,
@@ -2955,16 +2965,7 @@
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
       } else {
-        viewManagement.updateImageBox(img, param.boxW, param.boxH);
-        var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
-        $(this).css({
-          display   : '',
-          position  : overlayMode ? 'absolute' : '',
-          width     : overlayMode ? $('#view').width() + 'px' : '',
-          height    : overlayMode ? $('#view').height() + 'px' : '',
-          opacity   : isOverlay ? '0.5' : '',
-          background : overlayMode ? '#000' : ''
-        });
+        viewManagement.updateImageBox(this, img, param.boxW, param.boxH);
       }
     });
     $('#view > div.emptyBox').each(function(index) {
