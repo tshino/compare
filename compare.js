@@ -227,7 +227,6 @@
     }
   });
   var layoutMode = null;
-  var overlayMode = false;
   var overlayBaseIndex = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
@@ -264,6 +263,10 @@
   })();
   // View management functions
   var viewManagement = (function() {
+    var overlayMode = false;
+    var isOverlayMode = function() {
+      return overlayMode;
+    };
     var resetLayoutState = function() {
       currentImageIndex = 0;
       viewZoom.setZoom(0);
@@ -380,6 +383,7 @@
       });
     };
     return {
+      isOverlayMode: isOverlayMode,
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
@@ -2872,7 +2876,7 @@
     var updateSelectorButtonState = function() {
       if (isSingleView) {
         $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
-        if (overlayMode) {
+        if (viewManagement.isOverlayMode()) {
           $('.selector').eq(overlayBaseIndex).addClass('current');
         }
       } else {
@@ -2885,7 +2889,7 @@
       });
     };
     var updateOverlayModeIndicator = function() {
-      if (overlayMode) {
+      if (viewManagement.isOverlayMode()) {
         var baseIndex = overlayBaseIndex + 1;
         var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
               baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
@@ -2958,7 +2962,7 @@
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
     $('#view > div.imageBox').each(function(index) {
       var hide = isSingleView && index + 1 !== currentImageIndex;
-      if (overlayMode) {
+      if (viewManagement.isOverlayMode()) {
         hide = hide && index !== overlayBaseIndex;
       }
       var img = entries[index];
