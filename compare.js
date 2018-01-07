@@ -224,7 +224,6 @@
       }
     }
   });
-  var layoutMode = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -264,6 +263,7 @@
     var isSingleView = false;
     var overlayMode = false;
     var overlayBaseIndex = null;
+    var layoutMode = null;
     var isOverlayMode = function() {
       return overlayMode;
     };
@@ -276,6 +276,9 @@
         }
       }
       return indices;
+    };
+    var getLayoutMode = function() {
+      return layoutMode;
     };
     var resetLayoutState = function() {
       currentImageIndex = 0;
@@ -413,6 +416,7 @@
     return {
       isOverlayMode: isOverlayMode,
       getSelectedImageIndices: getSelectedImageIndices,
+      getLayoutMode: getLayoutMode,
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
@@ -422,7 +426,6 @@
       update: update,
       getCurrentIndexOr: getCurrentIndexOr,
       makeImageLayoutParam: makeImageLayoutParam,
-      updateImageBox: updateImageBox,
       onUpdateLayout: onUpdateLayout
     };
   })();
@@ -2901,6 +2904,7 @@
       return button;
     };
     var updateArrangeButton = function() {
+      var layoutMode = viewManagement.getLayoutMode();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     var updateSelectorButtonState = function() {
