@@ -217,7 +217,6 @@
   })();
   var entries = [];
   var images = [];
-  var currentImageIndex = 0;
   var isSingleView = false;
   var viewZoom = compareUtil.makeZoomController(updateTransform, {
     getBaseSize: function(index) {
@@ -262,6 +261,7 @@
   })();
   // View management functions
   var viewManagement = (function() {
+    var currentImageIndex = 0;
     var overlayMode = false;
     var overlayBaseIndex = null;
     var isOverlayMode = function() {
@@ -3145,7 +3145,7 @@
     for (var i = 0, f; f = sorted[i]; i++) {
       addFile(f);
     }
-    currentImageIndex = 0;
+    viewManagement.resetLayoutState();
     updateDOM();
     nowLoadingDialog.update();
   };
