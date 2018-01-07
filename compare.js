@@ -227,7 +227,6 @@
     }
   });
   var layoutMode = null;
-  var overlayBaseIndex = null;
   var dialog = null;
   var figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
@@ -264,8 +263,19 @@
   // View management functions
   var viewManagement = (function() {
     var overlayMode = false;
+    var overlayBaseIndex = null;
     var isOverlayMode = function() {
       return overlayMode;
+    };
+    var getSelectedImageIndices = function() {
+      var indices = [];
+      if (isSingleView) {
+        indices.push(currentImageIndex - 1);
+        if (overlayMode && overlayBaseIndex !== currentImageIndex - 1) {
+          indices.push(overlayBaseIndex);
+        }
+      }
+      return indices;
     };
     var resetLayoutState = function() {
       currentImageIndex = 0;
@@ -384,6 +394,7 @@
     };
     return {
       isOverlayMode: isOverlayMode,
+      getSelectedImageIndices: getSelectedImageIndices,
       resetLayoutState: resetLayoutState,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
@@ -2874,15 +2885,13 @@
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     var updateSelectorButtonState = function() {
-      if (isSingleView) {
-        $('.selector').removeClass('current').eq(currentImageIndex - 1).addClass('current');
-        if (viewManagement.isOverlayMode()) {
-          $('.selector').eq(overlayBaseIndex).addClass('current');
-        }
-      } else {
-        $('.selector').removeClass('current');
+      var indices = viewManagement.getSelectedImageIndices();
+      var selectors = $('.selector');
+      selectors.removeClass('current');
+      for (var i = 0; i < indices.length; i++) {
+        selectors.eq(indices[i]).addClass('current');
       }
-      $('.selector').each(function(index) {
+      selectors.each(function(index) {
         if (index < entries.length && !entries[index].visible) {
           $(this).css({ display : 'none' });
         }
@@ -2890,9 +2899,9 @@
     };
     var updateOverlayModeIndicator = function() {
       if (viewManagement.isOverlayMode()) {
-        var baseIndex = overlayBaseIndex + 1;
-        var modeDesc = (isSingleView && baseIndex !== currentImageIndex) ?
-              baseIndex + ' + ' + currentImageIndex : baseIndex + ' only';
+        var indices = viewManagement.getSelectedImageIndices();
+        var numbers = indices.map(function(i) { return i + 1; });
+        var modeDesc = numbers.join(' + ') + (numbers.length === 1 ? ' only' : '');
         textUtil.setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
           ja: 'オーバーレイモード : ' + modeDesc });
@@ -2959,12 +2968,10 @@
   var updateLayout = function() {
     viewManagement.update();
     var param = viewManagement.makeImageLayoutParam();
+    var indices = viewManagement.getSelectedImageIndices();
     $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
     $('#view > div.imageBox').each(function(index) {
-      var hide = isSingleView && index + 1 !== currentImageIndex;
-      if (viewManagement.isOverlayMode()) {
-        hide = hide && index !== overlayBaseIndex;
-      }
+      var hide = isSingleView && 0 > indices.indexOf(index);
       var img = entries[index];
       if (hide || !img || !img.visible) {
         $(this).css({ display : 'none' });
