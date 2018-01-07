@@ -217,7 +217,6 @@
   })();
   var entries = [];
   var images = [];
-  var isSingleView = false;
   var viewZoom = compareUtil.makeZoomController(updateTransform, {
     getBaseSize: function(index) {
       if (entries[index] && entries[index].ready()) {
@@ -262,6 +261,7 @@
   // View management functions
   var viewManagement = (function() {
     var currentImageIndex = 0;
+    var isSingleView = false;
     var overlayMode = false;
     var overlayBaseIndex = null;
     var isOverlayMode = function() {
@@ -392,6 +392,24 @@
         background : overlayMode ? '#000' : ''
       });
     };
+    var onUpdateLayout = function() {
+      var param = makeImageLayoutParam();
+      var indices = getSelectedImageIndices();
+      $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
+      $('#view > div.imageBox').each(function(index) {
+        var hide = isSingleView && 0 > indices.indexOf(index);
+        var img = entries[index];
+        if (hide || !img || !img.visible) {
+          $(this).css({ display : 'none' });
+        } else {
+          updateImageBox(this, img, param.boxW, param.boxH);
+        }
+      });
+      $('#view > div.emptyBox').each(function(index) {
+        var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
+        $(this).css({ display : (hide ? 'none' : '') });
+      });
+    };
     return {
       isOverlayMode: isOverlayMode,
       getSelectedImageIndices: getSelectedImageIndices,
@@ -404,7 +422,8 @@
       update: update,
       getCurrentIndexOr: getCurrentIndexOr,
       makeImageLayoutParam: makeImageLayoutParam,
-      updateImageBox: updateImageBox
+      updateImageBox: updateImageBox,
+      onUpdateLayout: onUpdateLayout
     };
   })();
   var removeEntry = function(index) {
@@ -2967,22 +2986,7 @@
   };
   var updateLayout = function() {
     viewManagement.update();
-    var param = viewManagement.makeImageLayoutParam();
-    var indices = viewManagement.getSelectedImageIndices();
-    $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
-    $('#view > div.imageBox').each(function(index) {
-      var hide = isSingleView && 0 > indices.indexOf(index);
-      var img = entries[index];
-      if (hide || !img || !img.visible) {
-        $(this).css({ display : 'none' });
-      } else {
-        viewManagement.updateImageBox(this, img, param.boxW, param.boxH);
-      }
-    });
-    $('#view > div.emptyBox').each(function(index) {
-      var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
-      $(this).css({ display : (hide ? 'none' : '') });
-    });
+    viewManagement.onUpdateLayout();
     sideBar.onUpdateLayout();
     roiMap.onUpdateLayout();
     updateTransform();
