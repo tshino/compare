@@ -29,9 +29,12 @@
 
   var newWorker = function(relativePath) {
     var newWorkerViaBlob = function(relativePath) {
-      var baseURL = window.location.href.
-                        replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
-      var array = ['importScripts("' + baseURL + relativePath + '");'];
+      var baseURL = window.location.href.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
+      var path = baseURL + relativePath;
+      var array = [
+        'var workerLocation = "' + path + '";' +
+        'importScripts("' + path + '");'
+      ];
       var blob = new Blob(array, {type: 'text/javascript'});
       var url = createObjectURL(blob);
       return new Worker(url);
