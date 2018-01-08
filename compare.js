@@ -60,20 +60,12 @@
             return false;
           }
           if (($('#diff').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
-              num - 1 < entries.length &&
-              entries[num - 1].ready() &&
-              baseImageIndex !== null && targetImageIndex !== null &&
-              targetImageIndex !== num - 1) {
-            setBaseAndTargetImage(targetImageIndex, num - 1);
+              changeTargetImage(num - 1)) {
             dialog.update();
             return false;
           }
           if ($('#metrics').is(':visible') &&
-              num - 1 < entries.length &&
-              entries[num - 1].ready() &&
-              baseImageIndex !== null &&
-              baseImageIndex !== num - 1) {
-            setBaseAndTargetImage(num - 1, null);
+              changeBaseImage(num - 1)) {
             dialog.update();
             return false;
           }
@@ -211,10 +203,6 @@
   updateDOM();
 });
 
-  var NEEDS_IOS_EXIF_WORKAROUND = (function() {
-    var ua = window.navigator.userAgent.toLowerCase();
-    return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
-  })();
   var entries = [];
   var images = [];
   var viewZoom = compareUtil.makeZoomController(updateTransform, {
@@ -483,6 +471,24 @@
           baseImageIndex = findImageIndexOtherThan(targetImageIndex);
         }
       }
+    }
+  };
+  var changeBaseImage = function(index) {
+    if (index < entries.length &&
+        entries[index].ready() &&
+        baseImageIndex !== null &&
+        baseImageIndex !== index) {
+      setBaseAndTargetImage(index, null);
+      return true;
+    }
+  };
+  var changeTargetImage = function(index) {
+    if (index < entries.length &&
+        entries[index].ready() &&
+        baseImageIndex !== null && targetImageIndex !== null &&
+        targetImageIndex !== index) {
+      setBaseAndTargetImage(targetImageIndex, index);
+      return true;
     }
   };
   var makeImageNameWithIndex = function(tag, img) {
@@ -2105,7 +2111,7 @@
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
           makeImageNameSelector(baseImageIndex, function(index) {
-            setBaseAndTargetImage(index, null);
+            changeBaseImage(index);
             updateTable();
           })
         )
@@ -2132,8 +2138,8 @@
         $('<td>').append(
           makeImageNameWithIndex('<span>', b),
           '&nbsp;',
-          $('<button>').text('↑').click(b.index, function(e) {
-            baseImageIndex = e.data;
+          $('<button>').text('↑').click(function(e) {
+            changeBaseImage(b.index);
             updateTable();
           })
         )
@@ -2162,7 +2168,7 @@
     setBaseAndTargetImage(null, null);
     $(baseSelector).append(
       makeImageNameSelector(baseImageIndex, function(index) {
-        setBaseAndTargetImage(index, null);
+        changeBaseImage(index);
         onUpdate();
       })
     );
@@ -3017,6 +3023,10 @@
     crossCursor.onUpdateTransform();
   }
 
+  var NEEDS_IOS_EXIF_WORKAROUND = (function() {
+    var ua = window.navigator.userAgent.toLowerCase();
+    return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
+  })();
   var setEntryImage = function(entry, img, useCanvasToDisplay) {
     var w = img.naturalWidth;
     var h = img.naturalHeight;
