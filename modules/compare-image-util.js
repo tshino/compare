@@ -24,12 +24,20 @@
     var offset = image.offset !== undefined ? image.offset : 0;
     left   = left   !== undefined ? left   : 0;
     top    = top    !== undefined ? top    : 0;
-    width  = width  !== undefined ? width  : image.width;
-    height = height !== undefined ? height : image.height;
+    width  = width  !== undefined ? width  : Math.max(0, image.width - left);
+    height = height !== undefined ? height : Math.max(0, image.height - top);
     left   = Math.min(image.width,  left);
     top    = Math.min(image.height, top);
     width  = Math.min(image.width  - left, width);
     height = Math.min(image.height - top,  height);
+    if (left < 0) {
+      width = Math.max(0, left + width);
+      left = 0;
+    }
+    if (top < 0) {
+      height = Math.max(0, top + height);
+      top = 0;
+    }
     return {
       width: width,
       height: height,
