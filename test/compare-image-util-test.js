@@ -165,3 +165,67 @@ TEST( 'compareImageUtil makeRegion too-big-range', function test() {
   EXPECT_EQ( 300 * 50 + 50, region6.offset );
   EXPECT( image1.data === region6.data );
 });
+
+TEST( 'compareImageUtil fill', function test() {
+  var image1 = compareImageUtil.makeImage(300, 200);
+  for (var i = 0; i < 240000; ++i) {
+    image1.data[i] = 55;
+  }
+
+  compareImageUtil.fill(image1, 20, 40, 60, 80);
+
+  EXPECT_EQ( 20, image1.data[0] );
+  EXPECT_EQ( 40, image1.data[1] );
+  EXPECT_EQ( 60, image1.data[2] );
+  EXPECT_EQ( 80, image1.data[3] );
+  EXPECT_EQ( 20, image1.data[299 * 4] );
+  EXPECT_EQ( 40, image1.data[299 * 4 + 1] );
+  EXPECT_EQ( 60, image1.data[299 * 4 + 2] );
+  EXPECT_EQ( 80, image1.data[299 * 4 + 3] );
+  EXPECT_EQ( 20, image1.data[300 * 4 * 199 + 299 * 4] );
+  EXPECT_EQ( 40, image1.data[300 * 4 * 199 + 299 * 4 + 1] );
+  EXPECT_EQ( 60, image1.data[300 * 4 * 199 + 299 * 4 + 2] );
+  EXPECT_EQ( 80, image1.data[300 * 4 * 199 + 299 * 4 + 3] );
+
+  var region1 = compareImageUtil.makeRegion(image1, 20, 10, 100, 50);
+  for (var i = 0; i < 240000; ++i) {
+    image1.data[i] = 55;
+  }
+
+  compareImageUtil.fill(region1, 20, 40, 60, 80);
+
+  EXPECT_EQ( 55, image1.data[0] );
+  EXPECT_EQ( 55, image1.data[1] );
+  EXPECT_EQ( 55, image1.data[2] );
+  EXPECT_EQ( 55, image1.data[3] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 199 + 299 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 199 + 299 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 199 + 299 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 199 + 299 * 4 + 3] );
+
+  EXPECT_EQ( 55, image1.data[300 * 4 * 9 + 20 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 9 + 20 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 9 + 20 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 9 + 20 * 4 + 3] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 19 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 19 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 19 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 19 * 4 + 3] );
+  EXPECT_EQ( 20, image1.data[300 * 4 * 10 + 20 * 4] );
+  EXPECT_EQ( 40, image1.data[300 * 4 * 10 + 20 * 4 + 1] );
+  EXPECT_EQ( 60, image1.data[300 * 4 * 10 + 20 * 4 + 2] );
+  EXPECT_EQ( 80, image1.data[300 * 4 * 10 + 20 * 4 + 3] );
+
+  EXPECT_EQ( 20, image1.data[300 * 4 * 59 + 119 * 4] );
+  EXPECT_EQ( 40, image1.data[300 * 4 * 59 + 119 * 4 + 1] );
+  EXPECT_EQ( 60, image1.data[300 * 4 * 59 + 119 * 4 + 2] );
+  EXPECT_EQ( 80, image1.data[300 * 4 * 59 + 119 * 4 + 3] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 120 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 120 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 120 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 120 * 4 + 3] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
+});
