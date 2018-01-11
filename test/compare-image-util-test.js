@@ -215,7 +215,15 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 40, image1.data[300 * 4 * 10 + 20 * 4 + 1] );
   EXPECT_EQ( 60, image1.data[300 * 4 * 10 + 20 * 4 + 2] );
   EXPECT_EQ( 80, image1.data[300 * 4 * 10 + 20 * 4 + 3] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 120 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 120 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 120 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 10 + 120 * 4 + 3] );
 
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 19 * 4] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 19 * 4 + 1] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 19 * 4 + 2] );
+  EXPECT_EQ( 55, image1.data[300 * 4 * 59 + 19 * 4 + 3] );
   EXPECT_EQ( 20, image1.data[300 * 4 * 59 + 119 * 4] );
   EXPECT_EQ( 40, image1.data[300 * 4 * 59 + 119 * 4 + 1] );
   EXPECT_EQ( 60, image1.data[300 * 4 * 59 + 119 * 4 + 2] );
@@ -228,4 +236,75 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 1] );
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 2] );
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
+});
+
+TEST( 'compareImageUtil convolution', function test() {
+  var image1 = compareImageUtil.makeImage(4, 4);
+  var bitmap = [
+      0,   0,   0,   0,
+      0, 100, 100,   0,
+      0,  50,   0,   0,
+      0,   0,   0,  50
+  ];
+  for (var i = 0; i < 16; ++i) {
+    image1.data[i * 4 + 0] = bitmap[i];
+    image1.data[i * 4 + 1] = bitmap[i];
+    image1.data[i * 4 + 2] = bitmap[i];
+    image1.data[i * 4 + 3] = 255;
+  }
+
+  var image2 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(image2, image1, { w: 3, h: 1 }, [
+    1, 0, -1
+  ]);
+  var expected2 = [
+      0,   0,    0,    0,
+    100, 100, -100, -100,
+     50,   0,  -50,    0,
+      0,   0,   50,   50
+  ];
+  for (var i = 0; i < 16; ++i) {
+    var label = (i + 1) + 'th pixel of image2.data';
+    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 0], label );
+    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 1], label );
+    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 2], label );
+  }
+
+  var image3 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(image3, image1, { w: 1, h: 3 }, [
+    0.20,
+    0.60,
+    0.20
+  ]);
+  var expected3 = [
+    0,  20, 20,  0,
+    0,  70, 60,  0,
+    0,  50, 20, 10,
+    0,  10,  0, 40
+  ];
+  for (var i = 0; i < 16; ++i) {
+    var label = (i + 1) + 'th pixel of image3.data';
+    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 0], label );
+    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 1], label );
+    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 2], label );
+  }
+
+  var image4 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(image4, image1, { w: 3, h: 3 }, [
+    0.0, 0.1, 0.0,
+    0.1, 0.6, 0.1,
+    0.0, 0.1, 0.0
+  ]);
+  var expected4 = [
+     0,  10, 10,  0,
+    10,  75, 70, 10,
+     5,  40, 15,  5,
+     0,   5,  5, 40
+  ];
+  for (var i = 0; i < 16; ++i) {
+    var label = (i + 1) + 'th pixel of image4.data';
+    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 0], label );
+    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 1], label );
+    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 2], label );
+  }
 });
