@@ -239,72 +239,101 @@ TEST( 'compareImageUtil fill', function test() {
 });
 
 TEST( 'compareImageUtil convolution', function test() {
-  var image1 = compareImageUtil.makeImage(4, 4);
-  var bitmap = [
+  var makeImageForConvolutionTest = function(bitmap) {
+    var image = compareImageUtil.makeImage(4, 4);
+    for (var i = 0; i < 16; ++i) {
+      image.data[i * 4 + 0] = bitmap[i];
+      image.data[i * 4 + 1] = bitmap[i];
+      image.data[i * 4 + 2] = bitmap[i];
+      image.data[i * 4 + 3] = 255;
+    }
+    return image;
+  };
+  var checkConvolutionResult = function(name, result, expected) {
+    for (var i = 0; i < 16; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT_EQ( 128 + expected[i], result.data[i * 4 + 0], label );
+      EXPECT_EQ( 128 + expected[i], result.data[i * 4 + 1], label );
+      EXPECT_EQ( 128 + expected[i], result.data[i * 4 + 2], label );
+    }
+  };
+
+  var image1 = makeImageForConvolutionTest([
       0,   0,   0,   0,
       0, 100, 100,   0,
       0,  50,   0,   0,
       0,   0,   0,  50
-  ];
-  for (var i = 0; i < 16; ++i) {
-    image1.data[i * 4 + 0] = bitmap[i];
-    image1.data[i * 4 + 1] = bitmap[i];
-    image1.data[i * 4 + 2] = bitmap[i];
-    image1.data[i * 4 + 3] = 255;
-  }
+  ]);
 
-  var image2 = compareImageUtil.makeImage(4, 4);
-  compareImageUtil.convolution(image2, image1, { w: 3, h: 1 }, [
+  var result1 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(result1, image1, { w: 3, h: 1 }, [
     1, 0, -1
   ]);
-  var expected2 = [
+  checkConvolutionResult('result1 (horizontal kernel)', result1, [
       0,   0,    0,    0,
     100, 100, -100, -100,
      50,   0,  -50,    0,
       0,   0,   50,   50
-  ];
-  for (var i = 0; i < 16; ++i) {
-    var label = (i + 1) + 'th pixel of image2.data';
-    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 0], label );
-    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 1], label );
-    EXPECT_EQ( 128 + expected2[i], image2.data[i * 4 + 2], label );
-  }
+  ]);
 
-  var image3 = compareImageUtil.makeImage(4, 4);
-  compareImageUtil.convolution(image3, image1, { w: 1, h: 3 }, [
+  var result2 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(result2, image1, { w: 1, h: 3 }, [
     0.20,
     0.60,
     0.20
   ]);
-  var expected3 = [
+  checkConvolutionResult('result2 (vertical kernel)', result2, [
     0,  20, 20,  0,
     0,  70, 60,  0,
     0,  50, 20, 10,
     0,  10,  0, 40
-  ];
-  for (var i = 0; i < 16; ++i) {
-    var label = (i + 1) + 'th pixel of image3.data';
-    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 0], label );
-    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 1], label );
-    EXPECT_EQ( 128 + expected3[i], image3.data[i * 4 + 2], label );
-  }
+  ]);
 
-  var image4 = compareImageUtil.makeImage(4, 4);
-  compareImageUtil.convolution(image4, image1, { w: 3, h: 3 }, [
+  var result3 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(result3, image1, { w: 3, h: 3 }, [
     0.0, 0.1, 0.0,
     0.1, 0.6, 0.1,
     0.0, 0.1, 0.0
   ]);
-  var expected4 = [
+  checkConvolutionResult('result3 (3x3 kernel)', result3, [
      0,  10, 10,  0,
     10,  75, 70, 10,
      5,  40, 15,  5,
      0,   5,  5, 40
-  ];
-  for (var i = 0; i < 16; ++i) {
-    var label = (i + 1) + 'th pixel of image4.data';
-    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 0], label );
-    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 1], label );
-    EXPECT_EQ( 128 + expected4[i], image4.data[i * 4 + 2], label );
-  }
+  ]);
+
+  var image2 = makeImageForConvolutionTest([
+      0,   0,   0,   0,
+      0,  10,   0,   0,
+      0,   0,   0,   0,
+      0,   0,   0,   0
+  ]);
+
+  var result4 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(result4, image2, { w: 3, h: 3 }, [
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 9
+  ]);
+  checkConvolutionResult('result4 (3x3 kernel)', result4, [
+     10, 20, 30, 0,
+     40, 50, 60, 0,
+     70, 80, 90, 0,
+      0,  0,  0, 0
+  ]);
+
+  var result5 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.convolution(result5, image2, { w: 5, h: 5 }, [
+    1,  2,  3,  4,  5,
+    2,  3,  4,  5,  6,
+    3,  4,  5,  6,  7,
+    4,  5,  6,  7,  8,
+    5,  6,  7,  8,  9
+  ]);
+  checkConvolutionResult('result5 (5x5 kernel)', result5, [
+     30, 40, 50, 60,
+     40, 50, 60, 70,
+     50, 60, 70, 80,
+     60, 70, 80, 90
+  ]);
 });
