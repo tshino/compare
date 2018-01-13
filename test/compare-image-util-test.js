@@ -238,6 +238,118 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
 });
 
+TEST( 'compareImageUtil resizeNN', function test() {
+  var image1 = compareImageUtil.makeImage(2, 2);
+  var image2 = compareImageUtil.makeImage(4, 4);
+
+  compareImageUtil.fill(image1, 10, 20, 30, 40);
+  compareImageUtil.fill(image2, 0, 0, 0, 0);
+  compareImageUtil.resizeNN(image2, image1);
+  EXPECT_EQ( 10, image2.data[0] );
+  EXPECT_EQ( 20, image2.data[1] );
+  EXPECT_EQ( 30, image2.data[2] );
+  EXPECT_EQ( 40, image2.data[3] );
+  EXPECT_EQ( 10, image2.data[20] );
+  EXPECT_EQ( 20, image2.data[21] );
+  EXPECT_EQ( 30, image2.data[22] );
+  EXPECT_EQ( 40, image2.data[23] );
+  EXPECT_EQ( 10, image2.data[36] );
+  EXPECT_EQ( 20, image2.data[37] );
+  EXPECT_EQ( 30, image2.data[38] );
+  EXPECT_EQ( 40, image2.data[39] );
+  EXPECT_EQ( 10, image2.data[60] );
+  EXPECT_EQ( 20, image2.data[61] );
+  EXPECT_EQ( 30, image2.data[62] );
+  EXPECT_EQ( 40, image2.data[63] );
+
+  image1.data[0] = 255;
+  image1.data[1] = 255;
+  image1.data[2] = 255;
+  image1.data[3] = 255;
+  compareImageUtil.fill(image2, 0, 0, 0, 0);
+  compareImageUtil.resizeNN(image2, image1);
+  EXPECT_EQ( 255, image2.data[0] );
+  EXPECT_EQ( 255, image2.data[1] );
+  EXPECT_EQ( 255, image2.data[2] );
+  EXPECT_EQ( 255, image2.data[3] );
+  EXPECT_EQ( 255, image2.data[20] );
+  EXPECT_EQ( 255, image2.data[21] );
+  EXPECT_EQ( 255, image2.data[22] );
+  EXPECT_EQ( 255, image2.data[23] );
+  EXPECT_EQ( 10, image2.data[24] );
+  EXPECT_EQ( 20, image2.data[25] );
+  EXPECT_EQ( 30, image2.data[26] );
+  EXPECT_EQ( 40, image2.data[27] );
+  EXPECT_EQ( 10, image2.data[36] );
+  EXPECT_EQ( 20, image2.data[37] );
+  EXPECT_EQ( 30, image2.data[38] );
+  EXPECT_EQ( 40, image2.data[39] );
+  EXPECT_EQ( 10, image2.data[40] );
+  EXPECT_EQ( 20, image2.data[41] );
+  EXPECT_EQ( 30, image2.data[42] );
+  EXPECT_EQ( 40, image2.data[43] );
+  EXPECT_EQ( 10, image2.data[60] );
+  EXPECT_EQ( 20, image2.data[61] );
+  EXPECT_EQ( 30, image2.data[62] );
+  EXPECT_EQ( 40, image2.data[63] );
+});
+
+TEST( 'compareImageUtil resizeBilinear', function test() {
+  var image1 = compareImageUtil.makeImage(2, 2);
+  var image2 = compareImageUtil.makeImage(4, 4);
+
+  compareImageUtil.fill(image1, 10, 20, 30, 40);
+  compareImageUtil.fill(image2, 0, 0, 0, 0);
+  compareImageUtil.resizeBilinear(image2, image1);
+  EXPECT_EQ( 10, image2.data[0] );
+  EXPECT_EQ( 20, image2.data[1] );
+  EXPECT_EQ( 30, image2.data[2] );
+  EXPECT_EQ( 40, image2.data[3] );
+  EXPECT_EQ( 10, image2.data[20] );
+  EXPECT_EQ( 20, image2.data[21] );
+  EXPECT_EQ( 30, image2.data[22] );
+  EXPECT_EQ( 40, image2.data[23] );
+  EXPECT_EQ( 10, image2.data[36] );
+  EXPECT_EQ( 20, image2.data[37] );
+  EXPECT_EQ( 30, image2.data[38] );
+  EXPECT_EQ( 40, image2.data[39] );
+  EXPECT_EQ( 10, image2.data[60] );
+  EXPECT_EQ( 20, image2.data[61] );
+  EXPECT_EQ( 30, image2.data[62] );
+  EXPECT_EQ( 40, image2.data[63] );
+
+  image1.data[0] = 255;
+  image1.data[1] = 255;
+  image1.data[2] = 255;
+  image1.data[3] = 255;
+  compareImageUtil.fill(image2, 0, 0, 0, 0);
+  compareImageUtil.resizeBilinear(image2, image1);
+  EXPECT_EQ( 255, image2.data[0] );
+  EXPECT_EQ( 255, image2.data[1] );
+  EXPECT_EQ( 255, image2.data[2] );
+  EXPECT_EQ( 255, image2.data[3] );
+  EXPECT_EQ( 148, image2.data[20] );
+  EXPECT_EQ( 152, image2.data[21] );
+  EXPECT_EQ( 157, image2.data[22] );
+  EXPECT_EQ( 161, image2.data[23] );
+  EXPECT_EQ( 56, image2.data[24] );
+  EXPECT_EQ( 64, image2.data[25] );
+  EXPECT_EQ( 72, image2.data[26] );
+  EXPECT_EQ( 80, image2.data[27] );
+  EXPECT_EQ( 56, image2.data[36] );
+  EXPECT_EQ( 64, image2.data[37] );
+  EXPECT_EQ( 72, image2.data[38] );
+  EXPECT_EQ( 80, image2.data[39] );
+  EXPECT_EQ( 25, image2.data[40] );
+  EXPECT_EQ( 35, image2.data[41] );
+  EXPECT_EQ( 44, image2.data[42] );
+  EXPECT_EQ( 53, image2.data[43] );
+  EXPECT_EQ( 10, image2.data[60] );
+  EXPECT_EQ( 20, image2.data[61] );
+  EXPECT_EQ( 30, image2.data[62] );
+  EXPECT_EQ( 40, image2.data[63] );
+});
+
 TEST( 'compareImageUtil convolution', function test() {
   var makeImageForConvolutionTest = function(bitmap) {
     var image = compareImageUtil.makeImage(4, 4);
