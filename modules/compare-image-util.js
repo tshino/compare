@@ -76,6 +76,27 @@
       j += (src.pitch - w) * 4;
     }
   };
+  var convertToGrayscale = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
+    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    var i = dest.offset * 4, j = src.offset * 4;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4, j += 4) {
+        var r = src.data[j    ];
+        var g = src.data[j + 1];
+        var b = src.data[j + 2];
+        var a = src.data[j + 3];
+        var v = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        dest.data[i    ] = v;
+        dest.data[i + 1] = v;
+        dest.data[i + 2] = v;
+        dest.data[i + 3] = a;
+      }
+      i += (dest.pitch - w) * 4;
+      j += (src.pitch - w) * 4;
+    }
+  };
   var resizeNN = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
@@ -647,6 +668,7 @@
     makeRegion:     makeRegion,
     fill:           fill,
     copy:           copy,
+    convertToGrayscale: convertToGrayscale,
     resize:         resize,
     resizeNN:       resizeNN,
     resizeBilinear: resizeBilinear,

@@ -238,6 +238,34 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
 });
 
+TEST( 'compareImageUtil convertToGrayscale', function test() {
+  var checkGrayscaleResult = function(name, result, expected) {
+    for (var i = 0; i < 16; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT_EQ( expected[i * 2], result.data[i * 4 + 0], label );
+      EXPECT_EQ( expected[i * 2], result.data[i * 4 + 1], label );
+      EXPECT_EQ( expected[i * 2], result.data[i * 4 + 2], label );
+      EXPECT_EQ( expected[i * 2 + 1], result.data[i * 4 + 3], label + ' (alpha)' );
+    }
+  };
+  var imageData = { width: 4, height: 4, data: [
+    0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
+    255, 0, 0, 255,   0, 255, 0, 255,   0, 0, 255, 255,     128, 128, 128, 255,
+    0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 0, 255,   255, 255, 255, 255,
+    80, 80, 80, 0,    80, 80, 80, 85,   80, 80, 80, 170,    80, 80, 80, 255
+  ] };
+  var image1 = compareImageUtil.makeImage(imageData);
+  var result1 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.fill(result1, 0, 0, 0, 0);
+  compareImageUtil.convertToGrayscale(result1, image1);
+  checkGrayscaleResult('result1', result1, [
+    0, 255,     85, 255,    170, 255,   255, 255,
+    76, 255,    150, 255,   29, 255,    128, 255,
+    179, 255,   105, 255,   226, 255,   255, 255,
+    80, 0,      80, 85,     80, 170,    80, 255
+  ]);
+});
+
 TEST( 'compareImageUtil resizeNN', function test() {
   var image1 = compareImageUtil.makeImage(2, 2);
   var image2 = compareImageUtil.makeImage(4, 4);
