@@ -378,7 +378,7 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   EXPECT_EQ( 40, image2.data[63] );
 });
 
-TEST( 'compareImageUtil convolution', function test() {
+TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
   var makeImageForConvolutionTest = function(bitmap) {
     var image = compareImageUtil.makeImage(4, 4);
     for (var i = 0; i < 16; ++i) {
@@ -475,5 +475,22 @@ TEST( 'compareImageUtil convolution', function test() {
      40, 50, 60, 70,
      50, 60, 70, 80,
      60, 70, 80, 90
+  ]);
+
+  var result6 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.sobelX(result6, image2);
+  checkConvolutionResult('result6 (sobelX)', result6, [
+     10,   0,  -10,   0,
+     20,   0,  -20,   0,
+     10,   0,  -10,   0,
+      0,   0,    0,   0
+  ]);
+  var result7 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.sobelY(result7, image2);
+  checkConvolutionResult('result7 (sobelY)', result7, [
+     10,  20,   10,   0,
+      0,   0,    0,   0,
+    -10, -20,  -10,   0,
+      0,   0,    0,   0
   ]);
 });
