@@ -238,6 +238,34 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
 });
 
+TEST( 'compareImageUtil copy', function test() {
+  var imageData = { width: 4, height: 4, data: [] };
+  for (var i = 0; i < 64; ++i) {
+    imageData.data[i] = i;
+  }
+  var image1 = compareImageUtil.makeImage(imageData);
+  var image2 = compareImageUtil.makeImage(2, 2);
+  compareImageUtil.copy(image2, image1);
+  EXPECT_EQ( 2, image2.width );
+  EXPECT_EQ( 2, image2.height );
+  EXPECT_EQ( 0, image2.data[0] );
+  EXPECT_EQ( 1, image2.data[1] );
+  EXPECT_EQ( 2, image2.data[2] );
+  EXPECT_EQ( 3, image2.data[3] );
+  EXPECT_EQ( 4, image2.data[4] );
+  EXPECT_EQ( 5, image2.data[5] );
+  EXPECT_EQ( 6, image2.data[6] );
+  EXPECT_EQ( 7, image2.data[7] );
+  EXPECT_EQ( 16, image2.data[8] );
+  EXPECT_EQ( 17, image2.data[9] );
+  EXPECT_EQ( 18, image2.data[10] );
+  EXPECT_EQ( 19, image2.data[11] );
+  EXPECT_EQ( 20, image2.data[12] );
+  EXPECT_EQ( 21, image2.data[13] );
+  EXPECT_EQ( 22, image2.data[14] );
+  EXPECT_EQ( 23, image2.data[15] );
+});
+
 TEST( 'compareImageUtil convertToGrayscale', function test() {
   var checkGrayscaleResult = function(name, result, expected) {
     for (var i = 0; i < 16; ++i) {
