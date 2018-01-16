@@ -522,3 +522,24 @@ TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
       0,   0,    0,   0
   ]);
 });
+
+TEST( 'compareImageUtil getUniqueColors', function test() {
+  var imageData = { width: 4, height: 4, data: [
+    0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
+    255, 0, 0, 255,   0, 255, 0, 255,   0, 0, 255, 255,     128, 128, 128, 255,
+    0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 0, 255,   255, 255, 255, 255,
+    0, 0, 0, 255,     0, 0, 0, 255,     0, 0, 0, 255,       0, 0, 0, 255
+  ] };
+  var uniqueColors = compareImageUtil.getUniqueColors(imageData);
+  EXPECT_EQ( 11, uniqueColors.colors.length );
+  EXPECT_EQ( 5, uniqueColors.counts[uniqueColors.colors.indexOf(0x000000)] );
+  EXPECT_EQ( 2, uniqueColors.counts[uniqueColors.colors.indexOf(0xffffff)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0x555555)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0xaaaaaa)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0xff0000)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0x00ff00)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0x0000ff)] );
+  EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0x808080)] );
+  EXPECT( 0 > uniqueColors.colors.indexOf(0x010101) );
+  EXPECT( 0 > uniqueColors.colors.indexOf(0x101010) );
+});
