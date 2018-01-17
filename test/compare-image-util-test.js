@@ -542,4 +542,5 @@ TEST( 'compareImageUtil getUniqueColors', function test() {
   EXPECT_EQ( 1, uniqueColors.counts[uniqueColors.colors.indexOf(0x808080)] );
   EXPECT( 0 > uniqueColors.colors.indexOf(0x010101) );
   EXPECT( 0 > uniqueColors.colors.indexOf(0x101010) );
+  EXPECT_EQ( 16, uniqueColors.totalCount );
 });
