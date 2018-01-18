@@ -621,6 +621,58 @@
     }
     return result;
   };
+  var cornerValue = function(src) {
+    src = makeImage(src);
+    var w = src.width;
+    var h = src.height;
+    var grayscale = makeImage(w, h);
+    convertToGrayscale(grayscale, src);
+    var dx = makeImage(w, h);
+    var dy = makeImage(w, h);
+    sobelX(dx, grayscale);
+    sobelY(dy, grayscale);
+    var cov = makeImage(w, h);
+    var i = 0, k = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4) {
+        var cov0 = 0, cov1 = 0, cov2 = 0;
+        for (var j = 0; j < 4; j++, k++) {
+          var ix = (dx.data[k] - 128) * 0.1;
+          var iy = (dy.data[k] - 128) * 0.1;
+          cov0 += ix * ix;
+          cov1 += ix * iy;
+          cov2 += iy * iy;
+        }
+        cov.data[i    ] = Math.max(0, Math.min(255, Math.round(cov0)));
+        cov.data[i + 1] = Math.max(0, Math.min(255, Math.round(cov1)));
+        cov.data[i + 2] = Math.max(0, Math.min(255, Math.round(-cov1)));
+        cov.data[i + 3] = Math.max(0, Math.min(255, Math.round(cov2)));
+      }
+    }
+    var m = makeImage(w, h);
+    convolution(m, cov, { w: 3, h: 3 }, [
+      0.1111, 0.1111, 0.1111,
+      0.1111, 0.1111, 0.1111,
+      0.1111, 0.1111, 0.1111
+    ]);
+    var dest = makeImage(w, h);
+    var i = 0, k = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += 4, k += 4) {
+        var cov0 = m.data[k] - 128;
+        var cov1 = m.data[k + 1] - m.data[k + 2];
+        var cov2 = m.data[k + 3] - 128;
+        var a = 0.5 * cov0, b = cov1, c = 0.5 * cov2;
+        var d = (a + c) - Math.sqrt((a - c) * (a - c) + b * b);
+        var val = Math.max(0, Math.min(255, Math.round(d)));
+        dest.data[i    ] = val;
+        dest.data[i + 1] = val;
+        dest.data[i + 2] = val;
+        dest.data[i + 3] = 255;
+      }
+    }
+    return dest;
+  };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
@@ -678,6 +730,7 @@
     sobelX:         sobelX,
     sobelY:         sobelY,
     estimateMotion: estimateMotion,
+    cornerValue:    cornerValue,
     getUniqueColors: getUniqueColors
   };
 })();
