@@ -523,6 +523,40 @@ TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
   ]);
 });
 
+TEST( 'compareImageUtil cornerValue', function test() {
+  var sum = function(image, l, t, w, h) {
+    image = compareImageUtil.makeRegion(image, l, t, w, h);
+    var r = 0, g = 0, b = 0, a = 0;
+    for (y = 0; y < image.height; y++) {
+      var i = (image.offset + image.pitch * y) * 4;
+      for (x = 0; x < image.width; x++, i += 4) {
+        r += image.data[i];
+        g += image.data[i + 1];
+        b += image.data[i + 2];
+        a += image.data[i + 3];
+      }
+    }
+    return [ r, g, b, a ];
+  };
+
+  var image1 = compareImageUtil.makeImage(50, 50);
+  compareImageUtil.fill(image1, 0, 0, 0, 255);
+  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 10);
+  compareImageUtil.fill(region1, 255, 255, 255, 255);
+
+  var result1 = compareImageUtil.cornerValue(image1);
+  EXPECT_EQ( 0, sum(result1, 0, 0, 18, 50)[0] );
+  EXPECT_EQ( 0, sum(result1, 22, 0, 16, 50)[0] );
+  EXPECT_EQ( 0, sum(result1, 42, 0, 8, 50)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 0, 50, 18)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 6)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 32, 50, 18)[0] );
+  EXPECT( 0 < sum(result1, 18, 18, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 38, 18, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 18, 28, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 38, 28, 4, 4)[0] );
+});
+
 TEST( 'compareImageUtil getUniqueColors', function test() {
   var imageData = { width: 4, height: 4, data: [
     0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
