@@ -469,6 +469,25 @@
       j += 8 + (src.pitch - w) * 4;
     }
   };
+  var dilate1x3 = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
+    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    if (h < 2) {
+      copy(dest, src);
+      return;
+    }
+    var i = dest.offset * 4;
+    for (var y = 0; y < h; y++) {
+      var j0 = (src.offset + src.pitch * Math.max(0, y - 1)) * 4;
+      var j1 = (src.offset + src.pitch * y) * 4;
+      var j2 = (src.offset + src.pitch * Math.min(h - 1, y + 1)) * 4;
+      for (var k = 4 * w; k > 0; k--) {
+        dest.data[i++] = Math.max(src.data[j0++], src.data[j1++], src.data[j2++]);
+      }
+      i += (dest.pitch - w) * 4;
+    }
+  };
   var estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
@@ -759,6 +778,7 @@
     sobelX:         sobelX,
     sobelY:         sobelY,
     dilate3x1:      dilate3x1,
+    dilate1x3:      dilate1x3,
     estimateMotion: estimateMotion,
     cornerValue:    cornerValue,
     getUniqueColors: getUniqueColors
