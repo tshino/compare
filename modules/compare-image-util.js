@@ -440,6 +440,35 @@
       -1, -2, -1
     ]);
   };
+  var dilate3x1 = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
+    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    if (w < 2) {
+      copy(dest, src);
+      return;
+    }
+    var i = dest.offset * 4, j = src.offset * 4;
+    for (var y = 0; y < h; y++) {
+      dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4]);
+      dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5]);
+      dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6]);
+      dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7]);
+      i += 4;
+      for (var x = 1; x < w - 1; x++, i += 4, j += 4) {
+        dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4], src.data[j + 8]);
+        dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5], src.data[j + 9]);
+        dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6], src.data[j + 10]);
+        dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7], src.data[j + 11]);
+      }
+      dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4]);
+      dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5]);
+      dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6]);
+      dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7]);
+      i += 4 + (dest.pitch - w) * 4;
+      j += 8 + (src.pitch - w) * 4;
+    }
+  };
   var estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
@@ -729,6 +758,7 @@
     convolution:    convolution,
     sobelX:         sobelX,
     sobelY:         sobelY,
+    dilate3x1:      dilate3x1,
     estimateMotion: estimateMotion,
     cornerValue:    cornerValue,
     getUniqueColors: getUniqueColors
