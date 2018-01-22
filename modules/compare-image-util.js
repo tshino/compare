@@ -450,23 +450,18 @@
     }
     var i = dest.offset * 4, j = src.offset * 4;
     for (var y = 0; y < h; y++) {
-      dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4]);
-      dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5]);
-      dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6]);
-      dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7]);
-      i += 4;
-      for (var x = 1; x < w - 1; x++, i += 4, j += 4) {
-        dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4], src.data[j + 8]);
-        dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5], src.data[j + 9]);
-        dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6], src.data[j + 10]);
-        dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7], src.data[j + 11]);
+      for (var k = 0; k < 4; k++, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + 4]);
       }
-      dest.data[i    ] = Math.max(src.data[j    ], src.data[j + 4]);
-      dest.data[i + 1] = Math.max(src.data[j + 1], src.data[j + 5]);
-      dest.data[i + 2] = Math.max(src.data[j + 2], src.data[j + 6]);
-      dest.data[i + 3] = Math.max(src.data[j + 3], src.data[j + 7]);
-      i += 4 + (dest.pitch - w) * 4;
-      j += 8 + (src.pitch - w) * 4;
+      j -= 4;
+      for (var k = 4 * (w - 2); k > 0; k--, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + 4], src.data[j + 8]);
+      }
+      for (var k = 0; k < 4; k++, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + 4]);
+      }
+      i += (dest.pitch - w) * 4;
+      j += 4 + (src.pitch - w) * 4;
     }
   };
   var dilate1x3 = function(dest, src) {
