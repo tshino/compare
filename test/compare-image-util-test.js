@@ -523,13 +523,13 @@ TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
   ]);
 });
 
-TEST( 'compareImageUtil dilate3x1, dilate1x3', function test() {
+TEST( 'compareImageUtil dilate3x1, dilate1x3, dilate3x3', function test() {
   var checkResult = function(name, result, expected) {
     EXPECT_EQ( expected.data.length, result.data.length, 'data.length of ' + name );
     EXPECT_EQ( expected.width, result.width, 'width of ' + name );
     EXPECT_EQ( expected.height, result.height, 'height of ' + name );
     for (i = 0; i < expected.data.length; ++i) {
-      var label = ((i % 4) + 1) + 'th pixel of ' + name;
+      var label = ((i >> 2) + 1) + 'th pixel of ' + name;
       EXPECT_EQ( expected.data[i], result.data[i], label );
     }
   };
@@ -550,17 +550,27 @@ TEST( 'compareImageUtil dilate3x1, dilate1x3', function test() {
   ] };
   checkResult('result3x1', result3x1, expected3x1);
 
-  d1[48] = 50;  d1[49] = 75;  d1[50] = 80;  d1[51] = 85;
+  d1[48] = 50;  d1[49] = 75;  d1[50] = 85;  d1[51] = 80;
 
   var result1x3 = compareImageUtil.makeImage(4, 4);
   compareImageUtil.dilate1x3(result1x3, image1);
   var expected1x3 = { width: 4, height: 4, data: [
     0, 0, 0, 0,     255, 128, 64, 42,   30, 60, 80, 90,   0, 0, 0, 0,
     0, 0, 0, 0,     255, 128, 64, 42,   30, 60, 80, 90,   10, 20, 30, 40,
-    50, 75, 80, 85, 255, 128, 64, 42,   30, 60, 80, 90,   10, 20, 30, 40,
-    50, 75, 80, 85, 0, 0, 0, 0,         0, 0, 0, 0,       10, 20, 30, 40
+    50, 75, 85, 80, 255, 128, 64, 42,   30, 60, 80, 90,   10, 20, 30, 40,
+    50, 75, 85, 80, 0, 0, 0, 0,         0, 0, 0, 0,       10, 20, 30, 40
   ] };
   checkResult('result1x3', result1x3, expected1x3);
+
+  var result3x3 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.dilate3x3(result3x3, image1);
+  var expected3x3 = { width: 4, height: 4, data: [
+    255, 128, 64, 42, 255, 128, 80, 90, 255, 128, 80, 90,   30, 60, 80, 90,
+    255, 128, 64, 42, 255, 128, 80, 90, 255, 128, 80, 90,   30, 60, 80, 90,
+    255, 128, 85, 80, 255, 128, 85, 90, 255, 128, 80, 90,   30, 60, 80, 90,
+    50, 75, 85, 80,   50, 75, 85, 80,   10, 20, 30, 40,     10, 20, 30, 40
+  ] };
+  checkResult('result3x3', result3x3, expected3x3);
 });
 
 TEST( 'compareImageUtil cornerValue', function test() {

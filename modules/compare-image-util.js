@@ -483,6 +483,11 @@
       i += (dest.pitch - w) * 4;
     }
   };
+  var dilate3x3 = function(dest, src) {
+    var temp = makeImage(src.width, src.height);
+    dilate3x1(temp, src);
+    dilate1x3(dest, temp);
+  };
   var estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
@@ -774,6 +779,7 @@
     sobelY:         sobelY,
     dilate3x1:      dilate3x1,
     dilate1x3:      dilate1x3,
+    dilate3x3:      dilate3x3,
     estimateMotion: estimateMotion,
     cornerValue:    cornerValue,
     getUniqueColors: getUniqueColors
