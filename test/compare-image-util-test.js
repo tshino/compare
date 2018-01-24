@@ -573,7 +573,7 @@ TEST( 'compareImageUtil dilate3x1, dilate1x3, dilate3x3', function test() {
   checkResult('result3x3', result3x3, expected3x3);
 });
 
-TEST( 'compareImageUtil cornerValue', function test() {
+TEST( 'compareImageUtil cornerValue, findCornerPoints', function test() {
   var sum = function(image, l, t, w, h) {
     image = compareImageUtil.makeRegion(image, l, t, w, h);
     var r = 0, g = 0, b = 0, a = 0;
@@ -591,7 +591,7 @@ TEST( 'compareImageUtil cornerValue', function test() {
 
   var image1 = compareImageUtil.makeImage(50, 50);
   compareImageUtil.fill(image1, 0, 0, 0, 255);
-  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 10);
+  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 12);
   compareImageUtil.fill(region1, 255, 255, 255, 255);
 
   var result1 = compareImageUtil.cornerValue(image1);
@@ -599,12 +599,36 @@ TEST( 'compareImageUtil cornerValue', function test() {
   EXPECT_EQ( 0, sum(result1, 22, 0, 16, 50)[0] );
   EXPECT_EQ( 0, sum(result1, 42, 0, 8, 50)[0] );
   EXPECT_EQ( 0, sum(result1, 0, 0, 50, 18)[0] );
-  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 6)[0] );
-  EXPECT_EQ( 0, sum(result1, 0, 32, 50, 18)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 8)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 34, 50, 16)[0] );
   EXPECT( 0 < sum(result1, 18, 18, 4, 4)[0] );
   EXPECT( 0 < sum(result1, 38, 18, 4, 4)[0] );
-  EXPECT( 0 < sum(result1, 18, 28, 4, 4)[0] );
-  EXPECT( 0 < sum(result1, 38, 28, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 18, 30, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 38, 30, 4, 4)[0] );
+
+  var distance = function(p1, p2) {
+    if (!p1 || !p2) {
+      return undefined;
+    }
+    return Math.max(Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y));
+  };
+
+  var corners = compareImageUtil.findCornerPoints(image1);
+  EXPECT_EQ( 4, corners.length );
+  var expected = [
+    { x: 20, y: 20 },
+    { x: 40, y: 20 },
+    { x: 20, y: 32 },
+    { x: 40, y: 32 }
+  ];
+  for (var i = 0; i < expected.length; ++i) {
+    for (var j = 0; j < corners.length; ++j) {
+      if (2 >= distance(corners[j], expected[j])) {
+        break;
+      }
+    }
+    EXPECT( j < corners.length );
+  }
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {

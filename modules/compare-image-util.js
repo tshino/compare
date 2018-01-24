@@ -721,6 +721,59 @@
     }
     return dest;
   };
+  var findCornerPoints = function(image) {
+    var w = image.width, h = image.height;
+    var corner = cornerValue(image);
+    var dilate = makeImage(w, h);
+    dilate3x3(dilate, corner);
+    var candidates = [];
+    for (var y = 1; y + 1 < h; y++) {
+      var i = 4 + y * w * 4;
+      for (var x = 1; x + 1 < w; x++, i += 4) {
+        var c = corner.data[i];
+        if (0 < c && c === dilate.data[i]) {
+          candidates.push([c, i]);
+        }
+      }
+    }
+    candidates.sort(function(a, b) {
+      return (
+        a[0] > b[0] ? -1 : a[0] < b[0] ? 1 :
+        a[1] < b[1] ? -1 : a[1] > b[1] ? 1 :
+        0
+      );
+    });
+    var gw = (w + 7) >> 3, margin = gw + 1;
+    var grid = [];
+    var result = [];
+    var tooNear = function(p1, p2) {
+      return Math.max(Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y)) < 8;
+    };
+    var near8 = [-gw - 1, -gw, -gw + 1, -1, 1, gw - 1, gw, gw + 1];
+    for (var i = 0, n = candidates.length; i < n; ++i) {
+      var o = candidates[i][1] / 4;
+      var x = o % w;
+      var y = (o - x) / w;
+      var cx = x >> 3, cy = y >> 3, c = cx + cy * gw + margin;
+      if (grid[c] === undefined) {
+        var point = { x: x, y: y };
+        grid[c] = point;
+        for (var k = 0; k < 8; k++) {
+          var p = grid[c + near8[k]];
+          if (p && tooNear(point, p)) {
+            break;
+          }
+        }
+        if (k === 8) {
+          result.push(point);
+          if (500 <= result.length) {
+            break;
+          }
+        }
+      }
+    }
+    return result;
+  };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
@@ -782,6 +835,7 @@
     dilate3x3:      dilate3x3,
     estimateMotion: estimateMotion,
     cornerValue:    cornerValue,
+    findCornerPoints: findCornerPoints,
     getUniqueColors: getUniqueColors
   };
 })();
