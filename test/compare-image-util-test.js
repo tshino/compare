@@ -1,16 +1,30 @@
 ﻿TEST( 'compareImageUtil makeImage', function test() {
-  var image = compareImageUtil.makeImage(300, 200);
-  EXPECT_EQ( 300, image.width );
-  EXPECT_EQ( 200, image.height );
-  EXPECT_EQ( 300, image.pitch );
-  EXPECT_EQ( 240000, image.data.length );
-  EXPECT_EQ( 0, image.offset );
+  var image0x0 = compareImageUtil.makeImage(0, 0);
+  EXPECT_EQ( 0, image0x0.width );
+  EXPECT_EQ( 0, image0x0.height );
+  EXPECT_EQ( 0, image0x0.pitch );
+  EXPECT_EQ( 0, image0x0.data.length );
+  EXPECT_EQ( 0, image0x0.offset );
 
-  var image2 = compareImageUtil.makeImage(image);
+  var image1x1 = compareImageUtil.makeImage(1, 1);
+  EXPECT_EQ( 1, image1x1.width );
+  EXPECT_EQ( 1, image1x1.height );
+  EXPECT_EQ( 1, image1x1.pitch );
+  EXPECT_EQ( 4, image1x1.data.length );
+  EXPECT_EQ( 0, image1x1.offset );
+
+  var image1 = compareImageUtil.makeImage(300, 200);
+  EXPECT_EQ( 300, image1.width );
+  EXPECT_EQ( 200, image1.height );
+  EXPECT_EQ( 300, image1.pitch );
+  EXPECT_EQ( 240000, image1.data.length );
+  EXPECT_EQ( 0, image1.offset );
+
+  var image2 = compareImageUtil.makeImage(image1);
   EXPECT_EQ( 300, image2.width );
   EXPECT_EQ( 200, image2.height );
   EXPECT_EQ( 300, image2.pitch );
-  EXPECT( image.data === image2.data );
+  EXPECT( image1.data === image2.data );
   EXPECT_EQ( 0, image2.offset );
 
   var imageData = { width: 300, height: 200, data: new Uint8Array(240000) };
@@ -59,6 +73,14 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 300, region2.pitch );
   EXPECT( image1.data === region2.data );
   EXPECT_EQ( 300 * 20 + 30, region2.offset );
+
+  var imageData = { width: 300, height: 200, data: new Uint8Array(240000) };
+  var region3 = compareImageUtil.makeRegion(imageData, 10, 20, 30, 40);
+  EXPECT_EQ( 30, region3.width );
+  EXPECT_EQ( 40, region3.height );
+  EXPECT_EQ( 300, region3.pitch );
+  EXPECT( imageData.data === region3.data );
+  EXPECT_EQ( 300 * 20 + 10, region3.offset );
 });
 
 TEST( 'compareImageUtil makeRegion empty-range', function test() {
