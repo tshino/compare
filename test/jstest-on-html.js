@@ -56,10 +56,10 @@
     warnCount += 1;
     log('warn', 'W#' + warnCount + ' ' + message);
   };
-  var EXPECT_IMPL = function(expr) {
+  var EXPECT_IMPL = function(expr, desc) {
     testCount += 1;
     if (!expr) {
-      REPORT_ERROR('EXPECT_IMPL', 'Test Failed:');
+      REPORT_ERROR('EXPECT_IMPL', 'Test Failed:' + (desc || ''));
     }
   };
   var EXPECT_EQ_IMPL = function(expected, actual, desc) {

@@ -304,6 +304,54 @@ TEST( 'compareImageUtil copy', function test() {
   EXPECT_EQ( 23, image2.data[15] );
 });
 
+TEST( 'compareImageUtil readSubPixel', function test() {
+  var checkFloatResult = function(name, result, expected) {
+    EXPECT_EQ( 4, result.width, name );
+    EXPECT_EQ( 4, result.height, name );
+    EXPECT_EQ( 16, result.data.length, name );
+    for (var i = 0; i < 16; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT( 1e-5 > Math.abs(expected[i] - result.data[i]), label );
+    }
+  };
+  var image1 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.fill(image1, 55, 55, 55, 255);
+  var expected1 = [
+    55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ];
+
+  var result1 = compareImageUtil.readSubPixel(image1, 0, 0, 4, 4);
+  checkFloatResult('result1', result1, expected1);
+  var result2 = compareImageUtil.readSubPixel(image1, 0.3, 0.3, 4, 4);
+  checkFloatResult('result2', result2, expected1);
+  var result3 = compareImageUtil.readSubPixel(image1, -1.7, -1.5, 4, 4);
+  checkFloatResult('result3', result3, expected1);
+
+  image1.data[0] = 11;
+  image1.data[4] = 11;
+  image1.data[16] = 11;
+  var result4 = compareImageUtil.readSubPixel(image1, 0, 0, 4, 4);
+  checkFloatResult('result4', result4, [
+    11, 11, 55, 55,  11, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result5 = compareImageUtil.readSubPixel(image1, 0.5, 0.5, 4, 4);
+  checkFloatResult('result5', result5, [
+    22, 44, 55, 55,  44, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result6 = compareImageUtil.readSubPixel(image1, -0.5, -0.5, 4, 4);
+  checkFloatResult('result6', result6, [
+    11, 11, 33, 55,  11, 22, 44, 55,  33, 44, 55, 55,  55, 55, 55, 55
+  ]);
+  var result7 = compareImageUtil.readSubPixel(image1, 0.1, 0, 4, 4);
+  checkFloatResult('result7', result7, [
+    11, 15.4, 55, 55,  15.4, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result8 = compareImageUtil.readSubPixel(image1, 0, 0.2, 4, 4);
+  checkFloatResult('result8', result8, [
+    11, 19.8, 55, 55,  19.8, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+});
+
 TEST( 'compareImageUtil convertToGrayscale', function test() {
   var checkGrayscaleResult = function(name, result, expected) {
     for (var i = 0; i < 16; ++i) {

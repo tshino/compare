@@ -76,6 +76,42 @@
       j += (src.pitch - w) * 4;
     }
   };
+  var readSubPixel = function(src, left, top, width, height) {
+    var region = { width: width, height: height };
+    region.data = new Float32Array(width * height);
+    var iLeft = Math.floor(left);
+    var iTop = Math.floor(top);
+    var sampleX = [], sampleY = [];
+    for (var i = 0; i < width; ++i) {
+      sampleX[i * 2] = Math.max(0, Math.min(src.width - 1, iLeft + i));
+      sampleX[i * 2 + 1] = Math.max(0, Math.min(src.width - 1, iLeft + i + 1));
+    }
+    for (var i = 0; i < height; ++i) {
+      sampleY[i * 2] = Math.max(0, Math.min(src.height - 1, iTop + i));
+      sampleY[i * 2 + 1] = Math.max(0, Math.min(src.height - 1, iTop + i + 1));
+    }
+    var rx = left - iLeft;
+    var ry = top - iTop;
+    var a00 = (1 - rx) * (1 - ry);
+    var a01 = rx * (1 - ry);
+    var a10 = (1 - rx) * ry;
+    var a11 = rx * ry;
+    var i = 0;
+    for (var b = 0; b < height; ++b) {
+      var y0 = sampleY[b * 2], y1 = sampleY[b * 2 + 1];
+      var k0 = (src.offset + src.pitch * y0) * 4;
+      var k1 = (src.offset + src.pitch * y1) * 4;
+      for (var a = 0; a < width; ++a) {
+        var x0 = sampleX[a * 2], x1 = sampleX[a * 2 + 1];
+        var c00 = a00 * src.data[k0 + x0 * 4];
+        var c01 = a01 * src.data[k0 + x1 * 4];
+        var c10 = a10 * src.data[k1 + x0 * 4];
+        var c11 = a11 * src.data[k1 + x1 * 4];
+        region.data[i++] = c00 + c01 + c10 + c11;
+      }
+    }
+    return region;
+  };
   var convertToGrayscale = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
@@ -821,6 +857,7 @@
     makeRegion:     makeRegion,
     fill:           fill,
     copy:           copy,
+    readSubPixel:   readSubPixel,
     convertToGrayscale: convertToGrayscale,
     resize:         resize,
     resizeNN:       resizeNN,
