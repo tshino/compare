@@ -659,7 +659,7 @@ TEST( 'compareImageUtil dilate3x1, dilate1x3, dilate3x3', function test() {
   checkResult('result3x3', result3x3, expected3x3);
 });
 
-TEST( 'compareImageUtil cornerValue, findCornerPoints', function test() {
+TEST( 'compareImageUtil cornerValue, findCornerPoints, adjustCornerPointsSubPixel', function test() {
   var sum = function(image, l, t, w, h) {
     image = compareImageUtil.makeRegion(image, l, t, w, h);
     var r = 0, g = 0, b = 0, a = 0;
@@ -677,7 +677,7 @@ TEST( 'compareImageUtil cornerValue, findCornerPoints', function test() {
 
   var image1 = compareImageUtil.makeImage(50, 50);
   compareImageUtil.fill(image1, 0, 0, 0, 255);
-  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 12);
+  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 16);
   compareImageUtil.fill(region1, 255, 255, 255, 255);
 
   var result1 = compareImageUtil.cornerValue(image1);
@@ -685,12 +685,12 @@ TEST( 'compareImageUtil cornerValue, findCornerPoints', function test() {
   EXPECT_EQ( 0, sum(result1, 22, 0, 16, 50)[0] );
   EXPECT_EQ( 0, sum(result1, 42, 0, 8, 50)[0] );
   EXPECT_EQ( 0, sum(result1, 0, 0, 50, 18)[0] );
-  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 8)[0] );
-  EXPECT_EQ( 0, sum(result1, 0, 34, 50, 16)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 12)[0] );
+  EXPECT_EQ( 0, sum(result1, 0, 38, 50, 12)[0] );
   EXPECT( 0 < sum(result1, 18, 18, 4, 4)[0] );
   EXPECT( 0 < sum(result1, 38, 18, 4, 4)[0] );
-  EXPECT( 0 < sum(result1, 18, 30, 4, 4)[0] );
-  EXPECT( 0 < sum(result1, 38, 30, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 18, 34, 4, 4)[0] );
+  EXPECT( 0 < sum(result1, 38, 34, 4, 4)[0] );
 
   var distance = function(p1, p2) {
     if (!p1 || !p2) {
@@ -702,14 +702,24 @@ TEST( 'compareImageUtil cornerValue, findCornerPoints', function test() {
   var corners = compareImageUtil.findCornerPoints(image1);
   EXPECT_EQ( 4, corners.length );
   var expected = [
-    { x: 20, y: 20 },
-    { x: 40, y: 20 },
-    { x: 20, y: 32 },
-    { x: 40, y: 32 }
+    { x: 19.5, y: 19.5 },
+    { x: 39.5, y: 19.5 },
+    { x: 19.5, y: 35.5 },
+    { x: 39.5, y: 35.5 }
   ];
   for (var i = 0; i < expected.length; ++i) {
     for (var j = 0; j < corners.length; ++j) {
       if (2 >= distance(corners[j], expected[j])) {
+        break;
+      }
+    }
+    EXPECT( j < corners.length );
+  }
+
+  compareImageUtil.adjustCornerPointsSubPixel(image1, corners);
+  for (var i = 0; i < expected.length; ++i) {
+    for (var j = 0; j < corners.length; ++j) {
+      if (0.1 >= distance(corners[j], expected[j])) {
         break;
       }
     }
