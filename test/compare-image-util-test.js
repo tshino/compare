@@ -274,6 +274,27 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 1] );
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 2] );
   EXPECT_EQ( 55, image1.data[300 * 4 * 60 + 119 * 4 + 3] );
+
+  for (var i = 0; i < 240000; ++i) {
+    image1.data[i] = 55;
+  }
+  var region2 = compareImageUtil.makeRegion(image1, 0, 0, 0, 0);
+  compareImageUtil.fill(region2, 10, 10, 10, 10);
+  var region3 = compareImageUtil.makeRegion(image1, 1, 0, 0, 0);
+  compareImageUtil.fill(region3, 20, 20, 20, 20);
+  var region4 = compareImageUtil.makeRegion(image1, -1, 0, 1, 1);
+  compareImageUtil.fill(region4, 30, 30, 30, 30);
+  var region5 = compareImageUtil.makeRegion(image1, 0, -1, 1, 1);
+  compareImageUtil.fill(region5, 40, 40, 40, 40);
+  var region6 = compareImageUtil.makeRegion(image1, 0, 0, 1, 0);
+  compareImageUtil.fill(region6, 50, 50, 50, 50);
+  var region7 = compareImageUtil.makeRegion(image1, 0, 0, 0, 1);
+  compareImageUtil.fill(region7, 60, 60, 60, 60);
+
+  EXPECT_EQ( 55, image1.data[0] );
+  EXPECT_EQ( 55, image1.data[1] );
+  EXPECT_EQ( 55, image1.data[2] );
+  EXPECT_EQ( 55, image1.data[3] );
 });
 
 TEST( 'compareImageUtil copy', function test() {
