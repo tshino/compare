@@ -24,23 +24,15 @@
     var offset = image.offset !== undefined ? image.offset : 0;
     left   = left   !== undefined ? left   : 0;
     top    = top    !== undefined ? top    : 0;
-    width  = width  !== undefined ? width  : Math.max(0, image.width - left);
-    height = height !== undefined ? height : Math.max(0, image.height - top);
-    left   = Math.min(image.width,  left);
-    top    = Math.min(image.height, top);
-    width  = Math.min(image.width  - left, width);
-    height = Math.min(image.height - top,  height);
-    if (left < 0) {
-      width = Math.max(0, left + width);
-      left = 0;
-    }
-    if (top < 0) {
-      height = Math.max(0, top + height);
-      top = 0;
-    }
+    var right  = width  !== undefined ? left + width : image.width;
+    var bottom = height !== undefined ? top + height : image.height;
+    left   = Math.max(0,    Math.min(image.width, left));
+    top    = Math.max(0,    Math.min(image.height, top));
+    right  = Math.max(left, Math.min(image.width, right));
+    bottom = Math.max(top,  Math.min(image.height, bottom));
     return {
-      width: width,
-      height: height,
+      width: right - left,
+      height: bottom - top,
       data: image.data,
       pitch: pitch,
       offset: offset + left + pitch * top
