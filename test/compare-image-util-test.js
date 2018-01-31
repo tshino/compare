@@ -513,7 +513,7 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   EXPECT_EQ( 40, image2.data[63] );
 });
 
-TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
+TEST( 'compareImageUtil convolution, sobelX, sobelY, scharrX, scharrY', function test() {
   var makeImageForConvolutionTest = function(bitmap) {
     var image = compareImageUtil.makeImage(4, 4);
     for (var i = 0; i < 16; ++i) {
@@ -627,6 +627,22 @@ TEST( 'compareImageUtil convolution, sobelX, sobelY', function test() {
       0,   0,    0,   0,
     -10, -20,  -10,   0,
       0,   0,    0,   0
+  ]);
+  var result8 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.scharrX(result8, image2);
+  checkConvolutionResult('result8 (scharrX)', result8, [
+     30,  0,  -30,  0,
+    100,  0, -100,  0,
+     30,  0,  -30,  0,
+      0,  0,    0,  0
+  ]);
+  var result9 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.scharrY(result9, image2);
+  checkConvolutionResult('result9 (scharrY)', result9, [
+     30,  100,  30,   0,
+      0,    0,   0,   0,
+    -30, -100, -30,   0,
+      0,    0,   0,   0
   ]);
 });
 

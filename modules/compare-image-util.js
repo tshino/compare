@@ -469,6 +469,20 @@
       -1, -2, -1
     ]);
   };
+  var scharrX = function(dest, src) {
+    convolution(dest, src, { w: 3, h: 3 }, [
+       3, 0,  -3,
+      10, 0, -10,
+       3, 0,  -3
+    ]);
+  };
+  var scharrY = function(dest, src) {
+    convolution(dest, src, { w: 3, h: 3 }, [
+       3,  10,  3,
+       0,   0,  0,
+      -3, -10, -3
+    ]);
+  };
   var dilate3x1 = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
@@ -921,6 +935,8 @@
     convolution:    convolution,
     sobelX:         sobelX,
     sobelY:         sobelY,
+    scharrX:        scharrX,
+    scharrY:        scharrY,
     dilate3x1:      dilate3x1,
     dilate1x3:      dilate1x3,
     dilate3x3:      dilate3x3,
