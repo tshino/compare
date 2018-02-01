@@ -156,6 +156,16 @@ TEST( 'compareImageUtil makeRegion empty-range', function test() {
   EXPECT_EQ( 0, region11.width * region11.height );
   EXPECT_EQ( 300, region11.pitch );
   EXPECT( image1.data === region11.data );
+
+  var region12 = compareImageUtil.makeRegion(image1, 0, 0, -50, -50);
+  EXPECT_EQ( 0, region12.width * region12.height );
+  EXPECT_EQ( 300, region12.pitch );
+  EXPECT( image1.data === region12.data );
+
+  var region13 = compareImageUtil.makeRegion(image1, 50, 50, -50, -50);
+  EXPECT_EQ( 0, region13.width * region13.height );
+  EXPECT_EQ( 300, region13.pitch );
+  EXPECT( image1.data === region13.data );
 });
 
 TEST( 'compareImageUtil makeRegion too-big-range', function test() {
