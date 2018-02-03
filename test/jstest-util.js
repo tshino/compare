@@ -1,4 +1,15 @@
 ﻿var jsTestUtil = (function() {
+  var expectEqualArray = function(a, b, label) {
+    label = label !== undefined ? ' (' + label + ')' : '';
+    EXPECT( undefined !== a.length );
+    EXPECT( undefined !== b.length );
+    EXPECT_EQ( a.length, b.length, 'the lengths of the arrays' + label + ' are different');
+    if (a.length === b.length) {
+      for (var i = 0; i < a.length; i++) {
+        EXPECT_EQ( a[i], b[i], 'the value of ' + (i + 1) + 'th element of the arrays' + label + ' are different');
+      }
+    }
+  };
   var makeSequentialTest = function(tests) {
     return function(done) {
       var runRest = done;
@@ -52,6 +63,42 @@
     return 'data:application/octet-stream;base64,' + btoa(str);
   };
   var makeSelfTest = function() {
+    var expectEqualArrayTest = function() {
+      var backup = { e: EXPECT, eq: EXPECT_EQ };
+      var result = true;
+      EXPECT = function(e) {
+        if (!e) result = false;
+      };
+      EXPECT_EQ = function(a, b) {
+        if (a !== b) result = false;
+      };
+
+      result = true; expectEqualArray([], []);
+      backup.eq( true, result );
+      result = true; expectEqualArray([1, 2], [1, 2]);
+      backup.eq( true, result );
+      result = true; expectEqualArray([3, 4], [1, 2]);
+      backup.eq( false, result );
+      result = true; expectEqualArray([1, 2, 3, 4], [1, 2]);
+      backup.eq( false, result );
+      result = true; expectEqualArray([1, 2], [1, 2, 3, 4]);
+      backup.eq( false, result );
+      result = true; expectEqualArray([0], []);
+      backup.eq( false, result );
+      result = true; expectEqualArray([1, 2], []);
+      backup.eq( false, result );
+      result = true; expectEqualArray([], [0]);
+      backup.eq( false, result );
+      result = true; expectEqualArray([], [1, 2]);
+      backup.eq( false, result );
+      result = true; expectEqualArray({}, {});
+      backup.eq( false, result );
+      result = true; expectEqualArray(1, 1);
+      backup.eq( false, result );
+
+      EXPECT = backup.e;
+      EXPECT_EQ = backup.eq;
+    };
     var asyncTestTest = function(done) {
       window.setTimeout(function() {
         EXPECT( true );
@@ -128,6 +175,7 @@
       EXPECT_EQ( 'data:application/octet-stream;base64,SGVsbG8sIHdvcmxkIQo=', datauri );
     };
     return makeSequentialTest([
+      expectEqualArrayTest,
       asyncTestTest,
       sequentialTestTest,
       readFileTest,
@@ -165,6 +213,7 @@
     };
   };
   return {
+    expectEqualArray: expectEqualArray,
     makeSequentialTest: makeSequentialTest,
     readFile: readFile,
     dataURIFromArrayBuffer: dataURIFromArrayBuffer,
