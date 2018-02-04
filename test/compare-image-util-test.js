@@ -315,24 +315,13 @@ TEST( 'compareImageUtil copy', function test() {
   var image1 = compareImageUtil.makeImage(imageData);
   var image2 = compareImageUtil.makeImage(2, 2);
   compareImageUtil.copy(image2, image1);
+
   EXPECT_EQ( 2, image2.width );
   EXPECT_EQ( 2, image2.height );
-  EXPECT_EQ( 0, image2.data[0] );
-  EXPECT_EQ( 1, image2.data[1] );
-  EXPECT_EQ( 2, image2.data[2] );
-  EXPECT_EQ( 3, image2.data[3] );
-  EXPECT_EQ( 4, image2.data[4] );
-  EXPECT_EQ( 5, image2.data[5] );
-  EXPECT_EQ( 6, image2.data[6] );
-  EXPECT_EQ( 7, image2.data[7] );
-  EXPECT_EQ( 16, image2.data[8] );
-  EXPECT_EQ( 17, image2.data[9] );
-  EXPECT_EQ( 18, image2.data[10] );
-  EXPECT_EQ( 19, image2.data[11] );
-  EXPECT_EQ( 20, image2.data[12] );
-  EXPECT_EQ( 21, image2.data[13] );
-  EXPECT_EQ( 22, image2.data[14] );
-  EXPECT_EQ( 23, image2.data[15] );
+  jsTestUtil.expectEqualArray( [
+    0, 1, 2, 3,  4, 5, 6, 7,
+    16, 17, 18, 19,  20, 21, 22, 23
+  ], image2.data );
 });
 
 TEST( 'compareImageUtil readSubPixel', function test() {
@@ -418,22 +407,12 @@ TEST( 'compareImageUtil resizeNN', function test() {
   compareImageUtil.fill(image1, 10, 20, 30, 40);
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeNN(image2, image1);
-  EXPECT_EQ( 10, image2.data[0] );
-  EXPECT_EQ( 20, image2.data[1] );
-  EXPECT_EQ( 30, image2.data[2] );
-  EXPECT_EQ( 40, image2.data[3] );
-  EXPECT_EQ( 10, image2.data[20] );
-  EXPECT_EQ( 20, image2.data[21] );
-  EXPECT_EQ( 30, image2.data[22] );
-  EXPECT_EQ( 40, image2.data[23] );
-  EXPECT_EQ( 10, image2.data[36] );
-  EXPECT_EQ( 20, image2.data[37] );
-  EXPECT_EQ( 30, image2.data[38] );
-  EXPECT_EQ( 40, image2.data[39] );
-  EXPECT_EQ( 10, image2.data[60] );
-  EXPECT_EQ( 20, image2.data[61] );
-  EXPECT_EQ( 30, image2.data[62] );
-  EXPECT_EQ( 40, image2.data[63] );
+  jsTestUtil.expectEqualArray( [
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40
+  ], image2.data );
 
   image1.data[0] = 255;
   image1.data[1] = 255;
@@ -441,30 +420,12 @@ TEST( 'compareImageUtil resizeNN', function test() {
   image1.data[3] = 255;
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeNN(image2, image1);
-  EXPECT_EQ( 255, image2.data[0] );
-  EXPECT_EQ( 255, image2.data[1] );
-  EXPECT_EQ( 255, image2.data[2] );
-  EXPECT_EQ( 255, image2.data[3] );
-  EXPECT_EQ( 255, image2.data[20] );
-  EXPECT_EQ( 255, image2.data[21] );
-  EXPECT_EQ( 255, image2.data[22] );
-  EXPECT_EQ( 255, image2.data[23] );
-  EXPECT_EQ( 10, image2.data[24] );
-  EXPECT_EQ( 20, image2.data[25] );
-  EXPECT_EQ( 30, image2.data[26] );
-  EXPECT_EQ( 40, image2.data[27] );
-  EXPECT_EQ( 10, image2.data[36] );
-  EXPECT_EQ( 20, image2.data[37] );
-  EXPECT_EQ( 30, image2.data[38] );
-  EXPECT_EQ( 40, image2.data[39] );
-  EXPECT_EQ( 10, image2.data[40] );
-  EXPECT_EQ( 20, image2.data[41] );
-  EXPECT_EQ( 30, image2.data[42] );
-  EXPECT_EQ( 40, image2.data[43] );
-  EXPECT_EQ( 10, image2.data[60] );
-  EXPECT_EQ( 20, image2.data[61] );
-  EXPECT_EQ( 30, image2.data[62] );
-  EXPECT_EQ( 40, image2.data[63] );
+  jsTestUtil.expectEqualArray( [
+    255, 255, 255, 255,  255, 255, 255, 255,  10, 20, 30, 40,  10, 20, 30, 40,
+    255, 255, 255, 255,  255, 255, 255, 255,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40
+  ], image2.data );
 });
 
 TEST( 'compareImageUtil resizeBilinear', function test() {
@@ -474,22 +435,12 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   compareImageUtil.fill(image1, 10, 20, 30, 40);
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeBilinear(image2, image1);
-  EXPECT_EQ( 10, image2.data[0] );
-  EXPECT_EQ( 20, image2.data[1] );
-  EXPECT_EQ( 30, image2.data[2] );
-  EXPECT_EQ( 40, image2.data[3] );
-  EXPECT_EQ( 10, image2.data[20] );
-  EXPECT_EQ( 20, image2.data[21] );
-  EXPECT_EQ( 30, image2.data[22] );
-  EXPECT_EQ( 40, image2.data[23] );
-  EXPECT_EQ( 10, image2.data[36] );
-  EXPECT_EQ( 20, image2.data[37] );
-  EXPECT_EQ( 30, image2.data[38] );
-  EXPECT_EQ( 40, image2.data[39] );
-  EXPECT_EQ( 10, image2.data[60] );
-  EXPECT_EQ( 20, image2.data[61] );
-  EXPECT_EQ( 30, image2.data[62] );
-  EXPECT_EQ( 40, image2.data[63] );
+  jsTestUtil.expectEqualArray( [
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40
+  ], image2.data );
 
   image1.data[0] = 255;
   image1.data[1] = 255;
@@ -497,30 +448,12 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   image1.data[3] = 255;
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeBilinear(image2, image1);
-  EXPECT_EQ( 255, image2.data[0] );
-  EXPECT_EQ( 255, image2.data[1] );
-  EXPECT_EQ( 255, image2.data[2] );
-  EXPECT_EQ( 255, image2.data[3] );
-  EXPECT_EQ( 148, image2.data[20] );
-  EXPECT_EQ( 152, image2.data[21] );
-  EXPECT_EQ( 157, image2.data[22] );
-  EXPECT_EQ( 161, image2.data[23] );
-  EXPECT_EQ( 56, image2.data[24] );
-  EXPECT_EQ( 64, image2.data[25] );
-  EXPECT_EQ( 72, image2.data[26] );
-  EXPECT_EQ( 80, image2.data[27] );
-  EXPECT_EQ( 56, image2.data[36] );
-  EXPECT_EQ( 64, image2.data[37] );
-  EXPECT_EQ( 72, image2.data[38] );
-  EXPECT_EQ( 80, image2.data[39] );
-  EXPECT_EQ( 25, image2.data[40] );
-  EXPECT_EQ( 35, image2.data[41] );
-  EXPECT_EQ( 44, image2.data[42] );
-  EXPECT_EQ( 53, image2.data[43] );
-  EXPECT_EQ( 10, image2.data[60] );
-  EXPECT_EQ( 20, image2.data[61] );
-  EXPECT_EQ( 30, image2.data[62] );
-  EXPECT_EQ( 40, image2.data[63] );
+  jsTestUtil.expectEqualArray( [
+    255, 255, 255, 255,  194, 196, 199, 201,  71, 79, 86, 94,  10, 20, 30, 40,
+    194, 196, 199, 201,  148, 152, 157, 161,  56, 64, 72, 80,  10, 20, 30, 40,
+    71, 79, 86, 94,  56, 64, 72, 80,  25, 35, 44, 53,  10, 20, 30, 40,
+    10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40
+  ], image2.data );
 });
 
 TEST( 'compareImageUtil convolution, sobelX, sobelY, scharrX, scharrY', function test() {
