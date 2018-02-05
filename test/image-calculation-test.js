@@ -83,4 +83,41 @@
       },
     ])(done);
   });
+  TEST( 'compare-worker.js calcMetrics', function test(done) {
+    jsTestUtil.makeSequentialTest([
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
+          imageData: [{
+            width: 4,
+            height: 4,
+            data: [
+              0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+              0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+              0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+              0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+            ]
+          },{
+            width: 4,
+            height: 4,
+            data: [
+              0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+              0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+              0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+              0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+            ]
+          }]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.mse );
+          //EXPECT_EQ( 1, data.result.ncc );
+          EXPECT_EQ( 0, data.result.ae );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+    ])(done);
+  });
 })();
