@@ -420,6 +420,12 @@ var changeLang = function(lang) {
 					<span class="ja">3次元色分布</span>
 					<span class="flat keys"><span>c</span></span>
 				</button>
+				<button id="colorfreqbtn">
+					<img src="res/histogram.svg" width="20" alt="icon">
+					<span class="en">Frequency of Colors</span>
+					<span class="ja">色の頻度</span>
+					<span class="flat keys"><span>u</span></span>
+				</button>
 				<button id="metricsbtn">
 					<img src="res/psnr.svg" width="20" alt="icon">
 					<span class="en">Image Quality Metrics (PSNR,MSE, etc)</span>
@@ -515,6 +521,21 @@ var changeLang = function(lang) {
 				</div>
 			</div>
 			<table id="colorDistTable">
+				<tr><td></tr>
+				<tr><td></tr>
+			</table>
+		</div>
+	</div>
+	<div id="colorFreq" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/histogram.svg" width="20" alt="icon">
+					<span class="en">Frequency of Colors</span>
+					<span class="ja">色の頻度</span>
+				</h3>
+			</div>
+			<table id="colorFreqTable">
 				<tr><td></tr>
 				<tr><td></tr>
 			</table>

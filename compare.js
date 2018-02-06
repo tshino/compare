@@ -26,6 +26,7 @@
   $('#waveformbtn').click(waveformDialog.toggle);
   $('#vectorscopebtn').click(vectorscopeDialog.toggle);
   $('#colordistbtn').click(colorDistDialog.toggle);
+  $('#colorfreqbtn').click(colorFreqDialog.toggle);
   $('#metricsbtn').click(metricsDialog.toggle);
   $('#tonecurvebtn').click(toneCurveDialog.toggle);
   $('#diffbtn').click(diffDialog.toggle);
@@ -164,8 +165,9 @@
     // 'Q' (81)
     81 : { global: false, func: altView.changeModeReverse },
     // 'l' (108)
-    108 : { global: false, func: altView.toggleContour }
-
+    108 : { global: false, func: altView.toggleContour },
+    // 'u'
+    117 : { global: true, func: colorFreqDialog.toggle }
   };
   $(window).keypress(function(e) {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
@@ -1395,7 +1397,11 @@
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
-      colorDistDialog.updateFigure(entries[data.index[0]]);
+      if ($('#colorDist').is(':visible')) {
+        colorDistDialog.updateFigure(entries[data.index[0]]);
+      } else {
+        colorFreqDialog.updateFigure(entries[data.index[0]]);
+      }
       break;
     case 'calcMetrics':
       entries[data.index[0]].metrics[data.index[1]] = data.result;
@@ -2051,6 +2057,66 @@
       toggle: toggle,
       processKeyDown: processKeyDown,
       enableMouseAndTouch: enableMouseAndTouch
+    };
+  })();
+  var colorFreqDialog = (function() {
+    var updateAsync = function(img) {
+      taskQueue.addTask({
+        cmd:      'calcColorTable',
+        index:    [img.index]
+      }, attachImageDataToTask);
+    };
+    var updateFigure = function(img) {
+      updateTable();
+    };
+    var updateTable = function() {
+      var target = $('#colorFreqTable');
+      target.find('td').remove();
+      for (var i = 0, img; img = images[i]; i++) {
+        var label = makeImageNameWithIndex('<td>', img);
+        target.find('tr').eq(0).append(label);
+        if (!img.colorTable) {
+          updateAsync(img);
+          continue;
+        }
+        var colors = img.colorTable.colors;
+        var counts = img.colorTable.counts;
+        var indirect = new Uint32Array(colors.length);
+        for (var k = 0; k < indirect.length; k++) {
+          indirect[k] = k;
+        }
+        indirect.sort(function(a, b) {
+          return counts[b] - counts[a];
+        });
+        var height = 640;
+        var fig = figureUtil.makeBlankFigure(256, height);
+        var context = fig.context;
+        context.fillStyle = '#666';
+        context.fillRect(0, 0, 256, height);
+        var topCount = counts[indirect[0]];
+        var num = Math.min(32, indirect.length);
+        for (var k = 0; k < num; k++) {
+          var rgb = colors[indirect[k]];
+          var count = counts[indirect[k]];
+          var frequency = count / topCount;
+          context.fillStyle = 'rgb(' + (rgb >> 16) + ',' + ((rgb >> 8) & 255) + ',' + (rgb & 255) + ')';
+          context.fillRect(
+            0, k / num * height,
+            256 * frequency, (k + 1) / num * height - k / num * height);
+        }
+        var cell = $('<td>').append($(fig.canvas).width(256).height(480));
+        target.find('tr').eq(1).append(cell);
+      }
+      if (i === 0) {
+        target.find('tr').eq(0).append(
+          $('<td>').text('no data')
+        );
+      }
+    };
+    var toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
+    return {
+      updateFigure: updateFigure,
+      toggle: toggle
     };
   })();
   var makeImageNameSelector = function(selectedIndex, onchange) {
