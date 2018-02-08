@@ -2079,25 +2079,46 @@
           updateAsync(img);
           continue;
         }
-        var colors = img.colorTable.colors;
-        var counts = img.colorTable.counts;
-        var indirect = new Uint32Array(colors.length);
-        for (var k = 0; k < indirect.length; k++) {
-          indirect[k] = k;
+        var colors_org = img.colorTable.colors;
+        var counts_org = img.colorTable.counts;
+        var length_org = counts_org.length;
+        //
+        var colors_map = [];
+        for (var k = 0; k < length_org; k++) {
+          var r = colors_org[k] >> 16;
+          var g = (colors_org[k] >> 8) & 255;
+          var b = colors_org[k] & 255;
+          r = Math.round(Math.round((r / 255) * 6) / 6 * 255);
+          g = Math.round(Math.round((g / 255) * 6) / 6 * 255);
+          b = Math.round(Math.round((b / 255) * 6) / 6 * 255);
+          colors_map[k] = [ (r << 16) + (g << 8) + b, counts_org[k] ];
         }
-        indirect.sort(function(a, b) {
-          return counts[b] - counts[a];
+        colors_map.sort(function(a, b) {
+          return b[0] - a[0]; // by color
+        });
+        var uniqueCount = 0;
+        for (var k = 1; k < colors_map.length; k++) {
+          if (colors_map[k - 1][0] !== colors_map[k][0]) {
+            uniqueCount += 1;
+            colors_map[uniqueCount] = colors_map[k];
+          } else {
+            colors_map[uniqueCount][1] += colors_map[k][1];
+          }
+        }
+        colors_map = colors_map.slice(0, uniqueCount);
+        colors_map.sort(function(a, b) {
+          return b[1] - a[1]; // by count
         });
         var height = 640;
         var fig = figureUtil.makeBlankFigure(256, height);
         var context = fig.context;
         context.fillStyle = '#666';
         context.fillRect(0, 0, 256, height);
-        var topCount = counts[indirect[0]];
-        var num = Math.min(32, indirect.length);
+        var topCount = colors_map[0][1];
+        var num = Math.min(32, colors_map.length);
         for (var k = 0; k < num; k++) {
-          var rgb = colors[indirect[k]];
-          var count = counts[indirect[k]];
+          var rgb = colors_map[k][0];
+          var count = colors_map[k][1];
           var frequency = count / topCount;
           context.fillStyle = 'rgb(' + (rgb >> 16) + ',' + ((rgb >> 8) & 255) + ',' + (rgb & 255) + ')';
           context.fillRect(
