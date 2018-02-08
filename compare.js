@@ -2096,13 +2096,13 @@
         colors_map.sort(function(a, b) {
           return b[0] - a[0]; // by color
         });
-        var uniqueCount = 0;
+        var uniqueCount = 1;
         for (var k = 1; k < colors_map.length; k++) {
           if (colors_map[k - 1][0] !== colors_map[k][0]) {
             uniqueCount += 1;
-            colors_map[uniqueCount] = colors_map[k];
+            colors_map[uniqueCount - 1] = colors_map[k];
           } else {
-            colors_map[uniqueCount][1] += colors_map[k][1];
+            colors_map[uniqueCount - 1][1] += colors_map[k][1];
           }
         }
         colors_map = colors_map.slice(0, uniqueCount);
