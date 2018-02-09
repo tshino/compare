@@ -2088,10 +2088,20 @@
           var r = colors_org[k] >> 16;
           var g = (colors_org[k] >> 8) & 255;
           var b = colors_org[k] & 255;
-          r = Math.round(Math.round((r / 255) * 6) / 6 * 255);
-          g = Math.round(Math.round((g / 255) * 6) / 6 * 255);
-          b = Math.round(Math.round((b / 255) * 6) / 6 * 255);
-          colors_map[k] = [ (r << 16) + (g << 8) + b, counts_org[k] ];
+          var y = 0.299 * r + 0.587 * g + 0.114 * b;
+          var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
+          var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
+          y = Math.round(Math.round((y / 255) * 3) / 3 * 255);
+          cb = Math.round(Math.round((cb / 255) * 5) / 5 * 255);
+          cr = Math.round(Math.round((cr / 255) * 5) / 5 * 255);
+          var count = counts_org[k];
+          colors_map[k] = [
+              (y << 16) + (cb << 8) + cr,
+              count,
+              r * count,
+              g * count,
+              b * count
+          ];
         }
         colors_map.sort(function(a, b) {
           return b[0] - a[0]; // by color
@@ -2103,6 +2113,9 @@
             colors_map[uniqueCount - 1] = colors_map[k];
           } else {
             colors_map[uniqueCount - 1][1] += colors_map[k][1];
+            colors_map[uniqueCount - 1][2] += colors_map[k][2];
+            colors_map[uniqueCount - 1][3] += colors_map[k][3];
+            colors_map[uniqueCount - 1][4] += colors_map[k][4];
           }
         }
         colors_map = colors_map.slice(0, uniqueCount);
@@ -2117,10 +2130,12 @@
         var topCount = colors_map[0][1];
         var num = Math.min(32, colors_map.length);
         for (var k = 0; k < num; k++) {
-          var rgb = colors_map[k][0];
           var count = colors_map[k][1];
+          var r = Math.round(colors_map[k][2] / count);
+          var g = Math.round(colors_map[k][3] / count);
+          var b = Math.round(colors_map[k][4] / count);
           var frequency = count / topCount;
-          context.fillStyle = 'rgb(' + (rgb >> 16) + ',' + ((rgb >> 8) & 255) + ',' + (rgb & 255) + ')';
+          context.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
           context.fillRect(
             0, k / num * height,
             256 * frequency, (k + 1) / num * height - k / num * height);
