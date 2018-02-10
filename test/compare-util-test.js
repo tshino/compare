@@ -56,6 +56,21 @@ TEST( 'compareUtil toPercent', function test() {
   EXPECT( compareUtil.toPercent(1)       === '100%' );
 });
 
+TEST( 'compareUtil toHexTriplet', function test() {
+  EXPECT_EQ( '#000000', compareUtil.toHexTriplet(0, 0, 0) );
+  EXPECT_EQ( '#010101', compareUtil.toHexTriplet(1, 1, 1) );
+  EXPECT_EQ( '#FFFFFF', compareUtil.toHexTriplet(255, 255, 255) );
+  EXPECT_EQ( '#0000FF', compareUtil.toHexTriplet(0, 0, 255) );
+  EXPECT_EQ( '#00FF00', compareUtil.toHexTriplet(0, 255, 0) );
+  EXPECT_EQ( '#FF0000', compareUtil.toHexTriplet(255, 0, 0) );
+  EXPECT_EQ( '#55AAFF', compareUtil.toHexTriplet(85, 170, 255) );
+  EXPECT_EQ( '#123456', compareUtil.toHexTriplet(18, 52, 86) );
+
+  EXPECT_EQ( '#000000', compareUtil.toHexTriplet(-1, -2, -3) );
+  EXPECT_EQ( '#FFFFFF', compareUtil.toHexTriplet(257, 300, 1000) );
+  EXPECT_EQ( '#101010', compareUtil.toHexTriplet(15.9, 16, 16.1) );
+});
+
 TEST( 'compareUtil binaryFromDataURI', function test() {
   // Hello, world!\n
   var datauri = 'data:;base64,SGVsbG8sIHdvcmxkIQo=';

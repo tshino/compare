@@ -117,6 +117,17 @@
     return (num * 100).toFixed(digits) + '%';
   };
 
+  var HexDigits = '0123456789ABCDEF';
+  var toHexTriplet = function(r, g, b) {
+    r = clamp(Math.round(r), 0, 255);
+    g = clamp(Math.round(g), 0, 255);
+    b = clamp(Math.round(b), 0, 255);
+    return '#' +
+        HexDigits[r >> 4] + HexDigits[r % 16] +
+        HexDigits[g >> 4] + HexDigits[g % 16] +
+        HexDigits[b >> 4] + HexDigits[b % 16];
+  };
+
   //
   // Make a binary view of a DataURI string
   //
@@ -1282,6 +1293,7 @@
     calcGCD:                calcGCD,
     addComma:               addComma,
     toPercent:              toPercent,
+    toHexTriplet:           toHexTriplet,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
