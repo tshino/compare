@@ -915,13 +915,6 @@
       if (!img.colorHUD) {
         return;
       }
-      var toCSS = function(rgb) {
-        var lut = '0123456789ABCDEF';
-        return '#' +
-            lut[rgb[0] >> 4] + lut[rgb[0] % 16] +
-            lut[rgb[1] >> 4] + lut[rgb[1] % 16] +
-            lut[rgb[2] >> 4] + lut[rgb[2] % 16];
-      };
       var cursor = crossCursor.getPosition(img.index);
       var x = cursor.x, y = cursor.y;
       var pos = img.interpretXY(x, y);
@@ -932,7 +925,7 @@
         var context = img.asCanvas.getContext('2d');
         var imageData = context.getImageData(pos.x, pos.y, 1, 1);
         var rgb = imageData.data;
-        var css = toCSS(rgb);
+        var css = compareUtil.toHexTriplet(rgb[0], rgb[1], rgb[2]);
         img.colorHUD.find('.colorSample').show().css('background', css);
         img.colorHUD.find('.colorBar').show().find('span').each(function(index) {
           $(this).css('width', (rgb[index]*127.5/255)+'px');
@@ -2129,16 +2122,21 @@
         context.fillRect(0, 0, 256, height);
         var topCount = colors_map[0][1];
         var num = Math.min(32, colors_map.length);
+        context.font = '14px sans-serif';
+        context.textAlign = 'right';
         for (var k = 0; k < num; k++) {
           var count = colors_map[k][1];
           var r = Math.round(colors_map[k][2] / count);
           var g = Math.round(colors_map[k][3] / count);
           var b = Math.round(colors_map[k][4] / count);
           var frequency = count / topCount;
-          context.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+          var rgb = compareUtil.toHexTriplet(r, g, b);
+          context.fillStyle = rgb;
           context.fillRect(
             0, k / num * height,
             256 * frequency, (k + 1) / num * height - k / num * height);
+          context.fillStyle = (frequency > 0.7 && r + g + b > 3 * 200) ? '#000' : '#fff';
+          context.fillText(rgb, 256 - 4, (k + 1) / num * height - 4);
         }
         var cell = $('<td>').append($(fig.canvas).width(256).height(480));
         target.find('tr').eq(1).append(cell);
