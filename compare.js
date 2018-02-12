@@ -2053,6 +2053,52 @@
     };
   })();
   var colorFreqDialog = (function() {
+    var makeReducedColorList = function(colorTable) {
+      var colors_org = colorTable.colors;
+      var counts_org = colorTable.counts;
+      var length_org = counts_org.length;
+      //
+      var colors_map = [];
+      for (var k = 0; k < length_org; k++) {
+        var r = colors_org[k] >> 16;
+        var g = (colors_org[k] >> 8) & 255;
+        var b = colors_org[k] & 255;
+        var y = 0.299 * r + 0.587 * g + 0.114 * b;
+        var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
+        var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
+        y = Math.round(Math.round((y / 255) * 3) / 3 * 255);
+        cb = Math.round(Math.round((cb / 255) * 5) / 5 * 255);
+        cr = Math.round(Math.round((cr / 255) * 5) / 5 * 255);
+        var count = counts_org[k];
+        colors_map[k] = [
+            (y << 16) + (cb << 8) + cr,
+            count,
+            r * count,
+            g * count,
+            b * count
+        ];
+      }
+      colors_map.sort(function(a, b) {
+        return b[0] - a[0]; // by color
+      });
+      var uniqueCount = 1;
+      for (var k = 1; k < colors_map.length; k++) {
+        if (colors_map[k - 1][0] !== colors_map[k][0]) {
+          uniqueCount += 1;
+          colors_map[uniqueCount - 1] = colors_map[k];
+        } else {
+          colors_map[uniqueCount - 1][1] += colors_map[k][1];
+          colors_map[uniqueCount - 1][2] += colors_map[k][2];
+          colors_map[uniqueCount - 1][3] += colors_map[k][3];
+          colors_map[uniqueCount - 1][4] += colors_map[k][4];
+        }
+      }
+      colors_map = colors_map.slice(0, uniqueCount);
+      colors_map.sort(function(a, b) {
+        return b[1] - a[1]; // by count
+      });
+      return colors_map;
+    };
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcColorTable',
@@ -2072,63 +2118,21 @@
           updateAsync(img);
           continue;
         }
-        var colors_org = img.colorTable.colors;
-        var counts_org = img.colorTable.counts;
-        var length_org = counts_org.length;
-        //
-        var colors_map = [];
-        for (var k = 0; k < length_org; k++) {
-          var r = colors_org[k] >> 16;
-          var g = (colors_org[k] >> 8) & 255;
-          var b = colors_org[k] & 255;
-          var y = 0.299 * r + 0.587 * g + 0.114 * b;
-          var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
-          var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
-          y = Math.round(Math.round((y / 255) * 3) / 3 * 255);
-          cb = Math.round(Math.round((cb / 255) * 5) / 5 * 255);
-          cr = Math.round(Math.round((cr / 255) * 5) / 5 * 255);
-          var count = counts_org[k];
-          colors_map[k] = [
-              (y << 16) + (cb << 8) + cr,
-              count,
-              r * count,
-              g * count,
-              b * count
-          ];
-        }
-        colors_map.sort(function(a, b) {
-          return b[0] - a[0]; // by color
-        });
-        var uniqueCount = 1;
-        for (var k = 1; k < colors_map.length; k++) {
-          if (colors_map[k - 1][0] !== colors_map[k][0]) {
-            uniqueCount += 1;
-            colors_map[uniqueCount - 1] = colors_map[k];
-          } else {
-            colors_map[uniqueCount - 1][1] += colors_map[k][1];
-            colors_map[uniqueCount - 1][2] += colors_map[k][2];
-            colors_map[uniqueCount - 1][3] += colors_map[k][3];
-            colors_map[uniqueCount - 1][4] += colors_map[k][4];
-          }
-        }
-        colors_map = colors_map.slice(0, uniqueCount);
-        colors_map.sort(function(a, b) {
-          return b[1] - a[1]; // by count
-        });
+        var color_list = makeReducedColorList(img.colorTable);
         var height = 640;
         var fig = figureUtil.makeBlankFigure(256, height);
         var context = fig.context;
         context.fillStyle = '#666';
         context.fillRect(0, 0, 256, height);
-        var topCount = colors_map[0][1];
-        var num = Math.min(32, colors_map.length);
+        var topCount = color_list[0][1];
+        var num = Math.min(32, color_list.length);
         context.font = '14px sans-serif';
         context.textAlign = 'right';
         for (var k = 0; k < num; k++) {
-          var count = colors_map[k][1];
-          var r = Math.round(colors_map[k][2] / count);
-          var g = Math.round(colors_map[k][3] / count);
-          var b = Math.round(colors_map[k][4] / count);
+          var count = color_list[k][1];
+          var r = Math.round(color_list[k][2] / count);
+          var g = Math.round(color_list[k][3] / count);
+          var b = Math.round(color_list[k][4] / count);
           var frequency = count / topCount;
           var rgb = compareUtil.toHexTriplet(r, g, b);
           context.fillStyle = rgb;
