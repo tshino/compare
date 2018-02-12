@@ -2099,6 +2099,32 @@
       });
       return colors_map;
     };
+    var drawFigure = function(colorList) {
+      var height = 640;
+      var fig = figureUtil.makeBlankFigure(256, height);
+      var context = fig.context;
+      context.fillStyle = '#666';
+      context.fillRect(0, 0, 256, height);
+      var topCount = colorList[0][1];
+      var num = Math.min(32, colorList.length);
+      context.font = '14px sans-serif';
+      context.textAlign = 'right';
+      for (var k = 0; k < num; k++) {
+        var count = colorList[k][1];
+        var r = Math.round(colorList[k][2] / count);
+        var g = Math.round(colorList[k][3] / count);
+        var b = Math.round(colorList[k][4] / count);
+        var frequency = count / topCount;
+        var rgb = compareUtil.toHexTriplet(r, g, b);
+        context.fillStyle = rgb;
+        context.fillRect(
+          0, k / num * height,
+          256 * frequency, (k + 1) / num * height - k / num * height);
+        context.fillStyle = (frequency > 0.7 && r + g + b > 3 * 200) ? '#000' : '#fff';
+        context.fillText(rgb, 256 - 4, (k + 1) / num * height - 4);
+      }
+      return $(fig.canvas).width(256).height(480);
+    };
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcColorTable',
@@ -2118,31 +2144,9 @@
           updateAsync(img);
           continue;
         }
-        var color_list = makeReducedColorList(img.colorTable);
-        var height = 640;
-        var fig = figureUtil.makeBlankFigure(256, height);
-        var context = fig.context;
-        context.fillStyle = '#666';
-        context.fillRect(0, 0, 256, height);
-        var topCount = color_list[0][1];
-        var num = Math.min(32, color_list.length);
-        context.font = '14px sans-serif';
-        context.textAlign = 'right';
-        for (var k = 0; k < num; k++) {
-          var count = color_list[k][1];
-          var r = Math.round(color_list[k][2] / count);
-          var g = Math.round(color_list[k][3] / count);
-          var b = Math.round(color_list[k][4] / count);
-          var frequency = count / topCount;
-          var rgb = compareUtil.toHexTriplet(r, g, b);
-          context.fillStyle = rgb;
-          context.fillRect(
-            0, k / num * height,
-            256 * frequency, (k + 1) / num * height - k / num * height);
-          context.fillStyle = (frequency > 0.7 && r + g + b > 3 * 200) ? '#000' : '#fff';
-          context.fillText(rgb, 256 - 4, (k + 1) / num * height - 4);
-        }
-        var cell = $('<td>').append($(fig.canvas).width(256).height(480));
+        var colorList = makeReducedColorList(img.colorTable);
+        var figure = drawFigure(colorList);
+        var cell = $('<td>').append(figure);
         target.find('tr').eq(1).append(cell);
       }
       if (i === 0) {
