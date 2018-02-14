@@ -2058,7 +2058,7 @@
       var counts_org = colorTable.counts;
       var length_org = counts_org.length;
       //
-      var colors_map = [];
+      var colorList = [];
       for (var k = 0; k < length_org; k++) {
         var r = colors_org[k] >> 16;
         var g = (colors_org[k] >> 8) & 255;
@@ -2070,7 +2070,7 @@
         cb = Math.round(Math.round((cb / 255) * 5) / 5 * 255);
         cr = Math.round(Math.round((cr / 255) * 5) / 5 * 255);
         var count = counts_org[k];
-        colors_map[k] = [
+        colorList[k] = [
             (y << 16) + (cb << 8) + cr,
             count,
             r * count,
@@ -2078,26 +2078,26 @@
             b * count
         ];
       }
-      colors_map.sort(function(a, b) {
+      colorList.sort(function(a, b) {
         return b[0] - a[0]; // by color
       });
       var uniqueCount = 1;
-      for (var k = 1; k < colors_map.length; k++) {
-        if (colors_map[k - 1][0] !== colors_map[k][0]) {
+      for (var k = 1; k < colorList.length; k++) {
+        if (colorList[k - 1][0] !== colorList[k][0]) {
           uniqueCount += 1;
-          colors_map[uniqueCount - 1] = colors_map[k];
+          colorList[uniqueCount - 1] = colorList[k];
         } else {
-          colors_map[uniqueCount - 1][1] += colors_map[k][1];
-          colors_map[uniqueCount - 1][2] += colors_map[k][2];
-          colors_map[uniqueCount - 1][3] += colors_map[k][3];
-          colors_map[uniqueCount - 1][4] += colors_map[k][4];
+          colorList[uniqueCount - 1][1] += colorList[k][1];
+          colorList[uniqueCount - 1][2] += colorList[k][2];
+          colorList[uniqueCount - 1][3] += colorList[k][3];
+          colorList[uniqueCount - 1][4] += colorList[k][4];
         }
       }
-      colors_map = colors_map.slice(0, uniqueCount);
-      colors_map.sort(function(a, b) {
+      colorList = colorList.slice(0, uniqueCount);
+      colorList.sort(function(a, b) {
         return b[1] - a[1]; // by count
       });
-      return colors_map;
+      return colorList;
     };
     var drawFigure = function(colorList) {
       var height = 640;
