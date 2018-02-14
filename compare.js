@@ -2067,7 +2067,7 @@
         var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
         var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
         y = Math.round(Math.round((y / 255) * 3) / 3 * 255);
-        var div = y < 128 ? 3 : 5;
+        var div = y < 128 ? 4 : 6;
         cb = Math.round(Math.round((cb / 255) * div) / div * 255);
         cr = Math.round(Math.round((cr / 255) * div) / div * 255);
         var count = counts_org[k];
