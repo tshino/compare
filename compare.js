@@ -2053,6 +2053,12 @@
     };
   })();
   var colorFreqDialog = (function() {
+    var rgbToYcbcr = function(r, g, b) {
+      var y = 0.299 * r + 0.587 * g + 0.114 * b;
+      var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
+      var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
+      return [y, cb, cr];
+    };
     var makeReducedColorList = function(colorTable) {
       var colors_org = colorTable.colors;
       var counts_org = colorTable.counts;
@@ -2063,13 +2069,11 @@
         var r = colors_org[k] >> 16;
         var g = (colors_org[k] >> 8) & 255;
         var b = colors_org[k] & 255;
-        var y = 0.299 * r + 0.587 * g + 0.114 * b;
-        var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
-        var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
-        y = Math.round(Math.round((y / 255) * 3) / 3 * 255);
+        var ycbcr = rgbToYcbcr(r, g, b);
+        var y = Math.round(Math.round((ycbcr[0] / 255) * 3) / 3 * 255);
         var div = y < 128 ? 4 : 6;
-        cb = Math.round(Math.round((cb / 255) * div) / div * 255);
-        cr = Math.round(Math.round((cr / 255) * div) / div * 255);
+        var cb = Math.round(Math.round((ycbcr[1] / 255) * div) / div * 255);
+        var cr = Math.round(Math.round((ycbcr[2] / 255) * div) / div * 255);
         var count = counts_org[k];
         colorList[k] = [
             (y << 16) + (cb << 8) + cr,
