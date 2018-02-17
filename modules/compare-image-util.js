@@ -878,6 +878,48 @@
       }
     }
   };
+  var sparseOpticalFlow = function(image1, image2, points) {
+    var nextPoints = [];
+    var dx1 = makeImage(image1.width, image1.height);
+    var dy1 = makeImage(image1.width, image1.height);
+    scharrX(dx1, image1);
+    scharrY(dy1, image1);
+    for (var i = 0, p; p = points[i]; i++) {
+      var np = { x: p.x, y: p.y };
+      var i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
+      var dxw = readSubPixel(dx1, p.x - 7, p.y - 7, 15, 15);
+      var dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);
+      var axx = 0, axy = 0, ayy = 0;
+      for (var k = 0; k < 15 * 15; k++) {
+        var dx = dxw.data[k];
+        var dy = dyw.data[k];
+        axx += dx * dx;
+        axy += dx * dy;
+        ayy += dy * dy;
+      }
+      var d = axx * ayy - axy * axy;
+      var e = (axx + ayy - Math.sqrt((axx - ayy) * (axx - ayy) + 4 * axy * axy)) / (2 * 15 * 15);
+      if (e < 0.001 || d < 0.00001) {
+        nextPoints[i] = null;
+        continue;
+      }
+      var id = 1 / d;
+      var nx = np.x, ny = np.y;
+      for (var j = 0; j < 20; j++) {
+        var i2w = readSubPixel(image2, np.x - 7, np.y - 7, 15, 15);
+        var bx = 0, by = 0;
+        for (var k = 0; k < 15 * 15; k++) {
+          var di = i2w.data[k] - i1w.data[k];
+          bx += di * dxw.data[k];
+          by += di * dyw.data[k];
+        }
+        np.x += (axy * by - ayy * bx) * id;
+        np.y += (axy * bx - axx * by) * id;
+      }
+      nextPoints[i] = np;
+    }
+    return nextPoints;
+  };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
@@ -944,6 +986,7 @@
     cornerValue:    cornerValue,
     findCornerPoints: findCornerPoints,
     adjustCornerPointsSubPixel: adjustCornerPointsSubPixel,
+    sparseOpticalFlow: sparseOpticalFlow,
     getUniqueColors: getUniqueColors
   };
 })();
