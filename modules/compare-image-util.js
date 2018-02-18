@@ -1,21 +1,39 @@
 ﻿var compareImageUtil = (function() {
 
-  var makeImage = function(a, b) {
+  var U8x4  = 0x0104;
+  var F32x1 = 0x0401;
+
+  var channelsOf = function(type) {
+    return type ? (type & 0x00ff) : 0x0004;
+  };
+  var newArrayOf = function(type, size) {
+    var elementType = type ? (type & 0xff00) : 0x0100;
+    if (elementType === 0x0400) {
+      return new Float32Array(size);
+    } else { // 0x0100
+      return new Uint8Array(size);
+    }
+  };
+
+  var makeImage = function(a, b, c) {
     if (b === undefined) {
       return {
         width:  a.width,
         height: a.height,
         data:   a.data,
         pitch:  (a.pitch !== undefined ? a.pitch : a.width),
-        offset: (a.offset !== undefined ? a.offset : 0)
+        offset: (a.offset !== undefined ? a.offset : 0),
+        channels: (a.channels !== undefined ? a.channels : 4)
       };
     } else {
+      var ch = channelsOf(c);
       return {
         width:    a,
         height:   b,
-        data:     new Uint8Array(a * b * 4),
+        data:     newArrayOf(c, a * b * ch),
         pitch:    a,
-        offset:   0
+        offset:   0,
+        channels: ch
       };
     }
   };
@@ -966,6 +984,10 @@
     };
   };
   return {
+    U8x4:           U8x4,
+    F32x1:          F32x1,
+    channelsOf:     channelsOf,
+    newArrayOf:     newArrayOf,
     makeImage:      makeImage,
     makeRegion:     makeRegion,
     fill:           fill,
