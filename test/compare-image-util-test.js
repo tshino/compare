@@ -1,27 +1,27 @@
 ﻿TEST( 'compareImageUtil channelsOf', function test() {
   var channelsOf = compareImageUtil.channelsOf;
-  EXPECT_EQ( 4, channelsOf(compareImageUtil.U8x4) );
-  EXPECT_EQ( 1, channelsOf(compareImageUtil.F32x1) );
+  EXPECT_EQ( 4, channelsOf(compareImageUtil.FORMAT_U8x4) );
+  EXPECT_EQ( 1, channelsOf(compareImageUtil.FORMAT_F32x1) );
   EXPECT_EQ( 4, channelsOf() );
   EXPECT_EQ( 4, channelsOf(null) );
 });
 
 TEST( 'compareImageUtil newArrayOf', function test() {
   var newArrayOf = compareImageUtil.newArrayOf;
-  var u8_0 = newArrayOf(compareImageUtil.U8x4, 0);
+  var u8_0 = newArrayOf(compareImageUtil.FORMAT_U8x4, 0);
   EXPECT_EQ( 0, u8_0.length );
-  var u8_1 = newArrayOf(compareImageUtil.U8x4, 1);
+  var u8_1 = newArrayOf(compareImageUtil.FORMAT_U8x4, 1);
   EXPECT_EQ( 1, u8_1.length );
   EXPECT_EQ( 'number', typeof u8_1[0] );
-  var u8_100 = newArrayOf(compareImageUtil.U8x4, 100);
+  var u8_100 = newArrayOf(compareImageUtil.FORMAT_U8x4, 100);
   EXPECT_EQ( 100, u8_100.length );
   EXPECT_EQ( 'number', typeof u8_100[0] );
-  var f8_0 = newArrayOf(compareImageUtil.F32x1, 0);
+  var f8_0 = newArrayOf(compareImageUtil.FORMAT_F32x1, 0);
   EXPECT_EQ( 0, f8_0.length );
-  var f8_1 = newArrayOf(compareImageUtil.F32x1, 1);
+  var f8_1 = newArrayOf(compareImageUtil.FORMAT_F32x1, 1);
   EXPECT_EQ( 1, f8_1.length );
   EXPECT_EQ( 'number', typeof f8_1[0] );
-  var f8_100 = newArrayOf(compareImageUtil.F32x1, 100);
+  var f8_100 = newArrayOf(compareImageUtil.FORMAT_F32x1, 100);
   EXPECT_EQ( 100, f8_100.length );
   EXPECT_EQ( 'number', typeof f8_100[0] );
 });
@@ -85,7 +85,7 @@ TEST( 'compareImageUtil makeImage', function test() {
 });
 
 TEST( 'compareImageUtil makeImage F32', function test() {
-  var image0x0 = compareImageUtil.makeImage(0, 0, compareImageUtil.F32x1);
+  var image0x0 = compareImageUtil.makeImage(0, 0, compareImageUtil.FORMAT_F32x1);
   EXPECT_EQ( 0, image0x0.width );
   EXPECT_EQ( 0, image0x0.height );
   EXPECT_EQ( 0, image0x0.pitch );
@@ -93,7 +93,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT_EQ( 0, image0x0.offset );
   EXPECT_EQ( 1, image0x0.channels );
 
-  var image1x1 = compareImageUtil.makeImage(1, 1, compareImageUtil.F32x1);
+  var image1x1 = compareImageUtil.makeImage(1, 1, compareImageUtil.FORMAT_F32x1);
   EXPECT_EQ( 1, image1x1.width );
   EXPECT_EQ( 1, image1x1.height );
   EXPECT_EQ( 1, image1x1.pitch );
@@ -101,7 +101,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT_EQ( 0, image1x1.offset );
   EXPECT_EQ( 1, image1x1.channels );
 
-  var image1 = compareImageUtil.makeImage(300, 200, compareImageUtil.F32x1);
+  var image1 = compareImageUtil.makeImage(300, 200, compareImageUtil.FORMAT_F32x1);
   EXPECT_EQ( 300, image1.width );
   EXPECT_EQ( 200, image1.height );
   EXPECT_EQ( 300, image1.pitch );
@@ -475,6 +475,12 @@ TEST( 'compareImageUtil convertToGrayscale', function test() {
       EXPECT_EQ( expected[i * 2 + 1], result.data[i * 4 + 3], label + ' (alpha)' );
     }
   };
+  var checkGrayscaleResultF32 = function(name, result, expected) {
+    for (var i = 0; i < 16; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT( 1e-4 > Math.abs(expected[i] - result.data[i]), label );
+    }
+  };
   var imageData = { width: 4, height: 4, data: [
     0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
     255, 0, 0, 255,   0, 255, 0, 255,   0, 0, 255, 255,     128, 128, 128, 255,
@@ -482,6 +488,7 @@ TEST( 'compareImageUtil convertToGrayscale', function test() {
     80, 80, 80, 0,    80, 80, 80, 85,   80, 80, 80, 170,    80, 80, 80, 255
   ] };
   var image1 = compareImageUtil.makeImage(imageData);
+  // RGBA ==> RGBA
   var result1 = compareImageUtil.makeImage(4, 4);
   compareImageUtil.fill(result1, 0, 0, 0, 0);
   compareImageUtil.convertToGrayscale(result1, image1);
@@ -490,6 +497,36 @@ TEST( 'compareImageUtil convertToGrayscale', function test() {
     76, 255,    150, 255,   29, 255,    128, 255,
     179, 255,   105, 255,   226, 255,   255, 255,
     80, 0,      80, 85,     80, 170,    80, 255
+  ]);
+  // RGBA ==> Y (F32)
+  var result2 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  //compareImageUtil.fill(result1, 0, 0, 0, 0);
+  compareImageUtil.convertToGrayscale(result2, image1);
+  checkGrayscaleResultF32('result2', result2, [
+    0,        85,       170,      255,
+    76.2450,  149.6850, 29.0700,  128,
+    178.7550, 105.3150, 225.9300, 255,
+    0,        26.6667,  53.3333,  80
+  ]);
+  // Y (F32) ==> RGBA
+  var result3 = compareImageUtil.makeImage(4, 4);
+  compareImageUtil.fill(result3, 0, 0, 0, 0);
+  compareImageUtil.convertToGrayscale(result3, result2);
+  checkGrayscaleResult('result3', result3, [
+    0, 255,     85, 255,    170, 255,   255, 255,
+    76, 255,    150, 255,   29, 255,    128, 255,
+    179, 255,   105, 255,   226, 255,   255, 255,
+    0, 255,     27, 255,    53, 255,    80, 255
+  ]);
+  // Y (F32) ==> Y (F32)
+  var result4 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  //compareImageUtil.fill(result1, 0, 0, 0, 0);
+  compareImageUtil.convertToGrayscale(result4, result2);
+  checkGrayscaleResultF32('result4', result4, [
+    0,        85,       170,      255,
+    76.2450,  149.6850, 29.0700,  128,
+    178.7550, 105.3150, 225.9300, 255,
+    0,        26.6667,  53.3333,  80
   ]);
 });
 

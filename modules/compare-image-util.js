@@ -1,13 +1,13 @@
 ﻿var compareImageUtil = (function() {
 
-  var U8x4  = 0x0104;
-  var F32x1 = 0x0401;
+  var FORMAT_U8x4  = 0x0104;
+  var FORMAT_F32x1 = 0x0401;
 
-  var channelsOf = function(type) {
-    return type ? (type & 0x00ff) : 0x0004;
+  var channelsOf = function(format) {
+    return format ? (format & 0x00ff) : 0x0004;
   };
-  var newArrayOf = function(type, size) {
-    var elementType = type ? (type & 0xff00) : 0x0100;
+  var newArrayOf = function(format, size) {
+    var elementType = format ? (format & 0xff00) : 0x0100;
     if (elementType === 0x0400) {
       return new Float32Array(size);
     } else { // 0x0100
@@ -15,7 +15,7 @@
     }
   };
 
-  var makeImage = function(a, b, c) {
+  var makeImage = function(a, b, format) {
     if (b === undefined) {
       return {
         width:  a.width,
@@ -26,11 +26,11 @@
         channels: (a.channels !== undefined ? a.channels : 4)
       };
     } else {
-      var ch = channelsOf(c);
+      var ch = channelsOf(format);
       return {
         width:    a,
         height:   b,
-        data:     newArrayOf(c, a * b * ch),
+        data:     newArrayOf(format, a * b * ch),
         pitch:    a,
         offset:   0,
         channels: ch
@@ -127,21 +127,31 @@
     dest = makeImage(dest);
     src = makeImage(src);
     var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var i = dest.offset * 4, j = src.offset * 4;
+    var i = dest.offset * dest.channels, j = src.offset * src.channels;
+    var read = src.channels === 4 ? function(k) {
+      var r = src.data[k    ];
+      var g = src.data[k + 1];
+      var b = src.data[k + 2];
+      var a = src.data[k + 3];
+      return [a, 0.299 * r + 0.587 * g + 0.114 * b];
+    } : function(k) {
+      return [255, src.data[k]];
+    };
+    var write = dest.channels === 4 ? function(k, val) {
+      var v = Math.round(val[1]);
+      dest.data[k    ] = v;
+      dest.data[k + 1] = v;
+      dest.data[k + 2] = v;
+      dest.data[k + 3] = val[0];
+    } : function(k, val) {
+      dest.data[k] = val[1] * val[0] * (1/255);
+    };
     for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4, j += 4) {
-        var r = src.data[j    ];
-        var g = src.data[j + 1];
-        var b = src.data[j + 2];
-        var a = src.data[j + 3];
-        var v = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-        dest.data[i    ] = v;
-        dest.data[i + 1] = v;
-        dest.data[i + 2] = v;
-        dest.data[i + 3] = a;
+      for (var x = 0; x < w; x++, i += dest.channels, j += src.channels) {
+        write(i, read(j));
       }
-      i += (dest.pitch - w) * 4;
-      j += (src.pitch - w) * 4;
+      i += (dest.pitch - w) * dest.channels;
+      j += (src.pitch - w) * src.channels;
     }
   };
   var resizeNN = function(dest, src) {
@@ -984,8 +994,8 @@
     };
   };
   return {
-    U8x4:           U8x4,
-    F32x1:          F32x1,
+    FORMAT_U8x4:    FORMAT_U8x4,
+    FORMAT_F32x1:   FORMAT_F32x1,
     channelsOf:     channelsOf,
     newArrayOf:     newArrayOf,
     makeImage:      makeImage,
