@@ -88,8 +88,7 @@
   };
   var readSubPixel = function(src, left, top, width, height) {
     src = makeImage(src);
-    var region = { width: width, height: height };
-    region.data = new Float32Array(width * height);
+    var region = makeImage(width, height, FORMAT_F32x1);
     var iLeft = Math.floor(left);
     var iTop = Math.floor(top);
     var sampleX = [], sampleY = [];
@@ -107,17 +106,18 @@
     var a01 = rx * (1 - ry);
     var a10 = (1 - rx) * ry;
     var a11 = rx * ry;
+    var ch = src.channels;
     var i = 0;
     for (var b = 0; b < height; ++b) {
       var y0 = sampleY[b * 2], y1 = sampleY[b * 2 + 1];
-      var k0 = (src.offset + src.pitch * y0) * 4;
-      var k1 = (src.offset + src.pitch * y1) * 4;
+      var k0 = (src.offset + src.pitch * y0) * ch;
+      var k1 = (src.offset + src.pitch * y1) * ch;
       for (var a = 0; a < width; ++a) {
         var x0 = sampleX[a * 2], x1 = sampleX[a * 2 + 1];
-        var c00 = a00 * src.data[k0 + x0 * 4];
-        var c01 = a01 * src.data[k0 + x1 * 4];
-        var c10 = a10 * src.data[k1 + x0 * 4];
-        var c11 = a11 * src.data[k1 + x1 * 4];
+        var c00 = a00 * src.data[k0 + x0 * ch];
+        var c01 = a01 * src.data[k0 + x1 * ch];
+        var c10 = a10 * src.data[k1 + x0 * ch];
+        var c11 = a11 * src.data[k1 + x1 * ch];
         region.data[i++] = c00 + c01 + c10 + c11;
       }
     }

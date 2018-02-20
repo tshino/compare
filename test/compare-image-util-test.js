@@ -419,15 +419,21 @@ TEST( 'compareImageUtil copy', function test() {
 
 TEST( 'compareImageUtil readSubPixel', function test() {
   var checkFloatResult = function(name, result, expected) {
-    EXPECT_EQ( 4, result.width, name );
-    EXPECT_EQ( 4, result.height, name );
-    EXPECT_EQ( 16, result.data.length, name );
+    EXPECT_EQ( 4, result.width, 'width of ' + name );
+    EXPECT_EQ( 4, result.height, 'height of ' + name );
+    EXPECT_EQ( 1, result.channels, 'channels of ' + name );
+    EXPECT_EQ( 16, result.data.length, 'data.length of ' + name );
     for (var i = 0; i < 16; ++i) {
-      var label = (i + 1) + 'th pixel of ' + name;
+      var label = (i + 1) + 'th pixel value of ' + name;
       EXPECT( 1e-5 > Math.abs(expected[i] - result.data[i]), label );
     }
   };
   var image1 = compareImageUtil.makeImage(4, 4);
+  var imageF = compareImageUtil.makeImage({
+    width: 4, height: 4, data: [
+      55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+    ], channels: 1
+  });
   compareImageUtil.fill(image1, 55, 55, 55, 255);
   var expected1 = [
     55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
@@ -439,6 +445,13 @@ TEST( 'compareImageUtil readSubPixel', function test() {
   checkFloatResult('result2', result2, expected1);
   var result3 = compareImageUtil.readSubPixel(image1, -1.7, -1.5, 4, 4);
   checkFloatResult('result3', result3, expected1);
+
+  var result1F = compareImageUtil.readSubPixel(imageF, 0, 0, 4, 4);
+  checkFloatResult('result1F', result1F, expected1);
+  var result2F = compareImageUtil.readSubPixel(imageF, 0.3, 0.3, 4, 4);
+  checkFloatResult('result2F', result2F, expected1);
+  var result3F = compareImageUtil.readSubPixel(imageF, -1.7, -1.5, 4, 4);
+  checkFloatResult('result3F', result3F, expected1);
 
   image1.data[0] = 11;
   image1.data[4] = 11;
@@ -461,6 +474,30 @@ TEST( 'compareImageUtil readSubPixel', function test() {
   ]);
   var result8 = compareImageUtil.readSubPixel(image1, 0, 0.2, 4, 4);
   checkFloatResult('result8', result8, [
+    11, 19.8, 55, 55,  19.8, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+
+  imageF.data[0] = 11;
+  imageF.data[1] = 11;
+  imageF.data[4] = 11;
+  var result4F = compareImageUtil.readSubPixel(imageF, 0, 0, 4, 4);
+  checkFloatResult('result4F', result4F, [
+    11, 11, 55, 55,  11, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result5F = compareImageUtil.readSubPixel(imageF, 0.5, 0.5, 4, 4);
+  checkFloatResult('result5F', result5F, [
+    22, 44, 55, 55,  44, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result6F = compareImageUtil.readSubPixel(imageF, -0.5, -0.5, 4, 4);
+  checkFloatResult('result6F', result6F, [
+    11, 11, 33, 55,  11, 22, 44, 55,  33, 44, 55, 55,  55, 55, 55, 55
+  ]);
+  var result7F = compareImageUtil.readSubPixel(imageF, 0.1, 0, 4, 4);
+  checkFloatResult('result7F', result7F, [
+    11, 15.4, 55, 55,  15.4, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
+  ]);
+  var result8F = compareImageUtil.readSubPixel(imageF, 0, 0.2, 4, 4);
+  checkFloatResult('result8F', result8F, [
     11, 19.8, 55, 55,  19.8, 55, 55, 55,  55, 55, 55, 55,  55, 55, 55, 55
   ]);
 });
