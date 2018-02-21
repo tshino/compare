@@ -437,13 +437,13 @@
     dest = makeImage(dest);
     src = makeImage(src);
     var w = dest.width, h = dest.height;
-    if (src.width !== w || src.height !== h) {
+    if (src.width !== w || src.height !== h || src.channels !== dest.channels) {
       return;
     }
     var kw = kernelSize.w, kh = kernelSize.h;
     var ox = Math.floor(kw / 2);
     var oy = Math.floor(kh / 2);
-    var i = dest.offset * 4;
+    var i = dest.offset * dest.channels;
     var ddata = dest.data, sdata = src.data;
     var round = Math.round;
     var sxo = new Uint32Array(w * kw);
@@ -451,36 +451,55 @@
     for (var x = 0; x < w; x++) {
       for (var k = 0; k < kw; k++) {
         var kx = Math.max(0, Math.min(w - 1, x + ox - k));
-        sxo[x * kw + k] = 4 * kx;
+        sxo[x * kw + k] = src.channels * kx;
       }
     }
     for (var y = 0; y < h; y++) {
       for (var k = 0; k < kh; k++) {
         var ky = Math.max(0, Math.min(h - 1, y + oy - k));
-        syo[y * kh + k] = 4 * src.pitch * ky;
+        syo[y * kh + k] = src.channels * src.pitch * ky;
       }
     }
-    var j0 = src.offset * 4;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4) {
-        var r = 0, g = 0, b = 0, a = 0;
-        for (var ky = 0, k = 0; ky < kh; ky++) {
-          var jy = j0 + syo[y * kh + ky];
-          for (var kx = 0; kx < kw; kx++, k++) {
-            var j = jy + sxo[x * kw + kx];
-            var c = kernel[k];
-            r += c * sdata[j    ];
-            g += c * sdata[j + 1];
-            b += c * sdata[j + 2];
-            a += c * sdata[j + 3];
-          }
+    var j0 = src.offset * src.channels;
+    var readWrite = src.channels === 4 ? function(x, y, write) {
+      var r = 0, g = 0, b = 0, a = 0;
+      for (var ky = 0, k = 0; ky < kh; ky++) {
+        var jy = j0 + syo[y * kh + ky];
+        for (var kx = 0; kx < kw; kx++, k++) {
+          var j = jy + sxo[x * kw + kx];
+          var c = kernel[k];
+          r += c * sdata[j    ];
+          g += c * sdata[j + 1];
+          b += c * sdata[j + 2];
+          a += c * sdata[j + 3];
         }
-        ddata[i    ] = Math.max(0, Math.min(255, round(128 + r)));
-        ddata[i + 1] = Math.max(0, Math.min(255, round(128 + g)));
-        ddata[i + 2] = Math.max(0, Math.min(255, round(128 + b)));
-        ddata[i + 3] = Math.max(0, Math.min(255, round(128 + a)));
+      };
+      write(r, g, b, a);
+    } : function(x, y, write) {
+      var v = 0;
+      for (var ky = 0, k = 0; ky < kh; ky++) {
+        var jy = j0 + syo[y * kh + ky];
+        for (var kx = 0; kx < kw; kx++, k++) {
+          var j = jy + sxo[x * kw + kx];
+          var c = kernel[k];
+          v += c * sdata[j];
+        }
+      };
+      write(v);
+    };
+    var write = dest.channels === 4 ? function(r, g, b, a) {
+      ddata[i    ] = Math.max(0, Math.min(255, round(128 + r)));
+      ddata[i + 1] = Math.max(0, Math.min(255, round(128 + g)));
+      ddata[i + 2] = Math.max(0, Math.min(255, round(128 + b)));
+      ddata[i + 3] = Math.max(0, Math.min(255, round(128 + a)));
+    } : function(v) {
+      ddata[i] = v;
+    };
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += dest.channels) {
+        readWrite(x, y, write);
       }
-      i += (dest.pitch - w) * 4;
+      i += (dest.pitch - w) * dest.channels;
     }
   };
   var sobelX = function(dest, src) {
