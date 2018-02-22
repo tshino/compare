@@ -417,6 +417,22 @@ TEST( 'compareImageUtil copy', function test() {
   ], image2.data );
 });
 
+TEST( 'compareImageUtil copy F32', function test() {
+  var image1 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  for (var i = 0; i < 16; ++i) {
+    image1.data[i] = i;
+  }
+  var image2 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.copy(image2, image1);
+
+  EXPECT_EQ( 2, image2.width );
+  EXPECT_EQ( 2, image2.height );
+  jsTestUtil.expectEqualArray( [
+    0, 1,
+    4, 5
+  ], image2.data );
+});
+
 TEST( 'compareImageUtil readSubPixel', function test() {
   var checkFloatResult = function(name, result, expected) {
     EXPECT_EQ( 4, result.width, 'width of ' + name );

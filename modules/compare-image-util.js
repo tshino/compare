@@ -73,17 +73,18 @@
   var copy = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
+    if (dest.channels !== src.channels) {
+      return;
+    }
     var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var i = dest.offset * 4, j = src.offset * 4;
+    var ch = src.channels;
+    var i = dest.offset * ch, j = src.offset * ch;
     for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4, j += 4) {
-        dest.data[i    ] = src.data[j    ];
-        dest.data[i + 1] = src.data[j + 1];
-        dest.data[i + 2] = src.data[j + 2];
-        dest.data[i + 3] = src.data[j + 3];
+      for (var x = 0; x < w * ch; x++, i++, j++) {
+        dest.data[i] = src.data[j];
       }
-      i += (dest.pitch - w) * 4;
-      j += (src.pitch - w) * 4;
+      i += (dest.pitch - w) * ch;
+      j += (src.pitch - w) * ch;
     }
   };
   var readSubPixel = function(src, left, top, width, height) {
