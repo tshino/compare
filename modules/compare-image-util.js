@@ -534,48 +534,58 @@
   var dilate3x1 = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
+    if (dest.channels !== src.channels) {
+      return;
+    }
     var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    var ch = dest.channels;
     if (w < 2) {
       copy(dest, src);
       return;
     }
-    var i = dest.offset * 4, j = src.offset * 4;
+    var i = dest.offset * ch, j = src.offset * ch;
     for (var y = 0; y < h; y++) {
-      for (var k = 0; k < 4; k++, i++, j++) {
-        dest.data[i] = Math.max(src.data[j], src.data[j + 4]);
+      for (var k = 0; k < ch; k++, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + ch]);
       }
-      j -= 4;
-      for (var k = 4 * (w - 2); k > 0; k--, i++, j++) {
-        dest.data[i] = Math.max(src.data[j], src.data[j + 4], src.data[j + 8]);
+      j -= ch;
+      for (var k = ch * (w - 2); k > 0; k--, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + ch], src.data[j + ch * 2]);
       }
-      for (var k = 0; k < 4; k++, i++, j++) {
-        dest.data[i] = Math.max(src.data[j], src.data[j + 4]);
+      for (var k = 0; k < ch; k++, i++, j++) {
+        dest.data[i] = Math.max(src.data[j], src.data[j + ch]);
       }
-      i += (dest.pitch - w) * 4;
-      j += 4 + (src.pitch - w) * 4;
+      i += (dest.pitch - w) * ch;
+      j += (src.pitch - w + 1) * ch;
     }
   };
   var dilate1x3 = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
+    if (dest.channels !== src.channels) {
+      return;
+    }
     var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    var ch = dest.channels;
     if (h < 2) {
       copy(dest, src);
       return;
     }
-    var i = dest.offset * 4;
+    var i = dest.offset * ch;
     for (var y = 0; y < h; y++) {
-      var j0 = (src.offset + src.pitch * Math.max(0, y - 1)) * 4;
-      var j1 = (src.offset + src.pitch * y) * 4;
-      var j2 = (src.offset + src.pitch * Math.min(h - 1, y + 1)) * 4;
-      for (var k = 4 * w; k > 0; k--) {
+      var j0 = (src.offset + src.pitch * Math.max(0, y - 1)) * ch;
+      var j1 = (src.offset + src.pitch * y) * ch;
+      var j2 = (src.offset + src.pitch * Math.min(h - 1, y + 1)) * ch;
+      for (var k = ch * w; k > 0; k--) {
         dest.data[i++] = Math.max(src.data[j0++], src.data[j1++], src.data[j2++]);
       }
-      i += (dest.pitch - w) * 4;
+      i += (dest.pitch - w) * ch;
     }
   };
   var dilate3x3 = function(dest, src) {
-    var temp = makeImage(src.width, src.height);
+    src = makeImage(src);
+    var format = src.channels === 4 ? FORMAT_U8x4 : FORMAT_F32x1;
+    var temp = makeImage(src.width, src.height, format);
     dilate3x1(temp, src);
     dilate1x3(dest, temp);
   };

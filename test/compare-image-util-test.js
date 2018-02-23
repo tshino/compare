@@ -887,6 +887,54 @@ TEST( 'compareImageUtil dilate3x1, dilate1x3, dilate3x3', function test() {
   checkResult('result3x3', result3x3, expected3x3);
 });
 
+TEST( 'compareImageUtil dilate3x1 F32, dilate1x3 F32, dilate3x3 F32', function test() {
+  var checkResult = function(name, result, expected) {
+    EXPECT_EQ( expected.data.length, result.data.length, 'data.length of ' + name );
+    EXPECT_EQ( expected.width, result.width, 'width of ' + name );
+    EXPECT_EQ( expected.height, result.height, 'height of ' + name );
+    for (i = 0; i < expected.data.length; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT_EQ( expected.data[i], result.data[i], label );
+    }
+  };
+
+  var image1F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  var d1 = image1F.data;
+  d1[5] = 128; d1[6] = 60; d1[11] = 20;
+
+  var result3x1F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.dilate3x1(result3x1F, image1F);
+  var expected3x1F = { width: 4, height: 4, data: [
+    0,   0,   0,   0,
+    128, 128, 128, 60,
+    0,   0,   20,  20,
+    0,   0,   0,   0
+  ] };
+  checkResult('result3x1F', result3x1F, expected3x1F);
+
+  d1[12] = 50;
+
+  var result1x3F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.dilate1x3(result1x3F, image1F);
+  var expected1x3F = { width: 4, height: 4, data: [
+    0,   128, 60,  0,
+    0,   128, 60,  20,
+    50,  128, 60,  20,
+    50,  0,   0,   20
+  ] };
+  checkResult('result1x3F', result1x3F, expected1x3F);
+
+  var result3x3F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.dilate3x3(result3x3F, image1F);
+  var expected3x3F = { width: 4, height: 4, data: [
+    128, 128, 128,  60,
+    128, 128, 128,  60,
+    128, 128, 128,  60,
+    50,  50,  20,   20
+  ] };
+  checkResult('result3x3F', result3x3F, expected3x3F);
+});
+
 TEST( 'compareImageUtil cornerValue, findCornerPoints, adjustCornerPointsSubPixel', function test() {
   var sum = function(image, l, t, w, h) {
     image = compareImageUtil.makeRegion(image, l, t, w, h);
