@@ -192,6 +192,31 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 0, region0x0_2.offset );
 });
 
+TEST( 'compareImageUtil makeRegion F32', function test() {
+  var image1F = compareImageUtil.makeImage(300, 200, compareImageUtil.FORMAT_F32x1);
+
+  var region0F = compareImageUtil.makeRegion(image1F);
+  EXPECT_EQ( 300, region0F.width );
+  EXPECT_EQ( 200, region0F.height );
+  EXPECT_EQ( 300, region0F.pitch );
+  EXPECT( image1F.data === region0F.data );
+  EXPECT_EQ( 0, region0F.offset );
+
+  var region1F = compareImageUtil.makeRegion(image1F, 30, 20);
+  EXPECT_EQ( 270, region1F.width );
+  EXPECT_EQ( 180, region1F.height );
+  EXPECT_EQ( 300, region1F.pitch );
+  EXPECT( image1F.data === region1F.data );
+  EXPECT_EQ( 300 * 20 + 30, region1F.offset );
+
+  var region2F = compareImageUtil.makeRegion(image1F, 30, 20, 130, 120);
+  EXPECT_EQ( 130, region2F.width );
+  EXPECT_EQ( 120, region2F.height );
+  EXPECT_EQ( 300, region2F.pitch );
+  EXPECT( image1F.data === region2F.data );
+  EXPECT_EQ( 300 * 20 + 30, region2F.offset );
+});
+
 TEST( 'compareImageUtil makeRegion empty-range', function test() {
   var image1 = compareImageUtil.makeImage(300, 200);
 

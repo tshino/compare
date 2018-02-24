@@ -38,8 +38,7 @@
     }
   };
   var makeRegion = function(image, left, top, width, height) {
-    var pitch = image.pitch !== undefined ? image.pitch : image.width;
-    var offset = image.offset !== undefined ? image.offset : 0;
+    image = makeImage(image);
     left   = left   !== undefined ? left   : 0;
     top    = top    !== undefined ? top    : 0;
     var right  = width  !== undefined ? left + width : image.width;
@@ -52,8 +51,9 @@
       width: right - left,
       height: bottom - top,
       data: image.data,
-      pitch: pitch,
-      offset: offset + left + pitch * top
+      pitch: image.pitch,
+      offset: image.offset + left + image.pitch * top,
+      channels: image.channels
     };
   };
   var fill = function(image, r, g, b, a) {
