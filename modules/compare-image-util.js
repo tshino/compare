@@ -59,15 +59,16 @@
   var fill = function(image, r, g, b, a) {
     image = makeImage(image);
     var w = image.width, h = image.height;
-    var i = image.offset * 4;
+    var ch = image.channels;
+    var i = image.offset * ch;
+    var v = [r, g, b, a];
     for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4) {
-        image.data[i    ] = r;
-        image.data[i + 1] = g;
-        image.data[i + 2] = b;
-        image.data[i + 3] = a;
+      for (var x = 0; x < w; x++) {
+        for (var k = 0; k < ch; k++, i++) {
+          image.data[i] = v[k];
+        }
       }
-      i += (image.pitch - w) * 4;
+      i += (image.pitch - w) * ch;
     }
   };
   var copy = function(dest, src) {

@@ -425,6 +425,32 @@ TEST( 'compareImageUtil fill', function test() {
   EXPECT_EQ( 55, image1.data[3] );
 });
 
+TEST( 'compareImageUtil fill F32', function test() {
+  var image1 = compareImageUtil.makeImage(300, 200, compareImageUtil.FORMAT_F32x1);
+  for (var i = 0; i < 60000; ++i) {
+    image1.data[i] = 55;
+  }
+
+  compareImageUtil.fill(image1, 20);
+  EXPECT_EQ( 20, image1.data[0] );
+  EXPECT_EQ( 20, image1.data[1] );
+  EXPECT_EQ( 20, image1.data[2] );
+  EXPECT_EQ( 20, image1.data[3] );
+  EXPECT_EQ( 20, image1.data[4] );
+  EXPECT_EQ( 20, image1.data[59999] );
+
+  var region1 = compareImageUtil.makeRegion(image1, 5, 5, 10, 5);
+  compareImageUtil.fill(region1, 70);
+  EXPECT_EQ( 20, image1.data[0] );
+  EXPECT_EQ( 20, image1.data[1504] );
+  EXPECT_EQ( 70, image1.data[1505] );
+  EXPECT_EQ( 70, image1.data[1514] );
+  EXPECT_EQ( 20, image1.data[1515] );
+  EXPECT_EQ( 70, image1.data[2714] );
+  EXPECT_EQ( 20, image1.data[2715] );
+  EXPECT_EQ( 20, image1.data[3005] );
+});
+
 TEST( 'compareImageUtil copy', function test() {
   var imageData = { width: 4, height: 4, data: [] };
   for (var i = 0; i < 64; ++i) {
