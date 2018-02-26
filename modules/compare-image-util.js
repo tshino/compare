@@ -773,23 +773,35 @@
   };
   var cornerValue = function(src) {
     var grayscale = makeImage(src);
+    var format = grayscale.channels === 4 ? FORMAT_U8x4 : FORMAT_F32x1;
     var w = src.width;
     var h = src.height;
-    var dx = makeImage(w, h);
-    var dy = makeImage(w, h);
+    var ch = grayscale.channels;
+    var dx = makeImage(w, h, format);
+    var dy = makeImage(w, h, format);
     sobelX(dx, grayscale);
     sobelY(dy, grayscale);
+    var dBias = grayscale.channels === 4 ? 128 : 0;
     var cov = makeImage(w, h);
     var i = 0, k = 0;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += 4) {
         var cov0 = 0, cov1 = 0, cov2 = 0;
-        for (var j = 0; j < 4; j++, k++) {
-          var ix = (dx.data[k] - 128) * 0.1;
-          var iy = (dy.data[k] - 128) * 0.1;
+        if (ch === 4) {
+          for (var j = 0; j < 4; j++, k++) {
+            var ix = (dx.data[k] - dBias) * 0.1;
+            var iy = (dy.data[k] - dBias) * 0.1;
+            cov0 += ix * ix;
+            cov1 += ix * iy;
+            cov2 += iy * iy;
+          }
+        } else {
+          var ix = (dx.data[k] - dBias) * 0.3;
+          var iy = (dy.data[k] - dBias) * 0.3;
           cov0 += ix * ix;
           cov1 += ix * iy;
           cov2 += iy * iy;
+          k++;
         }
         cov.data[i    ] = Math.max(0, Math.min(255, Math.round(cov0)));
         cov.data[i + 1] = Math.max(0, Math.min(255, Math.round(cov1)));
@@ -803,20 +815,24 @@
       0.1111, 0.1111, 0.1111,
       0.1111, 0.1111, 0.1111
     ]);
-    var dest = makeImage(w, h);
+    var dest = makeImage(w, h, format);
     var i = 0, k = 0;
     for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4, k += 4) {
+      for (var x = 0; x < w; x++, i += ch, k += 4) {
         var cov0 = m.data[k] - 128;
         var cov1 = m.data[k + 1] - m.data[k + 2];
         var cov2 = m.data[k + 3] - 128;
         var a = 0.5 * cov0, b = cov1, c = 0.5 * cov2;
         var d = (a + c) - Math.sqrt((a - c) * (a - c) + b * b);
         var val = Math.max(0, Math.min(255, Math.round(d)));
-        dest.data[i    ] = val;
-        dest.data[i + 1] = val;
-        dest.data[i + 2] = val;
-        dest.data[i + 3] = 255;
+        if (ch === 1) {
+          dest.data[i] = val;
+        } else {
+          dest.data[i    ] = val;
+          dest.data[i + 1] = val;
+          dest.data[i + 2] = val;
+          dest.data[i + 3] = 255;
+        }
       }
     }
     return dest;

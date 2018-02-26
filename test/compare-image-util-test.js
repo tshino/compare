@@ -1054,6 +1054,37 @@ TEST( 'compareImageUtil cornerValue, findCornerPoints, adjustCornerPointsSubPixe
   }
 });
 
+TEST( 'compareImageUtil cornerValue F32', function test() {
+  var sum = function(image, l, t, w, h) {
+    image = compareImageUtil.makeRegion(image, l, t, w, h);
+    var v = 0;
+    for (y = 0; y < image.height; y++) {
+      var i = image.offset + image.pitch * y;
+      for (x = 0; x < image.width; x++, i++) {
+        v += image.data[i];
+      }
+    }
+    return v;
+  };
+
+  var image1 = compareImageUtil.makeImage(50, 50, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image1, 0);
+  var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 16);
+  compareImageUtil.fill(region1, 255);
+
+  var result1 = compareImageUtil.cornerValue(image1);
+  EXPECT_EQ( 0, sum(result1, 0, 0, 18, 50) );
+  EXPECT_EQ( 0, sum(result1, 22, 0, 16, 50) );
+  EXPECT_EQ( 0, sum(result1, 42, 0, 8, 50) );
+  EXPECT_EQ( 0, sum(result1, 0, 0, 50, 18) );
+  EXPECT_EQ( 0, sum(result1, 0, 22, 50, 12) );
+  EXPECT_EQ( 0, sum(result1, 0, 38, 50, 12) );
+  EXPECT( 0 < sum(result1, 18, 18, 4, 4) );
+  EXPECT( 0 < sum(result1, 38, 18, 4, 4) );
+  EXPECT( 0 < sum(result1, 18, 34, 4, 4) );
+  EXPECT( 0 < sum(result1, 38, 34, 4, 4) );
+});
+
 TEST( 'compareImageUtil getUniqueColors', function test() {
   var imageData = { width: 4, height: 4, data: [
     0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
