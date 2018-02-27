@@ -34,6 +34,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT_EQ( 0, image0x0.data.length );
   EXPECT_EQ( 0, image0x0.offset );
   EXPECT_EQ( 4, image0x0.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image0x0.format );
 
   var image1x1 = compareImageUtil.makeImage(1, 1);
   EXPECT_EQ( 1, image1x1.width );
@@ -42,6 +43,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT_EQ( 4, image1x1.data.length );
   EXPECT_EQ( 0, image1x1.offset );
   EXPECT_EQ( 4, image1x1.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image1x1.format );
 
   var image1 = compareImageUtil.makeImage(300, 200);
   EXPECT_EQ( 300, image1.width );
@@ -50,6 +52,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT_EQ( 240000, image1.data.length );
   EXPECT_EQ( 0, image1.offset );
   EXPECT_EQ( 4, image1.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image1.format );
 
   var image2 = compareImageUtil.makeImage(image1);
   EXPECT_EQ( 300, image2.width );
@@ -58,6 +61,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT( image1.data === image2.data );
   EXPECT_EQ( 0, image2.offset );
   EXPECT_EQ( 4, image2.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image2.format );
 
   var imageData = { width: 300, height: 200, data: new Uint8Array(240000) };
   var image3 = compareImageUtil.makeImage(imageData);
@@ -67,6 +71,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT( imageData.data === image3.data );
   EXPECT_EQ( 0, image3.offset );
   EXPECT_EQ( 4, image3.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image3.format );
 
   var imageData2 = {
     width: 200,
@@ -82,6 +87,7 @@ TEST( 'compareImageUtil makeImage', function test() {
   EXPECT( imageData.data === image4.data );
   EXPECT_EQ( 15050, image4.offset );
   EXPECT_EQ( 4, image4.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, image4.format );
 });
 
 TEST( 'compareImageUtil makeImage F32', function test() {
@@ -92,6 +98,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT_EQ( 0, image0x0.data.length );
   EXPECT_EQ( 0, image0x0.offset );
   EXPECT_EQ( 1, image0x0.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image0x0.format );
 
   var image1x1 = compareImageUtil.makeImage(1, 1, compareImageUtil.FORMAT_F32x1);
   EXPECT_EQ( 1, image1x1.width );
@@ -100,6 +107,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT_EQ( 1, image1x1.data.length );
   EXPECT_EQ( 0, image1x1.offset );
   EXPECT_EQ( 1, image1x1.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image1x1.format );
 
   var image1 = compareImageUtil.makeImage(300, 200, compareImageUtil.FORMAT_F32x1);
   EXPECT_EQ( 300, image1.width );
@@ -108,6 +116,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT_EQ( 60000, image1.data.length );
   EXPECT_EQ( 0, image1.offset );
   EXPECT_EQ( 1, image1.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image1.format );
 
   var image2 = compareImageUtil.makeImage(image1);
   EXPECT_EQ( 300, image2.width );
@@ -116,6 +125,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT( image1.data === image2.data );
   EXPECT_EQ( 0, image2.offset );
   EXPECT_EQ( 1, image2.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image2.format );
 
   var imageData = { width: 300, height: 200, data: new Float32Array(60000), channels: 1 };
   var image3 = compareImageUtil.makeImage(imageData);
@@ -125,6 +135,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT( imageData.data === image3.data );
   EXPECT_EQ( 0, image3.offset );
   EXPECT_EQ( 1, image3.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image3.format );
 
   var imageData2 = {
     width: 200,
@@ -141,6 +152,7 @@ TEST( 'compareImageUtil makeImage F32', function test() {
   EXPECT( imageData.data === image4.data );
   EXPECT_EQ( 15050, image4.offset );
   EXPECT_EQ( 1, image4.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, image4.format );
 });
 
 TEST( 'compareImageUtil makeRegion', function test() {
@@ -152,6 +164,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 300, region0.pitch );
   EXPECT( image1.data === region0.data );
   EXPECT_EQ( 0, region0.offset );
+  EXPECT_EQ( 4, region0.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region0.format );
 
   var region1 = compareImageUtil.makeRegion(image1, 30, 20);
   EXPECT_EQ( 270, region1.width );
@@ -159,6 +173,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 300, region1.pitch );
   EXPECT( image1.data === region1.data );
   EXPECT_EQ( 300 * 20 + 30, region1.offset );
+  EXPECT_EQ( 4, region1.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region1.format );
 
   var region2 = compareImageUtil.makeRegion(image1, 30, 20, 130, 120);
   EXPECT_EQ( 130, region2.width );
@@ -166,6 +182,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 300, region2.pitch );
   EXPECT( image1.data === region2.data );
   EXPECT_EQ( 300 * 20 + 30, region2.offset );
+  EXPECT_EQ( 4, region2.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region2.format );
 
   var imageData = { width: 300, height: 200, data: new Uint8Array(240000) };
   var region3 = compareImageUtil.makeRegion(imageData, 10, 20, 30, 40);
@@ -174,6 +192,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 300, region3.pitch );
   EXPECT( imageData.data === region3.data );
   EXPECT_EQ( 300 * 20 + 10, region3.offset );
+  EXPECT_EQ( 4, region3.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region3.format );
 
   var image0x0 = compareImageUtil.makeImage(0, 0);
 
@@ -183,6 +203,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 0, region0x0.pitch );
   EXPECT_EQ( 0, region0x0.data.length );
   EXPECT_EQ( 0, region0x0.offset );
+  EXPECT_EQ( 4, region0x0.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region0x0.format );
 
   var region0x0_2 = compareImageUtil.makeRegion(image0x0, 10, 10, 10, 10);
   EXPECT_EQ( 0, region0x0_2.width );
@@ -190,6 +212,8 @@ TEST( 'compareImageUtil makeRegion', function test() {
   EXPECT_EQ( 0, region0x0_2.pitch );
   EXPECT_EQ( 0, region0x0_2.data.length );
   EXPECT_EQ( 0, region0x0_2.offset );
+  EXPECT_EQ( 4, region0x0_2.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_U8x4, region0x0_2.format );
 });
 
 TEST( 'compareImageUtil makeRegion F32', function test() {
@@ -201,6 +225,8 @@ TEST( 'compareImageUtil makeRegion F32', function test() {
   EXPECT_EQ( 300, region0F.pitch );
   EXPECT( image1F.data === region0F.data );
   EXPECT_EQ( 0, region0F.offset );
+  EXPECT_EQ( 1, region0F.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, region0F.format );
 
   var region1F = compareImageUtil.makeRegion(image1F, 30, 20);
   EXPECT_EQ( 270, region1F.width );
@@ -208,6 +234,8 @@ TEST( 'compareImageUtil makeRegion F32', function test() {
   EXPECT_EQ( 300, region1F.pitch );
   EXPECT( image1F.data === region1F.data );
   EXPECT_EQ( 300 * 20 + 30, region1F.offset );
+  EXPECT_EQ( 1, region1F.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, region1F.format );
 
   var region2F = compareImageUtil.makeRegion(image1F, 30, 20, 130, 120);
   EXPECT_EQ( 130, region2F.width );
@@ -215,6 +243,8 @@ TEST( 'compareImageUtil makeRegion F32', function test() {
   EXPECT_EQ( 300, region2F.pitch );
   EXPECT( image1F.data === region2F.data );
   EXPECT_EQ( 300 * 20 + 30, region2F.offset );
+  EXPECT_EQ( 1, region2F.channels );
+  EXPECT_EQ( compareImageUtil.FORMAT_F32x1, region2F.format );
 });
 
 TEST( 'compareImageUtil makeRegion empty-range', function test() {
@@ -489,6 +519,7 @@ TEST( 'compareImageUtil readSubPixel', function test() {
     EXPECT_EQ( 4, result.width, 'width of ' + name );
     EXPECT_EQ( 4, result.height, 'height of ' + name );
     EXPECT_EQ( 1, result.channels, 'channels of ' + name );
+    EXPECT_EQ( compareImageUtil.FORMAT_F32x1, result.format, 'format of ' + name );
     EXPECT_EQ( 16, result.data.length, 'data.length of ' + name );
     for (var i = 0; i < 16; ++i) {
       var label = (i + 1) + 'th pixel value of ' + name;

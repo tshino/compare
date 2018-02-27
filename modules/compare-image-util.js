@@ -17,13 +17,15 @@
 
   var makeImage = function(a, b, format) {
     if (b === undefined) {
+      var ch = a.channels !== undefined ? a.channels : 4;
       return {
         width:  a.width,
         height: a.height,
         data:   a.data,
         pitch:  (a.pitch !== undefined ? a.pitch : a.width),
         offset: (a.offset !== undefined ? a.offset : 0),
-        channels: (a.channels !== undefined ? a.channels : 4)
+        channels: ch,
+        format: (ch === 4 ? FORMAT_U8x4 : FORMAT_F32x1)
       };
     } else {
       var ch = channelsOf(format);
@@ -33,7 +35,8 @@
         data:     newArrayOf(format, a * b * ch),
         pitch:    a,
         offset:   0,
-        channels: ch
+        channels: ch,
+        format: (ch === 4 ? FORMAT_U8x4 : FORMAT_F32x1)
       };
     }
   };
@@ -53,7 +56,8 @@
       data: image.data,
       pitch: image.pitch,
       offset: image.offset + left + image.pitch * top,
-      channels: image.channels
+      channels: image.channels,
+      format: image.format
     };
   };
   var fill = function(image, r, g, b, a) {
