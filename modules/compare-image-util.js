@@ -589,8 +589,7 @@
   };
   var dilate3x3 = function(dest, src) {
     src = makeImage(src);
-    var format = src.channels === 4 ? FORMAT_U8x4 : FORMAT_F32x1;
-    var temp = makeImage(src.width, src.height, format);
+    var temp = makeImage(src.width, src.height, src.format);
     dilate3x1(temp, src);
     dilate1x3(dest, temp);
   };
@@ -777,12 +776,11 @@
   };
   var cornerValue = function(src) {
     var grayscale = makeImage(src);
-    var format = grayscale.channels === 4 ? FORMAT_U8x4 : FORMAT_F32x1;
     var w = src.width;
     var h = src.height;
     var ch = grayscale.channels;
-    var dx = makeImage(w, h, format);
-    var dy = makeImage(w, h, format);
+    var dx = makeImage(w, h, grayscale.format);
+    var dy = makeImage(w, h, grayscale.format);
     sobelX(dx, grayscale);
     sobelY(dy, grayscale);
     var dBias = grayscale.channels === 4 ? 128 : 0;
@@ -819,7 +817,7 @@
       0.1111, 0.1111, 0.1111,
       0.1111, 0.1111, 0.1111
     ]);
-    var dest = makeImage(w, h, format);
+    var dest = makeImage(w, h, grayscale.format);
     var i = 0, k = 0;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, k += 4) {
