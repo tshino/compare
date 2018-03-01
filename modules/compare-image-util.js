@@ -842,15 +842,16 @@
   var findCornerPoints = function(image) {
     var w = image.width, h = image.height;
     var corner = cornerValue(image);
-    var dilate = makeImage(w, h);
+    var dilate = makeImage(w, h, corner.format);
     dilate3x3(dilate, corner);
     var candidates = [];
+    var ch = corner.channels;
     for (var y = 1; y + 1 < h; y++) {
-      var i = 4 + y * w * 4;
-      for (var x = 1; x + 1 < w; x++, i += 4) {
+      var i = (1 + y * w) * ch;
+      for (var x = 1; x + 1 < w; x++, i += ch) {
         var c = corner.data[i];
         if (0 < c && c === dilate.data[i]) {
-          candidates.push([c, i]);
+          candidates.push([c, i / ch]);
         }
       }
     }
@@ -869,7 +870,7 @@
     };
     var near8 = [-gw - 1, -gw, -gw + 1, -1, 1, gw - 1, gw, gw + 1];
     for (var i = 0, n = candidates.length; i < n; ++i) {
-      var o = candidates[i][1] / 4;
+      var o = candidates[i][1];
       var x = o % w;
       var y = (o - x) / w;
       var cx = x >> 3, cy = y >> 3, c = cx + cy * gw + margin;
