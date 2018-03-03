@@ -957,10 +957,12 @@
     }
   };
   var sparseOpticalFlow = function(image1, image2, points) {
+    image1 = makeImage(image1);
     var nextPoints = [];
-    var dx1 = makeImage(image1.width, image1.height);
-    var dy1 = makeImage(image1.width, image1.height);
+    var dx1 = makeImage(image1.width, image1.height, image1.format);
+    var dy1 = makeImage(image1.width, image1.height, image1.format);
     var dScale = 1 / 8;
+    var dOffset = image1.channels === 4 ? -128 : 0;
     sobelX(dx1, image1);
     sobelY(dy1, image1);
     for (var i = 0, p; p = points[i]; i++) {
@@ -970,8 +972,8 @@
       var dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);
       var axx = 0, axy = 0, ayy = 0;
       for (var k = 0; k < 15 * 15; k++) {
-        var dx = dxw.data[k] - 128;
-        var dy = dyw.data[k] - 128;
+        var dx = dxw.data[k] + dOffset;
+        var dy = dyw.data[k] + dOffset;
         axx += dx * dx;
         axy += dx * dy;
         ayy += dy * dy;
@@ -991,8 +993,8 @@
         var bx = 0, by = 0;
         for (var k = 0; k < 15 * 15; k++) {
           var di = i2w.data[k] - i1w.data[k];
-          bx += di * (dxw.data[k] - 128);
-          by += di * (dyw.data[k] - 128);
+          bx += di * (dxw.data[k] + dOffset);
+          by += di * (dyw.data[k] + dOffset);
         }
         np.x += (axy * by - ayy * bx) * m;
         np.y += (axy * bx - axx * by) * m;
