@@ -29,6 +29,7 @@
   $('#colorfreqbtn').click(colorFreqDialog.toggle);
   $('#metricsbtn').click(metricsDialog.toggle);
   $('#tonecurvebtn').click(toneCurveDialog.toggle);
+  $('#opticalflowbtn').click(opticalFlowDialog.toggle);
   $('#diffbtn').click(diffDialog.toggle);
   $('.swapbtn').click(swapBaseAndTargetImage);
 
@@ -60,7 +61,7 @@
             sw.click();
             return false;
           }
-          if (($('#diff').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
+          if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
               changeTargetImage(num - 1)) {
             dialog.update();
             return false;
@@ -146,14 +147,16 @@
     109 : { global: true, func: metricsDialog.toggle },
     // 't' (116)
     116 : { global: true, func: toneCurveDialog.toggle },
+    // 'o' (111)
+    111 : { global: true, func: opticalFlowDialog.toggle },
     // 'd' (100)
     100 : { global: true, func: diffDialog.toggle },
     // 'i' (105)
     105 : { global: true, func: infoDialog.toggle },
     // '/' (47)
     47 : { global: false, func: viewManagement.arrangeLayout },
-    // 'o' (111)
-    111: { global: false, func: viewManagement.toggleOverlay },
+    // 'O' (79)
+    79: { global: false, func: viewManagement.toggleOverlay },
     // 'n' (110)
     110 : { global: false, func: roiMap.toggle },
     // 'g' (103)
@@ -185,7 +188,7 @@
   });
   
   viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
+  figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
   colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
   viewZoom.setPointCallback(function(e) {
@@ -434,6 +437,7 @@
         targetImageIndex = null;
       }
       toneCurveDialog.onRemoveEntry(index);
+      opticalFlowDialog.onRemoveEntry(index);
       diffDialog.onRemoveEntry(index);
       ent.mainImage = null;
       ent.asCanvas = null;
@@ -1403,6 +1407,9 @@
       break;
     case 'calcToneCurve':
       toneCurveDialog.updateFigure(data.type, data.index[0], data.index[1], data.result);
+      break;
+    case 'calcOpticalFlow':
+      opticalFlowDialog.updateFigure(data.index[0], data.index[1], data.result);
       break;
     case 'calcDiff':
       diffDialog.updateFigure(data.index[0], data.index[1], data.options, data.result);
@@ -2425,6 +2432,116 @@
     };
     var toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
+    });
+    return {
+      onRemoveEntry: onRemoveEntry,
+      updateTable: updateTable,
+      updateFigure: updateFigure,
+      toggle: toggle
+    };
+  })();
+  // Optical Flow
+  var opticalFlowDialog = (function() {
+    var opticalFlowResult = {};
+    var onRemoveEntry = function(index) {
+      if (opticalFlowResult.base === index || opticalFlowResult.target === index) {
+        $('#opticalFlowResult *').remove();
+        opticalFlowResult.result = null;
+      }
+    };
+    var updateOptionsDOM = function() {
+      $('#opticalFlowResult *').remove();
+      $('#opticalFlowSummary *').remove();
+      if (false === setupBaseAndTargetSelector('#opticalFlowBaseName', '#opticalFlowTargetName', updateTable)) {
+        return false;
+      }
+      return true;
+    };
+    var updateAsync = function() {
+      opticalFlowResult.base   = baseImageIndex;
+      opticalFlowResult.target = targetImageIndex;
+      opticalFlowResult.result  = null;
+      discardTasksOfCommand('calcOpticalFlow');
+      if (baseImageIndex !== targetImageIndex) {
+        taskQueue.addTask({
+          cmd:      'calcOpticalFlow',
+          index:    [baseImageIndex, targetImageIndex]
+        }, attachImageDataToTask);
+      }
+    };
+    var updateReport = function(styles) {
+      var w = opticalFlowResult.result.image.width;
+      var h = opticalFlowResult.result.image.height;
+      var fig = figureUtil.makeBlankFigure(w, h);
+      var bits = fig.context.createImageData(w, h);
+      figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
+      fig.context.putImageData(bits, 0, 0);
+      fig.context.lineWidth = 1;
+      fig.context.strokeStyle = '#fff';
+      for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+        fig.context.beginPath();
+        fig.context.moveTo(p.x0 + 0.5, p.y0 + 0.5);
+        fig.context.lineTo(p.x1 + 0.5, p.y1 + 0.5);
+        fig.context.stroke();
+      }
+      styles = updateFigureStylesForActualSize(styles, w, h);
+      opticalFlowResult.baseWidth = styles.baseW;
+      opticalFlowResult.baseHeight = styles.baseH;
+      styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
+      $('#opticalFlowResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
+      if (opticalFlowResult.result.points.length === 0) {
+        textUtil.setText($('#opticalFlowSummary'), {
+          en: 'Could not detect any optical flow',
+          ja: 'オプティカルフローを検出できませんでした'
+        });
+      } else {
+        var num = opticalFlowResult.result.points.length;
+        textUtil.setText($('#opticalFlowSummary'), {
+          en: 'Optical flow detected for ' + num + ' points',
+          ja: 'オプティカルフローが ' + num + ' 点で検出されました'
+        });
+      }
+    };
+    var updateTableDOM = function() {
+      if (false === updateOptionsDOM()) {
+        return;
+      }
+      if (opticalFlowResult.base !== baseImageIndex || opticalFlowResult.target !== targetImageIndex) {
+        updateAsync();
+      }
+      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
+      var figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
+      var styles = makeFigureStyles(figW, figH, figMargin, '#000');
+      if (opticalFlowResult.result === null) {
+        $('#opticalFlowResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+        textUtil.setText($('#opticalFlowSummary'), {
+          en: 'calculating...',
+          ja: '計算中...'
+        });
+      } else {
+        updateReport(styles);
+      }
+    };
+    var updateTable = function(transformOnly) {
+      if (transformOnly) {
+        if (opticalFlowResult.result !== null) {
+          $('#opticalFlowResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+        }
+      } else {
+        updateTableDOM();
+      }
+    };
+    var updateFigure = function(baseIndex, targetIndex, result) {
+      if (opticalFlowResult.base === baseIndex && opticalFlowResult.target === targetIndex) {
+        opticalFlowResult.result = result;
+      }
+      updateTable();
+    };
+    var toggle = dialogUtil.defineDialog($('#opticalFlow'), updateTable, toggleAnalysis, {
+      enableZoom: true,
+      getBaseSize: function() {
+        return opticalFlowResult ? { w: opticalFlowResult.baseWidth, h: opticalFlowResult.baseHeight } : null;
+      }
     });
     return {
       onRemoveEntry: onRemoveEntry,

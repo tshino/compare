@@ -39,6 +39,9 @@ self.addEventListener('message', function(e) {
     result.type   = data.type;
     result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type);
     break;
+  case 'calcOpticalFlow':
+    result.result = calcOpticalFlow(data.imageData[0], data.imageData[1]);
+    break;
   case 'calcDiff':
     result.result = calcDiff(data.imageData[0], data.imageData[1], data.options);
     result.options = data.options;
@@ -412,8 +415,57 @@ var calcToneCurve = function(a, b, type) {
   return result;
 };
 
-function calcDiff( a, b, options )
-{
+function calcOpticalFlow( a, b ) {
+  a = compareImageUtil.makeImage(a);
+  b = compareImageUtil.makeImage(b);
+  var w = Math.min(a.width, b.width);
+  var h = Math.min(a.height, b.height);
+  if (a.width !== w || a.height !== h) {
+    var new_a = compareImageUtil.makeImage(w, h);
+    compareImageUtil.resize(new_a, a);
+    a = new_a;
+  }
+  if (b.width !== w || b.height !== h) {
+    var new_b = compareImageUtil.makeImage(w, h);
+    compareImageUtil.resize(new_b, b);
+    b = new_b;
+  }
+  var grayA = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
+  var grayB = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.convertToGrayscale(grayA, a);
+  compareImageUtil.convertToGrayscale(grayB, b);
+  a = null;
+  b = null;
+  var figImage = compareImageUtil.makeImage(w, h);
+  for (var y = 0, i = 0; y < h; y++) {
+    for (var x = 0; x < w; x++, i++) {
+      figImage.data[i * 4 + 0] = 0.5 * grayA.data[i];
+      figImage.data[i * 4 + 1] = 0.5 * grayB.data[i];
+      figImage.data[i * 4 + 2] = 0.5 * grayB.data[i];
+      figImage.data[i * 4 + 3] = 255;
+    }
+  }
+  var pointsA = compareImageUtil.findCornerPoints(grayA);
+  compareImageUtil.adjustCornerPointsSubPixel(grayA, pointsA);
+  var pointsB = compareImageUtil.sparseOpticalFlow(grayA, grayB, pointsA);
+  points = [];
+  for (var i = 0; i < pointsB.length; i++) {
+    if (pointsB[i]) {
+      points.push({
+        x0: pointsA[i].x,
+        y0: pointsA[i].y,
+        x1: pointsB[i].x,
+        y1: pointsB[i].y
+      });
+    }
+  }
+  return {
+    image:      figImage,
+    points:     points
+  };
+}
+
+function calcDiff( a, b, options ) {
   var ignoreAE = options.ignoreAE;
 
   var makeDiff = function(a, b, out, summary) {

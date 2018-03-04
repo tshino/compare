@@ -64,8 +64,8 @@ var changeLang = function(lang) {
 		</button>
 		<button id="overlay">
 			<img src="res/overlay.svg" alt="overlay mode">
-			<span class="tooltip keys en">Overlay mode <span>o</span></span>
-			<span class="tooltip keys ja">オーバーレイモード <span>o</span></span>
+			<span class="tooltip keys en">Overlay mode <span>Shift</span>+<span>o</span></span>
+			<span class="tooltip keys ja">オーバーレイモード <span>Shift</span>+<span>o</span></span>
 		</button>
 		<button id="gridbtn">
 			<img src="res/grid.svg" alt="show grid">
@@ -243,7 +243,7 @@ var changeLang = function(lang) {
 					<td><span class="en">reset zoom</span><span class="ja">拡大状態をリセット</span></td>
 				</tr>
 				<tr>
-					<td class="keys"><span>o</span></td>
+					<td class="keys"><span>Shift</span>+<span>o</span></td>
 					<td><span class="en">overlay mode</span><span class="ja">オーバーレイモード</span></td>
 				</tr>
 				<tr>
@@ -277,6 +277,10 @@ var changeLang = function(lang) {
 				<tr>
 					<td class="keys"><span>m</span></td>
 					<td><span class="en">image quality metrics</span><span class="ja">画質メトリクス</span></td>
+				</tr>
+				<tr>
+					<td class="keys"><span>o</span></td>
+					<td><span class="en">optical flow</span><span class="ja">オプティカルフロー</span></td>
 				</tr>
 				<tr>
 					<td class="keys"><span>d</span></td>
@@ -437,6 +441,12 @@ var changeLang = function(lang) {
 					<span class="en">Tone Curve Estimation</span>
 					<span class="ja">トーンカーブ推定</span>
 					<span class="flat keys"><span>t</span></span>
+				</button>
+				<button id="opticalflowbtn">
+					<img src="res/diff.svg" width="20" alt="icon">
+					<span class="en">Optical Flow (Under Development)</span>
+					<span class="ja">オプティカルフロー (開発中)</span>
+					<span class="flat keys"><span>o</span></span>
 				</button>
 				<button id="diffbtn">
 					<img src="res/diff.svg" width="20" alt="icon">
@@ -656,6 +666,41 @@ var changeLang = function(lang) {
 						※ 図の濃淡は、2つの画像の対応するピクセル間の輝度の対応（トーンマップ）の分布を示します
 					</span>
 				</div>
+			</div>
+		</div>
+	</div>
+	<div id="opticalFlow" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/diff.svg" width="20" alt="icon">
+					<span class="en">Optical Flow (Under Development)</span>
+					<span class="ja">オプティカルフロー (開発中)</span>
+				</h3>
+			</div>
+			<div>
+				<table>
+					<tr>
+						<td class="prop">
+							<span class="en">Base Image</span>
+							<span class="ja">基準画像</span>
+						</td>
+						<td id="opticalFlowBaseName" style="min-width: 216px"></td>
+						<td class="prop">
+							<span class="en">Target Image</span>
+							<span class="ja">対象画像</span>
+						</td>
+						<td id="opticalFlowTargetName" style="min-width: 216px"></td>
+					</tr>
+					<tr>
+						<td id="opticalFlowResult" class="fig" colspan="4"></td>
+					</tr>
+					<tr>
+						<td class="output" colspan="4" style="text-align:center">
+							<span id="opticalFlowSummary"></span>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>
