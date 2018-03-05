@@ -958,6 +958,17 @@
   };
   var sparseOpticalFlow = function(image1, image2, points) {
     image1 = makeImage(image1);
+    image2 = makeImage(image2);
+    if (image1.channels !== 1) {
+      var gray = makeImage(image1.width, image1.height, FORMAT_F32x1);
+      convertToGrayscale(gray, image1);
+      image1 = gray;
+    }
+    if (image2.channels !== 1) {
+      var gray = makeImage(image2.width, image2.height, FORMAT_F32x1);
+      convertToGrayscale(gray, image2);
+      image2 = gray;
+    }
     var nextPoints = [];
     var dx1 = makeImage(image1.width, image1.height, image1.format);
     var dy1 = makeImage(image1.width, image1.height, image1.format);

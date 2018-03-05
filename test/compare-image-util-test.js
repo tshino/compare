@@ -1157,7 +1157,7 @@ TEST( 'compareImageUtil sparseOpticalFlow', function test() {
   var image1 = compareImageUtil.makeImage(50, 50);
   compareImageUtil.fill(image1, 0, 0, 0, 255);
   var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 16);
-  compareImageUtil.fill(region1, 15, 15, 15, 255);
+  compareImageUtil.fill(region1, 50, 50, 50, 255);
 
   var corners = compareImageUtil.findCornerPoints(image1);
   compareImageUtil.adjustCornerPointsSubPixel(image1, corners);
@@ -1177,7 +1177,7 @@ TEST( 'compareImageUtil sparseOpticalFlow', function test() {
   var image2 = compareImageUtil.makeImage(50, 50);
   compareImageUtil.fill(image2, 0, 0, 0, 255);
   var region3 = compareImageUtil.makeRegion(image2, 25, 22, 20, 16);
-  compareImageUtil.fill(region3, 15, 15, 15, 255);
+  compareImageUtil.fill(region3, 50, 50, 50, 255);
 
   var result2 = compareImageUtil.sparseOpticalFlow(image1, image2, corners);
 
