@@ -972,10 +972,10 @@
     var nextPoints = [];
     var dx1 = makeImage(image1.width, image1.height, image1.format);
     var dy1 = makeImage(image1.width, image1.height, image1.format);
-    var dScale = 1 / 8;
+    var dScale = 1 / 32;
     var dOffset = image1.channels === 4 ? -128 : 0;
-    sobelX(dx1, image1);
-    sobelY(dy1, image1);
+    scharrX(dx1, image1);
+    scharrY(dy1, image1);
     for (var i = 0, p; p = points[i]; i++) {
       var np = { x: p.x, y: p.y };
       var i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
