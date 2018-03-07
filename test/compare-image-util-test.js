@@ -721,6 +721,81 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   ], image2.data );
 });
 
+TEST( 'compareImageUtil gaussianBlur', function test() {
+  var checkGrayscaleResult = function(name, result, expected) {
+    for (var i = 0; i < 64; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      EXPECT_EQ( expected[i], result.data[i * 4 + 0], label + ' (R)' );
+      EXPECT_EQ( expected[i], result.data[i * 4 + 1], label + ' (G)' );
+      EXPECT_EQ( expected[i], result.data[i * 4 + 2], label + ' (B)' );
+      EXPECT_EQ( 255, result.data[i * 4 + 3], label + ' (alpha)' );
+    }
+  };
+
+  var image1 = compareImageUtil.makeImage(8, 8);
+  compareImageUtil.fill(image1, 0, 0, 0, 255);
+  var region1 = compareImageUtil.makeRegion(image1, 3, 3, 1, 1);
+  compareImageUtil.fill(region1, 255, 255, 255, 255);
+
+  var result1 = compareImageUtil.makeImage(8, 8);
+  compareImageUtil.fill(result1, 0, 0, 0, 0);
+
+  // stdev = 0
+  compareImageUtil.gaussianBlur(result1, image1, 0);
+  checkGrayscaleResult('gaussian stdev=0 of point', result1, [
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0, 255, 0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0
+  ]);
+
+  // stdev = 1
+  compareImageUtil.gaussianBlur(result1, image1, 1);
+  checkGrayscaleResult('gaussian stdev=1 of point', result1, [
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  1,  3,  5,  3,  1,  0,  0,
+    0,  3, 15, 25, 15,  3,  0,  0,
+    0,  5, 25, 41, 25,  5,  0,  0,
+    0,  3, 15, 25, 15,  3,  0,  0,
+    0,  1,  3,  5,  3,  1,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0
+  ]);
+
+  var region2 = compareImageUtil.makeRegion(image1, 0, 0, 4, 8);
+  compareImageUtil.fill(region2, 255, 255, 255, 255);
+
+  // stdev = 0
+  compareImageUtil.gaussianBlur(result1, image1, 0);
+  checkGrayscaleResult('gaussian stdev=0 of partition', result1, [
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0,
+    255, 255, 255, 255,  0,  0,  0,  0
+  ]);
+
+  // stdev = 1
+  compareImageUtil.gaussianBlur(result1, image1, 1);
+  checkGrayscaleResult('gaussian stdev=1 of partition', result1, [
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0,
+    255, 254, 240, 178, 77,  15,  1,  0
+  ]);
+});
+
 TEST( 'compareImageUtil convolution, sobelX, sobelY, scharrX, scharrY', function test() {
   var makeImageForConvolutionTest = function(bitmap) {
     var image = compareImageUtil.makeImage(4, 4);
