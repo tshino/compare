@@ -163,30 +163,39 @@
   var resizeNN = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
+    if (src.channels !== dest.channels) {
+      return;
+    }
     var w = dest.width, h = dest.height;
     var mw = src.width / w, mh = src.height / h;
-    var i = dest.offset * 4;
+    var i = dest.offset * dest.channels;
     var ddata = dest.data, sdata = src.data;
     var floor = Math.floor;
     var so = new Uint32Array(w);
     for (var x = 0; x < w; x++) {
-      so[x] = 4 * floor((x + 0.5) * mw);
+      so[x] = src.channels * floor((x + 0.5) * mw);
     }
     for (var y = 0; y < h; y++) {
       var sy = floor((y + 0.5) * mh);
-      var j0 = (src.offset + src.pitch * sy) * 4;
-      for (var x = 0; x < w; x++, i += 4) {
-        var j = j0 + so[x];
-        var r = sdata[j    ];
-        var g = sdata[j + 1];
-        var b = sdata[j + 2];
-        var a = sdata[j + 3];
-        ddata[i    ] = r;
-        ddata[i + 1] = g;
-        ddata[i + 2] = b;
-        ddata[i + 3] = a;
+      var j0 = (src.offset + src.pitch * sy) * src.channels;
+      if (src.channels === 4) {
+        for (var x = 0; x < w; x++, i += 4) {
+          var j = j0 + so[x];
+          var r = sdata[j    ];
+          var g = sdata[j + 1];
+          var b = sdata[j + 2];
+          var a = sdata[j + 3];
+          ddata[i    ] = r;
+          ddata[i + 1] = g;
+          ddata[i + 2] = b;
+          ddata[i + 3] = a;
+        }
+      } else {
+        for (var x = 0; x < w; x++, i += 1) {
+          ddata[i] = sdata[j0 + so[x]];
+        }
       }
-      i += (dest.pitch - w) * 4;
+      i += (dest.pitch - w) * dest.channels;
     }
   };
   var resizeBilinear = function(dest, src) {

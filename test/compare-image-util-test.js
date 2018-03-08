@@ -693,6 +693,31 @@ TEST( 'compareImageUtil resizeNN', function test() {
   ], image2.data );
 });
 
+TEST( 'compareImageUtil resizeNN F32', function test() {
+  var image1 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_F32x1);
+  var image2 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+
+  compareImageUtil.fill(image1, 10);
+  compareImageUtil.fill(image2, 0);
+  compareImageUtil.resizeNN(image2, image1);
+  jsTestUtil.expectEqualArray( [
+    10, 10, 10, 10,
+    10, 10, 10, 10,
+    10, 10, 10, 10,
+    10, 10, 10, 10
+  ], image2.data );
+
+  image1.data[0] = 255;
+  compareImageUtil.fill(image2, 0);
+  compareImageUtil.resizeNN(image2, image1);
+  jsTestUtil.expectEqualArray( [
+    255, 255, 10, 10,
+    255, 255, 10, 10,
+    10,  10,  10, 10,
+    10,  10,  10, 10
+  ], image2.data );
+});
+
 TEST( 'compareImageUtil resizeBilinear', function test() {
   var image1 = compareImageUtil.makeImage(2, 2);
   var image2 = compareImageUtil.makeImage(4, 4);
