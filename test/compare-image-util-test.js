@@ -821,6 +821,51 @@ TEST( 'compareImageUtil gaussianBlur', function test() {
   ]);
 });
 
+TEST( 'compareImageUtil gaussianBlur F32', function test() {
+  var checkGrayscaleResultF32 = function(name, result, expected) {
+    for (var i = 0; i < 64; ++i) {
+      var label = (i + 1) + 'th pixel of ' + name;
+      var e = Math.round(expected[i] * 100) / 100;
+      var a = Math.round(result.data[i] * 100) / 100;
+      EXPECT_EQ( e, a, label );
+    }
+  };
+
+  var image1 = compareImageUtil.makeImage(8, 8, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image1, 0);
+  var region1 = compareImageUtil.makeRegion(image1, 3, 3, 1, 1);
+  compareImageUtil.fill(region1, 255);
+
+  var result1 = compareImageUtil.makeImage(8, 8, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(result1, 0);
+
+  // stdev = 0
+  compareImageUtil.gaussianBlur(result1, image1, 0);
+  checkGrayscaleResultF32('gaussian stdev=0 of point', result1, [
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0, 255, 0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0
+  ]);
+
+  // stdev = 1
+  compareImageUtil.gaussianBlur(result1, image1, 1);
+  checkGrayscaleResultF32('gaussian stdev=1 of point', result1, [
+    0.01,  0.06,  0.27,  0.45,  0.27,  0.06,  0.01,  0,
+    0.06,  0.74,  3.33,  5.49,  3.33,  0.74,  0.06,  0,
+    0.27,  3.33, 14.93, 24.62, 14.93,  3.33,  0.27,  0,
+    0.45,  5.49, 24.62, 40.60, 24.62,  5.49,  0.45,  0,
+    0.27,  3.33, 14.93, 24.62, 14.93,  3.33,  0.27,  0,
+    0.06,  0.74,  3.33,  5.49,  3.33,  0.74,  0.06,  0,
+    0.01,  0.06,  0.27,  0.45,  0.27,  0.06,  0.01,  0,
+    0,     0,     0,     0,     0,     0,     0,     0
+  ]);
+});
+
 TEST( 'compareImageUtil convolution, sobelX, sobelY, scharrX, scharrY', function test() {
   var makeImageForConvolutionTest = function(bitmap) {
     var image = compareImageUtil.makeImage(4, 4);

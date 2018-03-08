@@ -286,6 +286,10 @@
   var resizeGeneral = function(dest, src, filterSize, filterFunc) {
     dest = makeImage(dest);
     src = makeImage(src);
+    if (src.channels !== dest.channels) {
+      return;
+    }
+    var ch = src.channels;
     var w = dest.width, h = dest.height;
     var sw = src.width, sh = src.height;
     var mw = sw / w, mh = sh / h;
@@ -301,7 +305,7 @@
       for (var f = 0; f < filterSize; ++f) {
         var val = filterFunc(rx - sx);
         sum += val;
-        sxo[x * filterSize + f] = 4 * Math.min(sw - 1, Math.max(0, sx));
+        sxo[x * filterSize + f] = ch * Math.min(sw - 1, Math.max(0, sx));
         fx[x * filterSize + f] = val;
         ++sx;
       }
@@ -318,7 +322,7 @@
       for (var f = 0; f < filterSize; ++f) {
         var val = filterFunc(ry - sy);
         sum += val;
-        syo[y * filterSize + f] = 4 * w * Math.min(sh - 1, Math.max(0, sy));
+        syo[y * filterSize + f] = ch * w * Math.min(sh - 1, Math.max(0, sy));
         fy[y * filterSize + f] = val;
         ++sy;
       }
@@ -326,30 +330,40 @@
         fy[y * filterSize + f] /= sum;
       }
     }
-    var kdata = new Float32Array(w * sh * 4);
+    var kdata = new Float32Array(w * sh * ch);
     var k = 0;
-    var j = src.offset * 4;
-    for (var jh = j + src.pitch * 4 * sh; j < jh; ) {
+    var j = src.offset * ch;
+    for (var jh = j + src.pitch * ch * sh; j < jh; ) {
       var f = 0;
-      for (var fw = w * filterSize; f < fw; k += 4) {
-        var r = 0, g = 0, b = 0, a = 0;
-        for (var fi = f + filterSize; f < fi; f++) {
-          var j0  = j + sxo[f];
-          var fx0 = fx[f];
-          r += sdata[j0    ] * fx0;
-          g += sdata[j0 + 1] * fx0;
-          b += sdata[j0 + 2] * fx0;
-          a += sdata[j0 + 3] * fx0;
+      if (ch === 4) {
+        for (var fw = w * filterSize; f < fw; k += ch) {
+          var r = 0, g = 0, b = 0, a = 0;
+          for (var fi = f + filterSize; f < fi; f++) {
+            var j0  = j + sxo[f];
+            var fx0 = fx[f];
+            r += sdata[j0    ] * fx0;
+            g += sdata[j0 + 1] * fx0;
+            b += sdata[j0 + 2] * fx0;
+            a += sdata[j0 + 3] * fx0;
+          }
+          kdata[k    ] = r;
+          kdata[k + 1] = g;
+          kdata[k + 2] = b;
+          kdata[k + 3] = a;
         }
-        kdata[k    ] = r;
-        kdata[k + 1] = g;
-        kdata[k + 2] = b;
-        kdata[k + 3] = a;
+      } else {
+        for (var fw = w * filterSize; f < fw; k += ch) {
+          var v = 0;
+          for (var fi = f + filterSize; f < fi; f++) {
+            v += sdata[j + sxo[f]] * fx[f];
+          }
+          kdata[k] = v;
+        }
       }
-      j += src.pitch * 4;
+      j += src.pitch * ch;
     }
-    var i = dest.offset * 4;
-    var igap = (dest.pitch - w) * 4;
+    var i = dest.offset * ch;
+    var igap = (dest.pitch - w) * ch;
     f = 0;
     for (var fh = h * filterSize; f < fh; ) {
       var k0a = [];
@@ -359,20 +373,30 @@
         fy0a[fi] = fy[f];
       }
       var k = 0;
-      for (var iw = i + w * 4; i < iw; i += 4, k += 4) {
-        var r = 0, g = 0, b = 0, a = 0;
-        for (var fi = 0; fi < filterSize; fi++) {
-          var k0 = k0a[fi] + k;
-          var fy0 = fy0a[fi];
-          r += kdata[k0    ] * fy0;
-          g += kdata[k0 + 1] * fy0;
-          b += kdata[k0 + 2] * fy0;
-          a += kdata[k0 + 3] * fy0;
+      if (ch === 4) {
+        for (var iw = i + w * ch; i < iw; i += ch, k += ch) {
+          var r = 0, g = 0, b = 0, a = 0;
+          for (var fi = 0; fi < filterSize; fi++) {
+            var k0 = k0a[fi] + k;
+            var fy0 = fy0a[fi];
+            r += kdata[k0    ] * fy0;
+            g += kdata[k0 + 1] * fy0;
+            b += kdata[k0 + 2] * fy0;
+            a += kdata[k0 + 3] * fy0;
+          }
+          ddata[i    ] = round(Math.min(255, Math.max(0, r)));
+          ddata[i + 1] = round(Math.min(255, Math.max(0, g)));
+          ddata[i + 2] = round(Math.min(255, Math.max(0, b)));
+          ddata[i + 3] = round(Math.min(255, Math.max(0, a)));
         }
-        ddata[i    ] = round(Math.min(255, Math.max(0, r)));
-        ddata[i + 1] = round(Math.min(255, Math.max(0, g)));
-        ddata[i + 2] = round(Math.min(255, Math.max(0, b)));
-        ddata[i + 3] = round(Math.min(255, Math.max(0, a)));
+      } else {
+        for (var iw = i + w * ch; i < iw; i += ch, k += ch) {
+          var v = 0;
+          for (var fi = 0; fi < filterSize; fi++) {
+            v += kdata[k0a[fi] + k] * fy0a[fi];
+          }
+          ddata[i] = v;
+        }
       }
       i += igap;
     }
