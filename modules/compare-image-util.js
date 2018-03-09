@@ -1017,16 +1017,16 @@
       var upper1 = makeImage(upperW, upperH, FORMAT_F32x1);
       var upper2 = makeImage(upperW, upperH, FORMAT_F32x1);
       var scale = function(p) {
-        return {
+        return p ? {
           x: (p.x + 0.5) * (upperW / image1.width) - 0.5,
           y: (p.y + 0.5) * (upperH / image1.height) - 0.5
-        };
+        } : null;
       };
       var unscale = function(p) {
-        return {
+        return p ? {
           x: (p.x + 0.5) * (image1.width / upperW) - 0.5,
           y: (p.y + 0.5) * (image1.height / upperH) - 0.5
-        };
+        } : null;
       };
       gaussianBlur(upper1, image1, 0.5);
       gaussianBlur(upper2, image2, 0.5);
@@ -1048,6 +1048,9 @@
     scharrY(dy1, image1);
     for (var i = 0, p; p = points[i]; i++) {
       var np = nextPoints[i];
+      if (!np) {
+        continue;
+      }
       var i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
       var dxw = readSubPixel(dx1, p.x - 7, p.y - 7, 15, 15);
       var dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);
@@ -1079,6 +1082,10 @@
         }
         np.x += (axy * by - ayy * bx) * m;
         np.y += (axy * bx - axx * by) * m;
+      }
+      if (np.x < 0 || image1.width - 1 < np.x || np.y < 0 || image1.height - 1 < np.y) {
+        nextPoints[i] = null;
+        continue;
       }
       nextPoints[i] = np;
     }
