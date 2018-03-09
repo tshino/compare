@@ -989,9 +989,12 @@
       }
     }
   };
-  var sparseOpticalFlow = function(image1, image2, points) {
+  var sparseOpticalFlow = function(image1, image2, points, nextPoints) {
     image1 = makeImage(image1);
     image2 = makeImage(image2);
+    if (image1.width !== image2.width || image1.height !== image2.height) {
+      return [];
+    }
     if (image1.channels !== 1) {
       var gray = makeImage(image1.width, image1.height, FORMAT_F32x1);
       convertToGrayscale(gray, image1);
@@ -1002,7 +1005,41 @@
       convertToGrayscale(gray, image2);
       image2 = gray;
     }
-    var nextPoints = [];
+    if (nextPoints === undefined) {
+      nextPoints = [];
+      for (var i = 0, p; p = points[i]; i++) {
+        nextPoints[i] = { x: p.x, y: p.y };
+      }
+    }
+    if (20 < Math.min(image1.width, image1.height)) {
+      var upperW = Math.ceil(image1.width / 2);
+      var upperH = Math.ceil(image1.height / 2);
+      var upper1 = makeImage(upperW, upperH, FORMAT_F32x1);
+      var upper2 = makeImage(upperW, upperH, FORMAT_F32x1);
+      var scale = function(p) {
+        return {
+          x: (p.x + 0.5) * (upperW / image1.width) - 0.5,
+          y: (p.y + 0.5) * (upperH / image1.height) - 0.5
+        };
+      };
+      var unscale = function(p) {
+        return {
+          x: (p.x + 0.5) * (image1.width / upperW) - 0.5,
+          y: (p.y + 0.5) * (image1.height / upperH) - 0.5
+        };
+      };
+      gaussianBlur(upper1, image1, 0.5);
+      gaussianBlur(upper2, image2, 0.5);
+      var upperPoints = [];
+      for (var i = 0, p; p = points[i]; i++) {
+        upperPoints[i] = scale(p);
+        nextPoints[i] = scale(nextPoints[i]);
+      }
+      nextPoints = sparseOpticalFlow(upper1, upper2, upperPoints, nextPoints);
+      for (var i = 0, p; p = points[i]; i++) {
+        nextPoints[i] = unscale(nextPoints[i]);
+      }
+    }
     var dx1 = makeImage(image1.width, image1.height, image1.format);
     var dy1 = makeImage(image1.width, image1.height, image1.format);
     var dScale = 1 / 32;
@@ -1010,7 +1047,7 @@
     scharrX(dx1, image1);
     scharrY(dy1, image1);
     for (var i = 0, p; p = points[i]; i++) {
-      var np = { x: p.x, y: p.y };
+      var np = nextPoints[i];
       var i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
       var dxw = readSubPixel(dx1, p.x - 7, p.y - 7, 15, 15);
       var dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);

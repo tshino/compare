@@ -1303,9 +1303,12 @@ TEST( 'compareImageUtil sparseOpticalFlow', function test() {
   compareImageUtil.fill(image1, 0, 0, 0, 255);
   var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 16);
   compareImageUtil.fill(region1, 50, 50, 50, 255);
-
-  var corners = compareImageUtil.findCornerPoints(image1);
+  var corners = [
+    { x: 19.5, y: 19.5 }, { x: 39.5, y: 19.5 },
+    { x: 19.5, y: 35.5 }, { x: 39.5, y: 35.5 }
+  ];
   compareImageUtil.adjustCornerPointsSubPixel(image1, corners);
+
   var result1 = compareImageUtil.sparseOpticalFlow(image1, image1, corners);
 
   EXPECT_EQ( 4, corners.length );
@@ -1345,8 +1348,10 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   compareImageUtil.fill(image1, 0);
   var region1 = compareImageUtil.makeRegion(image1, 20, 20, 20, 16);
   compareImageUtil.fill(region1, 255);
-
-  var corners = compareImageUtil.findCornerPoints(image1);
+  var corners = [
+    { x: 19.5, y: 19.5 }, { x: 39.5, y: 19.5 },
+    { x: 19.5, y: 35.5 }, { x: 39.5, y: 35.5 }
+  ];
   compareImageUtil.adjustCornerPointsSubPixel(image1, corners);
   var result1 = compareImageUtil.sparseOpticalFlow(image1, image1, corners);
 
@@ -1365,7 +1370,6 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   compareImageUtil.fill(image2, 0);
   var region3 = compareImageUtil.makeRegion(image2, 25, 22, 20, 16);
   compareImageUtil.fill(region3, 255);
-
   var result2 = compareImageUtil.sparseOpticalFlow(image1, image2, corners);
 
   EXPECT_EQ( 4, result2.length );
@@ -1377,6 +1381,22 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   EXPECT( 0.01 > Math.abs(2 - diffY(result2[2], corners[2])) );
   EXPECT( 0.01 > Math.abs(5 - diffX(result2[3], corners[3])) );
   EXPECT( 0.01 > Math.abs(2 - diffY(result2[3], corners[3])) );
+
+  var image3 = compareImageUtil.makeImage(50, 50, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image3, 0);
+  var region4 = compareImageUtil.makeRegion(image3, 8, 10, 20, 16);
+  compareImageUtil.fill(region4, 255);
+  var result3 = compareImageUtil.sparseOpticalFlow(image1, image3, corners);
+
+  EXPECT_EQ( 4, result3.length );
+  EXPECT( 0.01 > Math.abs(-12 - diffX(result3[0], corners[0])) );
+  EXPECT( 0.01 > Math.abs(-10 - diffY(result3[0], corners[0])) );
+  EXPECT( 0.01 > Math.abs(-12 - diffX(result3[1], corners[1])) );
+  EXPECT( 0.01 > Math.abs(-10 - diffY(result3[1], corners[1])) );
+  EXPECT( 0.01 > Math.abs(-12 - diffX(result3[2], corners[2])) );
+  EXPECT( 0.01 > Math.abs(-10 - diffY(result3[2], corners[2])) );
+  EXPECT( 0.01 > Math.abs(-12 - diffX(result3[3], corners[3])) );
+  EXPECT( 0.01 > Math.abs(-10 - diffY(result3[3], corners[3])) );
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
