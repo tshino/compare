@@ -1010,6 +1010,8 @@
       for (var i = 0, p; p = points[i]; i++) {
         nextPoints[i] = { x: p.x, y: p.y };
       }
+    } else {
+      nextPoints = Array.prototype.slice.call(nextPoints);
     }
     if (20 < Math.min(image1.width, image1.height)) {
       var upperW = Math.ceil(image1.width / 2);
@@ -1035,9 +1037,17 @@
         upperPoints[i] = scale(p);
         nextPoints[i] = scale(nextPoints[i]);
       }
-      nextPoints = sparseOpticalFlow(upper1, upper2, upperPoints, nextPoints);
-      for (var i = 0, p; p = points[i]; i++) {
-        nextPoints[i] = unscale(nextPoints[i]);
+      var updatedPoints = sparseOpticalFlow(upper1, upper2, upperPoints, nextPoints);
+      for (var i = 0; i < points.length; i++) {
+        if (!updatedPoints[i] && nextPoints[i]) {
+          var np = nextPoints[i];
+          var border = 7;
+          if (np.x < border || image1.width - 1 - border < np.x ||
+              np.y < border || image1.height - 1 - border < np.y) {
+            updatedPoints[i] = np;
+          }
+        }
+        nextPoints[i] = unscale(updatedPoints[i]);
       }
     }
     var dx1 = makeImage(image1.width, image1.height, image1.format);

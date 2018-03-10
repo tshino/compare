@@ -1433,6 +1433,18 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   checkOpticalFlowResult( 'result7', result7, 10, [
     { x: 54.5, y: 19.5 }, { x: 74.5, y: 19.5 }, { x: 54.5, y: 39.5 }, { x: 74.5, y: 39.5 }
   ] );
+
+  var image8 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image8, 0);
+  compareImageUtil.fill(makeRegion(image8, 12, 15, 20, 20), 255);
+  var result8 = compareImageUtil.sparseOpticalFlow(image6, image8, corners2);
+  checkOpticalFlowResult( 'result8', result8, 10, [
+    { x: 11.5, y: 14.5 }, { x: 31.5, y: 14.5 }, { x: 11.5, y: 34.5 }, { x: 31.5, y: 34.5 }
+  ] );
+  var result8rev = compareImageUtil.sparseOpticalFlow(image8, image6, result8);
+  checkOpticalFlowResult( 'result8 reverse', result8rev, 10, [
+    { x: 24.5, y: 14.5 }, { x: 44.5, y: 14.5 }, { x: 24.5, y: 34.5 }, { x: 44.5, y: 34.5 }
+  ] );
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
