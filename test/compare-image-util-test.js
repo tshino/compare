@@ -1445,6 +1445,27 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   checkOpticalFlowResult( 'result8 reverse', result8rev, 10, [
     { x: 24.5, y: 14.5 }, { x: 44.5, y: 14.5 }, { x: 24.5, y: 34.5 }, { x: 44.5, y: 34.5 }
   ] );
+
+  // Angle shape ('L')
+  var image9 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image9, 0);
+  compareImageUtil.fill(makeRegion(image9, 40, 20, 20, 40), 255);
+  compareImageUtil.fill(makeRegion(image9, 20, 40, 40, 20), 255);
+  var corners3 = [
+    { x: 39.5, y: 39.5 }
+  ];
+  compareImageUtil.adjustCornerPointsSubPixel(image9, corners3);
+  var result9 = compareImageUtil.sparseOpticalFlow(image9, image9, corners3);
+  checkOpticalFlowResult( 'result9', result9, 100, corners3);
+
+  var image10 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image10, 0);
+  compareImageUtil.fill(makeRegion(image10, 70, 25, 20, 40), 255);
+  compareImageUtil.fill(makeRegion(image10, 50, 45, 40, 20), 255);
+  var result10 = compareImageUtil.sparseOpticalFlow(image9, image10, corners3);
+  checkOpticalFlowResult( 'result10', result10, 10, [
+    { x: 69.5, y: 44.5 }
+  ] );
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
