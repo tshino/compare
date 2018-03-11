@@ -2475,20 +2475,28 @@
       var fig = figureUtil.makeBlankFigure(w, h);
       var bits = fig.context.createImageData(w, h);
       figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
+      var vectorPaths = [];
       fig.context.putImageData(bits, 0, 0);
-      fig.context.lineWidth = 1;
-      fig.context.strokeStyle = '#fff';
+      var pointToCoord = function(x, y) {
+        return x.toFixed(2) + ',' + y.toFixed(2);
+      };
       for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
-        fig.context.beginPath();
-        fig.context.moveTo(p.x0 + 0.5, p.y0 + 0.5);
-        fig.context.lineTo(p.x1 + 0.5, p.y1 + 0.5);
-        fig.context.stroke();
+        vectorPaths.push(
+          'M ' + pointToCoord(p.x0 + 0.5, p.y0 + 0.5) +
+          ' L ' + pointToCoord(p.x1 + 0.5, p.y1 + 0.5)
+        );
       }
+      var vectors =
+          '<g stroke="white" fill="none">' +
+            '<path stroke-width="0.6" d="' + vectorPaths.join(' ') + '"></path>' +
+          '</g>';
       styles = updateFigureStylesForActualSize(styles, w, h);
       opticalFlowResult.baseWidth = styles.baseW;
       opticalFlowResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
-      $('#opticalFlowResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
+      var picture = $(fig.canvas).css(styles.style).addClass('figMain');
+      var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
+      $('#opticalFlowResult').append(picture).append(overlay).css(styles.cellStyle);
       if (opticalFlowResult.result.points.length === 0) {
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'Could not detect any optical flow',
@@ -2525,7 +2533,7 @@
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (opticalFlowResult.result !== null) {
-          $('#opticalFlowResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+          $('#opticalFlowResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
         }
       } else {
         updateTableDOM();
