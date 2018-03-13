@@ -1466,6 +1466,25 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   checkOpticalFlowResult( 'result10', result10, 10, [
     { x: 69.5, y: 44.5 }
   ] );
+
+  // thin line
+  var image11 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image11, 0);
+  compareImageUtil.fill(makeRegion(image11, 30, 30, 100, 5), 255);
+  var corners4 = [
+    { x: 29.1, y: 32.0 }, { x:129.9, y: 32.0 }
+  ];
+  compareImageUtil.adjustCornerPointsSubPixel(image11, corners4);
+  var result11 = compareImageUtil.sparseOpticalFlow(image11, image11, corners4);
+  checkOpticalFlowResult( 'result11', result11, 100, corners4);
+
+  var image12 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+  compareImageUtil.fill(image12, 0);
+  compareImageUtil.fill(makeRegion(image12, 40, 40, 100, 5), 255);
+  var result12 = compareImageUtil.sparseOpticalFlow(image11, image12, corners4);
+  checkOpticalFlowResult( 'result12', result12, 10, [
+    { x: 39.1, y: 42.0 }, { x:139.9, y: 42.0 }
+  ] );
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
