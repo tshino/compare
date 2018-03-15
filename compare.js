@@ -2469,7 +2469,7 @@
         }, attachImageDataToTask);
       }
     };
-    var updateReport = function(styles) {
+    var makeFigure = function(styles) {
       var w = opticalFlowResult.result.image.width;
       var h = opticalFlowResult.result.image.height;
       var fig = figureUtil.makeBlankFigure(w, h);
@@ -2497,6 +2497,9 @@
       var picture = $(fig.canvas).css(styles.style).addClass('figMain');
       var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
       $('#opticalFlowResult').append(picture).append(overlay).css(styles.cellStyle);
+    };
+    var updateReport = function(styles) {
+      makeFigure(styles);
       if (opticalFlowResult.result.points.length === 0) {
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'Could not detect any optical flow',
