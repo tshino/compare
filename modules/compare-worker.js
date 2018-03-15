@@ -434,17 +434,17 @@ function calcOpticalFlow( a, b ) {
   var grayB = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
   compareImageUtil.convertToGrayscale(grayA, a);
   compareImageUtil.convertToGrayscale(grayB, b);
-  a = null;
-  b = null;
   var figImage = compareImageUtil.makeImage(w, h);
   for (var y = 0, i = 0; y < h; y++) {
     for (var x = 0; x < w; x++, i++) {
-      figImage.data[i * 4 + 0] = 0.5 * grayA.data[i];
-      figImage.data[i * 4 + 1] = 0.5 * grayB.data[i];
-      figImage.data[i * 4 + 2] = 0.5 * grayB.data[i];
+      figImage.data[i * 4 + 0] = 0.5 * a.data[i * 4 + 0];
+      figImage.data[i * 4 + 1] = 0.5 * b.data[i * 4 + 1];
+      figImage.data[i * 4 + 2] = 0.5 * b.data[i * 4 + 2];
       figImage.data[i * 4 + 3] = 255;
     }
   }
+  a = null;
+  b = null;
   var pointsA = compareImageUtil.findCornerPoints(grayA);
   compareImageUtil.adjustCornerPointsSubPixel(grayA, pointsA);
   var pointsB = compareImageUtil.sparseOpticalFlow(grayA, grayB, pointsA);
