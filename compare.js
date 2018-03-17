@@ -2445,12 +2445,13 @@
     var opticalFlowResult = {};
     var onRemoveEntry = function(index) {
       if (opticalFlowResult.base === index || opticalFlowResult.target === index) {
-        $('#opticalFlowResult *').remove();
+        $('#opticalFlowResult > *').remove();
         opticalFlowResult.result = null;
       }
     };
     var updateOptionsDOM = function() {
-      $('#opticalFlowResult *').remove();
+      $('#opticalFlowResult > *').remove();
+      $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
       $('#opticalFlowSummary *').remove();
       if (false === setupBaseAndTargetSelector('#opticalFlowBaseName', '#opticalFlowTargetName', updateTable)) {
         return false;
@@ -2498,8 +2499,25 @@
       var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
       $('#opticalFlowResult').append(picture).append(overlay).css(styles.cellStyle);
     };
+    var updateStatistics = function() {
+      if (opticalFlowResult.result.points.length === 0) {
+        $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
+      } else {
+        var sumDX = 0;
+        var sumDY = 0;
+        for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+          sumDX += p.x1 - p.x0;
+          sumDY += p.y1 - p.y0;
+        }
+        var avgDX = sumDX / opticalFlowResult.result.points.length;
+        var avgDY = sumDY / opticalFlowResult.result.points.length;
+        $('#opticalFlowDeltaX').text((0 < avgDX ? '+' : '') + avgDX.toFixed(2) + 'px');
+        $('#opticalFlowDeltaY').text((0 < avgDY ? '+' : '') + avgDY.toFixed(2) + 'px');
+      }
+    };
     var updateReport = function(styles) {
       makeFigure(styles);
+      updateStatistics();
       if (opticalFlowResult.result.points.length === 0) {
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'Could not detect any optical flow',
@@ -2520,11 +2538,12 @@
       if (opticalFlowResult.base !== baseImageIndex || opticalFlowResult.target !== targetImageIndex) {
         updateAsync();
       }
-      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
+      var figW = Math.max(600, Math.round($('#view').width() * 0.65));
       var figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (opticalFlowResult.result === null) {
         $('#opticalFlowResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+        $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'calculating...',
           ja: '計算中...'

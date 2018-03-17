@@ -690,13 +690,29 @@ var changeLang = function(lang) {
 							<span class="en">Target Image</span>
 							<span class="ja">対象画像</span>
 						</td>
-						<td id="opticalFlowTargetName" style="min-width: 216px"></td>
+						<td id="opticalFlowTargetName" style="min-width: 216px" colspan="2"></td>
 					</tr>
 					<tr>
 						<td id="opticalFlowResult" class="fig" colspan="4"></td>
+						<td class="prop"><table>
+							<tr>
+								<td class="prop">
+									<span class="en">Avg. ΔX</span>
+									<span class="ja">平均 ΔX</span>
+								</td>
+								<td id="opticalFlowDeltaX"></td>
+							</tr>
+							<tr>
+								<td class="prop">
+									<span class="en">Avg. ΔY</span>
+									<span class="ja">平均 ΔY</span>
+								</td>
+								<td id="opticalFlowDeltaY"></td>
+							</tr>
+						</table></td>
 					</tr>
 					<tr>
-						<td class="output" colspan="4" style="text-align:center">
+						<td class="output" colspan="5" style="text-align:center">
 							<span id="opticalFlowSummary"></span>
 						</td>
 					</tr>
