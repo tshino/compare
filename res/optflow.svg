@@ -16,7 +16,7 @@
     <path fill="none" stroke="rgb(0,0,0)" id="Drawing_2_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1900,2600 L 1500,2600 1500,2200"/>
    </g>
    <g>
-    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1500,2600 L 2200,1900"/>
+    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_3_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1500,2600 L 2000,2100"/>
    </g>
   </g>
   <g id="DrawingGroup_2">
@@ -24,7 +24,7 @@
     <path fill="none" stroke="rgb(0,0,0)" id="Drawing_4_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 3000,2607 L 2717,2890 2434,2607"/>
    </g>
    <g>
-    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2717,2890 L 2717,1900"/>
+    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_5_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 2717,2890 L 2717,2200"/>
    </g>
   </g>
   <g id="DrawingGroup_3">
@@ -32,7 +32,7 @@
     <path fill="none" stroke="rgb(0,0,0)" id="Drawing_6_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1293,1766 L 1010,1483 1293,1200"/>
    </g>
    <g>
-    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_7_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1010,1483 L 2000,1483"/>
+    <path fill="none" stroke="rgb(0,0,0)" id="Drawing_7_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1010,1483 L 1700,1483"/>
    </g>
   </g>
  </g>
