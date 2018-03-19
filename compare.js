@@ -2443,15 +2443,50 @@
   // Optical Flow
   var opticalFlowDialog = (function() {
     var opticalFlowResult = {};
+    var pointedVector = null;
+    $('#opticalFlow').on('mousemove', 'td.fig > *', function(e) {
+      if (opticalFlowResult.result !== null) {
+        var pointer = figureZoom.positionFromMouseEvent(e, this, null);
+        var w = opticalFlowResult.result.image.width;
+        var h = opticalFlowResult.result.image.height;
+        pointer.x *= w;
+        pointer.y *= h;
+        var nearest = 0, distance = w + h, size = 0;
+        for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+          var distX = pointer.x - (p.x0 + p.x1) * 0.5;
+          var distY = pointer.y - (p.y0 + p.y1) * 0.5;
+          var d = Math.sqrt(distX * distX + distY * distY);
+          if (d < distance) {
+            nearest = p;
+            distance = d;
+            size = Math.max(Math.abs(p.x0 - p.x1), Math.abs(p.y0 - p.y1));
+          }
+        }
+        if (distance < Math.max(5, size * 0.8)) {
+          if (pointedVector === null || pointedVector !== nearest) {
+            pointedVector = nearest;
+            var dx = pointedVector.x1 - pointedVector.x0;
+            var dy = pointedVector.y1 - pointedVector.y0;
+            $('#opticalFlowSelectedDeltaX').text((0 < dx ? '+' : '') + dx.toFixed(2) + 'px');
+            $('#opticalFlowSelectedDeltaY').text((0 < dy ? '+' : '') + dy.toFixed(2) + 'px');
+          }
+        } else {
+          pointedVector = null;
+          $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
+        }
+      }
+    });
     var onRemoveEntry = function(index) {
       if (opticalFlowResult.base === index || opticalFlowResult.target === index) {
         $('#opticalFlowResult > *').remove();
         opticalFlowResult.result = null;
+        pointedVector = null;
       }
     };
     var updateOptionsDOM = function() {
       $('#opticalFlowResult > *').remove();
       $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
+      $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
       $('#opticalFlowSummary *').remove();
       if (false === setupBaseAndTargetSelector('#opticalFlowBaseName', '#opticalFlowTargetName', updateTable)) {
         return false;
@@ -2462,6 +2497,7 @@
       opticalFlowResult.base   = baseImageIndex;
       opticalFlowResult.target = targetImageIndex;
       opticalFlowResult.result  = null;
+      pointedVector = null;
       discardTasksOfCommand('calcOpticalFlow');
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
@@ -2544,6 +2580,7 @@
       if (opticalFlowResult.result === null) {
         $('#opticalFlowResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
+        $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'calculating...',
           ja: '計算中...'
@@ -2564,6 +2601,7 @@
     var updateFigure = function(baseIndex, targetIndex, result) {
       if (opticalFlowResult.base === baseIndex && opticalFlowResult.target === targetIndex) {
         opticalFlowResult.result = result;
+        pointedVector = null;
       }
       updateTable();
     };
