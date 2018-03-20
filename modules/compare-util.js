@@ -98,6 +98,14 @@
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
 
+  var toSignedFixed = function(num, digits) {
+    digits = digits === undefined ? 0 : digits;
+    var scale = Math.pow(10, digits);
+    var intnum =  Math.round(num * scale);
+    var sign = 0 < intnum ? '+' : 0 > intnum ? '-' : '';
+    return sign + (Math.abs(intnum) / scale).toFixed(digits);
+  };
+
   var toPercent = function(num) {
     if (num === 0) return '0%';
     if (num === 1) return '100%';
@@ -1292,6 +1300,7 @@
     clamp:                  clamp,
     calcGCD:                calcGCD,
     addComma:               addComma,
+    toSignedFixed:          toSignedFixed,
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,
     binaryFromDataURI:      binaryFromDataURI,

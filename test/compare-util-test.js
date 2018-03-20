@@ -30,6 +30,34 @@ TEST( 'compareUtil addComma', function test() {
   EXPECT( compareUtil.addComma(1234567890) === '1,234,567,890' );
 });
 
+TEST( 'compareUtil toSignedFixed', function test() {
+  EXPECT_EQ( '+1', compareUtil.toSignedFixed(1.234567, 0) );
+  EXPECT_EQ( '-1', compareUtil.toSignedFixed(-1.234567, 0) );
+  EXPECT_EQ( '+1.2', compareUtil.toSignedFixed(1.234567, 1) );
+  EXPECT_EQ( '-1.2', compareUtil.toSignedFixed(-1.234567, 1) );
+  EXPECT_EQ( '+1.23', compareUtil.toSignedFixed(1.234567, 2) );
+  EXPECT_EQ( '+1.23457', compareUtil.toSignedFixed(1.234567, 5) );
+  EXPECT_EQ( '-1.23457', compareUtil.toSignedFixed(-1.234567, 5) );
+
+  EXPECT_EQ( '0', compareUtil.toSignedFixed(0, 0) );
+  EXPECT_EQ( '0.0', compareUtil.toSignedFixed(0, 1) );
+  EXPECT_EQ( '0.00', compareUtil.toSignedFixed(0, 2) );
+  EXPECT_EQ( '0.00000', compareUtil.toSignedFixed(0, 5) );
+
+  EXPECT_EQ( '0', compareUtil.toSignedFixed(0.01, 0) );
+  EXPECT_EQ( '0', compareUtil.toSignedFixed(-0.01, 0) );
+  EXPECT_EQ( '0.0', compareUtil.toSignedFixed(0.01, 1) );
+  EXPECT_EQ( '0.0', compareUtil.toSignedFixed(-0.01, 1) );
+  EXPECT_EQ( '+0.01', compareUtil.toSignedFixed(0.01, 2) );
+  EXPECT_EQ( '-0.01', compareUtil.toSignedFixed(-0.01, 2) );
+  EXPECT_EQ( '+0.010', compareUtil.toSignedFixed(0.01, 3) );
+  EXPECT_EQ( '-0.010', compareUtil.toSignedFixed(-0.01, 3) );
+
+  EXPECT_EQ( '0', compareUtil.toSignedFixed(0) );
+  EXPECT_EQ( '+123', compareUtil.toSignedFixed(123) );
+  EXPECT_EQ( '-123', compareUtil.toSignedFixed(-123) );
+});
+
 TEST( 'compareUtil toPercent', function test() {
   EXPECT( compareUtil.toPercent(0)       === '0%' );
   EXPECT( compareUtil.toPercent(0.00001) === '0.00100%' );
