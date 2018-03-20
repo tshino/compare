@@ -2467,8 +2467,8 @@
             pointedVector = nearest;
             var dx = pointedVector.x1 - pointedVector.x0;
             var dy = pointedVector.y1 - pointedVector.y0;
-            $('#opticalFlowSelectedDeltaX').text((0 < dx ? '+' : '') + dx.toFixed(2) + 'px');
-            $('#opticalFlowSelectedDeltaY').text((0 < dy ? '+' : '') + dy.toFixed(2) + 'px');
+            $('#opticalFlowSelectedDeltaX').text(compareUtil.toSignedFixed(dx, 2) + 'px');
+            $('#opticalFlowSelectedDeltaY').text(compareUtil.toSignedFixed(dy, 2) + 'px');
           }
         } else {
           pointedVector = null;
@@ -2547,8 +2547,8 @@
         }
         var avgDX = sumDX / opticalFlowResult.result.points.length;
         var avgDY = sumDY / opticalFlowResult.result.points.length;
-        $('#opticalFlowDeltaX').text((0 < avgDX ? '+' : '') + avgDX.toFixed(2) + 'px');
-        $('#opticalFlowDeltaY').text((0 < avgDY ? '+' : '') + avgDY.toFixed(2) + 'px');
+        $('#opticalFlowDeltaX').text(compareUtil.toSignedFixed(avgDX, 2) + 'px');
+        $('#opticalFlowDeltaY').text(compareUtil.toSignedFixed(avgDY, 2) + 'px');
       }
     };
     var updateReport = function(styles) {
