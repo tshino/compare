@@ -201,6 +201,11 @@
     var selector = '#view > div.imageBox';
     return crossCursor.processMouseMove(e, selector, this);
   });
+  figureZoom.setPointCallback(function(e) {
+    if ($('#opticalFlow').is(':visible')) {
+      opticalFlowDialog.processClick(e);
+    }
+  });
 
   hud.initialize();
   colorHUD.initialize();
@@ -2446,15 +2451,20 @@
     var pointedVector = null;
     $('#opticalFlow').on('mousemove', 'td.fig > *', function(e) {
       if (opticalFlowResult.result !== null) {
-        var pointer = figureZoom.positionFromMouseEvent(e, this, null);
+        var point = figureZoom.positionFromMouseEvent(e, this, null);
+        onFigurePointed(point);
+      }
+    });
+    var onFigurePointed = function(point) {
+      if (opticalFlowResult.result !== null) {
         var w = opticalFlowResult.result.image.width;
         var h = opticalFlowResult.result.image.height;
-        pointer.x *= w;
-        pointer.y *= h;
+        point.x *= w;
+        point.y *= h;
         var nearest = 0, distance = w + h, size = 0;
         for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
-          var distX = pointer.x - (p.x0 + p.x1) * 0.5;
-          var distY = pointer.y - (p.y0 + p.y1) * 0.5;
+          var distX = point.x - (p.x0 + p.x1) * 0.5;
+          var distY = point.y - (p.y0 + p.y1) * 0.5;
           var d = Math.sqrt(distX * distX + distY * distY);
           if (d < distance) {
             nearest = p;
@@ -2475,7 +2485,10 @@
           $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
         }
       }
-    });
+    };
+    var processClick = function(point) {
+      onFigurePointed(point);
+    };
     var onRemoveEntry = function(index) {
       if (opticalFlowResult.base === index || opticalFlowResult.target === index) {
         $('#opticalFlowResult > *').remove();
@@ -2612,6 +2625,7 @@
       }
     });
     return {
+      processClick: processClick,
       onRemoveEntry: onRemoveEntry,
       updateTable: updateTable,
       updateFigure: updateFigure,
