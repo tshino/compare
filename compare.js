@@ -2455,24 +2455,32 @@
         onFigurePointed(point);
       }
     });
+    var findPointedVector = function(point) {
+      var w = opticalFlowResult.result.image.width;
+      var h = opticalFlowResult.result.image.height;
+      var px = point.x * w;
+      var py = point.y * h;
+      var nearest = 0, distance = w + h, size = 0;
+      for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+        var distX = px - (p.x0 + p.x1) * 0.5;
+        var distY = py - (p.y0 + p.y1) * 0.5;
+        var d = Math.sqrt(distX * distX + distY * distY);
+        if (d < distance) {
+          nearest = p;
+          distance = d;
+          size = Math.max(Math.abs(p.x0 - p.x1), Math.abs(p.y0 - p.y1));
+        }
+      }
+      if (distance < Math.max(5, size * 0.8)) {
+        return nearest;
+      } else {
+        return null;
+      }
+    };
     var onFigurePointed = function(point) {
       if (opticalFlowResult.result !== null) {
-        var w = opticalFlowResult.result.image.width;
-        var h = opticalFlowResult.result.image.height;
-        point.x *= w;
-        point.y *= h;
-        var nearest = 0, distance = w + h, size = 0;
-        for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
-          var distX = point.x - (p.x0 + p.x1) * 0.5;
-          var distY = point.y - (p.y0 + p.y1) * 0.5;
-          var d = Math.sqrt(distX * distX + distY * distY);
-          if (d < distance) {
-            nearest = p;
-            distance = d;
-            size = Math.max(Math.abs(p.x0 - p.x1), Math.abs(p.y0 - p.y1));
-          }
-        }
-        if (distance < Math.max(5, size * 0.8)) {
+        var nearest = findPointedVector(point);
+        if (nearest) {
           if (pointedVector === null || pointedVector !== nearest) {
             pointedVector = nearest;
             var dx = pointedVector.x1 - pointedVector.x0;
