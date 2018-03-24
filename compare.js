@@ -2485,12 +2485,32 @@
             pointedVector = nearest;
             var dx = pointedVector.x1 - pointedVector.x0;
             var dy = pointedVector.y1 - pointedVector.y0;
-            $('#opticalFlowSelectedDeltaX').text(compareUtil.toSignedFixed(dx, 2) + 'px');
-            $('#opticalFlowSelectedDeltaY').text(compareUtil.toSignedFixed(dy, 2) + 'px');
+            var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
+            var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
+            $('#opticalFlowSelectedDeltaX').text(dxText);
+            $('#opticalFlowSelectedDeltaY').text(dyText);
+            var w = opticalFlowResult.result.image.width;
+            var h = opticalFlowResult.result.image.height;
+            var popupX = (pointedVector.x1 / w) * 100 + '%';
+            var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
+            $('#opticalFlowResult > div > span').text(dxText + ', ' + dyText).show().css({
+              position: 'absolute',
+              fontSize: '12px',
+              lineHeight: '16px',
+              border: '0.5px solid white',
+              borderRadius: '6px 6px 6px 0px',
+              margin: '1px',
+              padding: '0px 5px',
+              color: 'white',
+              background: 'rgba(128,128,128,0.5)',
+              left: popupX,
+              bottom: popupY
+            });
           }
         } else {
           pointedVector = null;
           $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
+          $('#opticalFlowResult > div > span').hide();
         }
       }
     };
@@ -2554,7 +2574,8 @@
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       var picture = $(fig.canvas).css(styles.style).addClass('figMain');
       var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
-      $('#opticalFlowResult').append(picture).append(overlay).css(styles.cellStyle);
+      var popup = $('<div>').append($('<span>')).css(styles.style);
+      $('#opticalFlowResult').append(picture).append(overlay).append(popup).css(styles.cellStyle);
     };
     var updateStatistics = function() {
       if (opticalFlowResult.result.points.length === 0) {
