@@ -2493,7 +2493,21 @@
             var h = opticalFlowResult.result.image.height;
             var popupX = (pointedVector.x1 / w) * 100 + '%';
             var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
-            $('#opticalFlowResult > div > span').text(dxText + ', ' + dyText).show().css({
+            var arrowType = dy < 0 ? (dx < 0 ? 0 : 1) : (dx < 0 ? 3 : 2);
+            var arrowDesc = [
+              'M9,9L1,1 m0,3v-3h3',
+              'M1,9L9,1 m-3,0h3v3',
+              'M1,1L9,9 m0,-3v3h-3',
+              'M9,1L1,9 m0,-3v3h3'
+            ][arrowType];
+            var arrowMark = $('<svg viewBox="0 0 10 10"><path fill="none" stroke="white" stroke-width="0.8" d="' + arrowDesc + '"></path></svg>').css({
+              display: 'inline-block',
+              width: '1em',
+              heigit: '1em'
+            });
+            var text = $('<span>').text(dxText + ', ' + dyText);
+            $('#opticalFlowResult > div > span *').remove();
+            $('#opticalFlowResult > div > span').append(arrowMark).append(text).show().css({
               position: 'absolute',
               fontSize: '12px',
               lineHeight: '16px',
