@@ -2513,13 +2513,15 @@
               lineHeight: '16px',
               border: '0.5px solid white',
               borderRadius: '6px 6px 6px 0px',
-              margin: '1px',
+              margin: '0.5px',
               padding: '0px 5px',
               color: 'white',
               background: 'rgba(128,128,128,0.5)',
               left: popupX,
-              bottom: popupY
+              bottom: popupY,
+              transformOrigin: 'left bottom'
             });
+            updateTable(/*transformOnly=*/ true);
           }
         } else {
           pointedVector = null;
@@ -2649,6 +2651,7 @@
       if (transformOnly) {
         if (opticalFlowResult.result !== null) {
           $('#opticalFlowResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+          $('#opticalFlowResult > div > span').css({ transform: 'scale(' + (1 / figureZoom.scale) + ')' });
         }
       } else {
         updateTableDOM();
