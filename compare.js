@@ -2502,8 +2502,9 @@
             ][arrowType];
             var arrowMark = $('<svg viewBox="0 0 10 10"><path fill="none" stroke="white" stroke-width="0.8" d="' + arrowDesc + '"></path></svg>').css({
               display: 'inline-block',
-              width: '1em',
-              heigit: '1em'
+              verticalAlign: '-10%',
+              width: '12px',
+              heigit: '12px'
             });
             var text = $('<span>').text(dxText + ', ' + dyText);
             $('#opticalFlowResult > div > span *').remove();
