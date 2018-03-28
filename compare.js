@@ -2116,16 +2116,15 @@
       });
       return colorList;
     };
-    var drawFigure = function(colorList) {
+    var drawFigure = function(colorList, totalCount) {
       var height = 640;
       var fig = figureUtil.makeBlankFigure(256, height);
       var context = fig.context;
-      context.fillStyle = '#666';
+      context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
       var topCount = colorList[0][1];
       var num = Math.min(32, colorList.length);
       context.font = '14px sans-serif';
-      context.textAlign = 'right';
       for (var k = 0; k < num; k++) {
         var count = colorList[k][1];
         var r = Math.round(colorList[k][2] / count);
@@ -2133,12 +2132,19 @@
         var b = Math.round(colorList[k][4] / count);
         var frequency = count / topCount;
         var rgb = compareUtil.toHexTriplet(r, g, b);
+        var y0 = k / num * height;
+        var y1 = (k + 1) / num * height;
+        var ratio = count / totalCount;
         context.fillStyle = rgb;
-        context.fillRect(
-          0, k / num * height,
-          256 * frequency, (k + 1) / num * height - k / num * height);
-        context.fillStyle = (frequency > 0.7 && r + g + b > 3 * 200) ? '#000' : '#fff';
-        context.fillText(rgb, 256 - 4, (k + 1) / num * height - 4);
+        context.fillRect(1, y0 + 1, 80 - 2, y1 - y0 - 2);
+        context.fillStyle = '#aaa';
+        context.fillRect(80, y0 + 1, (254 - 80) * frequency, y1 - y0 - 2);
+        context.textAlign = 'left';
+        context.fillStyle = (r + g + b > 3 * 200) ? '#000' : '#fff';
+        context.fillText(rgb, 1, y1 - 4);
+        context.textAlign = 'right';
+        context.fillStyle = '#fff';
+        context.fillText(compareUtil.toPercent(ratio), 256 - 4, y1 - 4);
       }
       return $(fig.canvas).width(256).height(480);
     };
@@ -2162,7 +2168,7 @@
           continue;
         }
         var colorList = makeReducedColorList(img.colorTable);
-        var figure = drawFigure(colorList);
+        var figure = drawFigure(colorList, img.colorTable.totalCount);
         var cell = $('<td>').append(figure);
         target.find('tr').eq(1).append(cell);
       }
