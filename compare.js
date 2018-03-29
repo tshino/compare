@@ -2117,13 +2117,13 @@
       return colorList;
     };
     var drawFigure = function(colorList, totalCount) {
-      var height = 640;
+      var height = 480;
       var fig = figureUtil.makeBlankFigure(256, height);
       var context = fig.context;
       context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
       var topCount = colorList[0][1];
-      var num = Math.min(32, colorList.length);
+      var num = Math.min(26, colorList.length);
       context.font = '14px sans-serif';
       for (var k = 0; k < num; k++) {
         var count = colorList[k][1];
@@ -2140,13 +2140,13 @@
         context.fillStyle = '#aaa';
         context.fillRect(80, y0 + 1, (254 - 80) * frequency, y1 - y0 - 2);
         context.textAlign = 'left';
-        context.fillStyle = (r + g + b > 3 * 200) ? '#000' : '#fff';
+        context.fillStyle = (r * 2 + g * 5 + b > 8 * 128) ? '#000' : '#fff';
         context.fillText(rgb, 1, y1 - 4);
         context.textAlign = 'right';
         context.fillStyle = '#fff';
         context.fillText(compareUtil.toPercent(ratio), 256 - 4, y1 - 4);
       }
-      return $(fig.canvas).width(256).height(480);
+      return $(fig.canvas).width(256).height(380);
     };
     var updateAsync = function(img) {
       taskQueue.addTask({
