@@ -2125,23 +2125,35 @@
       var topCount = colorList[0][1];
       var num = Math.min(26, colorList.length);
       context.font = '14px sans-serif';
+      var others = null;
+      if (num < colorList.length) {
+        others = [0, 0, 0, 0, 0];
+        for (var k = num - 1; k < colorList.length; k++) {
+          others[1] += colorList[k][1];
+          others[2] += colorList[k][2];
+          others[3] += colorList[k][3];
+          others[4] += colorList[k][4];
+        }
+      }
       for (var k = 0; k < num; k++) {
-        var count = colorList[k][1];
-        var r = Math.round(colorList[k][2] / count);
-        var g = Math.round(colorList[k][3] / count);
-        var b = Math.round(colorList[k][4] / count);
+        var entry = (k === num - 1 && others) ? others : colorList[k];
+        var count = entry[1];
+        var r = Math.round(entry[2] / count);
+        var g = Math.round(entry[3] / count);
+        var b = Math.round(entry[4] / count);
         var frequency = count / topCount;
         var rgb = compareUtil.toHexTriplet(r, g, b);
         var y0 = k / num * height;
         var y1 = (k + 1) / num * height;
         var ratio = count / totalCount;
+        var label = entry === others ? 'Others' : rgb;
         context.fillStyle = rgb;
         context.fillRect(1, y0 + 1, 80 - 2, y1 - y0 - 2);
         context.fillStyle = '#aaa';
         context.fillRect(80, y0 + 1, (254 - 80) * frequency, y1 - y0 - 2);
         context.textAlign = 'left';
         context.fillStyle = (r * 2 + g * 5 + b > 8 * 128) ? '#000' : '#fff';
-        context.fillText(rgb, 1, y1 - 4);
+        context.fillText(label, 1, y1 - 4);
         context.textAlign = 'right';
         context.fillStyle = '#fff';
         context.fillText(compareUtil.toPercent(ratio), 256 - 4, y1 - 4);
