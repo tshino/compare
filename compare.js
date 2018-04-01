@@ -2071,7 +2071,7 @@
       var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
       return [y, cb, cr];
     };
-    var makeReducedColorList = function(colorTable) {
+    var makeReducedColorTable = function(colorTable) {
       var colors_org = colorTable.colors;
       var counts_org = colorTable.counts;
       var length_org = counts_org.length;
@@ -2114,9 +2114,13 @@
       colorList.sort(function(a, b) {
         return b[1] - a[1]; // by count
       });
-      return colorList;
+      return {
+        colorList: colorList,
+        totalCount: colorTable.totalCount
+      };
     };
-    var drawFigure = function(colorList, totalCount) {
+    var drawFigure = function(reducedColorTable) {
+      var colorList = reducedColorTable.colorList;
       var height = 480;
       var fig = figureUtil.makeBlankFigure(256, height);
       var context = fig.context;
@@ -2145,7 +2149,7 @@
         var rgb = compareUtil.toHexTriplet(r, g, b);
         var y0 = k / num * height;
         var y1 = (k + 1) / num * height;
-        var ratio = count / totalCount;
+        var ratio = count / reducedColorTable.totalCount;
         var label = entry === others ? 'Others' : rgb;
         context.fillStyle = rgb;
         context.fillRect(1, y0 + 1, 80 - 2, y1 - y0 - 2);
@@ -2179,8 +2183,8 @@
           updateAsync(img);
           continue;
         }
-        var colorList = makeReducedColorList(img.colorTable);
-        var figure = drawFigure(colorList, img.colorTable.totalCount);
+        var reducedColorTable = makeReducedColorTable(img.colorTable);
+        var figure = drawFigure(reducedColorTable);
         var cell = $('<td>').append(figure);
         target.find('tr').eq(1).append(cell);
       }
