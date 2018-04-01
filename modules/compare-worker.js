@@ -31,6 +31,9 @@ self.addEventListener('message', function(e) {
   case 'calcColorTable':
     result.result = compareImageUtil.getUniqueColors(data.imageData[0]);
     break;
+  case 'calcReducedColorTable':
+    result.result = calcReducedColorTable(data.imageData[0]);
+    break;
   case 'calcMetrics':
     result.result = calcMetrics(data.imageData[0], data.imageData[1]);
     result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
@@ -187,6 +190,63 @@ function calcVectorscope( imageData, type )
     }
   }
   return dist;
+}
+
+function calcReducedColorTable( imageData )
+{
+  var rgbToYcbcr = function(r, g, b) {
+    var y = 0.299 * r + 0.587 * g + 0.114 * b;
+    var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
+    var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
+    return [y, cb, cr];
+  };
+  var colorTable = compareImageUtil.getUniqueColors(imageData);
+  var colors_org = colorTable.colors;
+  var counts_org = colorTable.counts;
+  var length_org = counts_org.length;
+  //
+  var colorList = [];
+  for (var k = 0; k < length_org; k++) {
+    var r = colors_org[k] >> 16;
+    var g = (colors_org[k] >> 8) & 255;
+    var b = colors_org[k] & 255;
+    var ycbcr = rgbToYcbcr(r, g, b);
+    var y = Math.round(Math.round((ycbcr[0] / 255) * 3) / 3 * 255);
+    var div = y < 128 ? 4 : 6;
+    var cb = Math.round(Math.round((ycbcr[1] / 255) * div) / div * 255);
+    var cr = Math.round(Math.round((ycbcr[2] / 255) * div) / div * 255);
+    var count = counts_org[k];
+    colorList[k] = [
+        (y << 16) + (cb << 8) + cr,
+        count,
+        r * count,
+        g * count,
+        b * count
+    ];
+  }
+  colorList.sort(function(a, b) {
+    return b[0] - a[0]; // by color
+  });
+  var uniqueCount = 1;
+  for (var k = 1; k < colorList.length; k++) {
+    if (colorList[k - 1][0] !== colorList[k][0]) {
+      uniqueCount += 1;
+      colorList[uniqueCount - 1] = colorList[k];
+    } else {
+      colorList[uniqueCount - 1][1] += colorList[k][1];
+      colorList[uniqueCount - 1][2] += colorList[k][2];
+      colorList[uniqueCount - 1][3] += colorList[k][3];
+      colorList[uniqueCount - 1][4] += colorList[k][4];
+    }
+  }
+  colorList = colorList.slice(0, uniqueCount);
+  colorList.sort(function(a, b) {
+    return b[1] - a[1]; // by count
+  });
+  return {
+    colorList: colorList,
+    totalCount: colorTable.totalCount
+  };
 }
 
 function calcAE( a, b )
