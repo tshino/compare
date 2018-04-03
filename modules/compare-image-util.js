@@ -733,7 +733,7 @@
         wsum += weight[k];
       }
       console.log('weightedAverageDelta (count = ' + count + ')');
-      return count == 0 ? null : {
+      return count === 0 ? null : {
         nx: xsum / wsum,
         ny: ysum / wsum
       };
@@ -767,8 +767,8 @@
           return h.mx === Math.round(nextX) && h.my === Math.round(nextY);
         });
         if (0 < duplicate.length) {
-          if (Math.round(result.motionX / 2) == 0 &&
-              Math.round(result.motionY / 2) == 0) {
+          if (Math.round(result.motionX / 2) === 0 &&
+              Math.round(result.motionY / 2) === 0) {
             mx = mxi;
             my = myi;
             break;
@@ -798,7 +798,7 @@
         continue;
       }
       var sameResult = results.filter(function(e) {
-        return e.motionX == result.motionX && e.motionY == result.motionY;
+        return e.motionX === result.motionX && e.motionY === result.motionY;
       });
       if (0 < sameResult.length) {
         return result;

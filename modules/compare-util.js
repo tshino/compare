@@ -384,7 +384,7 @@
               var app0 = binary.big32(block + 3);
               var app1 = binary.big32(block + 7);
               //console.log(app0.toString(16), app1.toString(16));
-              if (app0 === 0x4e455453 && app1 == 0x43415045 /* NETS CAPE */) {
+              if (app0 === 0x4e455453 && app1 === 0x43415045 /* NETS CAPE */) {
                 desc += ' (Animated)';
               }
             }
@@ -717,7 +717,7 @@
       return formatReader.detectTIFF(binary, magic, magic2);
     }
     var svg = formatReader.detectSVG(binary, magic, magic2);
-    if (svg != null) {
+    if (svg !== null) {
       return svg;
     }
     //alert(magic);

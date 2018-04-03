@@ -99,7 +99,7 @@
       }
       // TAB (9)
       if (e.keyCode === 9) {
-        if (false == viewManagement.flipSingleView(!e.shiftKey)) {
+        if (false === viewManagement.flipSingleView(!e.shiftKey)) {
           return false;
         }
       }
