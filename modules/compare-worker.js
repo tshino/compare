@@ -283,7 +283,7 @@ function calcMetrics( a, b )
   }
   var w = a.width;
   var h = a.height;
-  var average12 = function(data) {
+  var sum12 = function(data) {
     var sum1 = 0, sum2 = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum1 = 0, lineSum2 = 0;
@@ -295,14 +295,14 @@ function calcMetrics( a, b )
       sum1 += lineSum1;
       sum2 += lineSum2;
     }
-    return [ sum1 / (w * h * 3), sum2 / (w * h * 3) ];
+    return [sum1, sum2];
   };
-  var sd = function(ave12) {
-    return Math.sqrt(ave12[1] - ave12[0] * ave12[0]);
+  var sdsum = function(sum12) {
+    return Math.sqrt(sum12[1] * (w * h * 3) - sum12[0] * sum12[0]);
   };
   var calcNCC = function(dataA, dataB) {
-    var ave12A = average12(dataA), ave12B = average12(dataB);
-    var sdA = sd(ave12A), sdB = sd(ave12B);
+    var sum12A = sum12(dataA), sum12B = sum12(dataB);
+    var sdsumA = sdsum(sum12A), sdsumB = sdsum(sum12B);
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum = 0;
@@ -314,7 +314,7 @@ function calcMetrics( a, b )
       }
       sum += lineSum;
     }
-    return (sum / (w * h * 3) - ave12A[0] * ave12B[0]) / (sdA * sdB);
+    return (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / (sdsumA * sdsumB);
   };
   var ncc = calcNCC(a.data, b.data);
   var calcMSE = function(dataA, dataB) {
