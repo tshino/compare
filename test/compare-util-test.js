@@ -30,14 +30,25 @@ TEST( 'compareUtil addComma', function test() {
   EXPECT( compareUtil.addComma(1234567890) === '1,234,567,890' );
 });
 
+TEST( 'compareUtil hyphenToMinus', function test() {
+  EXPECT_EQ( '', compareUtil.hyphenToMinus('') );
+  EXPECT_EQ( '123', compareUtil.hyphenToMinus('123') );
+  EXPECT_EQ( '−123', compareUtil.hyphenToMinus('-123') );
+  EXPECT_EQ( '1.2345', compareUtil.hyphenToMinus('1.2345') );
+  EXPECT_EQ( '−1.2345', compareUtil.hyphenToMinus('-1.2345') );
+  EXPECT_EQ( '1.0e−5', compareUtil.hyphenToMinus('1.0e-5') );
+  EXPECT_EQ( '−1.0e−5', compareUtil.hyphenToMinus('-1.0e-5') );
+});
+
 TEST( 'compareUtil toSignedFixed', function test() {
+  // Note: '−' (U+2212 MINUS SIGN) is used instead of '-' (U+002D HYPHEN-MINUS)
   EXPECT_EQ( '+1', compareUtil.toSignedFixed(1.234567, 0) );
-  EXPECT_EQ( '-1', compareUtil.toSignedFixed(-1.234567, 0) );
+  EXPECT_EQ( '−1', compareUtil.toSignedFixed(-1.234567, 0) );
   EXPECT_EQ( '+1.2', compareUtil.toSignedFixed(1.234567, 1) );
-  EXPECT_EQ( '-1.2', compareUtil.toSignedFixed(-1.234567, 1) );
+  EXPECT_EQ( '−1.2', compareUtil.toSignedFixed(-1.234567, 1) );
   EXPECT_EQ( '+1.23', compareUtil.toSignedFixed(1.234567, 2) );
   EXPECT_EQ( '+1.23457', compareUtil.toSignedFixed(1.234567, 5) );
-  EXPECT_EQ( '-1.23457', compareUtil.toSignedFixed(-1.234567, 5) );
+  EXPECT_EQ( '−1.23457', compareUtil.toSignedFixed(-1.234567, 5) );
 
   EXPECT_EQ( '0', compareUtil.toSignedFixed(0, 0) );
   EXPECT_EQ( '0.0', compareUtil.toSignedFixed(0, 1) );
@@ -49,13 +60,13 @@ TEST( 'compareUtil toSignedFixed', function test() {
   EXPECT_EQ( '0.0', compareUtil.toSignedFixed(0.01, 1) );
   EXPECT_EQ( '0.0', compareUtil.toSignedFixed(-0.01, 1) );
   EXPECT_EQ( '+0.01', compareUtil.toSignedFixed(0.01, 2) );
-  EXPECT_EQ( '-0.01', compareUtil.toSignedFixed(-0.01, 2) );
+  EXPECT_EQ( '−0.01', compareUtil.toSignedFixed(-0.01, 2) );
   EXPECT_EQ( '+0.010', compareUtil.toSignedFixed(0.01, 3) );
-  EXPECT_EQ( '-0.010', compareUtil.toSignedFixed(-0.01, 3) );
+  EXPECT_EQ( '−0.010', compareUtil.toSignedFixed(-0.01, 3) );
 
   EXPECT_EQ( '0', compareUtil.toSignedFixed(0) );
   EXPECT_EQ( '+123', compareUtil.toSignedFixed(123) );
-  EXPECT_EQ( '-123', compareUtil.toSignedFixed(-123) );
+  EXPECT_EQ( '−123', compareUtil.toSignedFixed(-123) );
 });
 
 TEST( 'compareUtil toPercent', function test() {

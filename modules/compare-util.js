@@ -98,11 +98,15 @@
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
 
+  var hyphenToMinus = function(str) {
+    return String(str).replace(/\-/g, '\u2212');
+  };
+
   var toSignedFixed = function(num, digits) {
     digits = digits === undefined ? 0 : digits;
     var scale = Math.pow(10, digits);
     var intnum =  Math.round(num * scale);
-    var sign = 0 < intnum ? '+' : 0 > intnum ? '-' : '';
+    var sign = 0 < intnum ? '+' : 0 > intnum ? '\u2212' : '';
     return sign + (Math.abs(intnum) / scale).toFixed(digits);
   };
 
@@ -1300,6 +1304,7 @@
     clamp:                  clamp,
     calcGCD:                calcGCD,
     addComma:               addComma,
+    hyphenToMinus:          hyphenToMinus,
     toSignedFixed:          toSignedFixed,
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,

@@ -2242,10 +2242,10 @@
         )
       );
       var values = metricsToString(a.metrics[b.index], a);
-      $('#psnrValue').append($('<td>').text(values.psnr));
+      $('#psnrValue').append($('<td>').text(compareUtil.hyphenToMinus(values.psnr)));
       $('#rmseValue').append($('<td>').text(values.rmse));
       $('#mseValue').append($('<td>').text(values.mse));
-      $('#nccValue').append($('<td>').text(values.ncc));
+      $('#nccValue').append($('<td>').text(compareUtil.hyphenToMinus(values.ncc)));
       $('#aeValue').append($('<td>').text(values.ae));
     };
     var toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
