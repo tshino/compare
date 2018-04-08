@@ -2465,39 +2465,42 @@
         heigit: '12px'
       });
     };
+    var updateMotionVectorInfo = function() {
+      var dx = pointedVector.x1 - pointedVector.x0;
+      var dy = pointedVector.y1 - pointedVector.y0;
+      var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
+      var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
+      $('#opticalFlowSelectedDeltaX').text(dxText);
+      $('#opticalFlowSelectedDeltaY').text(dyText);
+      var w = opticalFlowResult.result.image.width;
+      var h = opticalFlowResult.result.image.height;
+      var popupX = (pointedVector.x1 / w) * 100 + '%';
+      var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
+      var arrowMark = makeArrowMark(dx, dy);
+      var text = $('<span>').text(dxText + ', ' + dyText);
+      $('#opticalFlowResult > div > span *').remove();
+      $('#opticalFlowResult > div > span').append(arrowMark).append(text).show().css({
+        position: 'absolute',
+        fontSize: '12px',
+        lineHeight: '16px',
+        border: '0.5px solid white',
+        borderRadius: '6px 6px 6px 0px',
+        margin: '0.5px',
+        padding: '0px 5px',
+        color: 'white',
+        background: 'rgba(128,128,128,0.5)',
+        left: popupX,
+        bottom: popupY,
+        transformOrigin: 'left bottom'
+      });
+    };
     var onFigurePointed = function(point) {
       if (opticalFlowResult.result !== null) {
         var nearest = findPointedVector(point);
         if (nearest) {
           if (pointedVector === null || pointedVector !== nearest) {
             pointedVector = nearest;
-            var dx = pointedVector.x1 - pointedVector.x0;
-            var dy = pointedVector.y1 - pointedVector.y0;
-            var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
-            var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
-            $('#opticalFlowSelectedDeltaX').text(dxText);
-            $('#opticalFlowSelectedDeltaY').text(dyText);
-            var w = opticalFlowResult.result.image.width;
-            var h = opticalFlowResult.result.image.height;
-            var popupX = (pointedVector.x1 / w) * 100 + '%';
-            var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
-            var arrowMark = makeArrowMark(dx, dy);
-            var text = $('<span>').text(dxText + ', ' + dyText);
-            $('#opticalFlowResult > div > span *').remove();
-            $('#opticalFlowResult > div > span').append(arrowMark).append(text).show().css({
-              position: 'absolute',
-              fontSize: '12px',
-              lineHeight: '16px',
-              border: '0.5px solid white',
-              borderRadius: '6px 6px 6px 0px',
-              margin: '0.5px',
-              padding: '0px 5px',
-              color: 'white',
-              background: 'rgba(128,128,128,0.5)',
-              left: popupX,
-              bottom: popupY,
-              transformOrigin: 'left bottom'
-            });
+            updateMotionVectorInfo();
             updateTable(/*transformOnly=*/ true);
           }
         } else {
