@@ -314,7 +314,12 @@ function calcMetrics( a, b )
       }
       sum += lineSum;
     }
-    return (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / (sdsumA * sdsumB);
+    var den = sdsumA * sdsumB;
+    if (den === 0) {
+      return 0;
+    } else {
+      return (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
+    }
   };
   var ncc = calcNCC(a.data, b.data);
   var calcMSE = function(dataA, dataB) {
