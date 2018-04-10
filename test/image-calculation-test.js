@@ -136,7 +136,7 @@
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
           EXPECT_EQ( 0, data.result.mse );
-          //EXPECT_EQ( 1, data.result.ncc );
+          EXPECT_EQ( 1, data.result.ncc );
           EXPECT_EQ( 0, data.result.ae );
           done();
         };

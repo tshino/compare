@@ -297,12 +297,12 @@ function calcMetrics( a, b )
     }
     return [sum1, sum2];
   };
-  var sdsum = function(sum12) {
-    return Math.sqrt(sum12[1] * (w * h * 3) - sum12[0] * sum12[0]);
+  var sdsum2 = function(sum12) {
+    return sum12[1] * (w * h * 3) - sum12[0] * sum12[0];
   };
   var calcNCC = function(dataA, dataB) {
     var sum12A = sum12(dataA), sum12B = sum12(dataB);
-    var sdsumA = sdsum(sum12A), sdsumB = sdsum(sum12B);
+    var sdsumA = sdsum2(sum12A), sdsumB = sdsum2(sum12B);
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineSum = 0;
@@ -314,7 +314,7 @@ function calcMetrics( a, b )
       }
       sum += lineSum;
     }
-    var den = sdsumA * sdsumB;
+    var den = Math.sqrt(sdsumA * sdsumB);
     if (den === 0) {
       return 0;
     } else {
