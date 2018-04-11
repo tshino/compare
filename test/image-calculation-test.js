@@ -105,6 +105,26 @@
         30, 1, 0, 255,  30, 1, 64, 255,  30, 1, 128, 255,  30, 1, 192, 255,
       ]
     };
+    var redImage = {
+      width: 4,
+      height: 4,
+      data: [
+        255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+        255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+        255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+        255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255
+      ]
+    };
+    var greenImage = {
+      width: 4,
+      height: 4,
+      data: [
+        0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+        0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+        0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+        0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255
+      ]
+    };
     var blackImage = {
       width: 4,
       height: 4,
@@ -124,7 +144,7 @@
         255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
         255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
       ]
-    }
+    };
     jsTestUtil.makeSequentialTest([
       // exactly same images
       function(done) {
@@ -152,7 +172,22 @@
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( 1e-14 > Math.abs(10 * Math.log10((3*255*255) / (30*30)) - data.result.psnr) );
           EXPECT_EQ( (30*30)/3, data.result.mse );
-          //EXPECT_EQ( ????, data.result.ncc );
+          //EXPECT_EQ( ????, data.result.ncc ); // non-trivial answer
+          EXPECT_EQ( 16, data.result.ae );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
+          imageData: [redImage, greenImage]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10(1.5) - data.result.psnr) );
+          EXPECT_EQ( 255 * 255 * 2 / 3, data.result.mse );
+          EXPECT_EQ( -0.5, data.result.ncc );
           EXPECT_EQ( 16, data.result.ae );
           done();
         };
@@ -185,6 +220,22 @@
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( 0, data.result.psnr );
           EXPECT_EQ( 255 * 255, data.result.mse );
+          EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( 16, data.result.ae );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      // different flat images
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
+          imageData: [blackImage, redImage]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10(3) - data.result.psnr) );
+          EXPECT_EQ( 255 * 255 / 3, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
           EXPECT_EQ( 16, data.result.ae );
           done();
