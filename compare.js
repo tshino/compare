@@ -2465,21 +2465,20 @@
         heigit: '12px'
       });
     };
-    var updateMotionVectorInfo = function() {
+    var updateMotionVectorPopup = function() {
       var dx = pointedVector.x1 - pointedVector.x0;
       var dy = pointedVector.y1 - pointedVector.y0;
       var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
       var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
-      $('#opticalFlowSelectedDeltaX').text(dxText);
-      $('#opticalFlowSelectedDeltaY').text(dyText);
       var w = opticalFlowResult.result.image.width;
       var h = opticalFlowResult.result.image.height;
       var popupX = (pointedVector.x1 / w) * 100 + '%';
       var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
       var arrowMark = makeArrowMark(dx, dy);
       var text = $('<span>').text(dxText + ', ' + dyText);
-      $('#opticalFlowResult > div > span *').remove();
-      $('#opticalFlowResult > div > span').append(arrowMark).append(text).show().css({
+      var span = $('#opticalFlowResult > div > span');
+      span.children().remove();
+      span.append(arrowMark).append(text).show().css({
         position: 'absolute',
         fontSize: '12px',
         lineHeight: '16px',
@@ -2494,12 +2493,21 @@
         transformOrigin: 'left bottom'
       });
     };
+    var updateMotionVectorInfo = function() {
+      var dx = pointedVector.x1 - pointedVector.x0;
+      var dy = pointedVector.y1 - pointedVector.y0;
+      var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
+      var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
+      $('#opticalFlowSelectedDeltaX').text(dxText);
+      $('#opticalFlowSelectedDeltaY').text(dyText);
+    };
     var onFigurePointed = function(point) {
       if (opticalFlowResult.result !== null) {
         var nearest = findPointedVector(point);
         if (nearest) {
           if (pointedVector === null || pointedVector !== nearest) {
             pointedVector = nearest;
+            updateMotionVectorPopup();
             updateMotionVectorInfo();
             updateTable(/*transformOnly=*/ true);
           }
