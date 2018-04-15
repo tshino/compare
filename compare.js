@@ -1481,6 +1481,16 @@
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
+      var drawGrid = function() {
+        for (var k = 16; k < 255; k += 16) {
+          context.strokeStyle = (k % 64 === 0) ? '#888' : '#444';
+          context.lineWidth = 1;
+          context.beginPath();
+          context.moveTo(k * 3 + 1.5, 0);
+          context.lineTo(k * 3 + 1.5, 512);
+          context.stroke();
+        }
+      };
       var drawHistogram = function(color, offset) {
         context.fillStyle = color;
         for (var i = 0; i < 256; ++i) {
@@ -1490,6 +1500,7 @@
       };
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
+      drawGrid();
       if (type === 0) { // RGB
         context.globalCompositeOperation = 'lighter';
         drawHistogram('#f00', 0);
