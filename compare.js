@@ -34,19 +34,7 @@
   $('.swapbtn').click(swapBaseAndTargetImage);
 
   $(window).resize(viewManagement.onResize);
-  $(window).keydown(function(e) {
-      if (e.ctrlKey || e.altKey || e.metaKey) {
-        return true;
-      }
-      // ESC (27)
-      if (dialog && e.keyCode === 27 && !e.shiftKey) {
-        dialog.close();
-        return false;
-      }
-      if (e.target.localName === 'input') {
-        return true;
-      }
-      if (dialog) {
+  var onKeyDownOnDialogs = function(e) {
         // BS (8)
         if (e.keyCode === 8 && !e.shiftKey) {
           dialog.close();
@@ -82,7 +70,8 @@
           return false;
         }
         return true;
-      }
+  };
+  var onKeyDownOnViews = function(e) {
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
           (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
@@ -124,6 +113,24 @@
         return false;
       }
       //alert('keydown: '+e.keyCode);
+  };
+  $(window).keydown(function(e) {
+      if (e.ctrlKey || e.altKey || e.metaKey) {
+        return true;
+      }
+      // ESC (27)
+      if (dialog && e.keyCode === 27 && !e.shiftKey) {
+        dialog.close();
+        return false;
+      }
+      if (e.target.localName === 'input') {
+        return true;
+      }
+      if (dialog) {
+        return onKeyDownOnDialogs(e);
+      } else {
+        return onKeyDownOnViews(e);
+      }
   });
   
   var keypressMap = {
