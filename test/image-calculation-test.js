@@ -83,6 +83,74 @@
       },
     ])(done);
   });
+  TEST( 'compare-worker.js calcReducedColorTable', function test(done) {
+    // single color
+    var black1 = {
+      width: 4,
+      height: 4,
+      data: [
+        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255
+      ]
+    };
+    // exactly only two colors
+    var image1 = {
+      width: 4,
+      height: 4,
+      data: [
+        0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255,
+        0,0,0,255, 255,0,128,255, 255,0,128,255, 0,0,0,255,
+        0,0,0,255, 255,0,128,255, 255,0,128,255, 0,0,0,255,
+        0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255
+      ]
+    };
+    jsTestUtil.makeSequentialTest([
+      function(done) {
+        var task = {
+          cmd: 'calcReducedColorTable',
+          imageData: [black1]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
+          EXPECT_EQ( 16, data.result.totalCount );
+          EXPECT_EQ( 1, data.result.colorList.length );
+          if (1 === data.result.colorList.length) {
+            EXPECT_EQ( 16, data.result.colorList[0][1] );
+            EXPECT_EQ( 16 * 0, data.result.colorList[0][2] );
+            EXPECT_EQ( 16 * 0, data.result.colorList[0][3] );
+            EXPECT_EQ( 16 * 0, data.result.colorList[0][4] );
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = {
+          cmd: 'calcReducedColorTable',
+          imageData: [image1]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
+          EXPECT_EQ( 16, data.result.totalCount );
+          EXPECT_EQ( 2, data.result.colorList.length );
+          if (2 === data.result.colorList.length) {
+            EXPECT_EQ( 12, data.result.colorList[0][1] );
+            EXPECT_EQ( 12 * 0, data.result.colorList[0][2] );
+            EXPECT_EQ( 12 * 0, data.result.colorList[0][3] );
+            EXPECT_EQ( 12 * 0, data.result.colorList[0][4] );
+            EXPECT_EQ( 4, data.result.colorList[1][1] );
+            EXPECT_EQ( 4 * 255, data.result.colorList[1][2] );
+            EXPECT_EQ( 4 * 0, data.result.colorList[1][3] );
+            EXPECT_EQ( 4 * 128, data.result.colorList[1][4] );
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+    ])(done);
+  });
   TEST( 'compare-worker.js calcMetrics', function test(done) {
     var colorImage1 = {
       width: 4,
