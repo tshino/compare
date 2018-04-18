@@ -106,6 +106,17 @@
         0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255
       ]
     };
+    // grayscale gradation
+    var grayscaleGradation = {
+      width: 4,
+      height: 4,
+      data: [
+        0, 0, 0, 255, 2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255,
+        2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255,
+        4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255,
+        6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
+      ]
+    };
     jsTestUtil.makeSequentialTest([
       function(done) {
         var task = {
@@ -144,6 +155,25 @@
             EXPECT_EQ( 4 * 255, data.result.colorList[1][2] );
             EXPECT_EQ( 4 * 0, data.result.colorList[1][3] );
             EXPECT_EQ( 4 * 128, data.result.colorList[1][4] );
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = {
+          cmd: 'calcReducedColorTable',
+          imageData: [grayscaleGradation]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
+          EXPECT_EQ( 16, data.result.totalCount );
+          EXPECT_EQ( 1, data.result.colorList.length );
+          if (1 === data.result.colorList.length) {
+            EXPECT_EQ( 16, data.result.colorList[0][1] );
+            EXPECT_EQ( 16 * 6, data.result.colorList[0][2] );
+            EXPECT_EQ( 16 * 6, data.result.colorList[0][3] );
+            EXPECT_EQ( 16 * 6, data.result.colorList[0][4] );
           }
           done();
         };
