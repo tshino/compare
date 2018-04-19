@@ -1101,6 +1101,48 @@
     }
     return nextPoints;
   };
+  var detectFlatRegion = function(image) {
+    image = makeImage(image);
+    if (image.channels !== 4) {
+      return null;
+    }
+    var w = image.width;
+    var h = image.height;
+    var ch = image.channels;
+    var isFlat = new Uint8Array(w * h);
+    var i0 = image.offset * ch;
+    var i = i0, f = 0;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch) {
+        var a = image.data[i + 3];
+        var s = a / 255;
+        var r = s * image.data[i];
+        var g = s * image.data[i + 1];
+        var b = s * image.data[i + 2];
+        var nearCount = 0;
+        for (var j = -2; j <= 2; j++) {
+          var yy = Math.max(0, Math.min(h - 1, y + j));
+          for (var k = -2; k <= 2; k++) {
+            var xx = Math.max(0, Math.min(w - 1, x + k));
+            var ii = i0 + ch * (image.pitch * yy + xx);
+            var diff = 0;
+            var aa = image.data[ii + 3];
+            var ss = aa / 255;
+            diff += Math.abs(ss * image.data[ii] - r) * 2;
+            diff += Math.abs(ss * image.data[ii + 1] - g) * 5;
+            diff += Math.abs(ss * image.data[ii + 2] - b);
+            diff += Math.abs(aa - a);
+            if (diff <= 175) {
+              nearCount += 1;
+            }
+          }
+        }
+        isFlat[f++] = (6 <= nearCount) ? 1 : 0;
+      }
+      i += (image.pitch - w) * ch;
+    }
+    return isFlat;
+  };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
@@ -1172,6 +1214,7 @@
     findCornerPoints: findCornerPoints,
     adjustCornerPointsSubPixel: adjustCornerPointsSubPixel,
     sparseOpticalFlow: sparseOpticalFlow,
+    detectFlatRegion: detectFlatRegion,
     getUniqueColors: getUniqueColors
   };
 })();

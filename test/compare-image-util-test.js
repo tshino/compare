@@ -1487,6 +1487,53 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   ] );
 });
 
+TEST( 'compareImageUtil detectFlatRegion', function test() {
+  var makeImage = compareImageUtil.makeImage;
+  var makeRegion = compareImageUtil.makeRegion;
+  var image1 = makeImage(200, 200);
+  // complete flat image
+  compareImageUtil.fill(image1, 0, 0, 0, 255);
+  var flat1 = compareImageUtil.detectFlatRegion(image1);
+  EXPECT_EQ( 200 * 200, flat1.length );
+  var errorCount = 0;
+  for (var i = 0; i < 200 * 200; i++) {
+    if (flat1[i] !== 1) {   // every pixels are flat
+      errorCount += 1;
+    }
+  }
+  EXPECT_EQ( 0, errorCount );
+  // with some rectangles are drawn
+  compareImageUtil.fill(makeRegion(image1, 50, 50, 20, 20), 255, 255, 255, 255);
+  compareImageUtil.fill(makeRegion(image1, 100, 50, 50, 50), 255, 0, 0, 255);
+  compareImageUtil.fill(makeRegion(image1, 0, 100, 100, 100), 0, 255, 0, 255);
+  compareImageUtil.fill(makeRegion(image1, 100, 100, 50, 50), 0, 0, 255, 255);
+  var flat2 = compareImageUtil.detectFlatRegion(image1);
+  EXPECT_EQ( 200 * 200, flat2.length );
+  errorCount = 0;
+  for (var i = 0; i < 200 * 200; i++) {
+    if (flat2[i] !== 1) {   // still every pixels belong to flat region
+      errorCount += 1;
+    }
+  }
+  EXPECT_EQ( 0, errorCount );
+  // with some thin lines are drawn
+  compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 128, 128, 255);
+  compareImageUtil.fill(makeRegion(image1, 0, 90, 200, 1), 45, 90, 135, 255);
+  var flat3 = compareImageUtil.detectFlatRegion(image1);
+  EXPECT_EQ( 200 * 200, flat3.length );
+  errorCount = 0;
+  for (var i = 0, y = 0; y < 200; y++) {
+    for (var x = 0; x < 200; x++, i++) {
+      // pixels on the thin lines are not in flat region
+      var expected = (x === 20 || y === 90) ? 0 : 1;
+      if (flat3[i] !== expected) {
+        errorCount += 1;
+      }
+    }
+  }
+  EXPECT_EQ( 0, errorCount );
+});
+
 TEST( 'compareImageUtil getUniqueColors', function test() {
   var imageData = { width: 4, height: 4, data: [
     0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
