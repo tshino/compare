@@ -1109,17 +1109,17 @@
     var w = image.width;
     var h = image.height;
     var ch = image.channels;
+    var isSimilar = new Uint32Array(w * h);
     var isFlat = new Uint8Array(w * h);
     var i0 = image.offset * ch;
-    var i = i0, f = 0;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch) {
+    for (var y = 0, i = i0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch, f++) {
         var a = image.data[i + 3];
         var s = a / 255;
         var r = s * image.data[i];
         var g = s * image.data[i + 1];
         var b = s * image.data[i + 2];
-        var nearCount = 0;
+        var similar = 0; // bit pattern
         for (var j = -2; j <= 2; j++) {
           var yy = Math.max(0, Math.min(h - 1, y + j));
           for (var k = -2; k <= 2; k++) {
@@ -1132,14 +1132,47 @@
             diff += Math.abs(ss * image.data[ii + 1] - g) * 5;
             diff += Math.abs(ss * image.data[ii + 2] - b);
             diff += Math.abs(aa - a);
+            similar = similar * 2;
             if (diff <= 175) {
-              nearCount += 1;
+              similar += 1;
             }
           }
         }
-        isFlat[f++] = (6 <= nearCount) ? 1 : 0;
+        isSimilar[f] = similar;
       }
       i += (image.pitch - w) * ch;
+    }
+    for (var y = 0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, f++) {
+        var similar = isSimilar[f];
+        var similarCount = 0;
+        for (var k = 0, m = 1; k < 25; k++, m *= 2) {
+          if ((similar & m) !== 0) {
+            similarCount++;
+          }
+        }
+        isFlat[f] = (8 <= similarCount) ? 1 : 0;
+      }
+    }
+    for (var y = 0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, f++) {
+        var similar = isSimilar[f];
+        if (0 === isFlat[f]) {
+          var similarAndFlatCount = 0;
+          for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
+            var yy = Math.max(0, Math.min(h - 1, y + dy));
+            for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
+              var xx = Math.max(0, Math.min(w - 1, x + dx));
+              if ((similar & m) !== 0 && isFlat[xx + yy * w]) {
+                similarAndFlatCount++;
+              }
+            }
+          }
+          if (2 <= similarAndFlatCount) {
+            isFlat[f] = 1;
+          }
+        }
+      }
     }
     return isFlat;
   };

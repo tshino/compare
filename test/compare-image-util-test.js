@@ -1512,8 +1512,14 @@ TEST( 'compareImageUtil detectFlatRegion', function test() {
   errorCount = 0;
   for (var i = 0; i < 200 * 200; i++) {
     if (flat2[i] !== 1) {   // still every pixels belong to flat region
+      if (errorCount < 10) {
+        WARN('... error at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
+      }
       errorCount += 1;
     }
+  }
+  if (10 < errorCount) {
+    WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
   // with some thin lines are drawn
@@ -1527,9 +1533,15 @@ TEST( 'compareImageUtil detectFlatRegion', function test() {
       // pixels on the thin lines are not in flat region
       var expected = (x === 20 || y === 90) ? 0 : 1;
       if (flat3[i] !== expected) {
+        if (errorCount < 10) {
+          WARN('... error at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
+        }
         errorCount += 1;
       }
     }
+  }
+  if (10 < errorCount) {
+    WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
 });
