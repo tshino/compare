@@ -1101,7 +1101,11 @@
     }
     return nextPoints;
   };
-  var detectFlatRegion = function(image) {
+  // Predict geometric type of each pixel
+  // 0 => unclassified
+  // 1 => belongs to a flat region
+  // 2 => border between flat regions
+  var geometricTypeOfPixel = function(image) {
     image = makeImage(image);
     if (image.channels !== 4) {
       return null;
@@ -1110,7 +1114,7 @@
     var h = image.height;
     var ch = image.channels;
     var isSimilar = new Uint32Array(w * h);
-    var isFlat = new Uint8Array(w * h);
+    var result = new Uint8Array(w * h);
     var i0 = image.offset * ch;
     for (var y = 0, i = i0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
@@ -1151,30 +1155,81 @@
             similarCount++;
           }
         }
-        isFlat[f] = (8 <= similarCount) ? 1 : 0;
+        result[f] = (8 <= similarCount) ? 1 : 0;
       }
     }
     for (var y = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, f++) {
         var similar = isSimilar[f];
-        if (0 === isFlat[f]) {
+        if (0 === result[f]) {
           var similarAndFlatCount = 0;
           for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
             var yy = Math.max(0, Math.min(h - 1, y + dy));
             for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
               var xx = Math.max(0, Math.min(w - 1, x + dx));
-              if ((similar & m) !== 0 && isFlat[xx + yy * w]) {
+              if ((similar & m) !== 0 && result[xx + yy * w]) {
                 similarAndFlatCount++;
               }
             }
           }
           if (2 <= similarAndFlatCount) {
-            isFlat[f] = 1;
+            result[f] = 1; // FLAT
           }
         }
       }
     }
-    return isFlat;
+    var isIntermediate = function(r, g, b, a, ii, jj) {
+      var ai = image.data[ii + 3];
+      var si = ai / 255;
+      var ri = si * image.data[ii];
+      var gi = si * image.data[ii + 1];
+      var bi = si * image.data[ii + 2];
+      var aj = image.data[jj + 3];
+      var sj = aj / 255;
+      var rj = sj * image.data[jj];
+      var gj = sj * image.data[jj + 1];
+      var bj = sj * image.data[jj + 2];
+      var diff = 0;
+      diff += Math.abs((ri + rj) * 0.5 - r) * 2;
+      diff += Math.abs((gi + gj) * 0.5 - g) * 5;
+      diff += Math.abs((bi + bj) * 0.5 - b);
+      diff += Math.abs((ai + aj) * 0.5 - a);
+      return diff <= 175
+    };
+    for (var y = 0, i = i0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch, f++) {
+        if (0 === result[f]) {
+          var a = image.data[i + 3];
+          var s = a / 255;
+          var r = s * image.data[i];
+          var g = s * image.data[i + 1];
+          var b = s * image.data[i + 2];
+          for (var dy = -2; dy <= 0; dy++) {
+            var y0 = Math.max(0, Math.min(h - 1, y + dy));
+            var y1 = Math.max(0, Math.min(h - 1, y - dy));
+            for (var dx = -2; dx <= 2; dx++) {
+              if (dy === 0 && dx === 0) {
+                break;
+              }
+              var x0 = Math.max(0, Math.min(w - 1, x + dx));
+              var x1 = Math.max(0, Math.min(w - 1, x - dx));
+              var f0 = f + w * (y0 - y) + x0 - x;
+              var f1 = f + w * (y1 - y) + x1 - x;
+              if (result[f0] !== 1 || result[f1] !== 1) {
+                continue;
+              }
+              var ii = i0 + ch * (image.pitch * y0 + x0);
+              var jj = i0 + ch * (image.pitch * y1 + x1);
+              if (isIntermediate(r, g, b, a, ii, jj)) {
+                result[f] = 2; // BORDER
+              }
+            }
+          }
+        }
+      }
+      i += (image.pitch - w) * ch;
+    }
+    return result;
   };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
@@ -1247,7 +1302,7 @@
     findCornerPoints: findCornerPoints,
     adjustCornerPointsSubPixel: adjustCornerPointsSubPixel,
     sparseOpticalFlow: sparseOpticalFlow,
-    detectFlatRegion: detectFlatRegion,
+    geometricTypeOfPixel: geometricTypeOfPixel,
     getUniqueColors: getUniqueColors
   };
 })();
