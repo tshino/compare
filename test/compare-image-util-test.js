@@ -1549,9 +1549,9 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var image2 = makeImage(200, 200);
   compareImageUtil.fill(image2, 255, 255, 255, 255); // white
   compareImageUtil.fill(makeRegion(image2, 50, 50, 100, 100), 0, 0, 255, 255); // blue
-  compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 128, 128, 255, 255); // light blue
+  compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue
   compareImageUtil.fill(makeRegion(image2, 49, 50, 1, 100), 128, 128, 255, 255); // light blue
-  compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 128, 128, 255, 255); // light blue
+  compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue
   compareImageUtil.fill(makeRegion(image2, 150, 50, 1, 100), 128, 128, 255, 255); // light blue
   var flat4 = compareImageUtil.geometricTypeOfPixel(image2);
   EXPECT_EQ( 200 * 200, flat4.length );

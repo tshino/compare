@@ -1189,11 +1189,21 @@
       var rj = sj * image.data[jj];
       var gj = sj * image.data[jj + 1];
       var bj = sj * image.data[jj + 2];
+      var rk = rj - ri;
+      var gk = gj - gi;
+      var bk = bj - bi;
+      var ak = aj - ai;
+      var dot1 = rk * rk + gk * gk + bk * bk + ak * ak;
+      var dot2 = (r - ri) * rk + (g - gi) * gk + (b - bi) * bk + (a - ai) * ak;
+      if (dot2 <= 0 || dot1 <= dot2) {
+        return false;
+      }
+      var s = dot2 / dot1;
       var diff = 0;
-      diff += Math.abs((ri + rj) * 0.5 - r) * 2;
-      diff += Math.abs((gi + gj) * 0.5 - g) * 5;
-      diff += Math.abs((bi + bj) * 0.5 - b);
-      diff += Math.abs((ai + aj) * 0.5 - a);
+      diff += Math.abs(r - (ri + s * rk)) * 2;
+      diff += Math.abs(g - (gi + s * gk)) * 5;
+      diff += Math.abs(b - (bi + s * bk));
+      diff += Math.abs(a - (ai + s * ak));
       return diff <= 175
     };
     for (var y = 0, i = i0, f = 0; y < h; y++) {
