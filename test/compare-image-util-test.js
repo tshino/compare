@@ -1495,10 +1495,10 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   // complete flat image
   compareImageUtil.fill(image1, 0, 0, 0, 255);
   var flat1 = compareImageUtil.geometricTypeOfPixel(image1);
-  EXPECT_EQ( 200 * 200, flat1.length );
+  EXPECT_EQ( 200 * 200, flat1.typeMap.length );
   var errorCount = 0;
   for (var i = 0; i < 200 * 200; i++) {
-    if (flat1[i] !== FLAT) {   // every pixels are flat
+    if (flat1.typeMap[i] !== FLAT) {   // every pixels are flat
       errorCount += 1;
     }
   }
@@ -1509,10 +1509,10 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   compareImageUtil.fill(makeRegion(image1, 0, 100, 100, 100), 0, 255, 0, 255);
   compareImageUtil.fill(makeRegion(image1, 100, 100, 50, 50), 0, 0, 255, 255);
   var flat2 = compareImageUtil.geometricTypeOfPixel(image1);
-  EXPECT_EQ( 200 * 200, flat2.length );
+  EXPECT_EQ( 200 * 200, flat2.typeMap.length );
   errorCount = 0;
   for (var i = 0; i < 200 * 200; i++) {
-    if (flat2[i] !== FLAT) {   // still every pixels belong to flat region
+    if (flat2.typeMap[i] !== FLAT) {   // still every pixels belong to flat region
       if (errorCount < 10) {
         WARN('... error at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
       }
@@ -1527,15 +1527,15 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 0, 128, 255);
   compareImageUtil.fill(makeRegion(image1, 0, 90, 200, 1), 45, 90, 135, 255);
   var flat3 = compareImageUtil.geometricTypeOfPixel(image1);
-  EXPECT_EQ( 200 * 200, flat3.length );
+  EXPECT_EQ( 200 * 200, flat3.typeMap.length );
   errorCount = 0;
   for (var i = 0, y = 0; y < 200; y++) {
     for (var x = 0; x < 200; x++, i++) {
       // pixels on the thin lines are not in flat region
       var expected = (x === 20 || y === 90) ? UNCLASSIFIED : FLAT;
-      if (flat3[i] !== expected) {
+      if (flat3.typeMap[i] !== expected) {
         if (errorCount < 10) {
-          EXPECT_EQ(expected, flat3[i], 'at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
+          EXPECT_EQ(expected, flat3.typeMap[i], 'at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
         }
         errorCount += 1;
       }
@@ -1554,7 +1554,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue
   compareImageUtil.fill(makeRegion(image2, 150, 50, 1, 100), 128, 128, 255, 255); // light blue
   var flat4 = compareImageUtil.geometricTypeOfPixel(image2);
-  EXPECT_EQ( 200 * 200, flat4.length );
+  EXPECT_EQ( 200 * 200, flat4.typeMap.length );
   errorCount = 0;
   for (var i = 0, y = 0; y < 200; y++) {
     for (var x = 0; x < 200; x++, i++) {
@@ -1566,7 +1566,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       if ((y === 49 || y === 150) && (50 <= x && x <= 149)) {
         expected = BORDER;
       }
-      if (flat4[i] !== expected) {
+      if (flat4.typeMap[i] !== expected) {
         if (errorCount < 10) {
           WARN('... error at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
         }

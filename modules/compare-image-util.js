@@ -1101,10 +1101,13 @@
     }
     return nextPoints;
   };
-  // Predict geometric type of each pixel
-  // 0 => unclassified
-  // 1 => belongs to a flat region
-  // 2 => border between flat regions
+  // Predict geometric type of each pixel:
+  // returns { typeMap: /see below/, colorMap: /modified image/ };
+  // 'typeMap' is a WxH Uint8Array of:
+  //    0 => unclassified
+  //    1 => belongs to a flat region
+  //    2 => border between flat regions
+  // 'colorMap' is an RGBA image which is anti-anti-aliased version of input.
   var geometricTypeOfPixel = function(image) {
     image = makeImage(image);
     if (image.channels !== 4) {
@@ -1114,7 +1117,8 @@
     var h = image.height;
     var ch = image.channels;
     var isSimilar = new Uint32Array(w * h);
-    var result = new Uint8Array(w * h);
+    var typeMap = new Uint8Array(w * h);
+    var colorMap = makeImage(w, h);
     var i0 = image.offset * ch;
     for (var y = 0, i = i0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
@@ -1143,6 +1147,10 @@
           }
         }
         isSimilar[f] = similar;
+        colorMap.data[f * 4 + 0] = image.data[i + 0];
+        colorMap.data[f * 4 + 1] = image.data[i + 1];
+        colorMap.data[f * 4 + 2] = image.data[i + 2];
+        colorMap.data[f * 4 + 3] = image.data[i + 3];
       }
       i += (image.pitch - w) * ch;
     }
@@ -1155,30 +1163,30 @@
             similarCount++;
           }
         }
-        result[f] = (8 <= similarCount) ? 1 : 0;
+        typeMap[f] = (8 <= similarCount) ? 1 : 0;
       }
     }
     for (var y = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, f++) {
         var similar = isSimilar[f];
-        if (0 === result[f]) {
+        if (0 === typeMap[f]) {
           var similarAndFlatCount = 0;
           for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
             var yy = Math.max(0, Math.min(h - 1, y + dy));
             for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
               var xx = Math.max(0, Math.min(w - 1, x + dx));
-              if ((similar & m) !== 0 && result[xx + yy * w]) {
+              if ((similar & m) !== 0 && typeMap[xx + yy * w]) {
                 similarAndFlatCount++;
               }
             }
           }
           if (2 <= similarAndFlatCount) {
-            result[f] = 1; // FLAT
+            typeMap[f] = 1; // FLAT
           }
         }
       }
     }
-    var isIntermediate = function(r, g, b, a, ii, jj) {
+    var intermediateColorInfo = function(r, g, b, a, ii, jj) {
       var ai = image.data[ii + 3];
       var si = ai / 255;
       var ri = si * image.data[ii];
@@ -1196,7 +1204,9 @@
       var dot1 = rk * rk + gk * gk + bk * bk + ak * ak;
       var dot2 = (r - ri) * rk + (g - gi) * gk + (b - bi) * bk + (a - ai) * ak;
       if (dot2 <= 0 || dot1 <= dot2) {
-        return false;
+        return {
+          isIntermediate: false
+        };
       }
       var s = dot2 / dot1;
       var diff = 0;
@@ -1204,11 +1214,14 @@
       diff += Math.abs(g - (gi + s * gk)) * 5;
       diff += Math.abs(b - (bi + s * bk));
       diff += Math.abs(a - (ai + s * ak));
-      return diff <= 175
+      return {
+        isIntermediate: (diff <= 175),
+        whichIsNear: (s < 0.5 ? 0 : 1)
+      };
     };
     for (var y = 0, i = i0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
-        if (0 === result[f]) {
+        if (0 === typeMap[f]) {
           var a = image.data[i + 3];
           var s = a / 255;
           var r = s * image.data[i];
@@ -1225,13 +1238,21 @@
               var x1 = Math.max(0, Math.min(w - 1, x - dx));
               var f0 = f + w * (y0 - y) + x0 - x;
               var f1 = f + w * (y1 - y) + x1 - x;
-              if (result[f0] !== 1 || result[f1] !== 1) {
+              if (typeMap[f0] !== 1 || typeMap[f1] !== 1) {
                 continue;
               }
               var ii = i0 + ch * (image.pitch * y0 + x0);
               var jj = i0 + ch * (image.pitch * y1 + x1);
-              if (isIntermediate(r, g, b, a, ii, jj)) {
-                result[f] = 2; // BORDER
+              var im = intermediateColorInfo(r, g, b, a, ii, jj);
+              if (im.isIntermediate) {
+                typeMap[f] = 2; // BORDER
+                var near = im.whichIsNear === 0 ? ii : jj;
+                colorMap.data[f * 4 + 0] = image.data[near + 0];
+                colorMap.data[f * 4 + 1] = image.data[near + 1];
+                colorMap.data[f * 4 + 2] = image.data[near + 2];
+                colorMap.data[f * 4 + 3] = image.data[near + 3];
+                dy = 0; // for quit dy loop
+                break;
               }
             }
           }
@@ -1239,7 +1260,10 @@
       }
       i += (image.pitch - w) * ch;
     }
-    return result;
+    return {
+      typeMap: typeMap,
+      colorMap: colorMap
+    };
   };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
