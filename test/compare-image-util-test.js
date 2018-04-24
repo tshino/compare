@@ -1497,12 +1497,20 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var flat1 = compareImageUtil.geometricTypeOfPixel(image1);
   EXPECT_EQ( 200 * 200, flat1.typeMap.length );
   var errorCount = 0;
+  var colorErrorCount = 0;
   for (var i = 0; i < 200 * 200; i++) {
     if (flat1.typeMap[i] !== FLAT) {   // every pixels are flat
       errorCount += 1;
     }
+    if (flat1.colorMap.data[i * 4 + 0] !== image1.data[i * 4 + 0] ||
+        flat1.colorMap.data[i * 4 + 1] !== image1.data[i * 4 + 1] ||
+        flat1.colorMap.data[i * 4 + 2] !== image1.data[i * 4 + 2] ||
+        flat1.colorMap.data[i * 4 + 3] !== image1.data[i * 4 + 3]) {
+      colorErrorCount += 1;
+    }
   }
   EXPECT_EQ( 0, errorCount );
+  EXPECT_EQ( 0, colorErrorCount );
   // with some rectangles are drawn
   compareImageUtil.fill(makeRegion(image1, 50, 50, 20, 20), 255, 255, 255, 255);
   compareImageUtil.fill(makeRegion(image1, 100, 50, 50, 50), 255, 0, 0, 255);
@@ -1511,6 +1519,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var flat2 = compareImageUtil.geometricTypeOfPixel(image1);
   EXPECT_EQ( 200 * 200, flat2.typeMap.length );
   errorCount = 0;
+  colorErrorCount = 0;
   for (var i = 0; i < 200 * 200; i++) {
     if (flat2.typeMap[i] !== FLAT) {   // still every pixels belong to flat region
       if (errorCount < 10) {
@@ -1518,17 +1527,25 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       }
       errorCount += 1;
     }
+    if (flat2.colorMap.data[i * 4 + 0] !== image1.data[i * 4 + 0] ||
+        flat2.colorMap.data[i * 4 + 1] !== image1.data[i * 4 + 1] ||
+        flat2.colorMap.data[i * 4 + 2] !== image1.data[i * 4 + 2] ||
+        flat2.colorMap.data[i * 4 + 3] !== image1.data[i * 4 + 3]) {
+      colorErrorCount += 1;
+    }
   }
   if (10 < errorCount) {
     WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
+  EXPECT_EQ( 0, colorErrorCount );
   // with some thin lines with unique colors are drawn
   compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 0, 128, 255);
   compareImageUtil.fill(makeRegion(image1, 0, 90, 200, 1), 45, 90, 135, 255);
   var flat3 = compareImageUtil.geometricTypeOfPixel(image1);
   EXPECT_EQ( 200 * 200, flat3.typeMap.length );
   errorCount = 0;
+  colorErrorCount = 0;
   for (var i = 0, y = 0; y < 200; y++) {
     for (var x = 0; x < 200; x++, i++) {
       // pixels on the thin lines are not in flat region
@@ -1539,32 +1556,43 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
         }
         errorCount += 1;
       }
+      if (flat3.colorMap.data[i * 4 + 0] !== image1.data[i * 4 + 0] ||
+          flat3.colorMap.data[i * 4 + 1] !== image1.data[i * 4 + 1] ||
+          flat3.colorMap.data[i * 4 + 2] !== image1.data[i * 4 + 2] ||
+          flat3.colorMap.data[i * 4 + 3] !== image1.data[i * 4 + 3]) {
+        colorErrorCount += 1;
+      }
     }
   }
   if (10 < errorCount) {
     WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
+  EXPECT_EQ( 0, colorErrorCount );
   // another image: white background and blue box with anti-aliasing-like border
   var image2 = makeImage(200, 200);
   compareImageUtil.fill(image2, 255, 255, 255, 255); // white
   compareImageUtil.fill(makeRegion(image2, 50, 50, 100, 100), 0, 0, 255, 255); // blue
-  compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue
-  compareImageUtil.fill(makeRegion(image2, 49, 50, 1, 100), 128, 128, 255, 255); // light blue
-  compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue
-  compareImageUtil.fill(makeRegion(image2, 150, 50, 1, 100), 128, 128, 255, 255); // light blue
+  compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue (top)
+  compareImageUtil.fill(makeRegion(image2, 49, 50, 1, 100), 128, 128, 255, 255); // light blue (left)
+  compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue (bottom)
+  compareImageUtil.fill(makeRegion(image2, 150, 50, 1, 100), 128, 128, 255, 255); // light blue (right)
   var flat4 = compareImageUtil.geometricTypeOfPixel(image2);
   EXPECT_EQ( 200 * 200, flat4.typeMap.length );
   errorCount = 0;
+  colorErrorCount = 0;
   for (var i = 0, y = 0; y < 200; y++) {
     for (var x = 0; x < 200; x++, i++) {
       // pixels on the border are classified as border
       var expected = FLAT;
+      var expectedColor = image2.data.slice(i * 4, i * 4 + 4);
       if ((x === 49 || x === 150) && (50 <= y && y <= 149)) {
         expected = BORDER;
+        expectedColor = [255,255,255,255];
       }
       if ((y === 49 || y === 150) && (50 <= x && x <= 149)) {
         expected = BORDER;
+        expectedColor = y === 49 ? [0,0,255,255] : [255,255,255,255];
       }
       if (flat4.typeMap[i] !== expected) {
         if (errorCount < 10) {
@@ -1572,12 +1600,19 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
         }
         errorCount += 1;
       }
+      if (flat4.colorMap.data[i * 4 + 0] !== expectedColor[0] ||
+          flat4.colorMap.data[i * 4 + 1] !== expectedColor[1] ||
+          flat4.colorMap.data[i * 4 + 2] !== expectedColor[2] ||
+          flat4.colorMap.data[i * 4 + 3] !== expectedColor[3]) {
+        colorErrorCount += 1;
+      }
     }
   }
   if (10 < errorCount) {
     WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
+  EXPECT_EQ( 0, colorErrorCount );
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
