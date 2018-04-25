@@ -117,6 +117,14 @@
         6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
       ]
     };
+    // stripe
+    var makeImage = compareImageUtil.makeImage;
+    var makeRegion = compareImageUtil.makeRegion;
+    var fill = compareImageUtil.fill;
+    var stripe = makeImage(50, 30);
+    fill(stripe, 255, 255, 255, 255);
+    fill(makeRegion(stripe, 10, 0, 10, 30), 0, 0, 255, 255);
+    fill(makeRegion(stripe, 30, 0, 10, 30), 0, 0, 255, 255);
     jsTestUtil.makeSequentialTest([
       function(done) {
         var task = {
@@ -174,6 +182,29 @@
             EXPECT_EQ( 16 * 6, data.result.colorList[0][2] );
             EXPECT_EQ( 16 * 6, data.result.colorList[0][3] );
             EXPECT_EQ( 16 * 6, data.result.colorList[0][4] );
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = {
+          cmd: 'calcReducedColorTable',
+          imageData: [stripe]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
+          EXPECT_EQ( 50 * 30, data.result.totalCount );
+          EXPECT_EQ( 2, data.result.colorList.length );
+          if (2 === data.result.colorList.length) {
+            EXPECT_EQ( 900, data.result.colorList[0][1] );
+            EXPECT_EQ( 900 * 255, data.result.colorList[0][2] );
+            EXPECT_EQ( 900 * 255, data.result.colorList[0][3] );
+            EXPECT_EQ( 900 * 255, data.result.colorList[0][4] );
+            EXPECT_EQ( 600, data.result.colorList[1][1] );
+            EXPECT_EQ( 600 * 0, data.result.colorList[1][2] );
+            EXPECT_EQ( 600 * 0, data.result.colorList[1][3] );
+            EXPECT_EQ( 600 * 255, data.result.colorList[1][4] );
           }
           done();
         };
