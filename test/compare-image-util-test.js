@@ -1487,6 +1487,17 @@ TEST( 'compareImageUtil sparseOpticalFlow F32', function test() {
   ] );
 });
 
+TEST( 'compareImageUtil mostFrequentColor', function test() {
+  var colors1 = [[0,0,0,255]];
+  EXPECT_EQ( [0,0,0,255].toString(), compareImageUtil.mostFrequentColor(colors1).toString() );
+  var colors2 = [[0,0,0,255], [0,0,0,255]];
+  EXPECT_EQ( [0,0,0,255].toString(), compareImageUtil.mostFrequentColor(colors2).toString() );
+  var colors3 = [[0,0,0,255], [0,0,0,255], [0,0,255,255]];
+  EXPECT_EQ( [0,0,0,255].toString(), compareImageUtil.mostFrequentColor(colors3).toString() );
+  var colors4 = [[0,0,255,255], [0,0,0,255], [0,0,0,255]];
+  EXPECT_EQ( [0,0,0,255].toString(), compareImageUtil.mostFrequentColor(colors4).toString() );
+});
+
 TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var makeImage = compareImageUtil.makeImage;
   var makeRegion = compareImageUtil.makeRegion;
