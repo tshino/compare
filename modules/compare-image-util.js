@@ -1176,7 +1176,7 @@
             diff += Math.abs(ss * image.data[ii + 2] - b);
             diff += Math.abs(aa - a);
             similar = similar * 2;
-            if (diff <= 175) {
+            if (diff <= 18) {
               similar += 1;
             }
           }
@@ -1250,7 +1250,7 @@
       diff += Math.abs(b - (bi + s * bk));
       diff += Math.abs(a - (ai + s * ak));
       return {
-        isIntermediate: (diff <= 175),
+        isIntermediate: (diff <= 18),
         whichIsNear: (s < 0.5 ? 0 : 1)
       };
     };
@@ -1262,6 +1262,7 @@
           var r = s * image.data[i];
           var g = s * image.data[i + 1];
           var b = s * image.data[i + 2];
+          var nearColors = [];
           for (var dy = -2; dy <= 0; dy++) {
             var y0 = Math.max(0, Math.min(h - 1, y + dy));
             var y1 = Math.max(0, Math.min(h - 1, y - dy));
@@ -1282,14 +1283,16 @@
               if (im.isIntermediate) {
                 typeMap[f] = 2; // BORDER
                 var near = im.whichIsNear === 0 ? ii : jj;
-                colorMap.data[f * 4 + 0] = image.data[near + 0];
-                colorMap.data[f * 4 + 1] = image.data[near + 1];
-                colorMap.data[f * 4 + 2] = image.data[near + 2];
-                colorMap.data[f * 4 + 3] = image.data[near + 3];
-                dy = 0; // for quit dy loop
-                break;
+                nearColors.push(image.data.slice(near, near + 4));
               }
             }
+          }
+          if (0 < nearColors.length) {
+            var nearColor = mostFrequentColor(nearColors);
+            colorMap.data[f * 4 + 0] = nearColor[0];
+            colorMap.data[f * 4 + 1] = nearColor[1];
+            colorMap.data[f * 4 + 2] = nearColor[2];
+            colorMap.data[f * 4 + 3] = nearColor[3];
           }
         }
       }
