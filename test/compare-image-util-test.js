@@ -1615,11 +1615,18 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
           flat4.colorMap.data[i * 4 + 1] !== expectedColor[1] ||
           flat4.colorMap.data[i * 4 + 2] !== expectedColor[2] ||
           flat4.colorMap.data[i * 4 + 3] !== expectedColor[3]) {
+        if (colorErrorCount < 10) {
+          var label = 'color error at(' + (i % 200) + ',' + Math.floor(i/200) + ')';
+          EXPECT_EQ( expectedColor[0], flat4.colorMap.data[i * 4 + 0], label + '[R]' );
+          EXPECT_EQ( expectedColor[1], flat4.colorMap.data[i * 4 + 1], label + '[G]' );
+          EXPECT_EQ( expectedColor[2], flat4.colorMap.data[i * 4 + 2], label + '[B]' );
+          EXPECT_EQ( expectedColor[3], flat4.colorMap.data[i * 4 + 3], label + '[A]' );
+        }
         colorErrorCount += 1;
       }
     }
   }
-  if (10 < errorCount) {
+  if (10 < errorCount || 10 < colorErrorCount) {
     WARN('... and more');
   }
   EXPECT_EQ( 0, errorCount );
