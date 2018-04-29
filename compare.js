@@ -2116,28 +2116,29 @@
       context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
       var topCount = colorList[0][1];
-      var num = Math.min(26, colorList.length);
+      var numImportant = 26 < colorList.length ? 25 : colorList.length;
+      var numEntries = numImportant < colorList.length ? numImportant + 1 : numImportant;
       context.font = '14px sans-serif';
       var others = null;
-      if (num < colorList.length) {
+      if (numImportant < colorList.length) {
         others = [0, 0, 0, 0, 0];
-        for (var k = num - 1; k < colorList.length; k++) {
+        for (var k = numImportant; k < colorList.length; k++) {
           others[1] += colorList[k][1];
           others[2] += colorList[k][2];
           others[3] += colorList[k][3];
           others[4] += colorList[k][4];
         }
       }
-      for (var k = 0; k < num; k++) {
-        var entry = (k === num - 1 && others) ? others : colorList[k];
+      for (var k = 0; k < numEntries; k++) {
+        var entry = (k === numImportant) ? others : colorList[k];
         var count = entry[1];
         var r = Math.round(entry[2] / count);
         var g = Math.round(entry[3] / count);
         var b = Math.round(entry[4] / count);
         var frequency = count / topCount;
         var rgb = compareUtil.toHexTriplet(r, g, b);
-        var y0 = k / num * height;
-        var y1 = (k + 1) / num * height;
+        var y0 = k / numEntries * height;
+        var y1 = (k + 1) / numEntries * height;
         var ratio = count / reducedColorTable.totalCount;
         var label = entry === others ? 'Others' : rgb;
         context.fillStyle = rgb;
