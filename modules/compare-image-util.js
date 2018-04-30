@@ -1155,6 +1155,14 @@
     var typeMap = new Uint8Array(w * h);
     var colorMap = makeImage(w, h);
     var i0 = image.offset * ch;
+    var xClamp = new Uint32Array(w + 4);
+    var yClamp = new Uint32Array(h + 4);
+    for (var x = 0; x < w + 4; x++) {
+      xClamp[x] = Math.max(0, Math.min(w - 1, x - 2));
+    }
+    for (var y = 0; y < h + 4; y++) {
+      yClamp[y] = Math.max(0, Math.min(h - 1, y - 2));
+    }
     for (var y = 0, i = i0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
         var a = image.data[i + 3];
@@ -1164,10 +1172,11 @@
         var b = s * image.data[i + 2];
         var similar = 0; // bit pattern
         for (var j = -2; j <= 2; j++) {
-          var yy = Math.max(0, Math.min(h - 1, y + j));
+          var yy = yClamp[y + j + 2];
+          var ii0 = i0 + ch * (image.pitch * yy);
           for (var k = -2; k <= 2; k++) {
-            var xx = Math.max(0, Math.min(w - 1, x + k));
-            var ii = i0 + ch * (image.pitch * yy + xx);
+            var xx = xClamp[x + k + 2];
+            var ii = ii0 + ch * xx;
             var diff = 0;
             var aa = image.data[ii + 3];
             var ss = aa / 255;
@@ -1207,9 +1216,9 @@
         if (0 === typeMap[f]) {
           var similarAndFlatCount = 0;
           for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
-            var yy = Math.max(0, Math.min(h - 1, y + dy));
+            var yy = yClamp[y + dy + 2];
             for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
-              var xx = Math.max(0, Math.min(w - 1, x + dx));
+              var xx = xClamp[x + dx + 2];
               if ((similar & m) !== 0 && typeMap[xx + yy * w]) {
                 similarAndFlatCount++;
               }
@@ -1264,21 +1273,23 @@
           var b = s * image.data[i + 2];
           var nearColors = [];
           for (var dy = -2; dy <= 0; dy++) {
-            var y0 = Math.max(0, Math.min(h - 1, y + dy));
-            var y1 = Math.max(0, Math.min(h - 1, y - dy));
+            var y0 = yClamp[y + 2 + dy];
+            var y1 = yClamp[y + 2 - dy];
+            var ii0 = i0 + ch * (image.pitch * y0);
+            var jj0 = i0 + ch * (image.pitch * y1);
             for (var dx = -2; dx <= 2; dx++) {
               if (dy === 0 && dx === 0) {
                 break;
               }
-              var x0 = Math.max(0, Math.min(w - 1, x + dx));
-              var x1 = Math.max(0, Math.min(w - 1, x - dx));
+              var x0 = xClamp[x + 2 + dx];
+              var x1 = xClamp[x + 2 - dx];
               var f0 = f + w * (y0 - y) + x0 - x;
               var f1 = f + w * (y1 - y) + x1 - x;
               if (typeMap[f0] !== 1 || typeMap[f1] !== 1) {
                 continue;
               }
-              var ii = i0 + ch * (image.pitch * y0 + x0);
-              var jj = i0 + ch * (image.pitch * y1 + x1);
+              var ii = ii0 + ch * x0;
+              var jj = jj0 + ch * x1;
               var im = intermediateColorInfo(r, g, b, a, ii, jj);
               if (im.isIntermediate) {
                 typeMap[f] = 2; // BORDER
