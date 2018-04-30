@@ -1176,7 +1176,7 @@
             diff += Math.abs(ss * image.data[ii + 2] - b);
             diff += Math.abs(aa - a);
             similar = similar * 2;
-            if (diff <= 18) {
+            if (diff <= 12) {
               similar += 1;
             }
           }

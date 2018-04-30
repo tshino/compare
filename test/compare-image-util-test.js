@@ -1585,9 +1585,13 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   compareImageUtil.fill(image2, 255, 255, 255, 255); // white
   compareImageUtil.fill(makeRegion(image2, 50, 50, 100, 100), 0, 0, 255, 255); // blue
   compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue (top)
-  compareImageUtil.fill(makeRegion(image2, 49, 50, 1, 100), 128, 128, 255, 255); // light blue (left)
   compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue (bottom)
-  compareImageUtil.fill(makeRegion(image2, 150, 50, 1, 100), 128, 128, 255, 255); // light blue (right)
+  for (var i = 0; i < 100; i++) {
+    var gray1 = 253 - Math.round((253-128) * i / 99);
+    var gray2 = 128 + Math.round((253-128) * i / 99);
+    compareImageUtil.fill(makeRegion(image2, 49, 50+i, 1, 1), gray1, gray1, 255, 255); // light blue (left)
+    compareImageUtil.fill(makeRegion(image2, 150, 50+i, 1, 1), gray2, gray2, 255, 255); // light blue (right)
+  }
   var flat4 = compareImageUtil.geometricTypeOfPixel(image2);
   EXPECT_EQ( 200 * 200, flat4.typeMap.length );
   errorCount = 0;
@@ -1607,7 +1611,8 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       }
       if (flat4.typeMap[i] !== expected) {
         if (errorCount < 10) {
-          WARN('... error at(' + (i % 200) + ',' + Math.floor(i/200) + ')');
+          var label = 'type error at(' + (i % 200) + ',' + Math.floor(i/200) + ')';
+          EXPECT_EQ( expected, flat4.typeMap[i], label);
         }
         errorCount += 1;
       }
