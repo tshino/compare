@@ -1263,9 +1263,7 @@
         whichIsNear: (s < 0.5 ? 0 : 1)
       };
     };
-    for (var y = 0, i = i0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, f++) {
-        if (0 === typeMap[f]) {
+    var checkForBorderColor = function(x, y, i, f) {
           var a = image.data[i + 3];
           var s = a / 255;
           var r = s * image.data[i];
@@ -1305,6 +1303,23 @@
             colorMap.data[f * 4 + 2] = nearColor[2];
             colorMap.data[f * 4 + 3] = nearColor[3];
           }
+    };
+    for (var y = 0, i = i0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch, f++) {
+        if (0 === typeMap[f]) {
+          checkForBorderColor(x, y, i, f);
+        }
+      }
+      i += (image.pitch - w) * ch;
+    }
+    for (var y = 0, i = i0, f = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch, f++) {
+        if (typeMap[f] === 1 && // FLAT
+            (typeMap[xClamp[x + 2 - 1] * w + y] === 2 ||
+             typeMap[xClamp[x + 2 + 1] * w + y] === 2 ||
+             typeMap[x * w + yClamp[y + 2 - 1]] === 2 ||
+             typeMap[x * w + yClamp[y + 2 + 1]] === 2)) {
+          checkForBorderColor(x, y, i, f);
         }
       }
       i += (image.pitch - w) * ch;

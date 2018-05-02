@@ -1587,8 +1587,8 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue (top)
   compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue (bottom)
   for (var i = 0; i < 100; i++) {
-    var gray1 = 253 - Math.round((253-128) * i / 99);
-    var gray2 = 128 + Math.round((253-128) * i / 99);
+    var gray1 = 254 - Math.round((254-128) * i / 99);
+    var gray2 = 128 + Math.round((254-128) * i / 99);
     compareImageUtil.fill(makeRegion(image2, 49, 50+i, 1, 1), gray1, gray1, 255, 255); // light blue (left)
     compareImageUtil.fill(makeRegion(image2, 150, 50+i, 1, 1), gray2, gray2, 255, 255); // light blue (right)
   }
@@ -1636,6 +1636,33 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   }
   EXPECT_EQ( 0, errorCount );
   EXPECT_EQ( 0, colorErrorCount );
+  // another image: grayscale gradation
+  var grayscaleGradation = {
+    width: 4,
+    height: 4,
+    data: [
+      0, 0, 0, 255, 2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255,
+      2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255,
+      4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255,
+      6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
+    ]
+  };
+  var flat5 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation);
+  EXPECT_EQ( 4 * 4, flat5.typeMap.length );
+  EXPECT_EQ( 4 * 4 * 4, flat5.colorMap.data.length );
+  /*
+  for (var i = 0, y = 0; y < 4; y++) {
+    for (var x = 0; x < 4; x++, i++) {
+      var label = 'error at(' + x + ',' + y + ')';
+      EXPECT_EQ( 1, flat5.typeMap[i], 'type ' + label );
+      var expectedColor = (x + y) * 2;
+      EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 0], 'color ' + label + '[R]' );
+      EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 1], 'color ' + label + '[G]' );
+      EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 2], 'color ' + label + '[B]' );
+      EXPECT_EQ( 255, flat5.colorMap.data[i * 4 + 3], 'color ' + label + '[A]' );
+    }
+  }
+  */
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
