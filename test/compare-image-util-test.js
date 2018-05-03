@@ -1636,7 +1636,18 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   }
   EXPECT_EQ( 0, errorCount );
   EXPECT_EQ( 0, colorErrorCount );
-  // another image: grayscale gradation
+  // another image: gradation
+  var blueGradation = {
+    width: 4,
+    height: 4,
+    data: [
+      0, 0, 0, 255, 0, 0, 2, 255, 0, 0, 4, 255, 0, 0, 6, 255,
+      0, 0, 2, 255, 0, 0, 4, 255, 0, 0, 6, 255, 0, 0, 8, 255,
+      0, 0, 4, 255, 0, 0, 6, 255, 0, 0, 8, 255, 0, 0, 10,255,
+      0, 0, 6, 255, 0, 0, 8, 255, 0, 0, 10,255, 0, 0, 12,255
+    ]
+  };
+  /*
   var grayscaleGradation = {
     width: 4,
     height: 4,
@@ -1647,22 +1658,21 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
     ]
   };
-  var flat5 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation);
+  */
+  var flat5 = compareImageUtil.geometricTypeOfPixel(blueGradation);
   EXPECT_EQ( 4 * 4, flat5.typeMap.length );
   EXPECT_EQ( 4 * 4 * 4, flat5.colorMap.data.length );
-  /*
   for (var i = 0, y = 0; y < 4; y++) {
     for (var x = 0; x < 4; x++, i++) {
       var label = 'error at(' + x + ',' + y + ')';
       EXPECT_EQ( 1, flat5.typeMap[i], 'type ' + label );
       var expectedColor = (x + y) * 2;
-      EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 0], 'color ' + label + '[R]' );
-      EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 1], 'color ' + label + '[G]' );
+      EXPECT_EQ( 0, flat5.colorMap.data[i * 4 + 0], 'color ' + label + '[R]' );
+      EXPECT_EQ( 0, flat5.colorMap.data[i * 4 + 1], 'color ' + label + '[G]' );
       EXPECT_EQ( expectedColor, flat5.colorMap.data[i * 4 + 2], 'color ' + label + '[B]' );
       EXPECT_EQ( 255, flat5.colorMap.data[i * 4 + 3], 'color ' + label + '[A]' );
     }
   }
-  */
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {
