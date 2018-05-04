@@ -1148,13 +1148,26 @@
     if (image.channels !== 4) {
       return null;
     }
+    var temp = makeImage(image.width, image.height, image.format);
+    copy(temp, image);
+    var pmaImage = makeImage(image.width, image.height, image.format);
+    copy(pmaImage, image);
+    image = temp;
     var w = image.width;
     var h = image.height;
     var ch = image.channels;
+    for (var i = 0, n = ch * w * h; i < n; i += ch) {
+      var a = pmaImage.data[i + 3];
+      if (a < 255) {
+        var s = a / 255;
+        pmaImage.data[i + 0] = Math.round(s * pmaImage.data[i + 0]);
+        pmaImage.data[i + 1] = Math.round(s * pmaImage.data[i + 1]);
+        pmaImage.data[i + 2] = Math.round(s * pmaImage.data[i + 2]);
+      }
+    }
     var isSimilar = new Uint32Array(w * h);
     var typeMap = new Uint8Array(w * h);
     var colorMap = makeImage(w, h);
-    var i0 = image.offset * ch;
     var xClamp = new Uint32Array(w + 4);
     var yClamp = new Uint32Array(h + 4);
     for (var x = 0; x < w + 4; x++) {
@@ -1163,27 +1176,24 @@
     for (var y = 0; y < h + 4; y++) {
       yClamp[y] = Math.max(0, Math.min(h - 1, y - 2));
     }
-    for (var y = 0, i = i0, f = 0; y < h; y++) {
+    for (var y = 0, i = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
-        var a = image.data[i + 3];
-        var s = a / 255;
-        var r = s * image.data[i];
-        var g = s * image.data[i + 1];
-        var b = s * image.data[i + 2];
+        var r = pmaImage.data[i];
+        var g = pmaImage.data[i + 1];
+        var b = pmaImage.data[i + 2];
+        var a = pmaImage.data[i + 3];
         var similar = 0; // bit pattern
         for (var j = -2; j <= 2; j++) {
           var yy = yClamp[y + j + 2];
-          var ii0 = i0 + ch * (image.pitch * yy);
+          var ii0 = ch * (w * yy);
           for (var k = -2; k <= 2; k++) {
             var xx = xClamp[x + k + 2];
             var ii = ii0 + ch * xx;
             var diff = 0;
-            var aa = image.data[ii + 3];
-            var ss = aa / 255;
-            diff += Math.abs(ss * image.data[ii] - r) * 2;
-            diff += Math.abs(ss * image.data[ii + 1] - g) * 5;
-            diff += Math.abs(ss * image.data[ii + 2] - b);
-            diff += Math.abs(aa - a);
+            diff += Math.abs(pmaImage.data[ii] - r) * 2;
+            diff += Math.abs(pmaImage.data[ii + 1] - g) * 5;
+            diff += Math.abs(pmaImage.data[ii + 2] - b);
+            diff += Math.abs(pmaImage.data[ii + 3] - a);
             similar = similar * 2;
             if (diff <= 12) {
               similar += 1;
@@ -1196,7 +1206,6 @@
         colorMap.data[f * 4 + 2] = image.data[i + 2];
         colorMap.data[f * 4 + 3] = image.data[i + 3];
       }
-      i += (image.pitch - w) * ch;
     }
     for (var y = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, f++) {
@@ -1231,16 +1240,14 @@
       }
     }
     var intermediateColorInfo = function(r, g, b, a, ii, jj) {
-      var ai = image.data[ii + 3];
-      var si = ai / 255;
-      var ri = si * image.data[ii];
-      var gi = si * image.data[ii + 1];
-      var bi = si * image.data[ii + 2];
-      var aj = image.data[jj + 3];
-      var sj = aj / 255;
-      var rj = sj * image.data[jj];
-      var gj = sj * image.data[jj + 1];
-      var bj = sj * image.data[jj + 2];
+      var ri = pmaImage.data[ii];
+      var gi = pmaImage.data[ii + 1];
+      var bi = pmaImage.data[ii + 2];
+      var ai = pmaImage.data[ii + 3];
+      var rj = pmaImage.data[jj];
+      var gj = pmaImage.data[jj + 1];
+      var bj = pmaImage.data[jj + 2];
+      var aj = pmaImage.data[jj + 3];
       var rk = rj - ri;
       var gk = gj - gi;
       var bk = bj - bi;
@@ -1264,17 +1271,16 @@
       };
     };
     var checkForBorderColor = function(x, y, i, f) {
-          var a = image.data[i + 3];
-          var s = a / 255;
-          var r = s * image.data[i];
-          var g = s * image.data[i + 1];
-          var b = s * image.data[i + 2];
+          var r = pmaImage.data[i];
+          var g = pmaImage.data[i + 1];
+          var b = pmaImage.data[i + 2];
+          var a = pmaImage.data[i + 3];
           var nearColors = [];
           for (var dy = -2; dy <= 0; dy++) {
             var y0 = yClamp[y + 2 + dy];
             var y1 = yClamp[y + 2 - dy];
-            var ii0 = i0 + ch * (image.pitch * y0);
-            var jj0 = i0 + ch * (image.pitch * y1);
+            var ii0 = ch * (w * y0);
+            var jj0 = ch * (w * y1);
             for (var dx = -2; dx <= 2; dx++) {
               if (dy === 0 && dx === 0) {
                 break;
@@ -1304,15 +1310,14 @@
             colorMap.data[f * 4 + 3] = nearColor[3];
           }
     };
-    for (var y = 0, i = i0, f = 0; y < h; y++) {
+    for (var y = 0, i = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
         if (0 === typeMap[f]) {
           checkForBorderColor(x, y, i, f);
         }
       }
-      i += (image.pitch - w) * ch;
     }
-    for (var y = 0, i = i0, f = 0; y < h; y++) {
+    for (var y = 0, i = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
         if (typeMap[f] === 1 && // FLAT
             (typeMap[xClamp[x + 2 - 1] * w + y] === 2 ||
@@ -1322,7 +1327,6 @@
           checkForBorderColor(x, y, i, f);
         }
       }
-      i += (image.pitch - w) * ch;
     }
     return {
       typeMap: typeMap,
