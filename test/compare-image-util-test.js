@@ -1665,7 +1665,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   for (var i = 0, y = 0; y < 4; y++) {
     for (var x = 0; x < 4; x++, i++) {
       var label = 'error at(' + x + ',' + y + ')';
-      EXPECT_EQ( 1, flat5.typeMap[i], 'type ' + label );
+      EXPECT_EQ( FLAT, flat5.typeMap[i], 'type ' + label );
       var expectedColor = (x + y) * 2;
       EXPECT_EQ( 0, flat5.colorMap.data[i * 4 + 0], 'color ' + label + '[R]' );
       EXPECT_EQ( 0, flat5.colorMap.data[i * 4 + 1], 'color ' + label + '[G]' );
