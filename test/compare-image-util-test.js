@@ -1580,6 +1580,41 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   }
   EXPECT_EQ( 0, errorCount );
   EXPECT_EQ( 0, colorErrorCount );
+  var checkGeometricTypeResult = function(label, result, getExpected) {
+    EXPECT_EQ( 200 * 200, result.typeMap.length );
+    var errorCount = 0;
+    var colorErrorCount = 0;
+    for (var i = 0; i < 200 * 200; i++) {
+      var x = i % 200;
+      var y = Math.floor(i / 200);
+      var expected = getExpected(x, y, i);
+      if (result.typeMap[i] !== expected.type) {
+        if (errorCount < 10) {
+          var msg = 'type error at(' + x + ',' + y + ') of ' + label;
+          EXPECT_EQ( expected.type, result.typeMap[i], msg );
+        }
+        errorCount += 1;
+      }
+      if (result.colorMap.data[i * 4 + 0] !== expected.color[0] ||
+          result.colorMap.data[i * 4 + 1] !== expected.color[1] ||
+          result.colorMap.data[i * 4 + 2] !== expected.color[2] ||
+          result.colorMap.data[i * 4 + 3] !== expected.color[3]) {
+        if (colorErrorCount < 10) {
+          var msg = 'color error at(' + x + ',' + y + ') of ' + label;
+          EXPECT_EQ( expected.color[0], result.colorMap.data[i * 4 + 0], msg + '[R]' );
+          EXPECT_EQ( expected.color[1], result.colorMap.data[i * 4 + 1], msg + '[G]' );
+          EXPECT_EQ( expected.color[2], result.colorMap.data[i * 4 + 2], msg + '[B]' );
+          EXPECT_EQ( expected.color[3], result.colorMap.data[i * 4 + 3], msg + '[A]' );
+        }
+        colorErrorCount += 1;
+      }
+    }
+    if (10 < errorCount || 10 < colorErrorCount) {
+      WARN('... and more');
+    }
+    EXPECT_EQ( 0, errorCount );
+    EXPECT_EQ( 0, colorErrorCount );
+  };
   // another image: white background and blue box with anti-aliasing-like border
   var image2 = makeImage(200, 200);
   compareImageUtil.fill(image2, 255, 255, 255, 255); // white
@@ -1593,11 +1628,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
     compareImageUtil.fill(makeRegion(image2, 150, 50+i, 1, 1), gray2, gray2, 255, 255); // light blue (right)
   }
   var flat4 = compareImageUtil.geometricTypeOfPixel(image2);
-  EXPECT_EQ( 200 * 200, flat4.typeMap.length );
-  errorCount = 0;
-  colorErrorCount = 0;
-  for (var i = 0, y = 0; y < 200; y++) {
-    for (var x = 0; x < 200; x++, i++) {
+  checkGeometricTypeResult('flat4', flat4, function(x, y, i) {
       // pixels on the border are classified as border
       var expected = FLAT;
       var expectedColor = image2.data.slice(i * 4, i * 4 + 4);
@@ -1609,33 +1640,8 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
         expected = BORDER;
         expectedColor = y === 49 ? [0,0,255,255] : [255,255,255,255];
       }
-      if (flat4.typeMap[i] !== expected) {
-        if (errorCount < 10) {
-          var label = 'type error at(' + (i % 200) + ',' + Math.floor(i/200) + ')';
-          EXPECT_EQ( expected, flat4.typeMap[i], label);
-        }
-        errorCount += 1;
-      }
-      if (flat4.colorMap.data[i * 4 + 0] !== expectedColor[0] ||
-          flat4.colorMap.data[i * 4 + 1] !== expectedColor[1] ||
-          flat4.colorMap.data[i * 4 + 2] !== expectedColor[2] ||
-          flat4.colorMap.data[i * 4 + 3] !== expectedColor[3]) {
-        if (colorErrorCount < 10) {
-          var label = 'color error at(' + (i % 200) + ',' + Math.floor(i/200) + ')';
-          EXPECT_EQ( expectedColor[0], flat4.colorMap.data[i * 4 + 0], label + '[R]' );
-          EXPECT_EQ( expectedColor[1], flat4.colorMap.data[i * 4 + 1], label + '[G]' );
-          EXPECT_EQ( expectedColor[2], flat4.colorMap.data[i * 4 + 2], label + '[B]' );
-          EXPECT_EQ( expectedColor[3], flat4.colorMap.data[i * 4 + 3], label + '[A]' );
-        }
-        colorErrorCount += 1;
-      }
-    }
-  }
-  if (10 < errorCount || 10 < colorErrorCount) {
-    WARN('... and more');
-  }
-  EXPECT_EQ( 0, errorCount );
-  EXPECT_EQ( 0, colorErrorCount );
+      return { type: expected, color: expectedColor };
+  });
   // another image: gradation
   var blueGradation = {
     width: 4,
