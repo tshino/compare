@@ -1101,37 +1101,45 @@
     }
     return nextPoints;
   };
+  var meanColor = function(colors) {
+    var mean = [0,0,0,0];
+    for (var i = 0; i < colors.length; i++) {
+      var c = colors[i];
+      mean[0] += c[0];
+      mean[1] += c[1];
+      mean[2] += c[2];
+      mean[3] += c[3];
+    }
+    mean[0] /= colors.length;
+    mean[1] /= colors.length;
+    mean[2] /= colors.length;
+    mean[3] /= colors.length;
+    return mean;
+  };
+  var mostDistantColorIndex = function(colors) {
+    var mean = meanColor(colors);
+    var maxD = 0, index = 0;
+    for (var i = 0; i < colors.length; i++) {
+      var c = colors[i];
+      var d = 0;
+      d += Math.abs(c[0] - mean[0]);
+      d += Math.abs(c[1] - mean[1]);
+      d += Math.abs(c[2] - mean[2]);
+      d += Math.abs(c[3] - mean[3]);
+      if (maxD < d) {
+        maxD = d;
+        index = i;
+      }
+    }
+    return index;
+  };
   var mostFrequentColor = function(colors) {
     if (1 === colors.length) {
       return colors[0];
     }
     var list = Array.prototype.slice.call(colors);
     while (1 < list.length) {
-      var mean = [0,0,0,0];
-      for (var i = 0; i < list.length; i++) {
-        var c = list[i];
-        mean[0] += c[0];
-        mean[1] += c[1];
-        mean[2] += c[2];
-        mean[3] += c[3];
-      }
-      mean[0] /= list.length;
-      mean[1] /= list.length;
-      mean[2] /= list.length;
-      mean[3] /= list.length;
-      var maxD = 0, index = 0;
-      for (var i = 0; i < list.length; i++) {
-        var c = list[i];
-        var d = 0;
-        d += Math.abs(c[0] - mean[0]);
-        d += Math.abs(c[1] - mean[1]);
-        d += Math.abs(c[2] - mean[2]);
-        d += Math.abs(c[3] - mean[3]);
-        if (maxD < d) {
-          maxD = d;
-          index = i;
-        }
-      }
+      var index = mostDistantColorIndex(list);
       list.splice(index, 1);
     }
     return list[0];
