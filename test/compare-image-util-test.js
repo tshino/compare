@@ -1517,16 +1517,12 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
         }
         typeErrors += 1;
       }
-      if (result.colorMap.data[i * 4 + 0] !== expected.color[0] ||
-          result.colorMap.data[i * 4 + 1] !== expected.color[1] ||
-          result.colorMap.data[i * 4 + 2] !== expected.color[2] ||
-          result.colorMap.data[i * 4 + 3] !== expected.color[3]) {
+      var expectedColor = expected.color.toString();
+      var actualColor = result.colorMap.data.slice(i * 4, i * 4 + 4).toString();
+      if (actualColor !== expectedColor) {
         if (colorErrors < 10) {
-          var msg = 'error at(' + x + ',' + y + ') of ' + label;
-          EXPECT_EQ( expected.color[0], result.colorMap.data[i * 4 + 0], 'color [R] ' + msg );
-          EXPECT_EQ( expected.color[1], result.colorMap.data[i * 4 + 1], 'color [G] ' + msg );
-          EXPECT_EQ( expected.color[2], result.colorMap.data[i * 4 + 2], 'color [B] ' + msg );
-          EXPECT_EQ( expected.color[3], result.colorMap.data[i * 4 + 3], 'color [A] ' + msg );
+          var msg = 'color error at(' + x + ',' + y + ') of ' + label;
+          EXPECT_EQ( expectedColor, actualColor, msg );
         }
         colorErrors += 1;
       }
@@ -1607,8 +1603,22 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   checkGeometricTypeResult('blueGradation', 4, 4, result5, function(x, y, i) {
     return { type: FLAT, color: [0, 0, (x + y) * 2, 255] };
   });
+  var grayscaleGradation1 = {
+    width: 4,
+    height: 4,
+    data: [
+      0, 0, 0, 255, 1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255,
+      1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255, 4, 4, 4, 255,
+      2, 2, 2, 255, 3, 3, 3, 255, 4, 4, 4, 255, 5, 5, 5, 255,
+      3, 3, 3, 255, 4, 4, 4, 255, 5, 5, 5, 255, 6, 6, 6, 255
+    ]
+  };
+  var result6 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation1);
+  checkGeometricTypeResult('grayscaleGradation1', 4, 4, result6, function(x, y, i) {
+    return { type: FLAT, color: [(x + y), (x + y), (x + y), 255] };
+  });
   /*
-  var grayscaleGradation = {
+  var grayscaleGradation2 = {
     width: 4,
     height: 4,
     data: [
@@ -1618,6 +1628,10 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
     ]
   };
+  var result7 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation2);
+  checkGeometricTypeResult('grayscaleGradation2', 4, 4, result7, function(x, y, i) {
+    return { type: FLAT, color: [(x + y) * 2, (x + y) * 2, (x + y) * 2, 255] };
+  });
   */
 });
 
