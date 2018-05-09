@@ -2169,17 +2169,20 @@
       for (var i = 0, img; img = images[i]; i++) {
         var label = makeImageNameWithIndex('<td>', img);
         target.find('tr').eq(0).append(label);
+        var cell = $('<td>');
+        target.find('tr').eq(1).append(cell);
         if (!img.reducedColorTable) {
           img.reducedColorTable = {};
           updateAsync(img);
+          cell.text('calculating...');
           continue;
         }
         if (img.reducedColorTable.colorList === undefined) {
+          cell.text('calculating...');
           continue;
         }
         var figure = drawFigure(img.reducedColorTable);
-        var cell = $('<td>').append(figure);
-        target.find('tr').eq(1).append(cell);
+        cell.append(figure);
       }
       if (i === 0) {
         target.find('tr').eq(0).append(
