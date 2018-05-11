@@ -1588,6 +1588,29 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       }
       return { type: FLAT, color: image2.data.slice(i * 4, i * 4 + 4) };
   });
+  // another image: simple border
+  var simpleBorder = {
+    width: 4,
+    height: 4,
+    data: [
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+      0, 0, 0, 255, 30,30,30,255, 50,50,50,255, 50,50,50,255,
+      0, 0, 0, 255, 50,50,50,255, 90,90,90,255, 90,90,90,255,
+      0, 0, 0, 255, 50,50,50,255, 90,90,90,255, 90,90,90,255
+    ]
+  };
+  var border1 = compareImageUtil.geometricTypeOfPixel(simpleBorder);
+  checkGeometricTypeResult('simpleBorder', 4, 4, border1, function(x, y, i) {
+    if (x === 0 || y === 0) {
+      return { type: FLAT, color: [0, 0, 0, 255] };
+    } else if (x === 1 && y === 1) {
+      return { type: BORDER, color: [0, 0, 0, 255] };
+    } else if (x === 1 || y === 1) {
+      return { type: BORDER, color: [90, 90, 90, 255] };
+    } else {
+      return { type: FLAT, color: [90, 90, 90, 255] };
+    }
+  });
   // another image: gradation
   var blueGradation = {
     width: 4,
