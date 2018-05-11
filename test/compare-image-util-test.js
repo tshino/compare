@@ -1500,10 +1500,10 @@ TEST( 'compareImageUtil mostFrequentColor', function test() {
 
 TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var checkGeometricTypeResult = function(label, w, h, result, getExpected) {
-    EXPECT_EQ( w * h, result.typeMap.length );
-    EXPECT_EQ( w, result.colorMap.width );
-    EXPECT_EQ( h, result.colorMap.height );
-    EXPECT_EQ( w * h * 4, result.colorMap.data.length );
+    EXPECT_EQ( w * h, result.typeMap.length, 'typeMap.length of ' + label );
+    EXPECT_EQ( w, result.colorMap.width, 'colorMap.width of ' + label );
+    EXPECT_EQ( h, result.colorMap.height, 'colorMap.height of ' + label );
+    EXPECT_EQ( w * h * 4, result.colorMap.data.length, 'colorMap.data.length of ' + label );
     var typeErrors = 0;
     var colorErrors = 0;
     for (var i = 0; i < w * h; i++) {
@@ -1544,7 +1544,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
     // every pixels are flat
     return { type: FLAT, color: image1.data.slice(i * 4, i * 4 + 4) };
   });
-  // with some rectangles are drawn
+  // ...with some rectangles are drawn
   compareImageUtil.fill(makeRegion(image1, 50, 50, 20, 20), 255, 255, 255, 255);
   compareImageUtil.fill(makeRegion(image1, 100, 50, 50, 50), 255, 0, 0, 255);
   compareImageUtil.fill(makeRegion(image1, 0, 100, 100, 100), 0, 255, 0, 255);
@@ -1554,7 +1554,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
     // still every pixels belong to flat region
     return { type: FLAT, color: image1.data.slice(i * 4, i * 4 + 4) };
   });
-  // with some thin lines with unique colors are drawn
+  // ...with some thin lines with unique colors are drawn
   compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 0, 128, 255);
   compareImageUtil.fill(makeRegion(image1, 0, 90, 200, 1), 45, 90, 135, 255);
   var result3 = compareImageUtil.geometricTypeOfPixel(image1);
@@ -1565,7 +1565,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       color: image1.data.slice(i * 4, i * 4 + 4)
     };
   });
-  // another image: white background and blue box with anti-aliasing-like border
+  // white background and blue box with anti-aliasing-like border
   var image2 = makeImage(200, 200);
   compareImageUtil.fill(image2, 255, 255, 255, 255); // white
   compareImageUtil.fill(makeRegion(image2, 50, 50, 100, 100), 0, 0, 255, 255); // blue
@@ -1588,7 +1588,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       }
       return { type: FLAT, color: image2.data.slice(i * 4, i * 4 + 4) };
   });
-  // another image: simple border
+  // simple border lines
   var simpleBorder = {
     width: 4,
     height: 4,
@@ -1611,7 +1611,27 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       return { type: FLAT, color: [90, 90, 90, 255] };
     }
   });
-  // another image: gradation
+  var simpleBorder2 = {
+    width: 4,
+    height: 4,
+    data: [
+      50,50,50,255, 90,90,90,255, 90,90,90,255, 90,90,90,255,
+      0, 0, 0, 255, 50,50,50,255, 90,90,90,255, 90,90,90,255,
+      0, 0, 0, 255, 0, 0, 0, 255, 50,50,50,255, 90,90,90,255,
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 50,50,50,255
+    ]
+  };
+  var border2 = compareImageUtil.geometricTypeOfPixel(simpleBorder2);
+  checkGeometricTypeResult('simpleBorder2', 4, 4, border2, function(x, y, i) {
+    if (x === y) {
+      return { type: BORDER, color: [90, 90, 90, 255] };
+    } else if (x > y) {
+      return { type: FLAT, color: [90, 90, 90, 255] };
+    } else {
+      return { type: FLAT, color: [0, 0, 0, 255] };
+    }
+  });
+  // gradation
   var blueGradation = {
     width: 4,
     height: 4,

@@ -1194,16 +1194,23 @@
         var similar = 0; // bit pattern
         for (var j = -2; j <= 2; j++) {
           var yy = yClamp[y + j + 2];
+          if (y + j < -1 || h < y + j) {
+            similar = similar * 32;
+            continue;
+          }
           var ii0 = ch * (w * yy);
           for (var k = -2; k <= 2; k++) {
             var xx = xClamp[x + k + 2];
+            similar = similar * 2;
+            if (x + k < -1 || w < x + k) {
+              continue;
+            }
             var ii = ii0 + ch * xx;
             var diff = 0;
             diff += Math.abs(pmaImage.data[ii] - r) * 2;
             diff += Math.abs(pmaImage.data[ii + 1] - g) * 5;
             diff += Math.abs(pmaImage.data[ii + 2] - b);
             diff += Math.abs(pmaImage.data[ii + 3] - a);
-            similar = similar * 2;
             if (diff <= 12) {
               similar += 1;
             }
