@@ -1152,6 +1152,7 @@
   //    2 => border between flat regions
   // 'colorMap' is an RGBA image which is anti-anti-aliased version of input.
   var geometricTypeOfPixel = function(image) {
+    var UNCLASSIFIED = 0, FLAT = 1, BORDER = 2;
     image = makeImage(image);
     if (image.channels !== 4) {
       return null;
@@ -1224,25 +1225,25 @@
             similarCount++;
           }
         }
-        typeMap[f] = (8 <= similarCount) ? 1 : 0;
+        typeMap[f] = (8 <= similarCount) ? FLAT : UNCLASSIFIED;
       }
     }
     for (var y = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, f++) {
         var similar = isSimilar[f];
-        if (0 === typeMap[f]) {
+        if (UNCLASSIFIED === typeMap[f]) {
           var similarAndFlatCount = 0;
           for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
             var yy = yClamp[y + dy + 2];
             for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
               var xx = xClamp[x + dx + 2];
-              if ((similar & m) !== 0 && typeMap[xx + yy * w]) {
+              if ((similar & m) !== 0 && UNCLASSIFIED !== typeMap[xx + yy * w]) {
                 similarAndFlatCount++;
               }
             }
           }
           if (2 <= similarAndFlatCount) {
-            typeMap[f] = 1; // FLAT
+            typeMap[f] = FLAT;
           }
         }
       }
@@ -1297,14 +1298,14 @@
               var x1 = xClamp[x + 2 - dx];
               var f0 = f + w * (y0 - y) + x0 - x;
               var f1 = f + w * (y1 - y) + x1 - x;
-              if (typeMap[f0] !== 1 || typeMap[f1] !== 1) {
+              if (typeMap[f0] !== FLAT || typeMap[f1] !== FLAT) {
                 continue;
               }
               var ii = ii0 + ch * x0;
               var jj = jj0 + ch * x1;
               var im = intermediateColorInfo(r, g, b, a, ii, jj);
               if (im.isIntermediate) {
-                typeMap[f] = 2; // BORDER
+                typeMap[f] = BORDER;
                 var near = im.whichIsNear === 0 ? ii : jj;
                 nearColors.push(image.data.slice(near, near + 4));
               }
@@ -1320,18 +1321,18 @@
     };
     for (var y = 0, i = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
-        if (0 === typeMap[f]) {
+        if (UNCLASSIFIED === typeMap[f]) {
           checkForBorderColor(x, y, i, f);
         }
       }
     }
     for (var y = 0, i = 0, f = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += ch, f++) {
-        if (typeMap[f] === 1 && // FLAT
-            (typeMap[xClamp[x + 2 - 1] * w + y] === 2 ||
-             typeMap[xClamp[x + 2 + 1] * w + y] === 2 ||
-             typeMap[x * w + yClamp[y + 2 - 1]] === 2 ||
-             typeMap[x * w + yClamp[y + 2 + 1]] === 2)) {
+        if (typeMap[f] === FLAT &&
+            (typeMap[xClamp[x + 2 - 1] * w + y] === BORDER ||
+             typeMap[xClamp[x + 2 + 1] * w + y] === BORDER ||
+             typeMap[x * w + yClamp[y + 2 - 1]] === BORDER ||
+             typeMap[x * w + yClamp[y + 2 + 1]] === BORDER)) {
           checkForBorderColor(x, y, i, f);
         }
       }
