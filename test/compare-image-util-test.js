@@ -1660,7 +1660,6 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   checkGeometricTypeResult('grayscaleGradation1', 4, 4, result6, function(x, y, i) {
     return { type: FLAT, color: [(x + y), (x + y), (x + y), 255] };
   });
-  /*
   var grayscaleGradation2 = {
     width: 4,
     height: 4,
@@ -1675,7 +1674,6 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   checkGeometricTypeResult('grayscaleGradation2', 4, 4, result7, function(x, y, i) {
     return { type: FLAT, color: [(x + y) * 2, (x + y) * 2, (x + y) * 2, 255] };
   });
-  */
 });
 
 TEST( 'compareImageUtil getUniqueColors', function test() {

@@ -1211,7 +1211,8 @@
             diff += Math.abs(pmaImage.data[ii + 1] - g) * 5;
             diff += Math.abs(pmaImage.data[ii + 2] - b);
             diff += Math.abs(pmaImage.data[ii + 3] - a);
-            if (diff <= 12) {
+            if (diff <= 24) {
+            //if (diff <= 12) {
               similar += 1;
             }
           }
