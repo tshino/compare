@@ -1625,10 +1625,26 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   checkGeometricTypeResult('simpleBorder2', 4, 4, border2, function(x, y, i) {
     if (x === y) {
       return { type: BORDER, color: [90, 90, 90, 255] };
-    } else if (x > y) {
-      return { type: FLAT, color: [90, 90, 90, 255] };
     } else {
-      return { type: FLAT, color: [0, 0, 0, 255] };
+      return { type: FLAT, color: x < y ? [0, 0, 0, 255] : [90, 90, 90, 255] };
+    }
+  });
+  var simpleBorder3 = {
+    width: 4,
+    height: 4,
+    data: [
+      4, 4, 4, 255, 90,90,90,255, 90,90,90,255, 90,90,90,255,
+      0, 0, 0, 255, 30,30,30,255, 90,90,90,255, 90,90,90,255,
+      0, 0, 0, 255, 0, 0, 0, 255, 60,60,60,255, 90,90,90,255,
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 86,86,86,255
+    ]
+  };
+  var border3 = compareImageUtil.geometricTypeOfPixel(simpleBorder3);
+  checkGeometricTypeResult('simpleBorder3', 4, 4, border3, function(x, y, i) {
+    if (x === y) {
+      return { type: BORDER, color: x < 2 ? [0, 0, 0, 255] : [90, 90, 90, 255] };
+    } else {
+      return { type: FLAT, color: x < y ? [0, 0, 0, 255] : [90, 90, 90, 255] };
     }
   });
   // gradation
