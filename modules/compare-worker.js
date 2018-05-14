@@ -205,6 +205,8 @@ function calcReducedColorTable( imageData )
   var counts_org = colorTable.counts;
   var length_org = counts_org.length;
   //
+  // very fast and simple clustering using quantization of color components
+  //
   var colorList = [];
   for (var k = 0; k < length_org; k++) {
     var r = colors_org[k] >> 16;
@@ -240,6 +242,56 @@ function calcReducedColorTable( imageData )
     }
   }
   colorList = colorList.slice(0, uniqueCount);
+  //
+  // merge nearest clusters iteratively
+  //
+  for (;;) {
+    var DistanceThreshold = 88 * colorList.length / (8 + colorList.length);
+    var minD = 256 * 3, minI, minJ;
+    for (var i = 0; i + 1 < colorList.length; i++) {
+      var n = colorList[i][1];
+      var rgbI = [
+        colorList[i][2] / n,
+        colorList[i][3] / n,
+        colorList[i][4] / n
+      ];
+      for (var j = i + 1; j < colorList.length; j++) {
+        n = colorList[j][1];
+        var rgbJ = [
+          colorList[j][2] / n,
+          colorList[j][3] / n,
+          colorList[j][4] / n
+        ];
+        var d =
+            Math.abs(rgbI[0] - rgbJ[0]) +
+            Math.abs(rgbI[1] - rgbJ[1]) +
+            Math.abs(rgbI[2] - rgbJ[2]);
+        if (minD > d) {
+          minD = d;
+          minI = i;
+          minJ = j;
+        }
+      }
+    }
+    if (minD === 256 * 3) {
+      break;
+    }
+    if (minD <= DistanceThreshold) {
+      colorList[minI][1] += colorList[minJ][1];
+      colorList[minI][2] += colorList[minJ][2];
+      colorList[minI][3] += colorList[minJ][3];
+      colorList[minI][4] += colorList[minJ][4];
+      for (var j = minJ; j + 1 < colorList.length; j++) {
+        colorList[j][1] = colorList[j + 1][1];
+        colorList[j][2] = colorList[j + 1][2];
+        colorList[j][3] = colorList[j + 1][3];
+        colorList[j][4] = colorList[j + 1][4];
+      }
+      colorList.pop();
+    } else {
+      break;
+    }
+  }
   colorList.sort(function(a, b) {
     return b[1] - a[1]; // by count
   });
