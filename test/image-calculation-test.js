@@ -84,8 +84,33 @@
     ])(done);
   });
   TEST( 'compare-worker.js calcReducedColorTable', function test(done) {
+    var makeAsyncTest = function(label, input, expected) {
+      return function(done) {
+        var task = {
+          cmd: 'calcReducedColorTable',
+          imageData: [input]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcReducedColorTable', data.cmd, 'cmd of ' + label );
+          EXPECT_EQ( expected.totalCount, data.result.totalCount, 'totalCount of ' + label );
+          EXPECT_EQ( expected.colorList.length, data.result.colorList.length, 'colorList.length of ' + label );
+          if (expected.colorList.length === data.result.colorList.length) {
+            for (var i = 0; i < expected.colorList.length; i++) {
+              var s0 = 'colorList[' + i + ']', s1 = ' of ' + label;
+              EXPECT_EQ( expected.colorList[i][1], data.result.colorList[i][1], s0 + '[1]' + s1 );
+              EXPECT_EQ( expected.colorList[i][2], data.result.colorList[i][2], s0 + '[2]' + s1 );
+              EXPECT_EQ( expected.colorList[i][3], data.result.colorList[i][3], s0 + '[3]' + s1 );
+              EXPECT_EQ( expected.colorList[i][4], data.result.colorList[i][4], s0 + '[4]' + s1 );
+            }
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      };
+    };
+    var tests = [];
     // single color
-    var black1 = {
+    tests.push(makeAsyncTest('single color', {
       width: 4,
       height: 4,
       data: [
@@ -94,9 +119,14 @@
         0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
         0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255
       ]
-    };
+    }, {
+      totalCount: 16,
+      colorList: [
+        [0, 16, 0, 0, 0]
+      ]
+    }));
     // exactly only two colors
-    var image1 = {
+    tests.push(makeAsyncTest('exactly only two colors', {
       width: 4,
       height: 4,
       data: [
@@ -105,9 +135,15 @@
         0,0,0,255, 255,0,128,255, 255,0,128,255, 0,0,0,255,
         0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255
       ]
-    };
+    }, {
+      totalCount: 16,
+      colorList: [
+        [0, 12, 0, 0, 0],
+        [0, 4, 4*255, 4*0, 4*128]
+      ]
+    }));
     // grayscale gradation
-    var grayscaleGradation = {
+    tests.push(makeAsyncTest('grayscaleGradation', {
       width: 4,
       height: 4,
       data: [
@@ -116,7 +152,12 @@
         4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255,
         6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
       ]
-    };
+    }, {
+      totalCount: 16,
+      colorList: [
+        [0, 16, 16*6, 16*6, 16*6]
+      ]
+    }));
     // stripe
     var makeImage = compareImageUtil.makeImage;
     var makeRegion = compareImageUtil.makeRegion;
@@ -125,92 +166,14 @@
     fill(stripe, 255, 255, 255, 255);
     fill(makeRegion(stripe, 10, 0, 10, 30), 0, 0, 255, 255);
     fill(makeRegion(stripe, 30, 0, 10, 30), 0, 0, 255, 255);
-    jsTestUtil.makeSequentialTest([
-      function(done) {
-        var task = {
-          cmd: 'calcReducedColorTable',
-          imageData: [black1]
-        };
-        taskCallback = function(data) {
-          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
-          EXPECT_EQ( 16, data.result.totalCount );
-          EXPECT_EQ( 1, data.result.colorList.length );
-          if (1 === data.result.colorList.length) {
-            EXPECT_EQ( 16, data.result.colorList[0][1] );
-            EXPECT_EQ( 16 * 0, data.result.colorList[0][2] );
-            EXPECT_EQ( 16 * 0, data.result.colorList[0][3] );
-            EXPECT_EQ( 16 * 0, data.result.colorList[0][4] );
-          }
-          done();
-        };
-        taskQueue.addTask(task);
-      },
-      function(done) {
-        var task = {
-          cmd: 'calcReducedColorTable',
-          imageData: [image1]
-        };
-        taskCallback = function(data) {
-          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
-          EXPECT_EQ( 16, data.result.totalCount );
-          EXPECT_EQ( 2, data.result.colorList.length );
-          if (2 === data.result.colorList.length) {
-            EXPECT_EQ( 12, data.result.colorList[0][1] );
-            EXPECT_EQ( 12 * 0, data.result.colorList[0][2] );
-            EXPECT_EQ( 12 * 0, data.result.colorList[0][3] );
-            EXPECT_EQ( 12 * 0, data.result.colorList[0][4] );
-            EXPECT_EQ( 4, data.result.colorList[1][1] );
-            EXPECT_EQ( 4 * 255, data.result.colorList[1][2] );
-            EXPECT_EQ( 4 * 0, data.result.colorList[1][3] );
-            EXPECT_EQ( 4 * 128, data.result.colorList[1][4] );
-          }
-          done();
-        };
-        taskQueue.addTask(task);
-      },
-      function(done) {
-        var task = {
-          cmd: 'calcReducedColorTable',
-          imageData: [grayscaleGradation]
-        };
-        taskCallback = function(data) {
-          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
-          EXPECT_EQ( 16, data.result.totalCount );
-          EXPECT_EQ( 1, data.result.colorList.length );
-          if (1 === data.result.colorList.length) {
-            EXPECT_EQ( 16, data.result.colorList[0][1] );
-            EXPECT_EQ( 16 * 6, data.result.colorList[0][2] );
-            EXPECT_EQ( 16 * 6, data.result.colorList[0][3] );
-            EXPECT_EQ( 16 * 6, data.result.colorList[0][4] );
-          }
-          done();
-        };
-        taskQueue.addTask(task);
-      },
-      function(done) {
-        var task = {
-          cmd: 'calcReducedColorTable',
-          imageData: [stripe]
-        };
-        taskCallback = function(data) {
-          EXPECT_EQ( 'calcReducedColorTable', data.cmd );
-          EXPECT_EQ( 50 * 30, data.result.totalCount );
-          EXPECT_EQ( 2, data.result.colorList.length );
-          if (2 === data.result.colorList.length) {
-            EXPECT_EQ( 900, data.result.colorList[0][1] );
-            EXPECT_EQ( 900 * 255, data.result.colorList[0][2] );
-            EXPECT_EQ( 900 * 255, data.result.colorList[0][3] );
-            EXPECT_EQ( 900 * 255, data.result.colorList[0][4] );
-            EXPECT_EQ( 600, data.result.colorList[1][1] );
-            EXPECT_EQ( 600 * 0, data.result.colorList[1][2] );
-            EXPECT_EQ( 600 * 0, data.result.colorList[1][3] );
-            EXPECT_EQ( 600 * 255, data.result.colorList[1][4] );
-          }
-          done();
-        };
-        taskQueue.addTask(task);
-      },
-    ])(done);
+    tests.push(makeAsyncTest('stripe', stripe, {
+      totalCount: 50 * 30,
+      colorList: [
+        [0, 900, 900*255, 900*255, 900*255],
+        [0, 600, 600*0, 600*0, 600*255],
+      ]
+    }));
+    jsTestUtil.makeSequentialTest(tests)(done);
   });
   TEST( 'compare-worker.js calcMetrics', function test(done) {
     var colorImage1 = {
