@@ -142,7 +142,7 @@
         [0, 4, 4*255, 4*0, 4*128]
       ]
     }));
-    // grayscale gradation
+    // gradation
     tests.push(makeAsyncTest('grayscaleGradation', {
       width: 4,
       height: 4,
@@ -156,6 +156,21 @@
       totalCount: 16,
       colorList: [
         [0, 16, 16*6, 16*6, 16*6]
+      ]
+    }));
+    tests.push(makeAsyncTest('colorGradation', {
+      width: 4,
+      height: 4,
+      data: [
+        70,30,30, 255, 72,32,32, 255, 74,34,34, 255, 76,36,36, 255,
+        72,32,32, 255, 74,34,34, 255, 76,36,36, 255, 78,38,38, 255,
+        74,34,34, 255, 76,36,36, 255, 78,38,38, 255, 80,40,40, 255,
+        76,36,36, 255, 78,38,38, 255, 80,40,40, 255, 82,42,42, 255
+      ]
+    }, {
+      totalCount: 16,
+      colorList: [
+        [0, 16, 16*76, 16*36, 16*36]
       ]
     }));
     // stripe

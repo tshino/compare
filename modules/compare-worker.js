@@ -246,7 +246,7 @@ function calcReducedColorTable( imageData )
   // merge nearest clusters iteratively
   //
   for (;;) {
-    var DistanceThreshold = 88 * colorList.length / (8 + colorList.length);
+    var DistanceThreshold = 100 * colorList.length / (8 + colorList.length);
     var minD = 256 * 3, minI, minJ;
     for (var i = 0; i + 1 < colorList.length; i++) {
       var n = colorList[i][1];
