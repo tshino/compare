@@ -2116,7 +2116,17 @@
       context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
       var topCount = colorList[0][1];
-      var numImportant = 26 < colorList.length ? 25 : colorList.length;
+      var numImportant = Math.min(24, colorList.length);
+      var threshold = Math.max(1, reducedColorTable.totalCount / 100000);
+      for (var k = 0; k < numImportant; k++) {
+        if (colorList[k][1] <= threshold) {
+          numImportant = k;
+          break;
+        }
+      }
+      if (numImportant + 1 === colorList.length) {
+        numImportant = colorList.length;
+      }
       var numEntries = numImportant < colorList.length ? numImportant + 1 : numImportant;
       context.font = '14px sans-serif';
       var others = null;
