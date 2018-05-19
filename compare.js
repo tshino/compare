@@ -3429,21 +3429,17 @@
     var ua = window.navigator.userAgent.toLowerCase();
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
-  var setEntryImage = function(entry, img, useCanvasToDisplay) {
-    var w = img.naturalWidth;
-    var h = img.naturalHeight;
-    if (entry.format === 'SVG' && (w === 0 && h === 0)) {
-      w = 150;
-      h = 150;
-      entry.sizeUnknown = true;
-    }
+  var canvasFromImage = function(image, w, h) {
     var fig = figureUtil.makeBlankFigure(w, h);
-    fig.context.drawImage(img, 0, 0, w, h);
-    //
+    fig.context.drawImage(image, 0, 0, w, h);
+    return fig.canvas;
+  };
+  var setEntryImage = function(entry, image, w, h) {
+    var canvas = image.nodeName === 'CANVAS' ? image : canvasFromImage(image, w, h);
     entry.altViewMode = null;
-    entry.mainImage  = useCanvasToDisplay ? fig.canvas : img;
+    entry.mainImage  = image;
     entry.element    = entry.mainImage;
-    entry.asCanvas   = fig.canvas;
+    entry.asCanvas   = canvas;
     entry.canvasWidth   = w;
     entry.canvasHeight  = h;
     entry.orientationAsCSS = compareUtil.orientationUtil.getCSSTransform(entry.orientation);
@@ -3465,7 +3461,7 @@
     updateDOM();
     nowLoadingDialog.update();
   };
-  var setEntryDataURI = function(entry, dataURI) {
+  var setupEntryWithDataURI = function(entry, dataURI) {
     var binary = compareUtil.binaryFromDataURI(dataURI);
     var formatInfo = compareUtil.detectImageFormat(binary);
     var format = formatInfo ? formatInfo.toString() : null;
@@ -3487,7 +3483,18 @@
     var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     var img = new Image;
     $(img).on('load', function() {
-        setEntryImage(entry, img, useCanvasToDisplay);
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (entry.format === 'SVG' && (w === 0 && h === 0)) {
+          w = 150;
+          h = 150;
+          entry.sizeUnknown = true;
+        }
+        if (useCanvasToDisplay) {
+          setEntryImage(entry, canvasFromImage(img, w, h), w, h);
+        } else {
+          setEntryImage(entry, img, w, h);
+        }
       }).
       on('error', function() {
         var message = 'Failed.';
@@ -3551,7 +3558,7 @@
         nowLoadingDialog.update();
       };
       reader.onload = function(e) {
-        setEntryDataURI(entry, e.target.result);
+        setupEntryWithDataURI(entry, e.target.result);
       };
       reader.onerror = function(e) {
         setEntryError(entry, 'Failed. File could not be read. (' + reader.error.name + ')');
