@@ -189,6 +189,30 @@ var changeLang = function(lang) {
 			</div>
 		</div>
 	</div>
+	<div id="camera" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/add.svg" width="20" alt="icon">
+					<span class="en">Capture an Image From Camera</span>
+					<span class="ja">カメラから画像を取り込む</span>
+				</h3>
+			</div>
+			<div width="720" style="text-align:center">
+				<div style="position:relative">
+					<video id="cameravideo" src="" width="720" height="405" style="display:block; background:#aaa"></video>
+					<div id="capturestatus" width="710" style="position:absolute;left:0px;right:0px;bottom:0px;opacity:0.5;line-height:40px;background:#444;color:white">
+						<span class="en"></span>
+						<span class="ja"></span>
+					</div>
+				</div>
+				<button id="capture" disabled style="margin:10px;height:35px">
+					<span class="en">Capture</span>
+					<span class="ja">キャプチャ</span>
+				</button>
+			</div>
+		</div>
+	</div>
 	<div id="shortcuts" class="dialog">
 		<div>
 			<div class="header">

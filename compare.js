@@ -140,6 +140,8 @@
     63 : { global: true, func: toggleHelp },
     // 'f' (102)
     102 : { global: true, func: toggleFullscreen },
+    // 'C' (67)
+    67 : { global: true, func: cameraDialog.toggle },
     // 'a' (97)
     97 : { global: true, func: toggleAnalysis },
     // 'h' (104)
@@ -1033,13 +1035,21 @@
   var dialogUtil = (function() {
     var hideDialog = function() {
       if (dialog) {
+        if (dialog.onclose) {
+          dialog.onclose();
+        }
         dialog.element.hide();
         dialog = null;
         figureZoom.disable();
       }
     };
-    var showDialog = function(target, parent, update) {
-      dialog = { element: target, close: parent || hideDialog, update: update };
+    var showDialog = function(target, parent, update, onclose) {
+      dialog = {
+        element: target,
+        close: parent || hideDialog,
+        update: update,
+        onclose: onclose
+      };
       target.css({ display: 'block' });
       target.children().find('.dummyFocusTarget').focus();
     };
@@ -1115,7 +1125,7 @@
           if (update) {
             update();
           }
-          showDialog(target, parent, update);
+          showDialog(target, parent, update, options.onClose);
           target.children().css({ position: '', left: '', top: '' });
         }
       };
@@ -1153,6 +1163,102 @@
   })();
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
+  // Camera
+  var cameraDialog = (function() {
+    var error = false;
+    var opening = false;
+    var stream = null;
+    var hasAPI = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    var video = document.getElementById('cameravideo');
+    $('#capture').on('click', function() {
+      if (error) {
+        error = false;
+        onUpdate(); // retry
+      } else if (!opening && stream) {
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        var context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0);
+        addCapturedImage(canvas);
+      }
+    });
+    var onUpdate = function() {
+      if (error) {
+        return;
+      }
+      if (!opening && !stream) {
+        if (!hasAPI) {
+          textUtil.setText($('#capturestatus'), {
+            en: 'This browser does not support camera input',
+            ja: 'このブラウザはカメラ入力をサポートしていません'
+          });
+          error = true;
+          return;
+        }
+        textUtil.setText($('#capturestatus'), {
+          en: 'Accessing the camera...',
+          ja: 'カメラにアクセスしています...'
+        });
+        opening = true;
+        var p = navigator.mediaDevices.getUserMedia({ video: true });
+        p.then(function(s) {
+          stream = s;
+          if (!opening) {
+            stream.getVideoTracks()[0].stop();
+            stream = null;
+            return;
+          }
+          $(video).on('loadedmetadata', function(e) {
+            if (stream) {
+              opening = false;
+              $('#capturestatus span').text('');
+              $('#capture').prop('disabled', false);
+            }
+          });
+          video.srcObject = stream;
+          video.play();
+        });
+        p.catch(function(e) {
+          if (opening) {
+            error = true;
+            opening = false;
+            textUtil.setText($('#capturestatus'),
+              e.name === 'NotFoundError' ? {
+                en: 'Camera not found',
+                ja: 'カメラがありません'
+              } : e.name === 'NotAllowedError' ? {
+                en: 'Access to the camera was blocked',
+                ja: 'カメラへのアクセスはブロックされました'
+              } : {
+                en: 'The camera can not be used. Please make sure that no other application is using the camera',
+                ja: 'カメラを使用できません. 他のアプリがカメラを利用していないか確認して下さい'
+              }
+            );
+          }
+        });
+      }
+    };
+    var onClose = function() {
+      if (stream) {
+        stream.getVideoTracks()[0].stop();
+        stream = null;
+        video.srcObject = null;
+        $('#capture').prop('disabled', true);
+      }
+      opening = false;
+      error = false;
+    };
+    var toggle = dialogUtil.defineDialog(
+      $('#camera'),
+      onUpdate,
+      null,
+      { onClose: onClose }
+    );
+    return {
+      toggle: toggle
+    };
+  })();
   // Image Information
   var infoDialog = (function() {
     var makeAspectRatioInfo = function(w, h) {
