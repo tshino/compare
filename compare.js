@@ -1227,7 +1227,9 @@
       loading.push(entry);
     };
     var update = function() {
-      dialogUtil.hideDialog();
+      if ($('#loading').is(':visible')) {
+        dialogUtil.hideDialog();
+      }
       $('#loadingList > tr').remove();
       if (0 === loading.length) {
         return;
@@ -3490,11 +3492,8 @@
           h = 150;
           entry.sizeUnknown = true;
         }
-        if (useCanvasToDisplay) {
-          setEntryImage(entry, canvasFromImage(img, w, h), w, h);
-        } else {
-          setEntryImage(entry, img, w, h);
-        }
+        var mainImage = useCanvasToDisplay ? canvasFromImage(img, w, h) : img;
+        setEntryImage(entry, mainImage, w, h);
       }).
       on('error', function() {
         var message = 'Failed.';
