@@ -1168,7 +1168,7 @@
     var error = false;
     var opening = false;
     var stream = null;
-    var hasAPI = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    var hasCameraAPI = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
     var video = document.getElementById('cameravideo');
     $('#capture').on('click', function() {
       if (error) {
@@ -1188,7 +1188,7 @@
         return;
       }
       if (!opening && !stream) {
-        if (!hasAPI) {
+        if (!hasCameraAPI) {
           textUtil.setText($('#capturestatus'), {
             en: 'This browser does not support camera input',
             ja: 'このブラウザはカメラ入力をサポートしていません'
@@ -1213,7 +1213,7 @@
             if (stream) {
               opening = false;
               $('#capturestatus span').text('');
-              $('#capture').prop('disabled', false);
+              $('#capture').prop('disabled', false).focus();
             }
           });
           video.srcObject = stream;
@@ -1235,6 +1235,7 @@
                 ja: 'カメラを使用できません. 他のアプリがカメラを利用していないか確認して下さい'
               }
             );
+            $('#capture').prop('disabled', false).focus();
           }
         });
       }
@@ -1256,6 +1257,7 @@
       { onClose: onClose }
     );
     return {
+      hasCameraAPI: hasCameraAPI,
       toggle: toggle
     };
   })();
@@ -3392,6 +3394,10 @@
     $('#add').click(function() {
       $('#file').click();
     });
+    $('#camerabtn').click(cameraDialog.toggle);
+    if (!cameraDialog.hasCameraAPI) {
+      $('#camerabtn').hide();
+    }
     $('#analysisbtn').click(toggleAnalysis);
     $('#zoomIn').click(viewZoom.zoomIn);
     $('#zoomOut').click(viewZoom.zoomOut);
