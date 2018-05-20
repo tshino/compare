@@ -1180,14 +1180,14 @@
     var makeTableValue = function(img) {
       return [
         [null, makeImageNameWithIndex('<span>', img) ],
-        [null, img.format ],
-        [null, img.color ],
+        [null, img.format !== '' ? image.format : '-'],
+        [null, img.color !== '' ? image.color : '-'],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
         [compareUtil.orientationUtil.toString(img.orientation), compareUtil.orientationUtil.toString(img.orientation)],
-        [img.size, compareUtil.addComma(img.size) ],
-        [img.lastModified, img.lastModified.toLocaleString()]
+        [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
+        [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
     var updateTableCell = function(val, i) {
@@ -3507,15 +3507,20 @@
       });
     img.src = dataURI;
   };
+  var setupEntryWithCanvas = function(entry, canvas) {
+    setEntryImage(entry, canvas, canvas.width, canvas.height);
+  };
   var newEntry = function(file) {
+      var lastModified = file.lastModified || file.lastModifiedDate;
       var entry = {
             index           : null,
             name            : file.name,
             size            : file.size,
             fileType        : file.type,
-            lastModified    : new Date(file.lastModified || file.lastModifiedDate),
+            lastModified    : lastModified ? new Date(lastModified) : null,
             formatInfo      : null,
             format          : '',
+            color           : '',
             width           : 0,
             height          : 0,
             canvasWidth     : 0,
@@ -3543,6 +3548,16 @@
             ready   : function() { return null !== this.element; }
       };
       return entry;
+  };
+  var addCapturedImage = function(canvas) {
+      var file = {
+        name: 'captured image',
+      };
+      var entry = newEntry(file);
+      entry.index = entries.length;
+      entries.push(entry);
+      viewManagement.resetLayoutState();
+      setupEntryWithCanvas(entry, canvas);
   };
   var addFile = function(file) {
       var entry = newEntry(file);
