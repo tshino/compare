@@ -1288,8 +1288,8 @@
     var makeTableValue = function(img) {
       return [
         [null, makeImageNameWithIndex('<span>', img) ],
-        [null, img.format !== '' ? image.format : '-'],
-        [null, img.color !== '' ? image.color : '-'],
+        [null, img.format !== '' ? img.format : '-'],
+        [null, img.color !== '' ? img.color : '-'],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
