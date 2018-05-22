@@ -1218,8 +1218,7 @@
           });
           video.srcObject = stream;
           video.play();
-        });
-        p.catch(function(e) {
+        }, function(e) {
           if (opening) {
             error = true;
             opening = false;
