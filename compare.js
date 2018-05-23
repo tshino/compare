@@ -1175,11 +1175,7 @@
         error = false;
         onUpdate(); // retry
       } else if (!opening && stream) {
-        var canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        var context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0);
+        var canvas = figureUtil.canvasFromImage(video, video.videoWidth, video.videoHeight);
         addCapturedImage(canvas);
       }
     });
@@ -1416,6 +1412,11 @@
       var context = canvas.getContext('2d');
       return { canvas: canvas, context: context };
     };
+    var canvasFromImage = function(image, w, h) {
+      var fig = makeBlankFigure(w, h);
+      fig.context.drawImage(image, 0, 0, w, h);
+      return fig.canvas;
+    };
     var copyImageBits = function(src, dest) {
       for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
         dest.data[i] = src.data[i];
@@ -1444,6 +1445,7 @@
     };
     return {
       makeBlankFigure: makeBlankFigure,
+      canvasFromImage: canvasFromImage,
       copyImageBits: copyImageBits,
       drawAxes: drawAxes
     };
@@ -3542,13 +3544,8 @@
     var ua = window.navigator.userAgent.toLowerCase();
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
-  var canvasFromImage = function(image, w, h) {
-    var fig = figureUtil.makeBlankFigure(w, h);
-    fig.context.drawImage(image, 0, 0, w, h);
-    return fig.canvas;
-  };
   var setEntryImage = function(entry, image, w, h) {
-    var canvas = image.nodeName === 'CANVAS' ? image : canvasFromImage(image, w, h);
+    var canvas = image.nodeName === 'CANVAS' ? image : figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
     entry.mainImage  = image;
     entry.element    = entry.mainImage;
@@ -3603,7 +3600,7 @@
           h = 150;
           entry.sizeUnknown = true;
         }
-        var mainImage = useCanvasToDisplay ? canvasFromImage(img, w, h) : img;
+        var mainImage = useCanvasToDisplay ? figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
       }).
       on('error', function() {
