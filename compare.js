@@ -3659,6 +3659,7 @@
   var addCapturedImage = function(canvas) {
       var file = {
         name: 'captured image',
+        lastModified: Date.now(),
       };
       var entry = newEntry(file);
       entry.index = entries.length;
