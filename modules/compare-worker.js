@@ -247,7 +247,8 @@ function calcReducedColorTable( imageData )
   //
   for (;;) {
     var DistanceThreshold = 100 * colorList.length / (8 + colorList.length);
-    var minD = 256 * 3, minI, minJ;
+    var IniD = 256 * 3;
+    var minD = IniD, minI, minJ;
     for (var i = 0; i + 1 < colorList.length; i++) {
       var n = colorList[i][1];
       var rgbI = [
@@ -273,7 +274,7 @@ function calcReducedColorTable( imageData )
         }
       }
     }
-    if (minD === 256 * 3) {
+    if (minD === IniD) {
       break;
     }
     if (minD <= DistanceThreshold) {
