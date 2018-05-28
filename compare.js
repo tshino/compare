@@ -271,6 +271,7 @@
     var overlayMode = false;
     var overlayBaseIndex = null;
     var layoutMode = null;
+    var backgroundColor = '';
     var isOverlayMode = function() {
       return overlayMode;
     };
@@ -420,6 +421,10 @@
         $(this).css({ display : (hide ? 'none' : '') });
       });
     };
+    var setBackgroundColor = function(color) {
+      backgroundColor = color;
+      $('#view').css({'background-color': backgroundColor});
+    };
     return {
       isOverlayMode: isOverlayMode,
       getSelectedImageIndices: getSelectedImageIndices,
@@ -433,7 +438,8 @@
       update: update,
       getCurrentIndexOr: getCurrentIndexOr,
       makeImageLayoutParam: makeImageLayoutParam,
-      onUpdateLayout: onUpdateLayout
+      onUpdateLayout: onUpdateLayout,
+      setBackgroundColor: setBackgroundColor
     };
   })();
   var removeEntry = function(index) {
