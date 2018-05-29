@@ -424,6 +424,10 @@
     var setBackgroundColor = function(color) {
       backgroundColor = color;
       $('#view').css({'background-color': backgroundColor});
+      var rgb = parseInt(color.substr(1), 16);
+      var y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
+      var textColor = (96 <= y) ? '#444' : '#888';
+      $('#view .dropHere').css({color: textColor, borderColor: textColor});
     };
     return {
       isOverlayMode: isOverlayMode,
