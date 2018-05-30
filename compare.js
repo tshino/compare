@@ -138,6 +138,8 @@
     64 : { global: true, func: textUtil.toggleLang },
     // '?' (63)
     63 : { global: true, func: toggleHelp },
+    // 's' (115)
+    115 : { global: true, func: settings.toggle },
     // 'f' (102)
     102 : { global: true, func: toggleFullscreen },
     // 'C' (67)
@@ -1173,6 +1175,17 @@
   })();
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
+  // Settings
+  var settings = (function() {
+    $('#settingsBGColor').prop('value', '#444444');
+    $('#settingsBGColor').on('change', function(e) {
+      viewManagement.setBackgroundColor(e.target.value);
+    });
+    var toggle = dialogUtil.defineDialog($('#settings'));
+    return {
+      toggle: toggle
+    };
+  })();
   // Camera
   var cameraDialog = (function() {
     var error = false;
