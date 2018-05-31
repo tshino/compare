@@ -1177,9 +1177,20 @@
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
   // Settings
   var settings = (function() {
-    $('#settingsBGColor').prop('value', '#444444');
+    var defaultBGColor = '#444444';
+    var setBGColor = function(bgColor) {
+      $('#settingsBGColor').prop('value', bgColor);
+      viewManagement.setBackgroundColor(bgColor);
+    };
+    var restoreDefault = function() {
+      setBGColor(defaultBGColor);
+    };
+    restoreDefault();
     $('#settingsBGColor').on('change', function(e) {
-      viewManagement.setBackgroundColor(e.target.value);
+      setBGColor(e.target.value);
+    });
+    $('#settingsReset').click(function(e) {
+      restoreDefault();
     });
     var toggle = dialogUtil.defineDialog($('#settings'));
     return {
