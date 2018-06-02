@@ -180,6 +180,8 @@
     81 : { global: false, func: altView.changeModeReverse },
     // 'l' (108)
     108 : { global: false, func: altView.toggleContour },
+    // 'b' (98)
+    98 : { global: false, func: settings.openBGColor },
     // 'u'
     117 : { global: true, func: colorFreqDialog.toggle }
   };
@@ -1178,7 +1180,11 @@
   // Settings
   var settings = (function() {
     var defaultBGColor = '#444444';
+    var openBGColor = function() {
+      $('#settingsBGColor').click();
+    };
     var setBGColor = function(bgColor) {
+      $('#bgcolorbtn svg path').attr('fill', bgColor);
       $('#settingsBGColor').prop('value', bgColor);
       viewManagement.setBackgroundColor(bgColor);
     };
@@ -1194,6 +1200,7 @@
     });
     var toggle = dialogUtil.defineDialog($('#settings'));
     return {
+      openBGColor: openBGColor,
       toggle: toggle
     };
   })();
@@ -3441,6 +3448,7 @@
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
     $('#channelbtn').click(altView.toggle);
+    $('#bgcolorbtn').click(settings.openBGColor);
     $('#fullscreen').click(toggleFullscreen);
     $('#helpbtn').click(toggleHelp);
     var newSelectorButton = function(index) {
