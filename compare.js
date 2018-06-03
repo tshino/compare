@@ -1191,13 +1191,16 @@
     var restoreDefault = function() {
       setBGColor(defaultBGColor);
     };
-    restoreDefault();
-    $('#settingsBGColor').on('change', function(e) {
-      setBGColor(e.target.value);
-    });
-    $('#settingsReset').click(function(e) {
+    var startup = function() {
       restoreDefault();
-    });
+      $('#settingsBGColor').on('change', function(e) {
+        setBGColor(e.target.value);
+      });
+      $('#settingsReset').click(function(e) {
+        restoreDefault();
+      });
+    };
+    startup();
     var toggle = dialogUtil.defineDialog($('#settings'));
     return {
       openBGColor: openBGColor,
