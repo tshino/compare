@@ -276,6 +276,7 @@
     var overlayBaseIndex = null;
     var layoutMode = null;
     var backgroundColor = '';
+    var imageScaling = 'smooth';
     var isOverlayMode = function() {
       return overlayMode;
     };
@@ -407,6 +408,11 @@
         background : overlayMode ? '#000' : ''
       });
     };
+    var updateImageScaling = function() {
+      $('#view .imageBox .image').css({
+        'image-rendering': (imageScaling === 'pixel' ? 'pixelated' : '')
+      });
+    };
     var onUpdateLayout = function() {
       var param = makeImageLayoutParam();
       var indices = getSelectedImageIndices();
@@ -424,6 +430,7 @@
         var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
         $(this).css({ display : (hide ? 'none' : '') });
       });
+      updateImageScaling();
     };
     var setBackgroundColor = function(color) {
       backgroundColor = color;
@@ -432,6 +439,10 @@
       var y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
       var textColor = (96 <= y) ? '#444' : '#888';
       $('#view .dropHere').css({color: textColor, borderColor: textColor});
+    };
+    var setImageScaling = function(type) {
+      imageScaling = type;
+      updateImageScaling();
     };
     return {
       isOverlayMode: isOverlayMode,
@@ -447,7 +458,8 @@
       getCurrentIndexOr: getCurrentIndexOr,
       makeImageLayoutParam: makeImageLayoutParam,
       onUpdateLayout: onUpdateLayout,
-      setBackgroundColor: setBackgroundColor
+      setBackgroundColor: setBackgroundColor,
+      setImageScaling: setImageScaling
     };
   })();
   var removeEntry = function(index) {
@@ -1188,13 +1200,32 @@
       $('#settingsBGColor').prop('value', bgColor);
       viewManagement.setBackgroundColor(bgColor);
     };
+    var setImageScaling = function(type) {
+      $('.settingsImageScaling').prop('value', type);
+      viewManagement.setImageScaling(type);
+    };
     var restoreDefault = function() {
       setBGColor(defaultBGColor);
+      setImageScaling('smooth');
+    };
+    var isChrome = function() {
+      var ua = window.navigator.userAgent.toLowerCase();
+      return (
+        ua.indexOf('msie') == -1 && ua.indexOf('trident') == -1 &&
+        ua.indexOf('edge') == -1 &&
+        ua.indexOf('chrome') != -1
+      );
     };
     var startup = function() {
+      if (!isChrome()) {
+        $('#settingsImageScalingRow').hide();
+      }
       restoreDefault();
       $('#settingsBGColor').on('change', function(e) {
         setBGColor(e.target.value);
+      });
+      $('.settingsImageScaling').on('change', function(e) {
+        setImageScaling(this.options[this.selectedIndex].value);
       });
       $('#settingsReset').click(function(e) {
         restoreDefault();
