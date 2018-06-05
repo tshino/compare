@@ -410,7 +410,8 @@
     };
     var updateImageScaling = function() {
       $('#view .imageBox .image').css({
-        'image-rendering': (imageScaling === 'pixel' ? 'pixelated' : '')
+        'image-rendering': (imageScaling === 'pixel' ? 'pixelated' : ''),
+        '-ms-interpolation-mode': (imageScaling === 'pixel' ? 'nearest-neighbor' : '')
       });
     };
     var onUpdateLayout = function() {
@@ -1208,16 +1209,23 @@
       setBGColor(defaultBGColor);
       setImageScaling('smooth');
     };
-    var isChrome = function() {
+    var browserName = function() {
       var ua = window.navigator.userAgent.toLowerCase();
       return (
-        ua.indexOf('msie') == -1 && ua.indexOf('trident') == -1 &&
-        ua.indexOf('edge') == -1 &&
-        ua.indexOf('chrome') != -1
+        (0 <= ua.indexOf('msie') || 0 <= ua.indexOf('trident')) ? 'msie' :
+        0 <= ua.indexOf('edge') ? 'edge' :
+        0 <= ua.indexOf('chrome') ? 'chrome' :
+        0 <= ua.indexOf('safari') ? 'safari' :
+        0 <= ua.indexOf('firefox') ? 'firefox' :
+        0 <= ua.indexOf('opera') ? 'opera' : ''
       );
     };
+    var supportsCSSImageRenderingPixelated = function() {
+      var n = browserName();
+      return n === 'msie' || n === 'chrome' || n === 'safari';
+    };
     var startup = function() {
-      if (!isChrome()) {
+      if (!supportsCSSImageRenderingPixelated()) {
         $('#settingsImageScalingRow').hide();
       }
       restoreDefault();
