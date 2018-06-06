@@ -1,5 +1,17 @@
 ﻿var compareUtil = (function() {
 
+  var browserName = (function() {
+    var ua = window.navigator.userAgent.toLowerCase();
+    return (
+      (0 <= ua.indexOf('msie') || 0 <= ua.indexOf('trident')) ? 'msie' :
+      0 <= ua.indexOf('edge') ? 'edge' :
+      0 <= ua.indexOf('chrome') ? 'chrome' :
+      0 <= ua.indexOf('safari') ? 'safari' :
+      0 <= ua.indexOf('firefox') ? 'firefox' :
+      0 <= ua.indexOf('opera') ? 'opera' : ''
+    );
+  })();
+
   var blobFromDataURI = function(dataURI, type) {
     var parts = dataURI.split(',');
     type = type || parts[0].match(/:(.*?);/)[1];
@@ -1296,6 +1308,7 @@
     };
   };
   return {
+    browserName:            browserName,
     blobFromDataURI:        blobFromDataURI,
     createObjectURL:        createObjectURL,
     revokeObjectURL:        revokeObjectURL,

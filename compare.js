@@ -409,10 +409,17 @@
       });
     };
     var updateImageScaling = function() {
-      $('#view .imageBox .image').css({
-        'image-rendering': (imageScaling === 'pixel' ? 'pixelated' : ''),
-        '-ms-interpolation-mode': (imageScaling === 'pixel' ? 'nearest-neighbor' : '')
-      });
+      var n = compareUtil.browserName;
+      $('#view .imageBox .image').css(
+        imageScaling === 'pixel' ? {
+          'image-rendering':
+            n === 'firefox' ? '-moz-crisp-edges' : 'pixelated',
+          '-ms-interpolation-mode': 'nearest-neighbor'
+        } : {
+          'image-rendering': '',
+          '-ms-interpolation-mode': ''
+        }
+      );
     };
     var onUpdateLayout = function() {
       var param = makeImageLayoutParam();
@@ -1209,20 +1216,9 @@
       setBGColor(defaultBGColor);
       setImageScaling('smooth');
     };
-    var browserName = function() {
-      var ua = window.navigator.userAgent.toLowerCase();
-      return (
-        (0 <= ua.indexOf('msie') || 0 <= ua.indexOf('trident')) ? 'msie' :
-        0 <= ua.indexOf('edge') ? 'edge' :
-        0 <= ua.indexOf('chrome') ? 'chrome' :
-        0 <= ua.indexOf('safari') ? 'safari' :
-        0 <= ua.indexOf('firefox') ? 'firefox' :
-        0 <= ua.indexOf('opera') ? 'opera' : ''
-      );
-    };
     var supportsCSSImageRenderingPixelated = function() {
-      var n = browserName();
-      return n === 'msie' || n === 'chrome' || n === 'safari';
+      var n = compareUtil.browserName;
+      return n === 'msie' || n === 'chrome' || n === 'safari' || n === 'firefox';
     };
     var startup = function() {
       if (!supportsCSSImageRenderingPixelated()) {
