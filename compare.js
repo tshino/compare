@@ -409,17 +409,11 @@
       });
     };
     var updateImageScaling = function() {
-      var n = compareUtil.browserName;
-      $('#view .imageBox .image').css(
-        imageScaling === 'pixel' ? {
-          'image-rendering':
-            n === 'firefox' ? '-moz-crisp-edges' : 'pixelated',
-          '-ms-interpolation-mode': 'nearest-neighbor'
-        } : {
-          'image-rendering': '',
-          '-ms-interpolation-mode': ''
-        }
-      );
+      if (imageScaling === 'pixel') {
+        $('#view .imageBox .image').addClass('pixelated');
+      } else {
+        $('#view .imageBox .image').removeClass('pixelated');
+      }
     };
     var onUpdateLayout = function() {
       var param = makeImageLayoutParam();
@@ -1218,7 +1212,7 @@
     };
     var supportsCSSImageRenderingPixelated = function() {
       var n = compareUtil.browserName;
-      return n === 'msie' || n === 'chrome' || n === 'safari' || n === 'firefox';
+      return 0 <= ['msie', 'chrome', 'safari', 'firefox', 'opera'].indexOf(n);
     };
     var startup = function() {
       if (!supportsCSSImageRenderingPixelated()) {

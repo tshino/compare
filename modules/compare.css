@@ -214,6 +214,13 @@ button.close
     margin          : 0px;
     padding         : 0px;
 }
+.pixelated
+{
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering:        -moz-crisp-edges;
+    image-rendering:        crisp-edges;
+    image-rendering:        pixelated;
+}
 #view .imageOverlay
 {
     pointer-events  : none;
