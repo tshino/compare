@@ -3482,6 +3482,7 @@
     $('#channelbtn').click(altView.toggle);
     $('#bgcolorbtn').click(settings.openBGColor);
     $('#fullscreen').click(toggleFullscreen);
+    $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
     var newSelectorButton = function(index) {
       var button = $('<button/>').addClass('selector').
