@@ -475,12 +475,12 @@ h3 img
     padding-right   : 5px;
     transform       : scale(1.5);
 }
-div.mode-sw
+div.mode-sw, div.button-group
 {
     display     : flex;
     padding     : 0px;
 }
-div.mode-sw > *
+div.mode-sw > *, div.button-group > *
 {
     box-sizing  : border-box;
     margin      : 2px;
