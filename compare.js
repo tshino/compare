@@ -1193,22 +1193,43 @@
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
   // Settings
   var settings = (function() {
-    var defaultBGColor = '#444444';
+    var storage = null;
+    if (compareUtil.storageAvailable('localStorage')) {
+      storage = window.localStorage;
+    }
     var openBGColor = function() {
       $('#settingsBGColor').click();
     };
-    var setBGColor = function(bgColor) {
+    var setBGColor = function(bgColor, save) {
       $('#bgcolorbtn svg path').attr('fill', bgColor);
       $('#settingsBGColor').prop('value', bgColor);
       viewManagement.setBackgroundColor(bgColor);
+      if (save && storage) {
+        storage.setItem('config-view-bg-color', bgColor);
+      }
     };
-    var setImageScaling = function(type) {
+    var setImageScaling = function(type, save) {
       $('.settingsImageScaling').prop('value', type);
       viewManagement.setImageScaling(type);
+      if (save && storage) {
+        storage.setItem('config-view-image-scaling-style', type);
+      }
     };
-    var restoreDefault = function() {
-      setBGColor(defaultBGColor);
-      setImageScaling('smooth');
+    var restoreDefault = function(save) {
+      setBGColor('#444444', save);
+      setImageScaling('smooth', save);
+    };
+    var loadFromStorage = function() {
+      if (storage) {
+        var loadConfig = function(key, setter) {
+          var value = storage.getItem(key);
+          if (value) {
+            setter(value);
+          }
+        };
+        loadConfig('config-view-bg-color', setBGColor);
+        loadConfig('config-view-image-scaling-style', setImageScaling);
+      }
     };
     var supportsCSSImageRenderingPixelated = function() {
       var n = compareUtil.browserName;
@@ -1219,14 +1240,17 @@
         $('#settingsImageScalingRow').hide();
       }
       restoreDefault();
+      loadFromStorage();
       $('#settingsBGColor').on('change', function(e) {
-        setBGColor(e.target.value);
+        var value = e.target.value;
+        setBGColor(value, true);
       });
       $('.settingsImageScaling').on('change', function(e) {
-        setImageScaling(this.options[this.selectedIndex].value);
+        var value = this.options[this.selectedIndex].value;
+        setImageScaling(value, true);
       });
       $('#settingsReset').click(function(e) {
-        restoreDefault();
+        restoreDefault(true);
       });
     };
     startup();
