@@ -1200,36 +1200,34 @@
     var openBGColor = function() {
       $('#settingsBGColor').click();
     };
-    var setBGColor = function(bgColor, save) {
-      $('#bgcolorbtn svg path').attr('fill', bgColor);
-      $('#settingsBGColor').prop('value', bgColor);
-      viewManagement.setBackgroundColor(bgColor);
-      if (save && storage) {
-        storage.setItem('config-view-bg-color', bgColor);
-      }
+    var configItem = function(key, initialValue, setter) {
+      var set = function(value) {
+        setter(value);
+        if (storage) {
+          storage.setItem(key, value);
+        }
+      };
+      var reset = function() {
+        set(initialValue);
+      };
+      var load = function() {
+        var value = storage && storage.getItem(key);
+        setter(value || initialValue);
+      };
+      return { set: set, reset: reset, load: load };
     };
-    var setImageScaling = function(type, save) {
-      $('.settingsImageScaling').prop('value', type);
-      viewManagement.setImageScaling(type);
-      if (save && storage) {
-        storage.setItem('config-view-image-scaling-style', type);
-      }
-    };
-    var restoreDefault = function(save) {
-      setBGColor('#444444', save);
-      setImageScaling('smooth', save);
-    };
-    var loadFromStorage = function() {
-      if (storage) {
-        var loadConfig = function(key, setter) {
-          var value = storage.getItem(key);
-          if (value) {
-            setter(value);
-          }
-        };
-        loadConfig('config-view-bg-color', setBGColor);
-        loadConfig('config-view-image-scaling-style', setImageScaling);
-      }
+    var bgColor = configItem('config-view-bg-color', '#444444', function(value) {
+      $('#bgcolorbtn svg path').attr('fill', value);
+      $('#settingsBGColor').prop('value', value);
+      viewManagement.setBackgroundColor(value);
+    });
+    var imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
+      $('.settingsImageScaling').prop('value', value);
+      viewManagement.setImageScaling(value);
+    });
+    var loadConfig = function() {
+      bgColor.load();
+      imageScaling.load();
     };
     var supportsCSSImageRenderingPixelated = function() {
       var n = compareUtil.browserName;
@@ -1239,18 +1237,16 @@
       if (!supportsCSSImageRenderingPixelated()) {
         $('#settingsImageScalingRow').hide();
       }
-      restoreDefault();
-      loadFromStorage();
+      loadConfig();
       $('#settingsBGColor').on('change', function(e) {
-        var value = e.target.value;
-        setBGColor(value, true);
+        bgColor.set(e.target.value);
       });
       $('.settingsImageScaling').on('change', function(e) {
-        var value = this.options[this.selectedIndex].value;
-        setImageScaling(value, true);
+        imageScaling.set(this.options[this.selectedIndex].value);
       });
       $('#settingsReset').click(function(e) {
-        restoreDefault(true);
+        bgColor.reset();
+        imageScaling.reset();
       });
     };
     startup();
