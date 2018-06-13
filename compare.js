@@ -1219,6 +1219,7 @@
     var bgColor = configItem('config-view-bg-color', '#444444', function(value) {
       $('#bgcolorbtn svg path').attr('fill', value);
       $('#settingsBGColor').prop('value', value);
+      $('#settingsBGColorText').prop('value', value);
       viewManagement.setBackgroundColor(value);
     });
     var imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
@@ -1244,6 +1245,14 @@
       loadConfig();
       $('#settingsBGColor').on('change', function(e) {
         bgColor.set(e.target.value);
+      });
+      $('#settingsBGColorText').on('change', function(e) {
+        var value = e.target.value;
+        if (/^\#[0-9a-fA-F]{6}$/.test(value)) {
+          bgColor.set(value);
+        } else {
+          bgColor.set('#000000');
+        }
       });
       $('.settingsImageScaling').on('change', function(e) {
         imageScaling.set(this.options[this.selectedIndex].value);
