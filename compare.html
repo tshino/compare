@@ -87,13 +87,6 @@ var changeLang = function(lang) {
 			<span class="tooltip keys en">Show channel view <span>q</span></span>
 			<span class="tooltip keys ja">チャンネルビューを表示 <span>q</span></span>
 		</button>
-		<button id="bgcolorbtn">
-			<svg viewBox="0 0 4000 4000">
-				<path fill="#444444" stroke="rgb(0,0,0)" stroke-width="200" stroke-linejoin="round" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
-			</svg>
-			<span class="tooltip keys en">Change background color <span>b</span></span>
-			<span class="tooltip keys ja">背景色を変更 <span>b</span></span>
-		</button>
 		<div class="bottom">
 			<button id="fullscreen">
 				<img src="res/full.svg" alt="fullscreen">
@@ -959,7 +952,15 @@ var changeLang = function(lang) {
 			<table>
 				<tr>
 					<td class="input"><span class="en">Background color</span><span class="ja">背景色</span></td>
-					<td><input id="settingsBGColor" type="color"> <input id="settingsBGColorText" type="text" style="width:80px"></td>
+					<td style="white-space:normal">
+						<input id="settingsBGColor" type="color" style="display:none">
+						<input id="settingsBGColorText" type="text" style="width:80px">
+						<button id="bgcolorbtn" style="padding:3px;height:30px;">
+							<svg viewBox="0 0 4000 4000" style="width:24px; vertical-align:bottom;">
+								<path fill="#444444" stroke="rgb(0,0,0)" stroke-width="200" stroke-linejoin="round" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
+							</svg>
+						</button>
+					</td>
 				</tr>
 				<tr id="settingsImageScalingRow">
 					<td class="input"><span class="en">Image scaling style</span><span class="ja">画像の拡大スタイル</span></td>
