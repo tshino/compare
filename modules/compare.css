@@ -386,7 +386,7 @@ div.dialog td.output
 {
     background      : rgba(51,136,238,0.2);
 }
-div.dialog td:not(.input):not(.output):not(.prop):not(.keys)
+div.dialog td:not(.input):not(.output):not(.prop):not(.keys):not(.settings)
 {
     font-size       : 1.1em;
     white-space     : pre-wrap;
