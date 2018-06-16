@@ -972,6 +972,19 @@ var changeLang = function(lang) {
 						<option value="pixel">ピクセル</option>
 					</select></td>
 				</tr>
+				<tr>
+					<td class="prop"><span class="en">Grid interval (aux/main)</span><span class="ja">グリッド間隔（補助/主）</span></td>
+					<td class="settings">
+						<div><input type="radio" name="settingsGridInterval" value="16/256">16 px / 256 px</div>
+						<div><input type="radio" name="settingsGridInterval" value="10/100">10 px / 100 px</div>
+						<div><input type="radio" name="settingsGridInterval" value="8/64">8 px / 64 px</div>
+						<div>
+							<input type="radio" name="settingsGridInterval" value="other">
+							<input type="number" min="1" max="256" value="4" id="settingsGridIntervalFreeAux"> px /
+							<input type="number" min="1" max="256" value="16" id="settingsGridIntervalFreeMain"> px
+						</div>
+					</td>
+				</tr>
 			</table>
 		</div>
 	</div>

@@ -614,10 +614,27 @@
   // Grid
   var grid = (function() {
     var enableGrid = false;
+    var mainGridInterval = 100;
+    var auxGridInterval = 10;
     var toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
       updateLayout();
+    };
+    var setInterval = function(main, aux) {
+      if (mainGridInterval !== main || auxGridInterval !== aux) {
+        mainGridInterval = main;
+        auxGridInterval = aux;
+        for (var i = 0, img; img = images[i]; i++) {
+          if (img.grid) {
+            $(img.grid).remove();
+            img.grid = null;
+          }
+        }
+        if (updateLayout) {
+          updateLayout();
+        }
+      }
     };
     var makePathDesc = function(size, step, skip) {
       var desc = '';
@@ -634,12 +651,12 @@
     var makeGrid = function(w, h) {
       var size = { w: w, h: h };
       var vbox = '0 0 ' + w + ' ' + h;
-      var grid100 = makePathDesc(size, 100);
-      var grid10 = makePathDesc(size, 10, 100);
+      var mainGrid = makePathDesc(size, mainGridInterval);
+      var auxGrid = makePathDesc(size, auxGridInterval, mainGridInterval);
       return $(
         '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
-          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid100 + '"></path>' +
-          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + grid10 + '"></path>' +
+          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + mainGrid + '"></path>' +
+          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + auxGrid + '"></path>' +
         '</svg>'
       ).width(w).height(h);
     };
@@ -668,6 +685,7 @@
     };
     return {
       toggle: toggle,
+      setInterval: setInterval,
       onUpdateImageBox: onUpdateImageBox,
       onUpdateTransform: onUpdateTransform
     };
@@ -1226,7 +1244,31 @@
       $('.settingsImageScaling').prop('value', value);
       viewManagement.setImageScaling(value);
     });
-    var configItems = [bgColor, imageScaling];
+    var gridIntervalValues = function(value) {
+      var num = value.split('/');
+      var aux = compareUtil.clamp(parseInt(num[0]) || 4, 1, 256);
+      var main = compareUtil.clamp(parseInt(num[1]) || 16, 1, 256);
+      return [aux, main];
+    };
+    var gridInterval = configItem('config-grid-interval', '10/100', function(value) {
+      var num = gridIntervalValues(value);
+      var radio = $('#settings input[name=settingsGridInterval]');
+      var other = true;
+      for (var i = 0; i < radio.length; i++) {
+        if (radio[i].value === value) {
+          radio.val([value]);
+          other = false;
+          break;
+        }
+      }
+      if (other) {
+        radio.val(['other']);
+        $('#settingsGridIntervalFreeAux').prop('value', num[0]);
+        $('#settingsGridIntervalFreeMain').prop('value', num[1]);
+      }
+      grid.setInterval(num[1], num[0]);
+    });
+    var configItems = [bgColor, imageScaling, gridInterval];
     var loadConfig = function(key) {
       configItems.forEach(function(item) {
         if (key === undefined || key === item.key) {
@@ -1256,6 +1298,23 @@
       });
       $('.settingsImageScaling').on('change', function(e) {
         imageScaling.set(this.options[this.selectedIndex].value);
+      });
+      $('#settings input[name=settingsGridInterval]').on('click', function(e) {
+        var value = e.target.value;
+        if (value === 'other') {
+          gridInterval.set(
+            $('#settingsGridIntervalFreeAux').val() + '/' +
+            $('#settingsGridIntervalFreeMain').val()
+          );
+        } else {
+          gridInterval.set(value);
+        }
+      });
+      $('#settingsGridIntervalFreeAux,#settingsGridIntervalFreeMain').on('change', function(e) {
+          gridInterval.set(
+            $('#settingsGridIntervalFreeAux').val() + '/' +
+            $('#settingsGridIntervalFreeMain').val()
+          );
       });
       $('#settingsReset').click(function(e) {
         configItems.forEach(function(item) { item.reset(); });
