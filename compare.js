@@ -1299,8 +1299,7 @@
       $('.settingsImageScaling').on('change', function(e) {
         imageScaling.set(this.options[this.selectedIndex].value);
       });
-      $('#settings input[name=settingsGridInterval]').on('click', function(e) {
-        var value = e.target.value;
+      var updateGridInterval = function(value) {
         if (value === 'other') {
           gridInterval.set(
             $('#settingsGridIntervalFreeAux').val() + '/' +
@@ -1309,12 +1308,17 @@
         } else {
           gridInterval.set(value);
         }
+      };
+      $('#settings input[name=settingsGridInterval]').on('change', function(e) {
+        updateGridInterval(e.target.value);
+      });
+      $('#settings input[name=settingsGridInterval]').parent().css({
+        cursor: 'pointer'
+      }).on('click', function(e) {
+        updateGridInterval($(this).find('input[name=settingsGridInterval]').val());
       });
       $('#settingsGridIntervalFreeAux,#settingsGridIntervalFreeMain').on('change', function(e) {
-          gridInterval.set(
-            $('#settingsGridIntervalFreeAux').val() + '/' +
-            $('#settingsGridIntervalFreeMain').val()
-          );
+        updateGridInterval('other');
       });
       $('#settingsReset').click(function(e) {
         configItems.forEach(function(item) { item.reset(); });
