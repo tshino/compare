@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page26">
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 2000,3700 L 300,3700 300,300 3700,300 3700,3700 2000,3700 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="100" stroke-linejoin="round" d="M 2000,3700 L 300,3700 300,300 3700,300 3700,3700 2000,3700 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(102,102,102)" stroke="none" d="M 600,3300 L 600,2700 1000,2700 1000,2300 1200,2300 1200,1900 1400,1900 1400,1500 1600,1500 1600,1100 1800,1100 1800,700 2200,700 2200,1100 2400,1100 2400,1500 2600,1500 2600,1900 2800,1900 2800,2300 3000,2300 3000,2700 3400,2700 3400,3300 2800,3300 2800,2700 2600,2700 2600,2300 1400,2300 1400,2500 1400,2700 1200,2700 1200,3300 600,3300 Z"/>
+   <rect fill="none" stroke="none" x="600" y="700" width="2801" height="2601"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="400" y="2700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_484" gradientUnits="userSpaceOnUse" x1="399" y1="3000" x2="801" y2="3000">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_484)" stroke="none" id="Drawing_3_0" d="M 400,3300 L 800,3300 800,2700 400,2700 400,3300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1000" y="2700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_485" gradientUnits="userSpaceOnUse" x1="1401" y1="3000" x2="999" y2="3000">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_485)" stroke="none" id="Drawing_4_0" d="M 1000,3300 L 1400,3300 1400,2700 1000,2700 1000,3300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="600" y="3100" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_486" gradientUnits="userSpaceOnUse" x1="900" y1="3501" x2="900" y2="3099">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_486)" stroke="none" id="Drawing_5_0" d="M 600,3500 L 1200,3500 1200,3100 600,3100 600,3500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="400" y="2500" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_487" gradientUnits="userSpaceOnUse" x1="700" y1="2500" x2="700" y2="2900">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_487)" stroke="none" id="Drawing_6_0" d="M 400,2900 L 1000,2900 1000,2500 400,2500 400,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="600" y="2300" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_488" gradientUnits="userSpaceOnUse" x1="599" y1="2600" x2="1001" y2="2600">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_488)" stroke="none" id="Drawing_7_0" d="M 600,2900 L 1000,2900 1000,2300 600,2300 600,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="600" y="2100" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_489" gradientUnits="userSpaceOnUse" x1="900" y1="2100" x2="900" y2="2500">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_489)" stroke="none" id="Drawing_8_0" d="M 600,2500 L 1200,2500 1200,2100 600,2100 600,2500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="800" y="1900" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_490" gradientUnits="userSpaceOnUse" x1="799" y1="2200" x2="1201" y2="2200">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_490)" stroke="none" id="Drawing_9_0" d="M 800,2500 L 1200,2500 1200,1900 800,1900 800,2500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="800" y="1700" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_491" gradientUnits="userSpaceOnUse" x1="1100" y1="1700" x2="1100" y2="2100">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_491)" stroke="none" id="Drawing_10_0" d="M 800,2100 L 1400,2100 1400,1700 800,1700 800,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1000" y="2700" width="401" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_492" gradientUnits="userSpaceOnUse" x1="1200" y1="3100" x2="1200" y2="2700">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_492)" stroke="none" id="Drawing_11_0" d="M 1000,3100 L 1400,3100 1400,2700 1000,2700 1000,3100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1200" y="2300" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_493" gradientUnits="userSpaceOnUse" x1="1601" y1="2600" x2="1199" y2="2600">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_493)" stroke="none" id="Drawing_12_0" d="M 1200,2900 L 1600,2900 1600,2300 1200,2300 1200,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2800" y="3100" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_494" gradientUnits="userSpaceOnUse" x1="3100" y1="3501" x2="3100" y2="3099">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_494)" stroke="none" id="Drawing_13_0" d="M 2800,3500 L 3400,3500 3400,3100 2800,3100 2800,3500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="3200" y="2700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_495" gradientUnits="userSpaceOnUse" x1="3601" y1="3000" x2="3199" y2="3000">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_495)" stroke="none" id="Drawing_14_0" d="M 3200,3300 L 3600,3300 3600,2700 3200,2700 3200,3300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2600" y="2700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_496" gradientUnits="userSpaceOnUse" x1="2599" y1="3000" x2="3001" y2="3000">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_496)" stroke="none" id="Drawing_15_0" d="M 2600,3300 L 3000,3300 3000,2700 2600,2700 2600,3300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2600" y="2700" width="401" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_497" gradientUnits="userSpaceOnUse" x1="2800" y1="3100" x2="2800" y2="2700">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_497)" stroke="none" id="Drawing_16_0" d="M 2600,3100 L 3000,3100 3000,2700 2600,2700 2600,3100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2400" y="2300" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_498" gradientUnits="userSpaceOnUse" x1="2399" y1="2600" x2="2801" y2="2600">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_498)" stroke="none" id="Drawing_17_0" d="M 2400,2900 L 2800,2900 2800,2300 2400,2300 2400,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1200" y="2300" width="1601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_499" gradientUnits="userSpaceOnUse" x1="2000" y1="2701" x2="2000" y2="2299">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_499)" stroke="none" id="Drawing_18_0" d="M 1200,2700 L 2800,2700 2800,2300 1200,2300 1200,2700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="3000" y="2500" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_500" gradientUnits="userSpaceOnUse" x1="3300" y1="2500" x2="3300" y2="2900">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_500)" stroke="none" id="Drawing_19_0" d="M 3000,2900 L 3600,2900 3600,2500 3000,2500 3000,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="3000" y="2300" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_501" gradientUnits="userSpaceOnUse" x1="3401" y1="2600" x2="2999" y2="2600">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_501)" stroke="none" id="Drawing_20_0" d="M 3000,2900 L 3400,2900 3400,2300 3000,2300 3000,2900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2800" y="2100" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_502" gradientUnits="userSpaceOnUse" x1="3100" y1="2100" x2="3100" y2="2500">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_502)" stroke="none" id="Drawing_21_0" d="M 2800,2500 L 3400,2500 3400,2100 2800,2100 2800,2500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2800" y="1900" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_503" gradientUnits="userSpaceOnUse" x1="3201" y1="2200" x2="2799" y2="2200">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_503)" stroke="none" id="Drawing_22_0" d="M 2800,2500 L 3200,2500 3200,1900 2800,1900 2800,2500 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2600" y="1700" width="602" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_504" gradientUnits="userSpaceOnUse" x1="2900" y1="1700" x2="2900" y2="2100">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_504)" stroke="none" id="Drawing_23_0" d="M 2600,2100 L 3200,2100 3200,1700 2600,1700 2600,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1000" y="1500" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_505" gradientUnits="userSpaceOnUse" x1="999" y1="1800" x2="1401" y2="1800">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_505)" stroke="none" id="Drawing_24_0" d="M 1000,2100 L 1400,2100 1400,1500 1000,1500 1000,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1000" y="1300" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_506" gradientUnits="userSpaceOnUse" x1="1300" y1="1300" x2="1300" y2="1700">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_506)" stroke="none" id="Drawing_25_0" d="M 1000,1700 L 1600,1700 1600,1300 1000,1300 1000,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1200" y="1100" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_507" gradientUnits="userSpaceOnUse" x1="1199" y1="1400" x2="1601" y2="1400">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_507)" stroke="none" id="Drawing_26_0" d="M 1200,1700 L 1600,1700 1600,1100 1200,1100 1200,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1200" y="900" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_508" gradientUnits="userSpaceOnUse" x1="1500" y1="900" x2="1500" y2="1300">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_508)" stroke="none" id="Drawing_27_0" d="M 1200,1300 L 1800,1300 1800,900 1200,900 1200,1300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1400" y="700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_509" gradientUnits="userSpaceOnUse" x1="1399" y1="1000" x2="1801" y2="1000">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_509)" stroke="none" id="Drawing_28_0" d="M 1400,1300 L 1800,1300 1800,700 1400,700 1400,1300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2600" y="1500" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_510" gradientUnits="userSpaceOnUse" x1="3001" y1="1800" x2="2599" y2="1800">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_510)" stroke="none" id="Drawing_29_0" d="M 2600,2100 L 3000,2100 3000,1500 2600,1500 2600,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2400" y="1300" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_511" gradientUnits="userSpaceOnUse" x1="2700" y1="1300" x2="2700" y2="1700">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_511)" stroke="none" id="Drawing_30_0" d="M 2400,1700 L 3000,1700 3000,1300 2400,1300 2400,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2400" y="1100" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_512" gradientUnits="userSpaceOnUse" x1="2801" y1="1400" x2="2399" y2="1400">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_512)" stroke="none" id="Drawing_31_0" d="M 2400,1700 L 2800,1700 2800,1100 2400,1100 2400,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2200" y="900" width="601" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_513" gradientUnits="userSpaceOnUse" x1="2500" y1="900" x2="2500" y2="1300">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_513)" stroke="none" id="Drawing_32_0" d="M 2200,1300 L 2800,1300 2800,900 2200,900 2200,1300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2200" y="700" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_514" gradientUnits="userSpaceOnUse" x1="2601" y1="1000" x2="2199" y2="1000">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_514)" stroke="none" id="Drawing_33_0" d="M 2200,1300 L 2600,1300 2600,700 2200,700 2200,1300 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1400" y="500" width="1201" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_515" gradientUnits="userSpaceOnUse" x1="2000" y1="500" x2="2000" y2="900">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_515)" stroke="none" id="Drawing_34_0" d="M 1400,900 L 2600,900 2600,500 1400,500 1400,900 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(255,255,255)" stroke="none" d="M 1600,2100 L 1600,1500 2400,1500 2400,2100 1600,2100 Z"/>
+   <rect fill="none" stroke="none" x="1600" y="1500" width="801" height="601"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1600" y="1700" width="801" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_516" gradientUnits="userSpaceOnUse" x1="2000" y1="1700" x2="2000" y2="2100">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_516)" stroke="none" id="Drawing_36_0" d="M 1600,2100 L 2400,2100 2400,1700 1600,1700 1600,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1600" y="1500" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_517" gradientUnits="userSpaceOnUse" x1="2001" y1="1800" x2="1599" y2="1800">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_517)" stroke="none" id="Drawing_37_0" d="M 1600,2100 L 2000,2100 2000,1500 1600,1500 1600,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="2000" y="1500" width="401" height="601"/>
+   <defs>
+    <linearGradient id="Gradient_518" gradientUnits="userSpaceOnUse" x1="1999" y1="1800" x2="2401" y2="1800">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_518)" stroke="none" id="Drawing_38_0" d="M 2000,2100 L 2400,2100 2400,1500 2000,1500 2000,2100 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1600" y="1500" width="801" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_519" gradientUnits="userSpaceOnUse" x1="2000" y1="1901" x2="2000" y2="1499">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_519)" stroke="none" id="Drawing_39_0" d="M 1600,1900 L 2400,1900 2400,1500 1600,1500 1600,1900 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1800" y="1000" width="401" height="701"/>
+   <defs>
+    <linearGradient id="Gradient_520" gradientUnits="userSpaceOnUse" x1="2201" y1="1350" x2="1799" y2="1350">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_520)" stroke="none" id="Drawing_40_0" d="M 1800,1700 L 2000,1700 2000,1100 2200,1100 2200,1000 1800,1000 1800,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1800" y="1000" width="401" height="701"/>
+   <defs>
+    <linearGradient id="Gradient_521" gradientUnits="userSpaceOnUse" x1="1799" y1="1350" x2="2201" y2="1350">
+     <stop offset="0.5" stop-color="rgb(255,255,255)"/>
+     <stop offset="1" stop-color="rgb(255,255,255)" stop-opacity="0"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_521)" stroke="none" id="Drawing_41_0" d="M 2000,1700 L 2200,1700 2200,1000 1800,1000 1800,1300 1800,1100 2000,1100 2000,1700 Z"/>
+  </g>
+  <g>
+   <rect fill="none" stroke="none" x="1800" y="1100" width="401" height="401"/>
+   <defs>
+    <linearGradient id="Gradient_522" gradientUnits="userSpaceOnUse" x1="2000" y1="1500" x2="2000" y2="1100">
+     <stop offset="0.5" stop-color="rgb(102,102,102)" stop-opacity="0"/>
+     <stop offset="1" stop-color="rgb(102,102,102)"/>
+    </linearGradient>
+   </defs>
+   <path fill="url(#Gradient_522)" stroke="none" id="Drawing_42_0" d="M 1800,1500 L 2200,1500 2200,1100 1800,1100 1800,1500 Z"/>
+  </g>
+  <g>
+   <path fill="rgb(102,102,102)" stroke="none" d="M 2000,1100 L 1800,1100 1800,900 2200,900 2200,1100 2000,1100 Z"/>
+   <rect fill="none" stroke="none" x="1800" y="900" width="401" height="201"/>
+  </g>
+ </g>
+</svg>
