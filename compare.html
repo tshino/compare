@@ -964,13 +964,18 @@ var changeLang = function(lang) {
 				</tr>
 				<tr id="settingsImageScalingRow">
 					<td class="prop"><span class="en">Image scaling style</span><span class="ja">画像の拡大スタイル</span></td>
-					<td class="settings"><select class="settingsImageScaling en">
-						<option value="smooth">Smooth</option>
-						<option value="pixel">Pixelated</option>
-					</select><select class="settingsImageScaling ja">
-						<option value="smooth">滑らか</option>
-						<option value="pixel">ピクセル</option>
-					</select></td>
+					<td class="settings">
+						<div id="settingsImageScalingButtons" class="button-group">
+							<button data-value="smooth">
+								<img src="res/smooth.svg" width="85" alt="smooth"><br>
+								<span class="en">Smooth</span><span class="ja">滑らか</span>
+							</button>
+							<button data-value="pixel">
+								<img src="res/pixelated.svg" width="85" alt="pixelated"><br>
+								<span class="en">Pixelated</span><span class="ja">ピクセル</span>
+							</button>
+						</div>
+					</td>
 				</tr>
 				<tr>
 					<td class="prop"><span class="en">Grid interval (aux/main)</span><span class="ja">グリッド間隔（補助/主）</span></td>

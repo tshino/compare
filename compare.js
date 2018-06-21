@@ -1241,7 +1241,11 @@
       viewManagement.setBackgroundColor(value);
     });
     var imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
-      $('.settingsImageScaling').prop('value', value);
+      $('#settingsImageScalingButtons button').removeClass('current').filter(
+        value === 'pixel' ?
+          '[data-value=pixel]' :
+          '[data-value=smooth]'
+      ).addClass('current');
       viewManagement.setImageScaling(value);
     });
     var gridIntervalValues = function(value) {
@@ -1296,8 +1300,8 @@
           bgColor.set('#000000');
         }
       });
-      $('.settingsImageScaling').on('change', function(e) {
-        imageScaling.set(this.options[this.selectedIndex].value);
+      $('#settingsImageScalingButtons button').on('click', function(e) {
+        imageScaling.set($(this).attr('data-value'));
       });
       var updateGridInterval = function(value) {
         if (value === 'other') {

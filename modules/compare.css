@@ -482,12 +482,12 @@ div.mode-sw > *, div.button-group > *
 {
     box-sizing  : border-box;
     margin      : 2px;
-    height      : 30px;
+    min-height  : 30px;
     min-width   : 50px;
     font-size   : 14px;
     color       : #444;
 }
-div.mode-sw > *.current
+div.mode-sw > *.current, div.button-group > *.current
 {
     background  : #7af;
     color       : white;
@@ -511,7 +511,7 @@ button:hover
 {
     background  : #bcf;
 }
-.mode-sw button:not(.current):hover
+.mode-sw button:not(.current):hover, .button-group button:not(.current):hover
 {
     background  : #eee;
 }
