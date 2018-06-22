@@ -1292,6 +1292,7 @@
       $('#settingsBGColor').on('change', function(e) {
         bgColor.set(e.target.value);
       });
+      $('#bgcolorbtn').click(openBGColor);
       $('#settingsBGColorText').on('change', function(e) {
         var value = e.target.value;
         if (/^\#[0-9a-fA-F]{6}$/.test(value)) {
@@ -3582,7 +3583,6 @@
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
     $('#channelbtn').click(altView.toggle);
-    $('#bgcolorbtn').click(settings.openBGColor);
     $('#fullscreen').click(toggleFullscreen);
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
