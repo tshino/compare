@@ -1235,6 +1235,9 @@
       return { key: key, set: set, reset: reset, load: load };
     };
     var bgColor = configItem('config-view-bg-color', '#444444', function(value) {
+      if (!/^\#[0-9a-fA-F]{6}$/.test(value)) {
+        value = '#000000';
+      }
       $('#bgcolorbtn svg path').attr('fill', value);
       $('#settingsBGColor').prop('value', value);
       $('#settingsBGColorText').prop('value', value);
@@ -1294,12 +1297,7 @@
       });
       $('#bgcolorbtn').click(openBGColor);
       $('#settingsBGColorText').on('change', function(e) {
-        var value = e.target.value;
-        if (/^\#[0-9a-fA-F]{6}$/.test(value)) {
-          bgColor.set(value);
-        } else {
-          bgColor.set('#000000');
-        }
+        bgColor.set(e.target.value);
       });
       $('#settingsImageScalingButtons button').on('click', function(e) {
         imageScaling.set($(this).attr('data-value'));
