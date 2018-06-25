@@ -53,7 +53,7 @@ body:not(.ja) *.ja, body:not(.en) *.en
 {
     width       : 35px;
 }
-#sidebar button.current
+#sidebar button.current, button.current
 {
     background  : #7af;
     color       : white;
@@ -136,6 +136,11 @@ button.close
     position        : relative;
     height          : 100%;
     overflow        : hidden;
+}
+#view.useChecker .imageBox .image, #view.useChecker .emptyBox
+{
+    background-image: url(../res/checker.png);
+    background-size: 12px;
 }
 #view .imageBox.error
 {

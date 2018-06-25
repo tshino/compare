@@ -442,6 +442,9 @@
       var textColor = (96 <= y) ? '#444' : '#888';
       $('#view .dropHere').css({color: textColor, borderColor: textColor});
     };
+    var setCheckerPattern = function(enable) {
+      enable ? $('#view').addClass('useChecker') : $('#view').removeClass('useChecker');
+    };
     var setImageScaling = function(type) {
       imageScaling = type;
       updateImageScaling();
@@ -461,6 +464,7 @@
       makeImageLayoutParam: makeImageLayoutParam,
       onUpdateLayout: onUpdateLayout,
       setBackgroundColor: setBackgroundColor,
+      setCheckerPattern: setCheckerPattern,
       setImageScaling: setImageScaling
     };
   })();
@@ -1243,6 +1247,14 @@
       $('#settingsBGColorText').prop('value', value);
       viewManagement.setBackgroundColor(value);
     });
+    var bgPattern = configItem('config-view-bg-pattern', '', function(value) {
+      if (value === 'checker') {
+        $('#settingsBGChecker').addClass('current');
+      } else {
+        $('#settingsBGChecker').removeClass('current');
+      }
+      viewManagement.setCheckerPattern(value === 'checker');
+    });
     var imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
       $('#settingsImageScalingButtons button').removeClass('current').filter(
         value === 'pixel' ?
@@ -1275,7 +1287,7 @@
       }
       grid.setInterval(num[1], num[0]);
     });
-    var configItems = [bgColor, imageScaling, gridInterval];
+    var configItems = [bgColor, bgPattern, imageScaling, gridInterval];
     var loadConfig = function(key) {
       configItems.forEach(function(item) {
         if (key === undefined || key === item.key) {
@@ -1298,6 +1310,13 @@
       $('#bgcolorbtn').click(openBGColor);
       $('#settingsBGColorText').on('change', function(e) {
         bgColor.set(e.target.value);
+      });
+      $('#settingsBGChecker').on('click', function(e) {
+        if ($('#settingsBGChecker').hasClass('current')) {
+          bgPattern.set('');
+        } else {
+          bgPattern.set('checker');
+        }
       });
       $('#settingsImageScalingButtons button').on('click', function(e) {
         imageScaling.set($(this).attr('data-value'));
