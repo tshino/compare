@@ -140,7 +140,7 @@ button.close
 #view.useChecker .imageBox .image, #view.useChecker .emptyBox
 {
     background-image: url(../res/checker.png);
-    background-size: 12px;
+    background-size: 24px;
 }
 #view .imageBox.error
 {
