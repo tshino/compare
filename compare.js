@@ -275,7 +275,7 @@
     var overlayMode = false;
     var overlayBaseIndex = null;
     var layoutMode = null;
-    var backgroundColor = '';
+    var backgroundColor = '#000000';
     var imageScaling = 'smooth';
     var isOverlayMode = function() {
       return overlayMode;
@@ -434,16 +434,24 @@
       });
       updateImageScaling();
     };
+    var updateEmptyBoxTextColor = function() {
+      if ($('#view').hasClass('useChecker')) {
+        var textColor = '#222';
+      } else {
+        var rgb = parseInt(backgroundColor.substr(1), 16);
+        var y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
+        var textColor = (96 <= y) ? '#444' : '#888';
+      }
+      $('#view .dropHere').css({color: textColor, borderColor: textColor});
+    };
     var setBackgroundColor = function(color) {
       backgroundColor = color;
-      $('#view').css({'background-color': backgroundColor});
-      var rgb = parseInt(color.substr(1), 16);
-      var y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
-      var textColor = (96 <= y) ? '#444' : '#888';
-      $('#view .dropHere').css({color: textColor, borderColor: textColor});
+      $('#view').css({'background-color': color});
+      updateEmptyBoxTextColor();
     };
     var setCheckerPattern = function(enable) {
       enable ? $('#view').addClass('useChecker') : $('#view').removeClass('useChecker');
+      updateEmptyBoxTextColor();
     };
     var setImageScaling = function(type) {
       imageScaling = type;
