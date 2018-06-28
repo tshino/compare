@@ -492,7 +492,7 @@ div.mode-sw > *, div.button-group > *
     font-size   : 14px;
     color       : #444;
 }
-div.mode-sw > *.current, div.button-group > *.current
+.mode-sw > button.current, .button-group > button.current
 {
     background  : #7af;
     color       : white;
@@ -516,7 +516,7 @@ button:hover
 {
     background  : #bcf;
 }
-.mode-sw button:not(.current):hover, .button-group button:not(.current):hover
+.mode-sw > button:not(.current):hover, .button-group > button:not(.current):hover
 {
     background  : #eee;
 }
