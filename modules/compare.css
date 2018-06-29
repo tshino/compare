@@ -57,6 +57,7 @@ body:not(.ja) *.ja, body:not(.en) *.en
 {
     background  : #7af;
     color       : white;
+    text-shadow : 0px 0px 10px #36f;
 }
 #sidebar button:not(.current):hover
 {
@@ -483,26 +484,20 @@ div.mode-sw, div.button-group
     display     : flex;
     padding     : 0px;
 }
-div.mode-sw > *, div.button-group > *
+div.mode-sw > button, div.button-group > button
 {
     box-sizing  : border-box;
     margin      : 2px;
     min-height  : 30px;
     min-width   : 50px;
     font-size   : 14px;
-    color       : #444;
-}
-.mode-sw > button.current, .button-group > button.current
-{
-    background  : #7af;
-    color       : white;
-    text-shadow : 0px 0px 10px #36f;
 }
 button
 {
     border      : 0px;
     border-radius : 3px;
     background  : #f8f8f8;
+    color       : #444;
     box-shadow  : 1px 2px 5px rgba(0,0,0, 0.5);
     cursor      : pointer;
 }
