@@ -73,6 +73,7 @@ button span.tooltip
     box-shadow      : 2px 4px 10px rgba(0,0,0, 0.5);
     border-radius   : 4px;
     color           : #444;
+    text-shadow     : none;
     line-height     : 30px;
     right           : -15px;
     margin          : 0px 0px;
