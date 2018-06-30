@@ -516,6 +516,10 @@ button:hover
 {
     background  : #eee;
 }
+button.image-btn
+{
+    padding     : 3px;
+}
 .menu button img
 {
     vertical-align  : bottom;

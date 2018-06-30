@@ -704,7 +704,7 @@ var changeLang = function(lang) {
 							<span class="ja">基準画像</span>
 						</td>
 						<td id="toneCurveBaseName" style="min-width: 216px"></td>
-						<td class="input" rowspan="2" style="width:40px; max-width: 40px"><button class="swapbtn" style="display:inline-block; width:40px; height:40px;"><img src="res/swap.svg" style="width:100%;" alt="swap"></button></td>
+						<td class="input" rowspan="2" style="width:40px; max-width: 40px"><button class="swapbtn image-btn" style="width:40px; height:40px;"><img src="res/swap.svg" style="width:100%;" alt="swap"></button></td>
 					</tr>
 					<tr>
 						<td class="prop">
@@ -955,13 +955,13 @@ var changeLang = function(lang) {
 					<td class="settings">
 						<input id="settingsBGColor" type="color" style="display:none">
 						<input id="settingsBGColorText" type="text" style="width:80px">
-						<button id="bgcolorbtn" style="padding:3px;height:30px;">
+						<button id="bgcolorbtn" class="image-btn" style="height:30px;">
 							<svg viewBox="0 0 4000 4000" style="width:24px; vertical-align:bottom;">
 								<path fill="#444444" stroke="rgb(0,0,0)" stroke-width="200" stroke-linejoin="round" d="M 2000,3500 L 500,3500 500,500 3500,500 3500,3500 2000,3500 Z"/>
 							</svg>
 						</button>
 						|
-						<button id="settingsBGChecker" style="padding:3px;height:30px;">
+						<button id="settingsBGChecker" class="image-btn" style="height:30px;">
 							<img src="res/checker.png" alt="checker" style="width:24px; vertical-align:bottom;">
 						</button>
 					</td>
@@ -970,11 +970,11 @@ var changeLang = function(lang) {
 					<td class="prop"><span class="en">Image scaling style</span><span class="ja">画像の拡大スタイル</span></td>
 					<td class="settings">
 						<div id="settingsImageScalingButtons" class="button-group">
-							<button data-value="smooth">
+							<button data-value="smooth" class="image-btn">
 								<img src="res/smooth.svg" width="85" alt="smooth"><br>
 								<span class="en">Smooth</span><span class="ja">滑らか</span>
 							</button>
-							<button data-value="pixel">
+							<button data-value="pixel" class="image-btn">
 								<img src="res/pixelated.svg" width="85" alt="pixelated"><br>
 								<span class="en">Pixelated</span><span class="ja">ピクセル</span>
 							</button>
