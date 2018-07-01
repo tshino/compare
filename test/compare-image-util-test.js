@@ -1499,6 +1499,12 @@ TEST( 'compareImageUtil mostFrequentColor', function test() {
 });
 
 TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
+  var getSlice4 = function(image, index) {
+    return [
+      image.data[index * 4], image.data[index * 4 + 1],
+      image.data[index * 4 + 2], image.data[index * 4 + 3]
+    ];
+  };
   var checkGeometricTypeResult = function(label, w, h, result, getExpected) {
     EXPECT_EQ( w * h, result.typeMap.length, 'typeMap.length of ' + label );
     EXPECT_EQ( w, result.colorMap.width, 'colorMap.width of ' + label );
@@ -1518,7 +1524,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
         typeErrors += 1;
       }
       var expectedColor = expected.color.toString();
-      var actualColor = result.colorMap.data.slice(i * 4, i * 4 + 4).toString();
+      var actualColor = getSlice4(result.colorMap, i).toString();
       if (actualColor !== expectedColor) {
         if (colorErrors < 10) {
           var msg = 'color error at(' + x + ',' + y + ') of ' + label;
@@ -1542,7 +1548,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var result1 = compareImageUtil.geometricTypeOfPixel(image1);
   checkGeometricTypeResult('result1', 200, 200, result1, function(x, y, i) {
     // every pixels are flat
-    return { type: FLAT, color: image1.data.slice(i * 4, i * 4 + 4) };
+    return { type: FLAT, color: getSlice4(image1, i) };
   });
   // ...with some rectangles are drawn
   compareImageUtil.fill(makeRegion(image1, 50, 50, 20, 20), 255, 255, 255, 255);
@@ -1552,7 +1558,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
   var result2 = compareImageUtil.geometricTypeOfPixel(image1);
   checkGeometricTypeResult('result2', 200, 200, result2, function(x, y, i) {
     // still every pixels belong to flat region
-    return { type: FLAT, color: image1.data.slice(i * 4, i * 4 + 4) };
+    return { type: FLAT, color: getSlice4(image1, i) };
   });
   // ...with some thin lines with unique colors are drawn
   compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 0, 128, 255);
@@ -1562,7 +1568,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
     // pixels on the thin lines are not in flat region
     return {
       type: (x === 20 || y === 90) ? UNCLASSIFIED : FLAT,
-      color: image1.data.slice(i * 4, i * 4 + 4)
+      color: getSlice4(image1, i)
     };
   });
   // white background and blue box with anti-aliasing-like border
@@ -1586,7 +1592,7 @@ TEST( 'compareImageUtil geometricTypeOfPixel', function test() {
       if ((y === 49 || y === 150) && (50 <= x && x <= 149)) {
         return { type: BORDER, color: (y === 49 ? [0,0,255,255] : [255,255,255,255]) };
       }
-      return { type: FLAT, color: image2.data.slice(i * 4, i * 4 + 4) };
+      return { type: FLAT, color: getSlice4(image2, i) };
   });
   // simple border lines
   var simpleBorder = {

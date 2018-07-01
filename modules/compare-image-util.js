@@ -1315,7 +1315,9 @@
               if (im.isIntermediate) {
                 typeMap[f] = BORDER;
                 var near = im.whichIsNear === 0 ? ii : jj;
-                nearColors.push(image.data.slice(near, near + 4));
+                nearColors.push([
+                  image.data[near], image.data[near + 1], image.data[near + 2], image.data[near + 3]
+                ]);
               }
             }
           }
