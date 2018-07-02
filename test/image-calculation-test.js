@@ -191,6 +191,9 @@
     jsTestUtil.makeSequentialTest(tests)(done);
   });
   TEST( 'compare-worker.js calcMetrics', function test(done) {
+    Math.log10 = Math.log10 || function(x) {
+      return Math.log(x) / Math.LN10;
+    };
     var colorImage1 = {
       width: 4,
       height: 4,
