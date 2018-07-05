@@ -453,7 +453,7 @@ div.header > *
 {
     flex        : 0 1 auto;
     display     : inline-block;
-    margin      : 0px;
+    margin      : 2px 6px;
     padding     : 5px;
 }
 div.header > *:nth-child(1)
@@ -487,14 +487,14 @@ div.mode-sw, div.button-group
 }
 div.mode-sw > button, div.button-group > button
 {
-    box-sizing  : border-box;
-    margin      : 2px;
     min-height  : 30px;
     min-width   : 50px;
     font-size   : 14px;
 }
 button
 {
+    box-sizing  : border-box;
+    margin      : 2px;
     border      : 0px;
     border-radius : 3px;
     background  : #f8f8f8;
