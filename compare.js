@@ -44,7 +44,7 @@
         if ((49 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
             (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
           var num = e.keyCode % 48;
-          var sw = $(dialog.element).find('.mode-sw > button:nth-child('+num+')');
+          var sw = $(dialog.element).find('.mode-sw').eq(0).children('button:nth-child('+num+')');
           if (sw.length === 1) {
             sw.click();
             return false;
