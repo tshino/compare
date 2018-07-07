@@ -24,7 +24,8 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcVectorscope':
     result.type   = data.type;
-    result.result = calcVectorscope(data.imageData[0], data.type);
+    result.color  = data.color;
+    result.result = calcVectorscope(data.imageData[0], data.type, data.color);
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;
@@ -126,7 +127,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type )
   return hist;
 }
 
-function calcVectorscope( imageData, type )
+function calcVectorscope( imageData, type, colorMode )
 {
   var w = imageData.width;
   var h = imageData.height;
@@ -134,17 +135,30 @@ function calcVectorscope( imageData, type )
   for (var i = 0; i < dist.length; ++i) {
     dist[i] = 0;
   }
+  var colorMap = null;
+  if (colorMode) {
+    colorMap = new Float32Array(320 * 320 * 3);
+    for (var i = 0; i < colorMap.length; ++i) {
+      colorMap[i] = 0;
+    }
+  }
   var k = 0;
   if (type === 0) { // Cb-Cr
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var r = imageData.data[k + 0];
+      var r = imageData.data[k];
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
       var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
       var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
       var plotx = Math.round(159.5 + cb);
       var ploty = Math.round(159.5 - cr);
-      dist[ploty * 320 + plotx] += 1;
+      var offset = ploty * 320 + plotx;
+      dist[offset] += 1;
+      if (colorMap) {
+        colorMap[offset] += r;
+        colorMap[offset + 102400] += g;
+        colorMap[offset + 204800] += b;
+      }
     }
   } else if (type === 1) { // x-y
     var srgbToLinear = [];
@@ -153,16 +167,25 @@ function calcVectorscope( imageData, type )
       srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
     }
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var r = srgbToLinear[imageData.data[k]];
-      var g = srgbToLinear[imageData.data[k + 1]];
-      var b = srgbToLinear[imageData.data[k + 2]];
-      var x = 0.412391 * r + 0.357584 * g + 0.180481 * b;
-      var y = 0.212639 * r + 0.715169 * g + 0.072192 * b;
-      var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
+      var r = imageData.data[k];
+      var g = imageData.data[k + 1];
+      var b = imageData.data[k + 2];
+      var linr = srgbToLinear[r];
+      var ling = srgbToLinear[g];
+      var linb = srgbToLinear[b];
+      var x = 0.412391 * linr + 0.357584 * ling + 0.180481 * linb;
+      var y = 0.212639 * linr + 0.715169 * ling + 0.072192 * linb;
+      var z = 0.019331 * linr + 0.119195 * ling + 0.950532 * linb;
       var xyz = x + y + z;
       var plotx = 32 + (xyz === 0 ? 0 : Math.round(x / xyz * 255));
       var ploty = 287 - (xyz === 0 ? 0 : Math.round(y / xyz * 255));
-      dist[ploty * 320 + plotx] += 1;
+      var offset = ploty * 320 + plotx;
+      dist[offset] += 1;
+      if (colorMap) {
+        colorMap[offset] += r;
+        colorMap[offset + 102400] += g;
+        colorMap[offset + 204800] += b;
+      }
     }
   } else if (type === 2) { // G-B
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
@@ -170,26 +193,47 @@ function calcVectorscope( imageData, type )
       var b = imageData.data[k + 2];
       var plotx = 32 + g;
       var ploty = 287 - b;
-      dist[ploty * 320 + plotx] += 1;
+      var offset = ploty * 320 + plotx;
+      dist[offset] += 1;
+      if (colorMap) {
+        colorMap[offset] += imageData.data[k];;
+        colorMap[offset + 102400] += g;
+        colorMap[offset + 204800] += b;
+      }
     }
   } else if (type === 3) { // G-R
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var r = imageData.data[k + 0];
+      var r = imageData.data[k];
       var g = imageData.data[k + 1];
       var plotx = 32 + g;
       var ploty = 287 - r;
-      dist[ploty * 320 + plotx] += 1;
+      var offset = ploty * 320 + plotx;
+      dist[offset] += 1;
+      if (colorMap) {
+        colorMap[offset] += r;
+        colorMap[offset + 102400] += g;
+        colorMap[offset + 204800] += imageData.data[k + 2];
+      }
     }
   } else { // B-R
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
-      var r = imageData.data[k + 0];
+      var r = imageData.data[k];
       var b = imageData.data[k + 2];
       var plotx = 32 + b;
       var ploty = 287 - r;
-      dist[ploty * 320 + plotx] += 1;
+      var offset = ploty * 320 + plotx;
+      dist[offset] += 1;
+      if (colorMap) {
+        colorMap[offset] += r;
+        colorMap[offset + 102400] += imageData.data[k + 1];
+        colorMap[offset + 204800] += b;
+      }
     }
   }
-  return dist;
+  return {
+    dist: dist,
+    colorMap: colorMap
+  };
 }
 
 function calcReducedColorTable( imageData )
