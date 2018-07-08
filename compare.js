@@ -2124,7 +2124,7 @@
         { pos: { x: 32,  y: 32  }, align: ['right', 'bottom'], color: '#08f', label: 'y', types: [1] },
         { pos: { x: 288, y: 288 }, align: ['left',  'top'], color: '#08f', label: 'x', types: [1] }
       ];
-      context.globalCompositeOperation = 'lighter';
+      context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
       context.lineWidth = 2;
       for (var i = 0, p; p = points[i]; ++i) {
         if (0 > p.types.indexOf(type)) {
