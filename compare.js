@@ -60,6 +60,11 @@
             return false;
           }
         }
+        if ($('#vectorscope').is(':visible')) {
+          if (false === vectorscopeDialog.processKeyDown(e)) {
+            return false;
+          }
+        }
         if ($('#colorDist').is(':visible')) {
           if (false === colorDistDialog.processKeyDown(e)) {
             return false;
@@ -1761,7 +1766,7 @@
 
   var makeModeSwitch = function(parent, initialValue, onchange, toggle) {
     var currentType = initialValue;
-    var changeType = function(type) {
+    var set = function(type) {
       if (currentType !== type) {
         currentType = type;
         var index = toggle ? [true, false].indexOf(type) : type;
@@ -1771,10 +1776,11 @@
     };
     $(parent).children().click(function() {
       var type = toggle ? !currentType : $(parent).children().index(this);
-      changeType(type);
+      set(type);
     });
     return {
-      current: function() { return currentType; }
+      current: function() { return currentType; },
+      set: set
     };
   };
   var makeToggleSwitch = function(parent, initialValue, onchange) {
@@ -2198,9 +2204,16 @@
     var toggle = dialogUtil.defineDialog($('#vectorscope'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
+    var processKeyDown = function(e) {
+      if (e.keyCode == 81/* q */) {
+        colorMode.set(!colorMode.current());
+        return false;
+      }
+    };
     return {
       updateFigure: updateFigure,
-      toggle: toggle
+      toggle: toggle,
+      processKeyDown: processKeyDown
     };
   })();
   // 3D Color Distribution

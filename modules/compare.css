@@ -470,7 +470,7 @@ div.menu > button
     font-size   : 16px;
     text-align  : left;
 }
-button > span.keys:not(.tooltip)
+div.menu > button > span.keys:not(.tooltip)
 {
     float       : right;
 }
