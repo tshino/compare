@@ -2179,12 +2179,12 @@
         var bg = new Image;
         bg.onload = function() {
           makeFigure(type, color, fig, w, h, result);
-          fig.context.globalAlpha = 0.5;
-          fig.context.globalCompositeOperation = 'lighter';
+          fig.context.globalAlpha = color ? 0.7 : 0.3;
+          fig.context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
           fig.context.drawImage(bg, 0, 0, 320, 320);
           notify();
         };
-        bg.src = 'res/xy-chromaticity-diagram.png';
+        bg.src = color ? 'res/xy-chromaticity-diagram-gray.png' : 'res/xy-chromaticity-diagram.png';
       } else {
         makeFigure(type, color, fig, w, h, result);
         notify();
