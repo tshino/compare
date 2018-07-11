@@ -2120,7 +2120,8 @@
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: '#024', types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: '#024', types: [2,3,4] },
         { indices: [1, 2, 2, 3, 3, 1], color: '#024', types: [1] },
-        { indices: [12, 13, 13, 14, 14, 12], color: '#06c', types: [1] },
+        { indices: [12, 13, 13, 14], color: '#06c', types: [1] },
+        { indices: [12, 14], color: '#024', types: [1] },
         { indices: [12, 13, 13, 14, 14, 15, 15, 12], color: '#024', types: [0] }
       ];
       var labels = [
