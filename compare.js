@@ -2082,12 +2082,12 @@
       };
       var points = [
         { pos: calcxy(0,   0,   0  ) , color: '',     types: []        },
-        { pos: calcxy(255, 0,   0  ) , color: '#f00', types: [0,1,3,4]   },
-        { pos: calcxy(0,   255, 0  ) , color: '#0f0', types: [0,1,2,3]   },
-        { pos: calcxy(0,   0,   255) , color: '#00f', types: [0,1,2,4]   },
-        { pos: calcxy(0,   255, 255) , color: '#0ff', types: [0,2]   },
-        { pos: calcxy(255, 0,   255) , color: '#f0f', types: [0,4]   },
-        { pos: calcxy(255, 255, 0  ) , color: '#ff0', types: [0,3]   },
+        { pos: calcxy(255, 0,   0  ) , color: color ? '#800' : '#f00', types: [0,1,3,4]   },
+        { pos: calcxy(0,   255, 0  ) , color: color ? '#080' : '#0f0', types: [0,1,2,3]   },
+        { pos: calcxy(0,   0,   255) , color: color ? '#008' : '#00f', types: [0,1,2,4]   },
+        { pos: calcxy(0,   255, 255) , color: color ? '#088' : '#0ff', types: [0,2]   },
+        { pos: calcxy(255, 0,   255) , color: color ? '#808' : '#f0f', types: [0,4]   },
+        { pos: calcxy(255, 255, 0  ) , color: color ? '#880' : '#ff0', types: [0,3]   },
         { pos: calcxy(255, 255, 255) , color: '',     types: []      },
         { pos: { x: 159.5, y: 0     } , color: '',     types: [] },
         { pos: { x: 159.5, y: 320   } , color: '',     types: [] },
