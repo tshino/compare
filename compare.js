@@ -2113,7 +2113,7 @@
       var mainAxesColor = '#06c';
       var auxAxesColor = color ? '#555' : '#024';
       var lines = [
-        { indices: [8, 9, 10, 11], color: mainAxesColor, types: [0] },
+        { indices: [24, 25, 26, 27], color: mainAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: auxAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: mainAxesColor, types: [2,3,4] },
         { indices: [16, 17, 18, 19, 20, 21, 22, 23], color: auxAxesColor, types: [0,2,3,4] },
