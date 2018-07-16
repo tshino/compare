@@ -2089,10 +2089,6 @@
         { pos: calcxy(255, 0,   255) , color: color ? '#808' : '#f0f', types: [0,4]   },
         { pos: calcxy(255, 255, 0  ) , color: color ? '#880' : '#ff0', types: [0,3]   },
         { pos: calcxy(255, 255, 255) , color: '',     types: []      },
-        { pos: { x: 159.5, y: 0     } , color: '',     types: [] },
-        { pos: { x: 159.5, y: 320   } , color: '',     types: [] },
-        { pos: { x: 0,     y: 159.5 } , color: '',     types: [] },
-        { pos: { x: 320,   y: 159.5 } , color: '',     types: [] },
         { pos: { x: 32,    y: 32    } , color: '',     types: [] },
         { pos: { x: 32,    y: 287   } , color: '',     types: [] },
         { pos: { x: 287,   y: 287   } , color: '',     types: [] },
@@ -2113,18 +2109,18 @@
       var mainAxesColor = '#06c';
       var auxAxesColor = color ? '#555' : '#024';
       var lines = [
-        { indices: [24, 25, 26, 27], color: mainAxesColor, types: [0] },
+        { indices: [20, 21, 22, 23], color: mainAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: auxAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: mainAxesColor, types: [2,3,4] },
-        { indices: [16, 17, 18, 19, 20, 21, 22, 23], color: auxAxesColor, types: [0,2,3,4] },
-        { indices: [24, 25, 26, 27], color: auxAxesColor, types: [2,3,4] },
+        { indices: [12, 13, 14, 15, 16, 17, 18, 19], color: auxAxesColor, types: [0,2,3,4] },
+        { indices: [20, 21, 22, 23], color: auxAxesColor, types: [2,3,4] },
         { indices: [0, 4, 0, 5, 0, 6], color: auxAxesColor, types: [0] },
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: auxAxesColor, types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: auxAxesColor, types: [2,3,4] },
         { indices: [1, 2, 2, 3, 3, 1], color: auxAxesColor, types: [1] },
-        { indices: [12, 13, 13, 14], color: mainAxesColor, types: [1] },
-        { indices: [12, 14], color: auxAxesColor, types: [1] },
-        { indices: [12, 13, 13, 14, 14, 15, 15, 12], color: auxAxesColor, types: [0] }
+        { indices: [8, 9, 9, 10], color: mainAxesColor, types: [1] },
+        { indices: [8, 10], color: auxAxesColor, types: [1] },
+        { indices: [8, 9, 9, 10, 10, 11, 11, 8], color: auxAxesColor, types: [0] }
       ];
       var labels = [
         { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
