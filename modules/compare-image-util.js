@@ -1369,7 +1369,7 @@
       colors = Array.prototype.slice.call(colors);
       colors.sort();
     }
-    var counts = new Uint32Array(w * h);
+    var counts = new Uint32Array(Math.min(w * h, 256 * 256 * 256));
     var totalCount = 0;
     var uniqueCount = 1;
     for (var i = 1; i < colors.length; i += 1) {
