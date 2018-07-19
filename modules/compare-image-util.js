@@ -1352,6 +1352,28 @@
       colorMap: colorMap
     };
   };
+  var growingTypedArray = function(type, initialCapacity) {
+    var capacity = initialCapacity;
+    var length = 0;
+    var array = new type(capacity);
+    var push = function(elem) {
+      if (length >= capacity) {
+        capacity *= 2;
+        var newArray = new type(capacity);
+        for (var i = 0; i < length; i++) {
+          newArray[i] = array[i];
+        }
+        array = newArray;
+      }
+      array[length++] = elem;
+    };
+    return {
+      length: function() { return length; },
+      capacity: function() { return capacity; },
+      array: function() { return array; },
+      push: push
+    };
+  };
   var getUniqueColors = function(imageData) {
     var w = imageData.width;
     var h = imageData.height;
@@ -1425,6 +1447,7 @@
     sparseOpticalFlow: sparseOpticalFlow,
     mostFrequentColor: mostFrequentColor,
     geometricTypeOfPixel: geometricTypeOfPixel,
+    growingTypedArray: growingTypedArray,
     getUniqueColors: getUniqueColors
   };
 })();
