@@ -1391,18 +1391,19 @@
       colors = Array.prototype.slice.call(colors);
       colors.sort();
     }
-    var counts = new Uint32Array(Math.min(w * h, 256 * 256 * 256));
+    var counts = growingTypedArray(Uint32Array, 16384);
     var totalCount = 0;
     var uniqueCount = 1;
     for (var i = 1; i < colors.length; i += 1) {
       if (colors[i - 1] !== colors[i]) {
         colors[uniqueCount] = colors[i];
-        counts[uniqueCount - 1] = i - totalCount;
+        counts.push(i - totalCount);
         uniqueCount += 1;
         totalCount = i;
       }
     }
-    counts[uniqueCount - 1] = colors.length - totalCount;
+    counts.push(colors.length - totalCount);
+    counts = counts.array();
     colors = colors.slice(0, uniqueCount);
     try {
       counts = counts.slice(0, uniqueCount);
