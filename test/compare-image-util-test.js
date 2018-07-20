@@ -1724,6 +1724,39 @@ TEST( 'compareImageUtil growingTypedArray', function test() {
   EXPECT_EQ( 5555, a.array()[4] );
 });
 
+TEST( 'compareImageUtil mergeUniqueColors', function test() {
+  var uc1 = {
+    colors: [ 0x000000, 0x111122, 0x222222, 0x223344, 0x778899 ],
+    counts: [ 1, 2, 3, 4, 5],
+    totalCount: 15
+  };
+  var uc2 = {
+    colors: [ 0x000000, 0x111111, 0x111122, 0x223344, 0xddeeff, 0xffeedd ],
+    counts: [ 3, 2, 1, 2, 3, 4 ],
+    totalCount: 15
+  };
+  var uc3 = compareImageUtil.mergeUniqueColors(uc1, uc2);
+  EXPECT_EQ( 8, uc3.colors.length );
+  EXPECT_EQ( 0x000000, uc3.colors[0] );
+  EXPECT_EQ( 0x111111, uc3.colors[1] );
+  EXPECT_EQ( 0x111122, uc3.colors[2] );
+  EXPECT_EQ( 0x222222, uc3.colors[3] );
+  EXPECT_EQ( 0x223344, uc3.colors[4] );
+  EXPECT_EQ( 0x778899, uc3.colors[5] );
+  EXPECT_EQ( 0xddeeff, uc3.colors[6] );
+  EXPECT_EQ( 0xffeedd, uc3.colors[7] );
+  EXPECT_EQ( 8, uc3.counts.length );
+  EXPECT_EQ( 4, uc3.counts[0] );
+  EXPECT_EQ( 2, uc3.counts[1] );
+  EXPECT_EQ( 3, uc3.counts[2] );
+  EXPECT_EQ( 3, uc3.counts[3] );
+  EXPECT_EQ( 6, uc3.counts[4] );
+  EXPECT_EQ( 5, uc3.counts[5] );
+  EXPECT_EQ( 3, uc3.counts[6] );
+  EXPECT_EQ( 4, uc3.counts[7] );
+  EXPECT_EQ( 30, uc3.totalCount );
+});
+
 TEST( 'compareImageUtil getUniqueColors', function test() {
   var imageData = { width: 4, height: 4, data: [
     0, 0, 0, 255,     85, 85, 85, 255,  170, 170, 170, 255, 255, 255, 255, 255,
