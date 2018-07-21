@@ -1422,15 +1422,22 @@
       totalCount: uc1.totalCount + uc2.totalCount
     };
   };
-  var getUniqueColors = function(imageData) {
+  var getUniqueColorsImpl = function(imageData) {
+    imageData = makeImage(imageData);
     var w = imageData.width;
     var h = imageData.height;
     var colors = new Uint32Array(w * h);
-    for (var i = 0, k = 0, n = 4 * w * h; k < n; k += 4, i += 1) {
-      var r = imageData.data[k + 0];
-      var g = imageData.data[k + 1];
-      var b = imageData.data[k + 2];
-      colors[i] = (r << 16) + (g << 8) + b;
+    var ch = imageData.channels;
+    var i = 0;
+    var k = imageData.offset * ch;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, k += ch, i++) {
+        var r = imageData.data[k + 0];
+        var g = imageData.data[k + 1];
+        var b = imageData.data[k + 2];
+        colors[i] = (r << 16) + (g << 8) + b;
+      }
+      k += (imageData.pitch - w) * ch;
     }
     try {
       colors.sort();
@@ -1464,6 +1471,30 @@
       counts: counts,
       totalCount: w * h
     };
+  };
+  var getUniqueColors = function(imageData) {
+    var w = imageData.width;
+    var h = imageData.height;
+    var step = Math.ceil(4 * 1024 * 1024 / w);
+    var buffer = [];
+    for (var y = 0; y < h; y += step) {
+      var r = makeRegion(imageData, 0, y, w, step);
+      var u = getUniqueColorsImpl(r);
+      buffer.push(u);
+    }
+    while (1 < buffer.length) {
+      var temp = [];
+      for (var i = 0; i < buffer.length; i += 2) {
+        if (i + 1 < buffer.length) {
+          var u = mergeUniqueColors(buffer[i], buffer[i + 1]);
+          temp.push(u);
+        } else {
+          temp.push(buffer[i]);
+        }
+      }
+      buffer = temp;
+    }
+    return buffer[0];
   };
   return {
     FORMAT_U8x4:    FORMAT_U8x4,
