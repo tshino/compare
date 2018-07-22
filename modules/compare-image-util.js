@@ -1379,30 +1379,23 @@
     var colors = growingTypedArray(Uint32Array, n1 + n2);
     var counts = growingTypedArray(Uint32Array, n1 + n2);
     for (var i1 = 0, i2 = 0; i1 < n1 || i2 < n2; ) {
-      if (i1 === n1) {
-        colors.push(uc2.colors[i2]);
-        counts.push(uc2.counts[i2]);
-        i2++;
-      } else if (i2 === n2) {
+      var k = i1 === n1 ? 2 :
+              i2 === n2 ? 1 :
+              uc1.colors[i1] < uc2.colors[i2] ? 1 :
+              uc1.colors[i1] > uc2.colors[i2] ? 2 : 3;
+      if (k === 1) {
         colors.push(uc1.colors[i1]);
         counts.push(uc1.counts[i1]);
         i1++;
+      } else if (k === 2) {
+        colors.push(uc2.colors[i2]);
+        counts.push(uc2.counts[i2]);
+        i2++;
       } else {
-        var c1 = uc1.colors[i1], c2 = uc2.colors[i2];
-        if (c1 < c2) {
-          colors.push(c1);
-          counts.push(uc1.counts[i1]);
-          i1++;
-        } else if (c2 < c1) {
-          colors.push(c2);
-          counts.push(uc2.counts[i2]);
-          i2++;
-        } else { // c1==c2
-          colors.push(c1);
-          counts.push(uc1.counts[i1] + uc2.counts[i2]);
-          i1++;
-          i2++;
-        }
+        colors.push(uc1.colors[i1]);
+        counts.push(uc1.counts[i1] + uc2.counts[i2]);
+        i1++;
+        i2++;
       }
     }
     var n = colors.length();
