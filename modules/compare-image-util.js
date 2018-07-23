@@ -1355,22 +1355,22 @@
   var growingTypedArray = function(type, initialCapacity) {
     var capacity = initialCapacity;
     var length = 0;
-    var array = new type(capacity);
+    var buffer = new type(capacity);
     var push = function(elem) {
       if (length >= capacity) {
         capacity *= 2;
-        var newArray = new type(capacity);
+        var newBuffer = new type(capacity);
         for (var i = 0; i < length; i++) {
-          newArray[i] = array[i];
+          newBuffer[i] = buffer[i];
         }
-        array = newArray;
+        buffer = newBuffer;
       }
-      array[length++] = elem;
+      buffer[length++] = elem;
     };
     return {
       length: function() { return length; },
       capacity: function() { return capacity; },
-      array: function() { return array; },
+      buffer: function() { return buffer; },
       push: push
     };
   };
@@ -1399,8 +1399,8 @@
       }
     }
     var n = colors.length();
-    colors = colors.array();
-    counts = counts.array();
+    colors = colors.buffer();
+    counts = counts.buffer();
     try {
       colors = colors.slice(0, n);
       counts = counts.slice(0, n);
@@ -1451,7 +1451,7 @@
       }
     }
     counts.push(colors.length - totalCount);
-    counts = counts.array();
+    counts = counts.buffer();
     colors = colors.slice(0, uniqueCount);
     try {
       counts = counts.slice(0, uniqueCount);

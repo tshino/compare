@@ -1702,26 +1702,26 @@ TEST( 'compareImageUtil growingTypedArray', function test() {
   var a = compareImageUtil.growingTypedArray(Uint32Array, 4);
   EXPECT_EQ( 0, a.length() );
   EXPECT_EQ( 4, a.capacity() );
-  EXPECT_EQ( 4, a.array().length );
+  EXPECT_EQ( 4, a.buffer().length );
 
   a.push( 1234 );
   EXPECT_EQ( 1, a.length() );
   EXPECT_EQ( 4, a.capacity() );
-  EXPECT_EQ( 1234, a.array()[0] );
+  EXPECT_EQ( 1234, a.buffer()[0] );
 
   a.push( 2222 );
   a.push( 3333 );
   a.push( 4444 );
   EXPECT_EQ( 4, a.length() );
   EXPECT_EQ( 4, a.capacity() );
-  EXPECT_EQ( 2222, a.array()[1] );
-  EXPECT_EQ( 3333, a.array()[2] );
-  EXPECT_EQ( 4444, a.array()[3] );
+  EXPECT_EQ( 2222, a.buffer()[1] );
+  EXPECT_EQ( 3333, a.buffer()[2] );
+  EXPECT_EQ( 4444, a.buffer()[3] );
 
   a.push( 5555 );
   EXPECT_EQ( 5, a.length() );
   EXPECT_EQ( 8, a.capacity() );
-  EXPECT_EQ( 5555, a.array()[4] );
+  EXPECT_EQ( 5555, a.buffer()[4] );
 });
 
 TEST( 'compareImageUtil mergeUniqueColors', function test() {
