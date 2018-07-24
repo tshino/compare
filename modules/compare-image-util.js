@@ -1356,22 +1356,38 @@
     var capacity = initialCapacity;
     var length = 0;
     var buffer = new type(capacity);
+    var transfer = function(newCapacity) {
+      var newBuffer = new type(newCapacity);
+      for (var i = 0; i < length; i++) {
+        newBuffer[i] = buffer[i];
+      }
+      return newBuffer;
+    };
     var push = function(elem) {
       if (length >= capacity) {
         capacity *= 2;
-        var newBuffer = new type(capacity);
-        for (var i = 0; i < length; i++) {
-          newBuffer[i] = buffer[i];
-        }
-        buffer = newBuffer;
+        buffer = transfer(capacity);
       }
       buffer[length++] = elem;
+    };
+    var makeArray = function() {
+      if (length === capacity) {
+        return buffer;
+      } else {
+        try {
+          return buffer.slice(0, length);
+        } catch(e) {
+          // IE11: no typedarray.slice() ?
+          return transfer(length);
+        }
+      }
     };
     return {
       length: function() { return length; },
       capacity: function() { return capacity; },
       buffer: function() { return buffer; },
-      push: push
+      push: push,
+      makeArray: makeArray
     };
   };
   var mergeUniqueColors = function(uc1, uc2) {
@@ -1398,20 +1414,9 @@
         i2++;
       }
     }
-    var n = colors.length();
-    colors = colors.buffer();
-    counts = counts.buffer();
-    try {
-      colors = colors.slice(0, n);
-      counts = counts.slice(0, n);
-    } catch(e) {
-      // IE11: no typedarray.slice() ?
-      colors = Array.prototype.slice.call(colors, 0, n);
-      counts = Array.prototype.slice.call(counts, 0, n);
-    }
     return {
-      colors: colors,
-      counts: counts,
+      colors: colors.makeArray(),
+      counts: counts.makeArray(),
       totalCount: uc1.totalCount + uc2.totalCount
     };
   };
@@ -1451,17 +1456,9 @@
       }
     }
     counts.push(colors.length - totalCount);
-    counts = counts.buffer();
-    colors = colors.slice(0, uniqueCount);
-    try {
-      counts = counts.slice(0, uniqueCount);
-    } catch(e) {
-      // IE11: no typedarray.slice() ?
-      counts = Array.prototype.slice.call(counts, 0, uniqueCount);
-    }
     return {
-      colors: colors,
-      counts: counts,
+      colors: colors.slice(0, uniqueCount),
+      counts: counts.makeArray(),
       totalCount: w * h
     };
   };

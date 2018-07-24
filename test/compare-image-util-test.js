@@ -1704,10 +1704,17 @@ TEST( 'compareImageUtil growingTypedArray', function test() {
   EXPECT_EQ( 4, a.capacity() );
   EXPECT_EQ( 4, a.buffer().length );
 
+  var array1 = a.makeArray();
+  EXPECT_EQ( 0, array1.length );
+
   a.push( 1234 );
   EXPECT_EQ( 1, a.length() );
   EXPECT_EQ( 4, a.capacity() );
   EXPECT_EQ( 1234, a.buffer()[0] );
+
+  var array2 = a.makeArray();
+  EXPECT_EQ( 1, array2.length );
+  EXPECT_EQ( 1234, array2[0] );
 
   a.push( 2222 );
   a.push( 3333 );
@@ -1718,10 +1725,20 @@ TEST( 'compareImageUtil growingTypedArray', function test() {
   EXPECT_EQ( 3333, a.buffer()[2] );
   EXPECT_EQ( 4444, a.buffer()[3] );
 
+  var array3 = a.makeArray();
+  EXPECT_EQ( 4, array3.length );
+  EXPECT_EQ( 2222, array3[1] );
+  EXPECT_EQ( 3333, array3[2] );
+  EXPECT_EQ( 4444, array3[3] );
+
   a.push( 5555 );
   EXPECT_EQ( 5, a.length() );
   EXPECT_EQ( 8, a.capacity() );
   EXPECT_EQ( 5555, a.buffer()[4] );
+
+  var array4 = a.makeArray();
+  EXPECT_EQ( 5, array4.length );
+  EXPECT_EQ( 5555, array4[4] );
 });
 
 TEST( 'compareImageUtil mergeUniqueColors', function test() {
