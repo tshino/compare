@@ -285,6 +285,12 @@
     var isOverlayMode = function() {
       return overlayMode;
     };
+    var numberFromIndex = function(index) {
+      return index + 1;
+    };
+    var indexFromNumber = function(number) {
+      return number - 1;
+    };
     var getSelectedImageIndices = function() {
       var indices = [];
       if (isSingleView) {
@@ -464,6 +470,8 @@
     };
     return {
       isOverlayMode: isOverlayMode,
+      numberFromIndex: numberFromIndex,
+      indexFromNumber: indexFromNumber,
       getSelectedImageIndices: getSelectedImageIndices,
       getLayoutMode: getLayoutMode,
       resetLayoutState: resetLayoutState,
@@ -3637,18 +3645,19 @@
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
     var newSelectorButton = function(index) {
+      var number = viewManagement.numberFromIndex(index);
       var button = $('<button/>').addClass('selector').
-        text(index + 1).
+        text(number).
         append(
           textUtil.setText($('<span class="tooltip"/>'), {
             en: 'Select picture ',
             ja: '画像を選択 '
           })
         ).
-        click(function(e) { viewManagement.toggleSingleView(index + 1); });
-      if (index < 9) {
+        click(function(e) { viewManagement.toggleSingleView(number); });
+      if (number <= 9) {
         button.find('span.tooltip span').addClass('keys flat').
-            append($('<span/>').text(index + 1));
+            append($('<span/>').text(number));
       }
       $('#overlay').before(button);
       return button;
@@ -3707,8 +3716,10 @@
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>').append(
             makeImageNameWithIndex('<span class="imageName">', ent).
-              click({index : i}, function(e) { viewManagement.toggleSingleView(e.data.index + 1); }).
-              append(
+              click({index : i}, function(e) {
+                var number = viewManagement.numberFromIndex(e.data.index);
+                viewManagement.toggleSingleView(number);
+              }).append(
                 $('<button>').addClass('remove').text('×').
                   click({index : i}, function(e) { removeEntry(e.data.index); }))
           );
