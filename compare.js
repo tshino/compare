@@ -80,7 +80,12 @@
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
           (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
-        viewManagement.toggleSingleView(e.keyCode % 48);
+        var number = e.keyCode % 48;
+        if (number === 0) {
+          viewManagement.toAllImageView();
+        } else {
+          viewManagement.toggleSingleView(number);
+        }
         return false;
       }
       // Cross cursor (cursor key)
@@ -310,14 +315,18 @@
       viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
     };
-    var toggleSingleView = function(targetIndex) {
-      if (targetIndex === 0 ||
-          targetIndex === currentImageIndex ||
-          targetIndex > entries.length ||
-          !entries[targetIndex - 1].visible) {
+    var toAllImageView = function() {
+      currentImageIndex = 0;
+      updateLayout();
+    };
+    var toggleSingleView = function(imageNumber) {
+      if (imageNumber === 0 ||
+          imageNumber === currentImageIndex ||
+          imageNumber > entries.length ||
+          !entries[imageNumber - 1].visible) {
         currentImageIndex = 0;
       } else {
-        currentImageIndex = targetIndex;
+        currentImageIndex = imageNumber;
       }
       updateLayout();
     };
@@ -475,6 +484,7 @@
       getSelectedImageIndices: getSelectedImageIndices,
       getLayoutMode: getLayoutMode,
       resetLayoutState: resetLayoutState,
+      toAllImageView: toAllImageView,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
       onResize: onResize,
