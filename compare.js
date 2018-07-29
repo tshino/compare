@@ -576,9 +576,10 @@
     }
   };
   var makeImageNameWithIndex = function(tag, img) {
+    var number = viewManagement.numberFromIndex(img.index);
     return $(tag).
         css({ wordBreak : 'break-all' }).
-        append($('<span class="imageIndex"/>').text(img.index + 1)).
+        append($('<span class="imageIndex"/>').text(number)).
         append($('<span/>').text(img.name));
   };
 
