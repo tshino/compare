@@ -2575,8 +2575,9 @@
         option.attr('selected','');
       }
     }
+    var number = viewManagement.numberFromIndex(selectedIndex);
     return $('<span>').append(
-      $('<span class="imageIndex"/>').text(selectedIndex + 1),
+      $('<span class="imageIndex"/>').text(number),
       select
     );
   };
