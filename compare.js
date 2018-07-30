@@ -294,7 +294,11 @@
       return index + 1;
     };
     var indexFromNumber = function(number) {
-      return number - 1;
+      if (1 <= number && number <= entries.length) {
+        return number - 1;
+      } else {
+        return null;
+      }
     };
     var getSelectedImageIndices = function() {
       var indices = [];
@@ -320,13 +324,13 @@
       updateLayout();
     };
     var toggleSingleView = function(imageNumber) {
-      if (imageNumber === 0 ||
-          imageNumber === currentImageIndex ||
-          imageNumber > entries.length ||
-          !entries[imageNumber - 1].visible) {
+      var index = indexFromNumber(imageNumber);
+      if (index === null ||
+          index + 1 === currentImageIndex ||
+          !entries[index].visible) {
         currentImageIndex = 0;
       } else {
-        currentImageIndex = imageNumber;
+        currentImageIndex = index + 1;
       }
       updateLayout();
     };
