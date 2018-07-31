@@ -3678,6 +3678,12 @@
       $('#overlay').before(button);
       return button;
     };
+    var updateSelectorButtons = function() {
+      $('.selector').remove();
+      for (var i = 0, ent; ent = entries[i]; i++) {
+        newSelectorButton(ent.index);
+      }
+    };
     var updateArrangeButton = function() {
       var layoutMode = viewManagement.getLayoutMode();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
@@ -3717,7 +3723,7 @@
       updateOverlayModeIndicator();
     };
     return {
-      newSelectorButton: newSelectorButton,
+      updateSelectorButtons: updateSelectorButtons,
       onUpdateLayout: onUpdateLayout
     };
   })();
@@ -3758,10 +3764,8 @@
           ent.view.addClass('error');
           ent.visible = false;
         }
-        if (!ent.button) {
-          ent.button = sideBar.newSelectorButton(i);
-        }
     }
+    sideBar.updateSelectorButtons();
     resetMouseDrag();
     updateLayout();
   };
@@ -3890,7 +3894,6 @@
             transposed      : false,
             orientationAsCSS    : '',
             view        : null,
-            button      : null,
             element     : null,
             asCanvas    : null,
             imageData   : null,
