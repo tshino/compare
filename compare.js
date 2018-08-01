@@ -291,7 +291,11 @@
       return overlayMode;
     };
     var numberFromIndex = function(index) {
-      return index + 1;
+      if (0 <= index && index < entries.length) {
+        return index + 1;
+      } else {
+        return null;
+      }
     };
     var indexFromNumber = function(number) {
       if (1 <= number && number <= entries.length) {
@@ -581,10 +585,11 @@
   };
   var makeImageNameWithIndex = function(tag, img) {
     var number = viewManagement.numberFromIndex(img.index);
-    return $(tag).
-        css({ wordBreak : 'break-all' }).
-        append($('<span class="imageIndex"/>').text(number)).
-        append($('<span/>').text(img.name));
+    var elem = $(tag).css({ wordBreak : 'break-all' });
+    if (number !== null) {
+      elem.append($('<span class="imageIndex"/>').text(number));
+    }
+    return elem.append($('<span/>').text(img.name));
   };
 
   // ROI map
