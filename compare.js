@@ -3741,7 +3741,11 @@
     }
     for (var i = 0, ent; ent = entries[i]; i++) {
         if (!ent.view) {
-          ent.view = $('<div class="imageBox"/>').append(
+          ent.view = $('<div class="imageBox"/>');
+          $('#drop').before(ent.view);
+        }
+        ent.view.find('.imageName').remove();
+        ent.view.append(
             makeImageNameWithIndex('<span class="imageName">', ent).
               click({index : i}, function(e) {
                 var number = viewManagement.numberFromIndex(e.data.index);
@@ -3749,9 +3753,7 @@
               }).append(
                 $('<button>').addClass('remove').text('×').
                   click({index : i}, function(e) { removeEntry(e.data.index); }))
-          );
-          $('#drop').before(ent.view);
-        }
+        );
         if (ent.element) {
           if (ent.altViewMode !== altView.currentMode()) {
             ent.view.find('.image').remove();
