@@ -291,18 +291,18 @@
       return overlayMode;
     };
     var numberFromIndex = function(index) {
-      if (0 <= index && index < entries.length) {
-        return index + 1;
-      } else {
-        return null;
+      for (var i = 0, img; img = images[i]; i++) {
+        if (img.index === index) {
+          return i + 1;
+        }
       }
+      return null;
     };
     var indexFromNumber = function(number) {
-      if (1 <= number && number <= entries.length) {
-        return number - 1;
-      } else {
-        return null;
+      if (1 <= number && number <= images.length) {
+        return images[number - 1].index;
       }
+      return null;
     };
     var getSelectedImageIndices = function() {
       var indices = [];
