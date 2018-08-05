@@ -84,7 +84,8 @@
         if (number === 0) {
           viewManagement.toAllImageView();
         } else {
-          viewManagement.toggleSingleView(number);
+          var index = viewManagement.indexFromNumber(number);
+          viewManagement.toggleSingleView(index);
         }
         return false;
       }
@@ -327,8 +328,7 @@
       currentImageIndex = 0;
       updateLayout();
     };
-    var toggleSingleView = function(imageNumber) {
-      var index = indexFromNumber(imageNumber);
+    var toggleSingleView = function(index) {
       if (index === null ||
           index + 1 === currentImageIndex ||
           !entries[index].visible) {
@@ -3675,7 +3675,7 @@
             ja: '画像を選択 '
           })
         ).
-        click(function(e) { viewManagement.toggleSingleView(number); });
+        click(function(e) { viewManagement.toggleSingleView(index); });
       if (number <= 9) {
         button.find('span.tooltip span').addClass('keys flat').
             append($('<span/>').text(number));
@@ -3748,8 +3748,7 @@
         ent.view.append(
             makeImageNameWithIndex('<span class="imageName">', ent).
               click({index : i}, function(e) {
-                var number = viewManagement.numberFromIndex(e.data.index);
-                viewManagement.toggleSingleView(number);
+                viewManagement.toggleSingleView(e.data.index);
               }).append(
                 $('<button>').addClass('remove').text('×').
                   click({index : i}, function(e) { removeEntry(e.data.index); }))
