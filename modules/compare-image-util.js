@@ -1420,11 +1420,11 @@
       totalCount: uc1.totalCount + uc2.totalCount
     };
   };
-  var getUniqueColorsImpl = function(imageData) {
+  var getUniqueColorsImpl = function(imageData, colorBuffer) {
     imageData = makeImage(imageData);
     var w = imageData.width;
     var h = imageData.height;
-    var colors = new Uint32Array(w * h);
+    var colors = colorBuffer || new Uint32Array(w * h);
     var ch = imageData.channels;
     var i = 0;
     var k = imageData.offset * ch;
@@ -1467,9 +1467,15 @@
     var h = imageData.height;
     var step = Math.ceil(4 * 1024 * 1024 / w);
     var buffer = [];
+    var colorBuffer = [];
     for (var y = 0; y < h; y += step) {
       var r = makeRegion(imageData, 0, y, w, step);
-      var u = getUniqueColorsImpl(r);
+      var colorBufferSize = r.width * r.height;
+      if (colorBuffer.length !== colorBufferSize) {
+        colorBuffer = null;
+        colorBuffer = new Uint32Array(colorBufferSize);
+      }
+      var u = getUniqueColorsImpl(r, colorBuffer);
       buffer.push(u);
     }
     while (1 < buffer.length) {
