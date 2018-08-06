@@ -329,6 +329,7 @@
       updateLayout();
     };
     var toggleSingleView = function(index) {
+      var prevImageIndex = currentImageIndex;
       if (index === null ||
           index + 1 === currentImageIndex ||
           !entries[index].visible) {
@@ -336,7 +337,9 @@
       } else {
         currentImageIndex = index + 1;
       }
-      updateLayout();
+      if (prevImageIndex !== currentImageIndex) {
+        updateLayout();
+      }
     };
     var flipSingleView = function(forward) {
       if (0 < images.length) {
