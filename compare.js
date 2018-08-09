@@ -2255,7 +2255,7 @@
     var colorDistZoom = 0;
     var colorDistDragState = null;
     var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
-    var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
+    var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
       for (var i = 0, img; img = images[i]; i++) {
         img.colorDist = null;
         img.colorDistAxes = null;
@@ -2293,7 +2293,7 @@
         dist[i] = 0;
       }
       var colorMap = null;
-      if (colorDistType.current() === 0) { // RGB with Color
+      if (colorMode.current() === true) { // RGB with Color
         colorMap = new Float32Array(320 * 320 * 3);
         for (var i = 0; i < colorMap.length; ++i) {
           colorMap[i] = 0;
@@ -2319,13 +2319,13 @@
         var offset = ploty * 320 + plotx;
         var count = counts[k];
         dist[offset] += count;
-        if (colorDistType.current() === 0) { // RGB with Color
+        if (colorMode.current() === true) { // RGB with Color
           colorMap[offset] += count * r;
           colorMap[offset + 102400] += count * g;
           colorMap[offset + 204800] += count * b;
         }
       }
-      if (colorDistType.current() === 0) { // RGB with Color
+      if (colorMode.current() === true) { // RGB with Color
         var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       } else { // RGB without Color
         var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
@@ -2413,6 +2413,10 @@
       onOpen: function() { colorDistZoom = 0; }
     });
     var processKeyDown = function(e) {
+      if (e.keyCode == 81/* q */) {
+        colorMode.set(!colorMode.current());
+        return false;
+      }
       return compareUtil.processKeyDownEvent(e, {
         zoomIn: function() { zoomColorDist(0.25); return false; },
         zoomOut: function() { zoomColorDist(-0.25); return false; },
