@@ -1518,6 +1518,7 @@
       $('#infoLastModified') ];
     var unknown = [null, '‐'];
     var makeTableValue = function(img) {
+      var orientation = compareUtil.orientationUtil.toString(img.orientation);
       return [
         [null, makeImageNameWithIndex('<span>', img) ],
         [null, img.format !== '' ? img.format : '-'],
@@ -1525,7 +1526,7 @@
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
-        [compareUtil.orientationUtil.toString(img.orientation), compareUtil.orientationUtil.toString(img.orientation)],
+        [orientation, orientation],
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
