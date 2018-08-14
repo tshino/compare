@@ -1521,7 +1521,7 @@
       var orientation = compareUtil.orientationUtil.toString(img.orientation);
       var orientationExpr = img.orientation ? $('<span>').append(
         $('<img src="res/orientation.svg" width="30">').css({
-          verticalAlign: 'bottom',
+          verticalAlign: '-8px',
           transform: img.orientationAsCSS
         }),
         $('<span>').text('(' + orientation + ')')
