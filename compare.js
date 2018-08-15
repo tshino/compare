@@ -1137,7 +1137,7 @@
         figureZoom.disable();
       }
     };
-    var showDialog = function(target, parent, update, onclose) {
+    var showDialog = function(target, parent, update, onclose, initialFocus) {
       dialog = {
         element: target,
         close: parent || hideDialog,
@@ -1145,7 +1145,8 @@
         onclose: onclose
       };
       target.css({ display: 'block' });
-      target.children().find('.dummyFocusTarget').focus();
+      initialFocus = initialFocus || target.children().find('.dummyFocusTarget');
+      initialFocus.focus();
     };
     var initFigureZoom = function(options) {
       if (options.enableZoom) {
@@ -1219,7 +1220,7 @@
           if (update) {
             update();
           }
-          showDialog(target, parent, update, options.onClose);
+          showDialog(target, parent, update, options.onClose, options.initialFocus);
           target.children().css({ position: '', left: '', top: '' });
         }
       };
@@ -1490,6 +1491,30 @@
     );
     return {
       hasCameraAPI: hasCameraAPI,
+      toggle: toggle
+    };
+  })();
+  // Clipboard
+  var clipboardReceiver = (function() {
+    $('#pasteArea').on('paste', function(e) {
+      //console.log(e);
+      var evt = e.originalEvent;
+      var data = e.originalEvent.clipboardData || window.clipboardData;
+      //console.log(data.types);
+      //console.log(data.items);
+      if (data.files && 0 < data.files.length) {
+        //console.log(data.files);
+        addFiles(data.files);
+      }
+      return false;
+    });
+    var toggle = dialogUtil.defineDialog(
+      $('#clipboardReceiver'),
+      null,
+      null,
+      { initialFocus: $('#pasteArea') }
+    );
+    return {
       toggle: toggle
     };
   })();
