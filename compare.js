@@ -1498,7 +1498,6 @@
   var clipboardReceiver = (function() {
     $('#pasteArea').on('paste', function(e) {
       //console.log(e);
-      var evt = e.originalEvent;
       var data = e.originalEvent.clipboardData || window.clipboardData;
       //console.log(data.types);
       //console.log(data.items);
