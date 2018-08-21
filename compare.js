@@ -2267,7 +2267,7 @@
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     var processKeyDown = function(e) {
-      if (e.keyCode == 81/* q */) {
+      if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
         return false;
       }
@@ -2445,7 +2445,7 @@
       onOpen: function() { colorDistZoom = 0; }
     });
     var processKeyDown = function(e) {
-      if (e.keyCode == 81/* q */) {
+      if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
         return false;
       }
