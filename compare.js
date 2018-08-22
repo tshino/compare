@@ -733,7 +733,9 @@
     };
     return {
       toggle: toggle,
+      isEnabled: function() { return enableGrid; },
       setInterval: setInterval,
+      makeGrid: makeGrid,
       onUpdateImageBox: onUpdateImageBox,
       onUpdateTransform: onUpdateTransform
     };
@@ -3039,8 +3041,13 @@
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       var picture = $(fig.canvas).css(styles.style).addClass('figMain');
       var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
+      var overlayGrid = grid.isEnabled() && grid.makeGrid(w, h).css(styles.style);
       var popup = $('<div>').append($('<span>')).css(styles.style);
-      $('#opticalFlowResult').append(picture).append(overlay).append(popup).css(styles.cellStyle);
+      $('#opticalFlowResult').append(picture);
+      if (overlayGrid) {
+        $('#opticalFlowResult').append(overlayGrid);
+      }
+      $('#opticalFlowResult').append(overlay).append(popup).css(styles.cellStyle);
     };
     var updateStatistics = function() {
       if (opticalFlowResult.result.points.length === 0) {
