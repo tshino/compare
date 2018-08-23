@@ -3260,6 +3260,10 @@
       diffResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
+      var overlayGrid = grid.isEnabled() && grid.makeGrid(w, h).css(styles.style);
+      if (overlayGrid) {
+        $('#diffResult').append(overlayGrid);
+      }
       if (diffResult.result.summary.unmatch === 0) {
         textUtil.setText($('#diffSummary'), {
           en: 'Perfect match',
@@ -3333,7 +3337,7 @@
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (diffResult.result !== null) {
-          $('#diffResult canvas').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+          $('#diffResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
         }
       } else {
         updateTableDOM();
