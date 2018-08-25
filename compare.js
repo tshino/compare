@@ -3041,11 +3041,11 @@
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       var picture = $(fig.canvas).css(styles.style).addClass('figMain');
       var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
-      var overlayGrid = grid.isEnabled() && grid.makeGrid(w, h).css(styles.style);
+      opticalFlowResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
       var popup = $('<div>').append($('<span>')).css(styles.style);
       $('#opticalFlowResult').append(picture);
-      if (overlayGrid) {
-        $('#opticalFlowResult').append(overlayGrid);
+      if (opticalFlowResult.grid) {
+        $('#opticalFlowResult').append(opticalFlowResult.grid);
       }
       $('#opticalFlowResult').append(overlay).append(popup).css(styles.cellStyle);
     };
@@ -3260,9 +3260,9 @@
       diffResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
-      var overlayGrid = grid.isEnabled() && grid.makeGrid(w, h).css(styles.style);
-      if (overlayGrid) {
-        $('#diffResult').append(overlayGrid);
+      diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
+      if (diffResult.grid) {
+        $('#diffResult').append(diffResult.grid);
       }
       if (diffResult.result.summary.unmatch === 0) {
         textUtil.setText($('#diffSummary'), {
