@@ -712,15 +712,15 @@
     var onUpdateImageBox = function(img, w, h) {
       onUpdateLayoutImpl(enableGrid, img, w, h);
     };
-    var updateGridStyle = function(ent, commonStyle) {
-      var base = 0.5 * ent.width / (ent.baseWidth * viewZoom.scale);
+    var updateGridStyle = function(grid, width, baseWidth, scale, commonStyle) {
+      var base = 0.5 * width / (baseWidth * scale);
       var strokeWidth = [
           (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
           (base > 0.5 ? 0 : 1) * base];
       var opacity = [
           0.6,
           base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
-      $(ent.grid).css(commonStyle).find('path').each(function(index) {
+      $(grid).css(commonStyle || {}).find('path').each(function(index) {
         $(this).
             attr('stroke-width', strokeWidth[index]).
             attr('opacity', opacity[index]);
@@ -728,7 +728,7 @@
     };
     var onUpdateTransform = function(ent, commonStyle) {
       if (ent.grid) {
-        updateGridStyle(ent, commonStyle);
+        updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
       }
     };
     return {
@@ -736,6 +736,7 @@
       isEnabled: function() { return enableGrid; },
       setInterval: setInterval,
       makeGrid: makeGrid,
+      updateGridStyle: updateGridStyle,
       onUpdateImageBox: onUpdateImageBox,
       onUpdateTransform: onUpdateTransform
     };
@@ -3046,6 +3047,7 @@
       $('#opticalFlowResult').append(picture);
       if (opticalFlowResult.grid) {
         $('#opticalFlowResult').append(opticalFlowResult.grid);
+        updateGridStyle();
       }
       $('#opticalFlowResult').append(overlay).append(popup).css(styles.cellStyle);
     };
@@ -3103,11 +3105,21 @@
         updateReport(styles);
       }
     };
+    var updateGridStyle = function() {
+      if (opticalFlowResult.result !== null && opticalFlowResult.grid) {
+        grid.updateGridStyle(
+          opticalFlowResult.grid,
+          opticalFlowResult.result.image.width,
+          opticalFlowResult.baseWidth,
+          figureZoom.scale);
+      }
+    };
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (opticalFlowResult.result !== null) {
           $('#opticalFlowResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
           $('#opticalFlowResult > div > span').css({ transform: 'scale(' + (1 / figureZoom.scale) + ')' });
+          updateGridStyle();
         }
       } else {
         updateTableDOM();
