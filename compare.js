@@ -3275,6 +3275,7 @@
       diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
       if (diffResult.grid) {
         $('#diffResult').append(diffResult.grid);
+        updateGridStyle();
       }
       if (diffResult.result.summary.unmatch === 0) {
         textUtil.setText($('#diffSummary'), {
@@ -3346,10 +3347,20 @@
         updateReport(styles);
       }
     };
+    var updateGridStyle = function() {
+      if (diffResult.result !== null && diffResult.grid) {
+        grid.updateGridStyle(
+          diffResult.grid,
+          diffResult.result.image.width,
+          diffResult.baseWidth,
+          figureZoom.scale);
+      }
+    };
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (diffResult.result !== null) {
           $('#diffResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
+          updateGridStyle();
         }
       } else {
         updateTableDOM();
