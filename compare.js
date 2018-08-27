@@ -182,7 +182,7 @@
     // 'n' (110)
     110 : { global: false, func: roiMap.toggle },
     // 'g' (103)
-    103 : { global: false, func: grid.toggle },
+    103 : { global: true, func: grid.toggle },
     // 'p' (112)
     112 : { global: false, func: crossCursor.toggle },
     // 'q' (113)
@@ -664,10 +664,14 @@
     var enableGrid = false;
     var mainGridInterval = 100;
     var auxGridInterval = 10;
+    var onChangeCallback = null;
     var toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
       updateLayout();
+      if (onChangeCallback) {
+        onChangeCallback();
+      }
     };
     var setInterval = function(main, aux) {
       if (mainGridInterval !== main || auxGridInterval !== aux) {
@@ -682,7 +686,13 @@
         if (updateLayout) {
           updateLayout();
         }
+        if (onChangeCallback) {
+          onChangeCallback();
+        }
       }
+    };
+    var setOnChange = function(onchange) {
+      onChangeCallback = onchange;
     };
     var makePathDesc = function(size, step, skip) {
       var desc = '';
@@ -735,6 +745,7 @@
       toggle: toggle,
       isEnabled: function() { return enableGrid; },
       setInterval: setInterval,
+      setOnChange: setOnChange,
       makeGrid: makeGrid,
       updateGridStyle: updateGridStyle,
       onUpdateImageBox: onUpdateImageBox,
@@ -3136,7 +3147,9 @@
       enableZoom: true,
       getBaseSize: function() {
         return opticalFlowResult ? { w: opticalFlowResult.baseWidth, h: opticalFlowResult.baseHeight } : null;
-      }
+      },
+      onOpen: function() { grid.setOnChange(updateTable); },
+      onClose: function() { grid.setOnChange(null); }
     });
     return {
       processClick: processClick,
@@ -3382,7 +3395,9 @@
       enableZoom: true,
       getBaseSize: function() {
         return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
-      }
+      },
+      onOpen: function() { grid.setOnChange(updateTable); },
+      onClose: function() { grid.setOnChange(null); }
     });
     return {
       onRemoveEntry: onRemoveEntry,
