@@ -2896,6 +2896,7 @@
   var opticalFlowDialog = (function() {
     var opticalFlowResult = {};
     var pointedVector = null;
+    $('#opticalFlowGridBtn').click(grid.toggle);
     $('#opticalFlow').on('mousemove', 'td.fig > *', function(e) {
       if (opticalFlowResult.result !== null) {
         var point = figureZoom.positionFromMouseEvent(e, this, null);
@@ -3094,6 +3095,10 @@
         });
       }
     };
+    var updateHeader = function() {
+      var gridbtn = $('#opticalFlowGridBtn');
+      grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
+    };
     var updateTableDOM = function() {
       if (false === updateOptionsDOM()) {
         return;
@@ -3133,6 +3138,7 @@
           updateGridStyle();
         }
       } else {
+        updateHeader();
         updateTableDOM();
       }
     };
