@@ -97,7 +97,6 @@ button:hover span.tooltip
 }
 #statusbar
 {
-    overflow        : scroll hidden;
     background      : #ccc;
     color           : #444;
 }
