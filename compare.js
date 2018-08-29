@@ -3176,6 +3176,7 @@
       offsetX: 0,
       offsetY: 0
     };
+    $('#diffGridBtn').click(grid.toggle);
     $('#diffIgnoreAE').on('change', function(e) {
       diffOptions.ignoreAE = +this.value;
       updateTable();
@@ -3340,6 +3341,10 @@
         return false;
       });
     };
+    var updateHeader = function() {
+      var gridbtn = $('#diffGridBtn');
+      grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
+    };
     var updateTableDOM = function() {
       if (false === updateOptionsDOM()) {
         return;
@@ -3382,6 +3387,7 @@
           updateGridStyle();
         }
       } else {
+        updateHeader();
         updateTableDOM();
       }
     };
