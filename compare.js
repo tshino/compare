@@ -3234,7 +3234,7 @@
       }
       var a = entries[baseImageIndex];
       var b = entries[targetImageIndex];
-      if (a.width === b.width && a.height === b.height) {
+      if (a.canvasWidth === b.canvasWidth && a.canvasHeight === b.canvasHeight) {
         $('.diffDimension').css({display:'none'});
       } else {
         $('.diffDimension').css({display:''});
