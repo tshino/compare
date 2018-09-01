@@ -92,6 +92,26 @@
       j += (src.pitch - w) * ch;
     }
   };
+  var rotate = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
+    if (dest.channels !== src.channels) {
+      return;
+    }
+    var dw = Math.min(dest.width, src.height), dh = Math.min(dest.height, src.width);
+    var ch = src.channels;
+    var i = dest.offset * ch, j0 = src.offset * ch;
+    for (var y = 0; y < dh; y++) {
+      var j = j0 + (src.pitch * (dw - 1) + y) * ch;
+      for (var x = 0; x < dw; x++, i += ch, j -= src.pitch * ch) {
+        dest.data[i] = src.data[j];
+        dest.data[i+1] = src.data[j+1];
+        dest.data[i+2] = src.data[j+2];
+        dest.data[i+3] = src.data[j+3];
+      }
+      i += (dest.pitch - dw) * ch;
+    }
+  };
   var readSubPixel = function(src, left, top, width, height) {
     src = makeImage(src);
     var region = makeImage(width, height, FORMAT_F32x1);
@@ -1501,6 +1521,7 @@
     makeRegion:     makeRegion,
     fill:           fill,
     copy:           copy,
+    rotate:         rotate,
     readSubPixel:   readSubPixel,
     convertToGrayscale: convertToGrayscale,
     resize:         resize,
