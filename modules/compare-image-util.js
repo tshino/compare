@@ -132,6 +132,26 @@
       j += (src.pitch + w) * ch;
     }
   };
+  var flipV = function(dest, src) {
+    dest = makeImage(dest);
+    src = makeImage(src);
+    if (dest.channels !== src.channels) {
+      return;
+    }
+    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    var ch = src.channels;
+    var i = dest.offset * ch, j = (src.offset + src.pitch * (h - 1)) * ch;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += ch, j += ch) {
+        dest.data[i] = src.data[j];
+        dest.data[i+1] = src.data[j+1];
+        dest.data[i+2] = src.data[j+2];
+        dest.data[i+3] = src.data[j+3];
+      }
+      i += (dest.pitch - w) * ch;
+      j -= (src.pitch + w) * ch;
+    }
+  };
   var readSubPixel = function(src, left, top, width, height) {
     src = makeImage(src);
     var region = makeImage(width, height, FORMAT_F32x1);
@@ -1543,6 +1563,7 @@
     copy:           copy,
     rotate:         rotate,
     flipH:          flipH,
+    flipV:          flipV,
     readSubPixel:   readSubPixel,
     convertToGrayscale: convertToGrayscale,
     resize:         resize,
