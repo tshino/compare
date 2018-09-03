@@ -516,6 +516,26 @@ TEST( 'compareImageUtil rotate', function test() {
   ], image2.data );
 });
 
+TEST( 'compareImageUtil flipH', function test() {
+  var imageData = { width: 3, height: 5, data: [] };
+  for (var i = 0; i < 60; ++i) {
+    imageData.data[i] = i;
+  }
+  var image1 = compareImageUtil.makeImage(imageData);
+  var image2 = compareImageUtil.makeImage(3, 5);
+  compareImageUtil.flipH(image2, image1);
+
+  EXPECT_EQ( 3, image2.width );
+  EXPECT_EQ( 5, image2.height );
+  jsTestUtil.expectEqualArray( [
+    8,9,10,11, 4,5,6,7, 0,1,2,3,
+    20,21,22,23, 16,17,18,19, 12,13,14,15,
+    32,33,34,35, 28,29,30,31, 24,25,26,27,
+    44,45,46,47, 40,41,42,43, 36,37,38,39,
+    56,57,58,59, 52,53,54,55, 48,49,50,51
+  ], image2.data );
+});
+
 TEST( 'compareImageUtil copy F32', function test() {
   var image1 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
   for (var i = 0; i < 16; ++i) {
