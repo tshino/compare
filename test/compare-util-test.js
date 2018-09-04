@@ -161,6 +161,7 @@ TEST( 'compareUtil orientationUtil toString', function test() {
   EXPECT_EQ( 'RightBottom', toString(7) );
   EXPECT_EQ( 'LeftBottom', toString(8) );
   EXPECT_EQ( 'Invalid', toString(9) );
+  EXPECT_EQ( 'Invalid', toString(0) );
   EXPECT_EQ( '‐', toString(null) );
 });
 TEST( 'compareUtil orientationUtil isTransposed', function test() {
@@ -174,6 +175,7 @@ TEST( 'compareUtil orientationUtil isTransposed', function test() {
   EXPECT_EQ( true, isTransposed(7) );
   EXPECT_EQ( true, isTransposed(8) );
   EXPECT_EQ( false, isTransposed(9) );
+  EXPECT_EQ( false, isTransposed(0) );
   EXPECT_EQ( false, isTransposed(null) );
 });
 TEST( 'compareUtil orientationUtil getCSSTransform', function test() {
@@ -187,6 +189,7 @@ TEST( 'compareUtil orientationUtil getCSSTransform', function test() {
   EXPECT_EQ( ' scale(-1,1) rotate(-90deg)', getCSSTransform(7) );
   EXPECT_EQ( ' rotate(-90deg)', getCSSTransform(8) );
   EXPECT_EQ( '', getCSSTransform(9) );
+  EXPECT_EQ( '', getCSSTransform(0) );
   EXPECT_EQ( '', getCSSTransform(null) );
 });
 TEST( 'compareUtil orientationUtil interpretXY', function test() {
@@ -209,6 +212,8 @@ TEST( 'compareUtil orientationUtil interpretXY', function test() {
   EXPECT_EQ( 10, interpretXY(8, 30, 40, 10, 5).y );
   EXPECT_EQ( 10, interpretXY(9, 40, 30, 10, 5).x );
   EXPECT_EQ( 5, interpretXY(9, 40, 30, 10, 5).y );
+  EXPECT_EQ( 10, interpretXY(0, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY(0, 40, 30, 10, 5).y );
   EXPECT_EQ( 10, interpretXY(null, 40, 30, 10, 5).x );
   EXPECT_EQ( 5, interpretXY(null, 40, 30, 10, 5).y );
 });

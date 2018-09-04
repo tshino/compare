@@ -766,7 +766,7 @@
   };
   var orientationUtil = (function() {
     var stringTable = [
-      'Undefined',
+      undefined,
       'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
       'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
     var cssTable = {
@@ -779,7 +779,7 @@
       8: { transposed: true,  transform: ' rotate(-90deg)' }
     };
     var toString = function(orientation) {
-      return orientation ? (stringTable[orientation] || 'Invalid') : '‐';
+      return orientation !== null ? (stringTable[orientation] || 'Invalid') : '‐';
     };
     var isTransposed = function(orientation) {
       var o = cssTable[orientation] || { transposed: false, transform: '' };
