@@ -157,12 +157,12 @@
     var transposed = [5,6,7,8].indexOf(orientation) >= 0;
     var w = src.width, h = src.height, format = src.format;
     var dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
-    var temp = makeImage(w, h, format);
     switch (orientation) {
       case 2:
         flipH(dest, src);
         break;
       case 3:
+        var temp = makeImage(w, h, format);
         flipH(temp, src);
         flipV(dest, temp);
         break;
@@ -170,16 +170,24 @@
         flipV(dest, src);
         break;
       case 5:
+        var temp = makeImage(w, h, format);
         flipH(temp, src);
+        rotate(dest, temp);
+        rotate(temp, dest);
         rotate(dest, temp);
         break;
       case 6:
-        rotate(dest, temp);
+        rotate(dest, src);
         break;
       case 7:
+        var temp = makeImage(w, h, format);
+        flipH(temp, src);
         rotate(dest, temp);
         break;
       case 8:
+        var temp = makeImage(w, h, format);
+        rotate(dest, src);
+        rotate(temp, dest);
         rotate(dest, temp);
         break;
       default:

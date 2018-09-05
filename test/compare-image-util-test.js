@@ -556,6 +556,74 @@ TEST( 'compareImageUtil flipV', function test() {
   ], image2.data );
 });
 
+TEST( 'compareImageUtil applyOrientation', function test() {
+  var src = compareImageUtil.makeImage({ width: 2, height: 3, data: [
+    0,1,2,3,     4,5,6,7,
+    8,9,10,11,   12,13,14,15,
+    16,17,18,19, 20,21,22,23
+  ]});
+  var result1 = compareImageUtil.applyOrientation(src, 1);
+  EXPECT_EQ( 2, result1.width );
+  EXPECT_EQ( 3, result1.height );
+  jsTestUtil.expectEqualArray( [
+    0,1,2,3,     4,5,6,7,
+    8,9,10,11,   12,13,14,15,
+    16,17,18,19, 20,21,22,23
+  ], result1.data );
+  var result2 = compareImageUtil.applyOrientation(src, 2);
+  EXPECT_EQ( 2, result2.width );
+  EXPECT_EQ( 3, result2.height );
+  jsTestUtil.expectEqualArray( [
+    4,5,6,7,     0,1,2,3,
+    12,13,14,15, 8,9,10,11,
+    20,21,22,23, 16,17,18,19
+  ], result2.data );
+  var result3 = compareImageUtil.applyOrientation(src, 3);
+  EXPECT_EQ( 2, result3.width );
+  EXPECT_EQ( 3, result3.height );
+  jsTestUtil.expectEqualArray( [
+    20,21,22,23, 16,17,18,19,
+    12,13,14,15, 8,9,10,11,
+    4,5,6,7,     0,1,2,3
+  ], result3.data );
+  var result4 = compareImageUtil.applyOrientation(src, 4);
+  EXPECT_EQ( 2, result4.width );
+  EXPECT_EQ( 3, result4.height );
+  jsTestUtil.expectEqualArray( [
+    16,17,18,19, 20,21,22,23,
+    8,9,10,11,   12,13,14,15,
+    0,1,2,3,     4,5,6,7
+  ], result4.data );
+  var result5 = compareImageUtil.applyOrientation(src, 5);
+  EXPECT_EQ( 3, result5.width );
+  EXPECT_EQ( 2, result5.height );
+  jsTestUtil.expectEqualArray( [
+    0,1,2,3, 8,9,10,11,   16,17,18,19,
+    4,5,6,7, 12,13,14,15, 20,21,22,23
+  ], result5.data );
+  var result6 = compareImageUtil.applyOrientation(src, 6);
+  EXPECT_EQ( 3, result6.width );
+  EXPECT_EQ( 2, result6.height );
+  jsTestUtil.expectEqualArray( [
+    16,17,18,19, 8,9,10,11,   0,1,2,3,
+    20,21,22,23, 12,13,14,15, 4,5,6,7
+  ], result6.data );
+  var result7 = compareImageUtil.applyOrientation(src, 7);
+  EXPECT_EQ( 3, result7.width );
+  EXPECT_EQ( 2, result7.height );
+  jsTestUtil.expectEqualArray( [
+    20,21,22,23, 12,13,14,15, 4,5,6,7,
+    16,17,18,19, 8,9,10,11,   0,1,2,3
+  ], result7.data );
+  var result8 = compareImageUtil.applyOrientation(src, 8);
+  EXPECT_EQ( 3, result8.width );
+  EXPECT_EQ( 2, result8.height );
+  jsTestUtil.expectEqualArray( [
+    4,5,6,7, 12,13,14,15, 20,21,22,23,
+    0,1,2,3, 8,9,10,11,   16,17,18,19
+  ], result8.data );
+});
+
 TEST( 'compareImageUtil copy F32', function test() {
   var image1 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
   for (var i = 0; i < 16; ++i) {
