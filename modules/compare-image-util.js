@@ -152,6 +152,41 @@
       j -= (src.pitch + w) * ch;
     }
   };
+  var applyOrientation = function(src, orientation) {
+    src = makeImage(src);
+    var transposed = [5,6,7,8].indexOf(orientation) >= 0;
+    var w = src.width, h = src.height, format = src.format;
+    var dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
+    var temp = makeImage(w, h, format);
+    switch (orientation) {
+      case 2:
+        flipH(dest, src);
+        break;
+      case 3:
+        flipH(temp, src);
+        flipV(dest, temp);
+        break;
+      case 4:
+        flipV(dest, src);
+        break;
+      case 5:
+        flipH(temp, src);
+        rotate(dest, temp);
+        break;
+      case 6:
+        rotate(dest, temp);
+        break;
+      case 7:
+        rotate(dest, temp);
+        break;
+      case 8:
+        rotate(dest, temp);
+        break;
+      default:
+        copy(dest, src);
+    }
+    return dest;
+  };
   var readSubPixel = function(src, left, top, width, height) {
     src = makeImage(src);
     var region = makeImage(width, height, FORMAT_F32x1);
@@ -1564,6 +1599,7 @@
     rotate:         rotate,
     flipH:          flipH,
     flipV:          flipV,
+    applyOrientation:   applyOrientation,
     readSubPixel:   readSubPixel,
     convertToGrayscale: convertToGrayscale,
     resize:         resize,
