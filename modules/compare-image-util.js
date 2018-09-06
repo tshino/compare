@@ -155,43 +155,22 @@
   var applyOrientation = function(src, orientation) {
     src = makeImage(src);
     var transposed = [5,6,7,8].indexOf(orientation) >= 0;
-    var w = src.width, h = src.height, format = src.format;
+    var w = src.width, h = src.height, format = src.format, ch = src.channels;
     var dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
-    switch (orientation) {
-      case 2:
-        flipH(dest, src);
-        break;
-      case 3:
-        var temp = makeImage(w, h, format);
-        flipH(temp, src);
-        flipV(dest, temp);
-        break;
-      case 4:
-        flipV(dest, src);
-        break;
-      case 5:
-        var temp = makeImage(w, h, format);
-        flipH(temp, src);
-        rotate(dest, temp);
-        rotate(temp, dest);
-        rotate(dest, temp);
-        break;
-      case 6:
-        rotate(dest, src);
-        break;
-      case 7:
-        var temp = makeImage(w, h, format);
-        flipH(temp, src);
-        rotate(dest, temp);
-        break;
-      case 8:
-        var temp = makeImage(w, h, format);
-        rotate(dest, src);
-        rotate(temp, dest);
-        rotate(dest, temp);
-        break;
-      default:
-        copy(dest, src);
+    orientation = [2,3,4,5,6,7,8].indexOf(orientation) >= 0 ? orientation : 1;
+    var idx = ch * [1, -1, -1, 1, dest.pitch, dest.pitch, -dest.pitch, -dest.pitch][orientation - 1];
+    var idy = ch * [dest.pitch, dest.pitch, -dest.pitch, -dest.pitch, 1, -1, -1, 1][orientation - 1];
+    var i = ch * dest.offset + (idx < 0 ? idx * (1 - w) : 0) + (idy < 0 ? idy * (1 - h) : 0);
+    var j = ch * src.offset;
+    for (var y = 0; y < h; y++) {
+      for (var x = 0; x < w; x++, i += idx, j += ch) {
+        dest.data[i] = src.data[j];
+        dest.data[i+1] = src.data[j+1];
+        dest.data[i+2] = src.data[j+2];
+        dest.data[i+3] = src.data[j+3];
+      }
+      i += idy - w * idx;
+      j += (src.pitch - w) * ch;
     }
     return dest;
   };
