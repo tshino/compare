@@ -667,6 +667,12 @@ function calcDiff( a, b, options ) {
     summary.countIgnoreAE += countIgnoreAE;
     summary.total += w * h;
   };
+  if (options.orientationA && options.orientationA !== 1) {
+    a = compareImageUtil.applyOrientation(a, options.orientationA);
+  }
+  if (options.orientationB && options.orientationB !== 1) {
+    b = compareImageUtil.applyOrientation(b, options.orientationB);
+  }
   var minW = Math.min(a.width, b.width);
   var minH = Math.min(a.height, b.height);
   var maxW = Math.max(a.width, b.width);

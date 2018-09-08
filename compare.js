@@ -3234,7 +3234,7 @@
       }
       var a = entries[baseImageIndex];
       var b = entries[targetImageIndex];
-      if (a.canvasWidth === b.canvasWidth && a.canvasHeight === b.canvasHeight) {
+      if (a.width === b.width && a.height === b.height) {
         $('.diffDimension').css({display:'none'});
       } else {
         $('.diffDimension').css({display:''});
@@ -3266,7 +3266,9 @@
             resizeToLarger: diffOptions.resizeToLarger,
             resizeMethod: diffOptions.resizeMethod,
             offsetX: diffOptions.offsetX,
-            offsetY: diffOptions.offsetY
+            offsetY: diffOptions.offsetY,
+            orientationA: entries[baseImageIndex].orientation,
+            orientationB: entries[targetImageIndex].orientation,
           }
         }, attachImageDataToTask);
       }
