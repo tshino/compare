@@ -624,6 +624,28 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   ], result8.data );
 });
 
+TEST( 'compareImageUtil applyOrientation F32', function test() {
+  var src = compareImageUtil.makeImage(2, 3, compareImageUtil.FORMAT_F32x1);
+  for (var i = 0; i < 6; ++i) {
+    src.data[i] = i;
+  }
+  var result1 = compareImageUtil.applyOrientation(src, 1);
+  EXPECT_EQ( 2, result1.width );
+  EXPECT_EQ( 3, result1.height );
+  EXPECT_EQ( 1, result1.channels );
+  jsTestUtil.expectEqualArray( [ 0, 1, 2, 3, 4, 5 ], result1.data );
+  var result2 = compareImageUtil.applyOrientation(src, 2);
+  EXPECT_EQ( 2, result2.width );
+  EXPECT_EQ( 3, result2.height );
+  EXPECT_EQ( 1, result2.channels );
+  jsTestUtil.expectEqualArray( [ 1, 0, 3, 2, 5, 4 ], result2.data );
+  var result3 = compareImageUtil.applyOrientation(src, 3);
+  EXPECT_EQ( 2, result3.width );
+  EXPECT_EQ( 3, result3.height );
+  EXPECT_EQ( 1, result3.channels );
+  jsTestUtil.expectEqualArray( [ 5, 4, 3, 2, 1, 0 ], result3.data );
+});
+
 TEST( 'compareImageUtil copy F32', function test() {
   var image1 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
   for (var i = 0; i < 16; ++i) {

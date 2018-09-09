@@ -164,10 +164,9 @@
     var j = ch * src.offset;
     for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += idx, j += ch) {
-        dest.data[i] = src.data[j];
-        dest.data[i+1] = src.data[j+1];
-        dest.data[i+2] = src.data[j+2];
-        dest.data[i+3] = src.data[j+3];
+        for (var k = 0; k < ch; k++) {
+          dest.data[i + k] = src.data[j + k];
+        }
       }
       i += idy - w * idx;
       j += (src.pitch - w) * ch;
