@@ -93,70 +93,31 @@
     }
   };
   var rotate = function(dest, src) {
-    dest = makeImage(dest);
-    src = makeImage(src);
-    if (dest.channels !== src.channels) {
-      return;
-    }
-    var dw = Math.min(dest.width, src.height), dh = Math.min(dest.height, src.width);
-    var ch = src.channels;
-    var i = dest.offset * ch, j = (src.offset + src.pitch * (dw - 1)) * ch;
-    for (var y = 0; y < dh; y++) {
-      for (var x = 0; x < dw; x++, i += ch, j -= src.pitch * ch) {
-        dest.data[i] = src.data[j];
-        dest.data[i+1] = src.data[j+1];
-        dest.data[i+2] = src.data[j+2];
-        dest.data[i+3] = src.data[j+3];
-      }
-      i += (dest.pitch - dw) * ch;
-      j += (src.pitch * dw + 1) * ch;
-    }
+    applyOrientationImpl(dest, src, 6);
   };
   var flipH = function(dest, src) {
-    dest = makeImage(dest);
-    src = makeImage(src);
-    if (dest.channels !== src.channels) {
-      return;
-    }
-    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var ch = src.channels;
-    var i = dest.offset * ch, j = (src.offset + w - 1) * ch;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, j -= ch) {
-        dest.data[i] = src.data[j];
-        dest.data[i+1] = src.data[j+1];
-        dest.data[i+2] = src.data[j+2];
-        dest.data[i+3] = src.data[j+3];
-      }
-      i += (dest.pitch - w) * ch;
-      j += (src.pitch + w) * ch;
-    }
+    applyOrientationImpl(dest, src, 2);
   };
   var flipV = function(dest, src) {
-    dest = makeImage(dest);
-    src = makeImage(src);
-    if (dest.channels !== src.channels) {
-      return;
-    }
-    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var ch = src.channels;
-    var i = dest.offset * ch, j = (src.offset + src.pitch * (h - 1)) * ch;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, j += ch) {
-        dest.data[i] = src.data[j];
-        dest.data[i+1] = src.data[j+1];
-        dest.data[i+2] = src.data[j+2];
-        dest.data[i+3] = src.data[j+3];
-      }
-      i += (dest.pitch - w) * ch;
-      j -= (src.pitch + w) * ch;
-    }
+    applyOrientationImpl(dest, src, 4);
   };
   var applyOrientation = function(src, orientation) {
+    return applyOrientationImpl(null, src, orientation);
+  };
+  var applyOrientationImpl = function(dest, src, orientation) {
     src = makeImage(src);
     var transposed = [5,6,7,8].indexOf(orientation) >= 0;
     var w = src.width, h = src.height, format = src.format, ch = src.channels;
-    var dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
+    if (dest) {
+      dest = makeImage(dest);
+      if (ch !== dest.channels) {
+        return;
+      }
+      w = Math.min(w, transposed ? dest.height : dest.width);
+      h = Math.min(h, transposed ? dest.width : dest.height);
+    } else {
+      dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
+    }
     orientation = [2,3,4,5,6,7,8].indexOf(orientation) >= 0 ? orientation : 1;
     var idx = ch * [1, -1, -1, 1, dest.pitch, dest.pitch, -dest.pitch, -dest.pitch][orientation - 1];
     var idy = ch * [dest.pitch, dest.pitch, -dest.pitch, -dest.pitch, 1, -1, -1, 1][orientation - 1];
