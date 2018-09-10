@@ -92,8 +92,11 @@
       j += (src.pitch - w) * ch;
     }
   };
-  var rotate = function(dest, src) {
+  var rotateCW = function(dest, src) {
     applyOrientationImpl(dest, src, 6);
+  };
+  var rotateCCW = function(dest, src) {
+    applyOrientationImpl(dest, src, 8);
   };
   var flipH = function(dest, src) {
     applyOrientationImpl(dest, src, 2);
@@ -1543,7 +1546,8 @@
     makeRegion:     makeRegion,
     fill:           fill,
     copy:           copy,
-    rotate:         rotate,
+    rotateCW:       rotateCW,
+    rotateCCW:      rotateCCW,
     flipH:          flipH,
     flipV:          flipV,
     applyOrientation:   applyOrientation,

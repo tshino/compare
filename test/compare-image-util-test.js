@@ -498,14 +498,14 @@ TEST( 'compareImageUtil copy', function test() {
   ], image2.data );
 });
 
-TEST( 'compareImageUtil rotate', function test() {
+TEST( 'compareImageUtil rotateCW', function test() {
   var imageData = { width: 3, height: 5, data: [] };
   for (var i = 0; i < 60; ++i) {
     imageData.data[i] = i;
   }
   var image1 = compareImageUtil.makeImage(imageData);
   var image2 = compareImageUtil.makeImage(5, 3);
-  compareImageUtil.rotate(image2, image1);
+  compareImageUtil.rotateCW(image2, image1);
 
   EXPECT_EQ( 5, image2.width );
   EXPECT_EQ( 3, image2.height );
@@ -513,6 +513,24 @@ TEST( 'compareImageUtil rotate', function test() {
     48,49,50,51, 36,37,38,39, 24,25,26,27, 12,13,14,15, 0,1,2,3,
     52,53,54,55, 40,41,42,43, 28,29,30,31, 16,17,18,19, 4,5,6,7,
     56,57,58,59, 44,45,46,47, 32,33,34,35, 20,21,22,23, 8,9,10,11
+  ], image2.data );
+});
+
+TEST( 'compareImageUtil rotateCCW', function test() {
+  var imageData = { width: 3, height: 5, data: [] };
+  for (var i = 0; i < 60; ++i) {
+    imageData.data[i] = i;
+  }
+  var image1 = compareImageUtil.makeImage(imageData);
+  var image2 = compareImageUtil.makeImage(5, 3);
+  compareImageUtil.rotateCCW(image2, image1);
+
+  EXPECT_EQ( 5, image2.width );
+  EXPECT_EQ( 3, image2.height );
+  jsTestUtil.expectEqualArray( [
+    8,9,10,11,20,21,22,23, 32,33,34,35, 44,45,46,47, 56,57,58,59,
+    4,5,6,7,  16,17,18,19, 28,29,30,31, 40,41,42,43, 52,53,54,55,
+    0,1,2,3,  12,13,14,15, 24,25,26,27, 36,37,38,39, 48,49,50,51
   ], image2.data );
 });
 
