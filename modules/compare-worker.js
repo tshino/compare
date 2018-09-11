@@ -44,7 +44,7 @@ self.addEventListener('message', function(e) {
     result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type);
     break;
   case 'calcOpticalFlow':
-    result.result = calcOpticalFlow(data.imageData[0], data.imageData[1]);
+    result.result = calcOpticalFlow(data.imageData[0], data.imageData[1], data.options);
     break;
   case 'calcDiff':
     result.result = calcDiff(data.imageData[0], data.imageData[1], data.options);
@@ -577,9 +577,15 @@ var calcToneCurve = function(a, b, type) {
   return result;
 };
 
-function calcOpticalFlow( a, b ) {
+function calcOpticalFlow( a, b, options ) {
   a = compareImageUtil.makeImage(a);
   b = compareImageUtil.makeImage(b);
+  if (options.orientationA && options.orientationA !== 1) {
+    a = compareImageUtil.applyOrientation(a, options.orientationA);
+  }
+  if (options.orientationB && options.orientationB !== 1) {
+    b = compareImageUtil.applyOrientation(b, options.orientationB);
+  }
   var w = Math.min(a.width, b.width);
   var h = Math.min(a.height, b.height);
   if (a.width !== w || a.height !== h) {

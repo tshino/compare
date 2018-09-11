@@ -3023,7 +3023,11 @@
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
           cmd:      'calcOpticalFlow',
-          index:    [baseImageIndex, targetImageIndex]
+          index:    [baseImageIndex, targetImageIndex],
+          options:  {
+            orientationA: entries[baseImageIndex].orientation,
+            orientationB: entries[targetImageIndex].orientation,
+          }
         }, attachImageDataToTask);
       }
     };
