@@ -370,4 +370,56 @@
       },
     ])(done);
   });
+  TEST( 'compare-worker.js calcMetrics invalid args', function test(done) {
+    var image3x2 = { width: 3, height: 2, data: [
+      0,0,0,0,     85,85,85,85,     170,170,170,170,
+      85,85,85,85, 170,170,170,170, 255,255,255,255
+    ]};
+    var image2x3 = { width: 2, height: 3, data: [
+      0,0,0,0,         85,85,85,85,
+      85,85,85,85,     170,170,170,170,
+      170,170,170,170, 255,255,255,255
+    ]};
+    var imageEmpty = { width: 0, height: 0, data: [] };
+    jsTestUtil.makeSequentialTest([
+      // different size => error
+      function(done) {
+        var task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3] };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.mse) );
+          EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.ae) );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      // invalid size => error
+      function(done) {
+        var task = { cmd: 'calcMetrics', imageData: [imageEmpty, image2x3] };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.mse) );
+          EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.ae) );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = { cmd: 'calcMetrics', imageData: [image2x3, imageEmpty] };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.mse) );
+          EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.ae) );
+          done();
+        };
+        taskQueue.addTask(task);
+      }
+    ])(done);
+  });
 })();
