@@ -37,7 +37,6 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcMetrics':
     result.result = calcMetrics(data.imageData[0], data.imageData[1], data.options);
-    result.result.ae = calcAE(data.imageData[0], data.imageData[1], data.options);
     break;
   case 'calcToneCurve':
     result.type   = data.type;
@@ -346,35 +345,6 @@ function calcReducedColorTable( imageData )
   };
 }
 
-function calcAE( a, b, options )
-{
-  options = options || {};
-  if (options.orientationA && options.orientationA !== 1) {
-    a = compareImageUtil.applyOrientation(a, options.orientationA);
-  }
-  if (options.orientationB && options.orientationB !== 1) {
-    b = compareImageUtil.applyOrientation(b, options.orientationB);
-  }
-  if (a.width !== b.width || a.height !== b.height) {
-    // error
-    return NaN;
-  }
-  if (a.width === 0 || a.height === 0) {
-    // error
-    return NaN;
-  }
-  var count = 0;
-  for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
-    if (a.data[i + 0] !== b.data[i + 0] ||
-        a.data[i + 1] !== b.data[i + 1] ||
-        a.data[i + 2] !== b.data[i + 2] ||
-        a.data[i + 3] !== b.data[i + 3]) {
-      ++count;
-    }
-  }
-  return count;
-}
-
 function calcMetrics( a, b, options )
 {
   options = options || {};
@@ -386,11 +356,11 @@ function calcMetrics( a, b, options )
   }
   if (a.width !== b.width || a.height !== b.height) {
     // error
-    return { psnr: NaN, mse: NaN, ncc: NaN };
+    return { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
   }
   if (a.width === 0 || a.height === 0) {
     // error
-    return { psnr: NaN, mse: NaN, ncc: NaN };
+    return { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
   }
   var w = a.width;
   var h = a.height;
@@ -433,6 +403,19 @@ function calcMetrics( a, b, options )
     }
   };
   var ncc = calcNCC(a.data, b.data);
+  var calcAE = function(a, b) {
+    var count = 0;
+    for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
+      if (a.data[i + 0] !== b.data[i + 0] ||
+          a.data[i + 1] !== b.data[i + 1] ||
+          a.data[i + 2] !== b.data[i + 2] ||
+          a.data[i + 3] !== b.data[i + 3]) {
+        ++count;
+      }
+    }
+    return count;
+  };
+  var ae = calcAE(a, b);
   var calcMSE = function(dataA, dataB) {
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
@@ -451,11 +434,11 @@ function calcMetrics( a, b, options )
   var mse = calcMSE(a.data, b.data);
   if (mse === 0) {
     // a === b;
-    return { psnr: Infinity, mse: 0, ncc: ncc };
+    return { psnr: Infinity, mse: 0, ncc: ncc, ae: ae };
   }
   var max = 255 * 255;
   var psnr = 10 * Math.log(max / mse) / Math.LN10;
-  return { psnr: psnr, mse: mse, ncc: ncc };
+  return { psnr: psnr, mse: mse, ncc: ncc, ae: ae };
 }
 
 var calcToneCurveByHistogram = function(hist, offset, total) {
