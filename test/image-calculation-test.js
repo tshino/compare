@@ -370,7 +370,7 @@
       },
     ])(done);
   });
-  TEST( 'compare-worker.js calcMetrics invalid args', function test(done) {
+  TEST( 'compare-worker.js calcMetrics size/orientation', function test(done) {
     var image3x2 = { width: 3, height: 2, data: [
       0,0,0,0,     85,85,85,85,     170,170,170,170,
       85,85,85,85, 170,170,170,170, 255,255,255,255
@@ -416,6 +416,20 @@
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
           EXPECT( isNaN(data.result.ae) );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      // different orientation and resulting same image
+      function(done) {
+        var options = { orientationA: 1, orientationB: 5 };
+        var task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3], options };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.mse );
+          EXPECT_EQ( 1, data.result.ncc );
+          EXPECT_EQ( 0, data.result.ae );
           done();
         };
         taskQueue.addTask(task);

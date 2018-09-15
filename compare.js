@@ -2703,7 +2703,11 @@
         b.metrics[a.index] = 'calculating...';
         taskQueue.addTask({
           cmd:      'calcMetrics',
-          index:    [a.index, b.index]
+          index:    [a.index, b.index],
+          options:  {
+            orientationA: entries[a.index].orientation,
+            orientationB: entries[b.index].orientation,
+          }
         }, attachImageDataToTask);
       }
       $('#metricsTargetName').append(

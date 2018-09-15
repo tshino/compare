@@ -36,8 +36,8 @@ self.addEventListener('message', function(e) {
     result.result = calcReducedColorTable(data.imageData[0]);
     break;
   case 'calcMetrics':
-    result.result = calcMetrics(data.imageData[0], data.imageData[1]);
-    result.result.ae = calcAE(data.imageData[0], data.imageData[1]);
+    result.result = calcMetrics(data.imageData[0], data.imageData[1], data.options);
+    result.result.ae = calcAE(data.imageData[0], data.imageData[1], data.options);
     break;
   case 'calcToneCurve':
     result.type   = data.type;
@@ -346,8 +346,15 @@ function calcReducedColorTable( imageData )
   };
 }
 
-function calcAE( a, b )
+function calcAE( a, b, options )
 {
+  options = options || {};
+  if (options.orientationA && options.orientationA !== 1) {
+    a = compareImageUtil.applyOrientation(a, options.orientationA);
+  }
+  if (options.orientationB && options.orientationB !== 1) {
+    b = compareImageUtil.applyOrientation(b, options.orientationB);
+  }
   if (a.width !== b.width || a.height !== b.height) {
     // error
     return NaN;
@@ -368,8 +375,15 @@ function calcAE( a, b )
   return count;
 }
 
-function calcMetrics( a, b )
+function calcMetrics( a, b, options )
 {
+  options = options || {};
+  if (options.orientationA && options.orientationA !== 1) {
+    a = compareImageUtil.applyOrientation(a, options.orientationA);
+  }
+  if (options.orientationB && options.orientationB !== 1) {
+    b = compareImageUtil.applyOrientation(b, options.orientationB);
+  }
   if (a.width !== b.width || a.height !== b.height) {
     // error
     return { psnr: NaN, mse: NaN, ncc: NaN };
