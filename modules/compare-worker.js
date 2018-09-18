@@ -40,7 +40,7 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcToneCurve':
     result.type   = data.type;
-    result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type);
+    result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type, data.options);
     break;
   case 'calcOpticalFlow':
     result.result = calcOpticalFlow(data.imageData[0], data.imageData[1], data.options);
@@ -555,7 +555,8 @@ var calcToneMap = function(a, b, type) {
     max : w * h
   };
 };
-var calcToneCurve = function(a, b, type) {
+var calcToneCurve = function(a, b, type, options) {
+  options = options || {};
   var result = {
       components : []
   };
@@ -570,6 +571,14 @@ var calcToneCurve = function(a, b, type) {
     result.components[0] = calcToneCurveByHistogram(hist, 0, total);
   }
   // tone map
+  a = compareImageUtil.makeImage(a);
+  b = compareImageUtil.makeImage(b);
+  if (options.orientationA && options.orientationA !== 1) {
+    a = compareImageUtil.applyOrientation(a, options.orientationA);
+  }
+  if (options.orientationB && options.orientationB !== 1) {
+    b = compareImageUtil.applyOrientation(b, options.orientationB);
+  }
   result.toneMap = calcToneMap(a, b, type);
   return result;
 };

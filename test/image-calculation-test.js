@@ -439,11 +439,16 @@
   TEST( 'compare-worker.js calcToneCurve', function test(done) {
     var image1 = { width: 3, height: 2, data: [
       0,0,0,0,     85,85,85,85,     170,170,170,170,
-      85,85,85,85, 170,170,170,170, 255,255,255,255
+      85,85,85,85, 170,170,170,170, 170,170,170,170
     ]};
     var image2 = { width: 3, height: 2, data: [
       10,10,10,10, 20,20,20,20, 30,30,30,30,
-      30,30,30,30, 30,30,30,30, 50,50,50,50
+      30,30,30,30, 30,30,30,30, 30,30,30,30
+    ]};
+    var image3 = { width: 2, height: 3, data: [
+      20,20,20,20, 10,10,10,10,
+      30,30,30,30, 20,20,20,20,
+      50,50,50,50, 30,30,30,30
     ]};
     jsTestUtil.makeSequentialTest([
       function(done) {
@@ -464,12 +469,35 @@
           EXPECT_EQ( 1, data.result.toneMap.dist[85 + (255-30)*256] );
           EXPECT_EQ( 1, data.result.toneMap.dist[85 + (255-30)*256 + 65536] );
           EXPECT_EQ( 1, data.result.toneMap.dist[85 + (255-30)*256 + 131072] );
+          EXPECT_EQ( 3, data.result.toneMap.dist[170 + (255-30)*256] );
+          EXPECT_EQ( 3, data.result.toneMap.dist[170 + (255-30)*256 + 65536] );
+          EXPECT_EQ( 3, data.result.toneMap.dist[170 + (255-30)*256 + 131072] );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var options = { orientationA: 1, orientationB: 8 };
+        var task = { cmd: 'calcToneCurve', type: 0, imageData: [image1, image3], options };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcToneCurve', data.cmd );
+          EXPECT_EQ( 0, data.type );
+          EXPECT_EQ( 3, data.result.components.length );
+          EXPECT( data.result.toneMap );
+          EXPECT_EQ( 256 * 256 * 3, data.result.toneMap.dist.length );
+          EXPECT_EQ( 3 * 2, data.result.toneMap.max );
+          EXPECT_EQ( 1, data.result.toneMap.dist[0 + (255-10)*256] );
+          EXPECT_EQ( 1, data.result.toneMap.dist[0 + (255-10)*256 + 65536] );
+          EXPECT_EQ( 1, data.result.toneMap.dist[0 + (255-10)*256 + 131072] );
+          EXPECT_EQ( 2, data.result.toneMap.dist[85 + (255-20)*256] );
+          EXPECT_EQ( 2, data.result.toneMap.dist[85 + (255-20)*256 + 65536] );
+          EXPECT_EQ( 2, data.result.toneMap.dist[85 + (255-20)*256 + 131072] );
           EXPECT_EQ( 2, data.result.toneMap.dist[170 + (255-30)*256] );
           EXPECT_EQ( 2, data.result.toneMap.dist[170 + (255-30)*256 + 65536] );
           EXPECT_EQ( 2, data.result.toneMap.dist[170 + (255-30)*256 + 131072] );
-          EXPECT_EQ( 1, data.result.toneMap.dist[255 + (255-50)*256] );
-          EXPECT_EQ( 1, data.result.toneMap.dist[255 + (255-50)*256 + 65536] );
-          EXPECT_EQ( 1, data.result.toneMap.dist[255 + (255-50)*256 + 131072] );
+          EXPECT_EQ( 1, data.result.toneMap.dist[170 + (255-50)*256] );
+          EXPECT_EQ( 1, data.result.toneMap.dist[170 + (255-50)*256 + 65536] );
+          EXPECT_EQ( 1, data.result.toneMap.dist[170 + (255-50)*256 + 131072] );
           done();
         };
         taskQueue.addTask(task);
