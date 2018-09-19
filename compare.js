@@ -2854,7 +2854,11 @@
           taskQueue.addTask({
             cmd:      'calcToneCurve',
             type:     toneCurveType.current(),
-            index:    [a.index, b.index]
+            index:    [a.index, b.index],
+            options:  {
+              orientationA: entries[a.index].orientation,
+              orientationB: entries[b.index].orientation
+            }
           }, attachImageDataToTask);
         }
       }
