@@ -354,11 +354,8 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  if (a.width !== b.width || a.height !== b.height) {
-    // error
-    return { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
-  }
-  if (a.width === 0 || a.height === 0) {
+  if (a.width !== b.width || a.height !== b.height ||
+      a.width === 0 || a.height === 0) {
     // error
     return { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
   }
