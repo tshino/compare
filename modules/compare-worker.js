@@ -354,10 +354,11 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
+  var result = { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
   if (a.width !== b.width || a.height !== b.height ||
       a.width === 0 || a.height === 0) {
     // error
-    return { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
+    return result;
   }
   var w = a.width;
   var h = a.height;
@@ -399,7 +400,7 @@ function calcMetrics( a, b, options )
       return (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
     }
   };
-  var ncc = calcNCC(a.data, b.data);
+  result.ncc = calcNCC(a.data, b.data);
   var calcAE = function(a, b) {
     var count = 0;
     for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
@@ -412,7 +413,7 @@ function calcMetrics( a, b, options )
     }
     return count;
   };
-  var ae = calcAE(a, b);
+  result.ae = calcAE(a, b);
   var calcMSE = function(dataA, dataB) {
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
@@ -428,14 +429,15 @@ function calcMetrics( a, b, options )
     }
     return sum / (w * h * 3);
   };
-  var mse = calcMSE(a.data, b.data);
-  if (mse === 0) {
+  result.mse = calcMSE(a.data, b.data);
+  if (result.mse === 0) {
     // a === b;
-    return { psnr: Infinity, mse: 0, ncc: ncc, ae: ae };
+    result.psnr = Infinity;
+  } else {
+    var max = 255 * 255;
+    result.psnr = 10 * Math.log(max / result.mse) / Math.LN10;
   }
-  var max = 255 * 255;
-  var psnr = 10 * Math.log(max / mse) / Math.LN10;
-  return { psnr: psnr, mse: mse, ncc: ncc, ae: ae };
+  return result;
 }
 
 var calcToneCurveByHistogram = function(hist, offset, total) {
