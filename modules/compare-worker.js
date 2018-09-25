@@ -354,7 +354,7 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var result = { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN };
+  var result = { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
   if (a.width !== b.width || a.height !== b.height ||
       a.width === 0 || a.height === 0) {
     // error
@@ -402,18 +402,24 @@ function calcMetrics( a, b, options )
   };
   result.ncc = calcNCC(a.data, b.data);
   var calcAE = function(a, b) {
-    var count = 0;
+    var count = { rgba: 0, rgb: 0, a: 0 };
     for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
-      if (a.data[i + 0] !== b.data[i + 0] ||
+      var diff_rgb =
+          a.data[i + 0] !== b.data[i + 0] ||
           a.data[i + 1] !== b.data[i + 1] ||
-          a.data[i + 2] !== b.data[i + 2] ||
-          a.data[i + 3] !== b.data[i + 3]) {
-        ++count;
-      }
+          a.data[i + 2] !== b.data[i + 2];
+      var diff_a =
+          a.data[i + 3] !== b.data[i + 3];
+      count.rgb += diff_rgb ? 1 : 0;
+      count.a += diff_a ? 1 : 0;
+      count.rgba += (diff_rgb || diff_a) ? 1 : 0;
     }
     return count;
   };
-  result.ae = calcAE(a, b);
+  var aeCounts = calcAE(a, b);
+  result.ae = aeCounts.rgba;
+  result.aeRgb = aeCounts.rgb;
+  result.aeAlpha = aeCounts.a;
   var calcMSE = function(dataA, dataB) {
     var sum = 0;
     for (var i = 0, y = 0; y < h; ++y) {
