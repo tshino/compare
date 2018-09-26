@@ -255,6 +255,16 @@
         255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
       ]
     };
+    var transparent = {
+      width: 4,
+      height: 4,
+      data: [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      ]
+    };
     jsTestUtil.makeSequentialTest([
       // exactly same images
       function(done) {
@@ -268,6 +278,8 @@
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );
           EXPECT_EQ( 0, data.result.ae );
+          EXPECT_EQ( 0, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -284,6 +296,8 @@
           EXPECT_EQ( (30*30)/3, data.result.mse );
           //EXPECT_EQ( ????, data.result.ncc ); // non-trivial answer
           EXPECT_EQ( 16, data.result.ae );
+          EXPECT_EQ( 16, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -299,6 +313,8 @@
           EXPECT_EQ( 255 * 255 * 2 / 3, data.result.mse );
           EXPECT_EQ( -0.5, data.result.ncc );
           EXPECT_EQ( 16, data.result.ae );
+          EXPECT_EQ( 16, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -316,6 +332,26 @@
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
           EXPECT_EQ( 0, data.result.ae );
+          EXPECT_EQ( 0, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      // exactly same flat images (both transparent)
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
+          imageData: [transparent, transparent]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.mse );
+          EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( 0, data.result.ae );
+          EXPECT_EQ( 0, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -332,6 +368,8 @@
           EXPECT_EQ( 255 * 255, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
           EXPECT_EQ( 16, data.result.ae );
+          EXPECT_EQ( 16, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -348,6 +386,26 @@
           EXPECT_EQ( 255 * 255 / 3, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
           EXPECT_EQ( 16, data.result.ae );
+          EXPECT_EQ( 16, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      // different flat images
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
+          imageData: [blackImage, transparent]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.mse );
+          EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( 16, data.result.ae );
+          EXPECT_EQ( 0, data.result.aeRgb );
+          EXPECT_EQ( 16, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -364,6 +422,8 @@
           //EXPECT_EQ( ???, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
           EXPECT_EQ( 15, data.result.ae );
+          EXPECT_EQ( 15, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
@@ -391,6 +451,8 @@
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
           EXPECT( isNaN(data.result.ae) );
+          EXPECT( isNaN(data.result.aeRgb) );
+          EXPECT( isNaN(data.result.aeAlpha) );
           done();
         };
         taskQueue.addTask(task);
@@ -404,6 +466,8 @@
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
           EXPECT( isNaN(data.result.ae) );
+          EXPECT( isNaN(data.result.aeRgb) );
+          EXPECT( isNaN(data.result.aeAlpha) );
           done();
         };
         taskQueue.addTask(task);
@@ -416,6 +480,8 @@
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
           EXPECT( isNaN(data.result.ae) );
+          EXPECT( isNaN(data.result.aeRgb) );
+          EXPECT( isNaN(data.result.aeAlpha) );
           done();
         };
         taskQueue.addTask(task);
@@ -430,6 +496,8 @@
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );
           EXPECT_EQ( 0, data.result.ae );
+          EXPECT_EQ( 0, data.result.aeRgb );
+          EXPECT_EQ( 0, data.result.aeAlpha );
           done();
         };
         taskQueue.addTask(task);
