@@ -354,7 +354,7 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var result = { psnr: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
+  var result = { psnr: NaN, mae: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
   if (a.width !== b.width || a.height !== b.height ||
       a.width === 0 || a.height === 0) {
     // error
@@ -420,22 +420,28 @@ function calcMetrics( a, b, options )
   result.ae = aeCounts.rgba;
   result.aeRgb = aeCounts.rgb;
   result.aeAlpha = aeCounts.a;
-  var calcMSE = function(dataA, dataB) {
-    var sum = 0;
+  var calcMAEMSE = function(dataA, dataB) {
+    var sumAE = 0, sumSE = 0;
     for (var i = 0, y = 0; y < h; ++y) {
-      var lineSum = 0;
+      var lineAE = 0, lineSE = 0;
       for (var x = 0; x < w; ++x, i += 4) {
         var r = dataA[i + 0] - dataB[i + 0];
         var g = dataA[i + 1] - dataB[i + 1];
         var b = dataA[i + 2] - dataB[i + 2];
-        var se = r * r + g * g + b * b;
-        lineSum += se;
+        lineAE += Math.abs(r) + Math.abs(g) + Math.abs(b);
+        lineSE += r * r + g * g + b * b;
       }
-      sum += lineSum;
+      sumAE += lineAE;
+      sumSE += lineSE;
     }
-    return sum / (w * h * 3);
+    return {
+      mae: sumAE / (w * h * 3),
+      mse: sumSE / (w * h * 3)
+    };
   };
-  result.mse = calcMSE(a.data, b.data);
+  var m = calcMAEMSE(a.data, b.data);
+  result.mae = m.mae;
+  result.mse = m.mse;
   if (result.mse === 0) {
     // a === b;
     result.psnr = Infinity;
