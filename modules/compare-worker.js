@@ -402,7 +402,7 @@ function calcMetrics( a, b, options )
   };
   result.ncc = calcNCC(a.data, b.data);
   var calcAE = function(a, b) {
-    var count = { rgba: 0, rgb: 0, a: 0 };
+    var countRgba = 0, countRgb = 0, countA = 0;
     for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
       var diff_rgb =
           a.data[i + 0] !== b.data[i + 0] ||
@@ -410,11 +410,11 @@ function calcMetrics( a, b, options )
           a.data[i + 2] !== b.data[i + 2];
       var diff_a =
           a.data[i + 3] !== b.data[i + 3];
-      count.rgb += diff_rgb ? 1 : 0;
-      count.a += diff_a ? 1 : 0;
-      count.rgba += (diff_rgb || diff_a) ? 1 : 0;
+      countRgb += diff_rgb ? 1 : 0;
+      countA += diff_a ? 1 : 0;
+      countRgba += (diff_rgb || diff_a) ? 1 : 0;
     }
-    return count;
+    return { rgba: countRgba, rgb: countRgb, a: countA };
   };
   var aeCounts = calcAE(a, b);
   result.ae = aeCounts.rgba;
