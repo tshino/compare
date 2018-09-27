@@ -275,6 +275,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.sad );
+          EXPECT_EQ( 0, data.result.ssd );
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );
@@ -294,6 +296,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( 1e-14 > Math.abs(10 * Math.log10((3*255*255) / (30*30)) - data.result.psnr) );
+          EXPECT_EQ( 30*16, data.result.sad );
+          EXPECT_EQ( 30*30*16, data.result.ssd );
           EXPECT_EQ( 30/3, data.result.mae );
           EXPECT_EQ( (30*30)/3, data.result.mse );
           //EXPECT_EQ( ????, data.result.ncc ); // non-trivial answer
@@ -312,6 +316,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( 1e-14 > Math.abs(10 * Math.log10(1.5) - data.result.psnr) );
+          EXPECT_EQ( 255 * 2 * 16, data.result.sad );
+          EXPECT_EQ( 255 * 255 * 2 * 16, data.result.ssd );
           EXPECT_EQ( 255 * 2 / 3, data.result.mae );
           EXPECT_EQ( 255 * 255 * 2 / 3, data.result.mse );
           EXPECT_EQ( -0.5, data.result.ncc );
@@ -332,6 +338,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.sad );
+          EXPECT_EQ( 0, data.result.ssd );
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -351,6 +359,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.sad );
+          EXPECT_EQ( 0, data.result.ssd );
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -370,6 +380,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( 0, data.result.psnr );
+          EXPECT_EQ( 255*3*16, data.result.sad );
+          EXPECT_EQ( 255*255*3*16, data.result.ssd );
           EXPECT_EQ( 255, data.result.mae );
           EXPECT_EQ( 255 * 255, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -389,6 +401,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( 1e-14 > Math.abs(10 * Math.log10(3) - data.result.psnr) );
+          EXPECT_EQ( 255 * 16, data.result.sad );
+          EXPECT_EQ( 255 * 255 * 16, data.result.ssd );
           EXPECT_EQ( 255 / 3, data.result.mae );
           EXPECT_EQ( 255 * 255 / 3, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -408,6 +422,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.sad );
+          EXPECT_EQ( 0, data.result.ssd );
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -427,6 +443,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           //EXPECT_EQ( ???, data.result.psnr );
+          //EXPECT_EQ( ???, data.result.sad );
+          //EXPECT_EQ( ???, data.result.ssd );
           //EXPECT_EQ( ???, data.result.mae );
           //EXPECT_EQ( ???, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
@@ -457,6 +475,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.sad) );
+          EXPECT( isNaN(data.result.ssd) );
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
@@ -473,6 +493,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.sad) );
+          EXPECT( isNaN(data.result.ssd) );
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
@@ -488,6 +510,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT( isNaN(data.result.psnr) );
+          EXPECT( isNaN(data.result.sad) );
+          EXPECT( isNaN(data.result.ssd) );
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
@@ -505,6 +529,8 @@
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
+          EXPECT_EQ( 0, data.result.sad );
+          EXPECT_EQ( 0, data.result.ssd );
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );

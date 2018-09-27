@@ -2647,7 +2647,7 @@
   var metricsDialog = (function() {
     var metricsToString = function(metrics, imgA) {
       if (typeof metrics === 'string') {
-        return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ncc: metrics, ae: metrics };
+        return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
       }
       return {
         psnr:
@@ -2663,6 +2663,12 @@
         mae:
             isNaN(metrics.mae) ? '‐' :
             metrics.mae.toPrecision(6),
+        ssd:
+            isNaN(metrics.ssd) ? '‐' :
+            compareUtil.addComma(metrics.ssd),
+        sad:
+            isNaN(metrics.sad) ? '‐' :
+            compareUtil.addComma(metrics.sad),
         ncc:
             isNaN(metrics.ncc) ? '‐' :
             metrics.ncc.toFixed(6),
@@ -2728,6 +2734,8 @@
       $('#rmseValue').append($('<td>').text(values.rmse));
       $('#mseValue').append($('<td>').text(values.mse));
       $('#maeValue').append($('<td>').text(values.mae));
+      $('#ssdValue').append($('<td>').text(values.ssd));
+      $('#sadValue').append($('<td>').text(values.sad));
       $('#nccValue').append($('<td>').text(compareUtil.hyphenToMinus(values.ncc)));
       $('#aeValue').append($('<td>').text(values.ae));
     };

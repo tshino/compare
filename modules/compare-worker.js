@@ -354,7 +354,7 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var result = { psnr: NaN, mae: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
+  var result = { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
   if (a.width !== b.width || a.height !== b.height ||
       a.width === 0 || a.height === 0) {
     // error
@@ -420,7 +420,7 @@ function calcMetrics( a, b, options )
   result.ae = aeCounts.rgba;
   result.aeRgb = aeCounts.rgb;
   result.aeAlpha = aeCounts.a;
-  var calcMAEMSE = function(dataA, dataB) {
+  var calcSumOfDifference = function(dataA, dataB) {
     var sumAE = 0, sumSE = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineAE = 0, lineSE = 0;
@@ -435,11 +435,15 @@ function calcMetrics( a, b, options )
       sumSE += lineSE;
     }
     return {
+      sad: sumAE,
+      ssd: sumSE,
       mae: sumAE / (w * h * 3),
       mse: sumSE / (w * h * 3)
     };
   };
-  var m = calcMAEMSE(a.data, b.data);
+  var m = calcSumOfDifference(a.data, b.data);
+  result.sad = m.sad;
+  result.ssd = m.ssd;
   result.mae = m.mae;
   result.mse = m.mse;
   if (result.mse === 0) {
