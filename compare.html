@@ -647,18 +647,19 @@ var changeLang = function(lang) {
 			<div>
 				<table id="metricsTable">
 					<tr id="metricsBaseName">
-						<td class="prop">
+						<td class="prop" colspan="2">
 							<span class="en">Base Image</span>
 							<span class="ja">基準画像</span>
 						</td>
 					</tr>
 					<tr id="metricsTargetName">
-						<td class="prop">
+						<td class="prop" colspan="2">
 							<span class="en">Target Image</span>
 							<span class="ja">対象画像</span>
 						</td>
 					</tr>
 					<tr id="psnrValue" class="num">
+						<td class="prop" rowspan="7" id="metricsModeLabel" style="min-width:auto;vertical-align:baseline">RGB</td>
 						<td class="prop">
 							<span class="en">PSNR (*)</span>
 							<span class="ja">PSNR (※)</span>
@@ -701,7 +702,7 @@ var changeLang = function(lang) {
 						</td>
 					</tr>
 					<tr id="aeValue" class="num">
-						<td class="prop">
+						<td class="prop" colspan="2">
 							<span class="en">Number of different pixels</span>
 							<span class="ja">異なるピクセルの数</span>
 						</td>
