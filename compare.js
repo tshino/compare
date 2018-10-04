@@ -49,13 +49,14 @@
             sw.click();
             return false;
           }
+          var index = viewManagement.indexFromNumber(num);
           if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
-              changeTargetImage(num - 1)) {
+              index !== null && changeTargetImage(index)) {
             dialog.update();
             return false;
           }
           if ($('#metrics').is(':visible') &&
-              changeBaseImage(num - 1)) {
+              index !== null && changeBaseImage(index)) {
             dialog.update();
             return false;
           }
