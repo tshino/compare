@@ -280,6 +280,12 @@
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );
+          EXPECT_EQ( Infinity, data.result.y.psnr );
+          EXPECT_EQ( 0, data.result.y.sad );
+          EXPECT_EQ( 0, data.result.y.ssd );
+          EXPECT_EQ( 0, data.result.y.mae );
+          EXPECT_EQ( 0, data.result.y.mse );
+          //EXPECT_EQ( 1, data.result.y.ncc );  //FIXME
           EXPECT_EQ( 0, data.result.ae );
           EXPECT_EQ( 0, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -301,6 +307,12 @@
           EXPECT_EQ( 30/3, data.result.mae );
           EXPECT_EQ( (30*30)/3, data.result.mse );
           //EXPECT_EQ( ????, data.result.ncc ); // non-trivial answer
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10((255*255) / (9*9)) - data.result.y.psnr) );
+          EXPECT_EQ( 9*16, data.result.y.sad );
+          EXPECT_EQ( 9*9*16, data.result.y.ssd );
+          EXPECT_EQ( 9, data.result.y.mae );
+          EXPECT_EQ( 9*9, data.result.y.mse );
+          //EXPECT_EQ( ????, data.result.y.ncc ); // non-trivial answer
           EXPECT_EQ( 16, data.result.ae );
           EXPECT_EQ( 16, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -321,6 +333,12 @@
           EXPECT_EQ( 255 * 2 / 3, data.result.mae );
           EXPECT_EQ( 255 * 255 * 2 / 3, data.result.mse );
           EXPECT_EQ( -0.5, data.result.ncc );
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10((255*255) / (74*74)) - data.result.y.psnr) );
+          EXPECT_EQ( 74 * 16, data.result.y.sad );
+          EXPECT_EQ( 74 * 74 * 16, data.result.y.ssd );
+          EXPECT_EQ( 74, data.result.y.mae );
+          EXPECT_EQ( 74 * 74, data.result.y.mse );
+          //EXPECT_EQ( xxx, data.result.y.ncc );  //FIXME
           EXPECT_EQ( 16, data.result.ae );
           EXPECT_EQ( 16, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -343,6 +361,12 @@
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( Infinity, data.result.y.psnr );
+          EXPECT_EQ( 0, data.result.y.sad );
+          EXPECT_EQ( 0, data.result.y.ssd );
+          EXPECT_EQ( 0, data.result.y.mae );
+          EXPECT_EQ( 0, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 0, data.result.ae );
           EXPECT_EQ( 0, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -364,6 +388,12 @@
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( Infinity, data.result.y.psnr );
+          EXPECT_EQ( 0, data.result.y.sad );
+          EXPECT_EQ( 0, data.result.y.ssd );
+          EXPECT_EQ( 0, data.result.y.mae );
+          EXPECT_EQ( 0, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 0, data.result.ae );
           EXPECT_EQ( 0, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -385,6 +415,12 @@
           EXPECT_EQ( 255, data.result.mae );
           EXPECT_EQ( 255 * 255, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( 0, data.result.y.psnr );
+          EXPECT_EQ( 255*16, data.result.y.sad );
+          EXPECT_EQ( 255*255*16, data.result.y.ssd );
+          EXPECT_EQ( 255, data.result.y.mae );
+          EXPECT_EQ( 255 * 255, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 16, data.result.ae );
           EXPECT_EQ( 16, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -406,6 +442,12 @@
           EXPECT_EQ( 255 / 3, data.result.mae );
           EXPECT_EQ( 255 * 255 / 3, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10((255*255) / (76*76)) - data.result.y.psnr) );
+          EXPECT_EQ( 76 * 16, data.result.y.sad );
+          EXPECT_EQ( 76 * 76 * 16, data.result.y.ssd );
+          EXPECT_EQ( 76, data.result.y.mae );
+          EXPECT_EQ( 76 * 76, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 16, data.result.ae );
           EXPECT_EQ( 16, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -427,6 +469,12 @@
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          EXPECT_EQ( Infinity, data.result.y.psnr );
+          EXPECT_EQ( 0, data.result.y.sad );
+          EXPECT_EQ( 0, data.result.y.ssd );
+          EXPECT_EQ( 0, data.result.y.mae );
+          EXPECT_EQ( 0, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 16, data.result.ae );
           EXPECT_EQ( 0, data.result.aeRgb );
           EXPECT_EQ( 16, data.result.aeAlpha );
@@ -448,6 +496,12 @@
           //EXPECT_EQ( ???, data.result.mae );
           //EXPECT_EQ( ???, data.result.mse );
           EXPECT_EQ( 0, data.result.ncc );
+          //EXPECT_EQ( ???, data.result.y.psnr );
+          //EXPECT_EQ( ???, data.result.y.sad );
+          //EXPECT_EQ( ???, data.result.y.ssd );
+          //EXPECT_EQ( ???, data.result.y.mae );
+          //EXPECT_EQ( ???, data.result.y.mse );
+          //EXPECT_EQ( 0, data.result.y.ncc ); FIXME
           EXPECT_EQ( 15, data.result.ae );
           EXPECT_EQ( 15, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );
@@ -480,6 +534,12 @@
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.y.psnr) );
+          EXPECT( isNaN(data.result.y.sad) );
+          EXPECT( isNaN(data.result.y.ssd) );
+          EXPECT( isNaN(data.result.y.mae) );
+          EXPECT( isNaN(data.result.y.mse) );
+          EXPECT( isNaN(data.result.y.ncc) );
           EXPECT( isNaN(data.result.ae) );
           EXPECT( isNaN(data.result.aeRgb) );
           EXPECT( isNaN(data.result.aeAlpha) );
@@ -498,6 +558,12 @@
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.y.psnr) );
+          EXPECT( isNaN(data.result.y.sad) );
+          EXPECT( isNaN(data.result.y.ssd) );
+          EXPECT( isNaN(data.result.y.mae) );
+          EXPECT( isNaN(data.result.y.mse) );
+          EXPECT( isNaN(data.result.y.ncc) );
           EXPECT( isNaN(data.result.ae) );
           EXPECT( isNaN(data.result.aeRgb) );
           EXPECT( isNaN(data.result.aeAlpha) );
@@ -515,6 +581,12 @@
           EXPECT( isNaN(data.result.mae) );
           EXPECT( isNaN(data.result.mse) );
           EXPECT( isNaN(data.result.ncc) );
+          EXPECT( isNaN(data.result.y.psnr) );
+          EXPECT( isNaN(data.result.y.sad) );
+          EXPECT( isNaN(data.result.y.ssd) );
+          EXPECT( isNaN(data.result.y.mae) );
+          EXPECT( isNaN(data.result.y.mse) );
+          EXPECT( isNaN(data.result.y.ncc) );
           EXPECT( isNaN(data.result.ae) );
           EXPECT( isNaN(data.result.aeRgb) );
           EXPECT( isNaN(data.result.aeAlpha) );
@@ -534,6 +606,12 @@
           EXPECT_EQ( 0, data.result.mae );
           EXPECT_EQ( 0, data.result.mse );
           EXPECT_EQ( 1, data.result.ncc );
+          EXPECT_EQ( Infinity, data.result.y.psnr );
+          EXPECT_EQ( 0, data.result.y.sad );
+          EXPECT_EQ( 0, data.result.y.ssd );
+          EXPECT_EQ( 0, data.result.y.mae );
+          EXPECT_EQ( 0, data.result.y.mse );
+          //EXPECT_EQ( 1, data.result.y.ncc ); FIXME
           EXPECT_EQ( 0, data.result.ae );
           EXPECT_EQ( 0, data.result.aeRgb );
           EXPECT_EQ( 0, data.result.aeAlpha );

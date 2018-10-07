@@ -354,7 +354,11 @@ function calcMetrics( a, b, options )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var result = { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
+  var result = {
+    psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN,
+    y: { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN },
+    ae: NaN, aeRgb: NaN, aeAlpha: NaN
+  };
   if (a.width !== b.width || a.height !== b.height ||
       a.width === 0 || a.height === 0) {
     // error
@@ -421,24 +425,37 @@ function calcMetrics( a, b, options )
   result.aeRgb = aeCounts.rgb;
   result.aeAlpha = aeCounts.a;
   var calcSumOfDifference = function(dataA, dataB) {
-    var sumAE = 0, sumSE = 0;
+    var sumAE = 0, sumSE = 0, sumYAE = 0, sumYSE = 0;
     for (var i = 0, y = 0; y < h; ++y) {
       var lineAE = 0, lineSE = 0;
+      var lineYAE = 0, lineYSE = 0;
       for (var x = 0; x < w; ++x, i += 4) {
-        var r = dataA[i + 0] - dataB[i + 0];
-        var g = dataA[i + 1] - dataB[i + 1];
-        var b = dataA[i + 2] - dataB[i + 2];
+        var r0 = dataA[i + 0], r1 = dataB[i + 0];
+        var g0 = dataA[i + 1], g1 = dataB[i + 1];
+        var b0 = dataA[i + 2], b1 = dataB[i + 2];
+        var y0 = Math.round(0.299 * r0 + 0.587 * g0 + 0.114 * b0);
+        var y1 = Math.round(0.299 * r1 + 0.587 * g1 + 0.114 * b1);
+        var r = r0 - r1, g = g0 - g1, b = b0 - b1, dy = y0 - y1;
         lineAE += Math.abs(r) + Math.abs(g) + Math.abs(b);
         lineSE += r * r + g * g + b * b;
+        lineYAE += Math.abs(dy);
+        lineYSE += dy * dy;
       }
       sumAE += lineAE;
       sumSE += lineSE;
+      sumYAE += lineYAE;
+      sumYSE += lineYSE;
     }
+    var wh = w * h;
     return {
       sad: sumAE,
       ssd: sumSE,
-      mae: sumAE / (w * h * 3),
-      mse: sumSE / (w * h * 3)
+      mae: sumAE / (wh * 3),
+      mse: sumSE / (wh * 3),
+      y_sad: sumYAE,
+      y_ssd: sumYSE,
+      y_mae: sumYAE / wh,
+      y_mse: sumYSE / wh
     };
   };
   var m = calcSumOfDifference(a.data, b.data);
@@ -452,6 +469,17 @@ function calcMetrics( a, b, options )
   } else {
     var max = 255 * 255;
     result.psnr = 10 * Math.log(max / result.mse) / Math.LN10;
+  }
+  result.y.sad = m.y_sad;
+  result.y.ssd = m.y_ssd;
+  result.y.mae = m.y_mae;
+  result.y.mse = m.y_mse;
+  if (result.y.mse === 0) {
+    // a === b;
+    result.y.psnr = Infinity;
+  } else {
+    var max = 255 * 255;
+    result.y.psnr = 10 * Math.log(max / result.y.mse) / Math.LN10;
   }
   return result;
 }
