@@ -367,44 +367,57 @@ function calcMetrics( a, b, options )
   var w = a.width;
   var h = a.height;
   var sum12 = function(data) {
-    var sum1 = 0, sum2 = 0;
+    var sum1 = 0, sum2 = 0, sumY1 = 0, sumY2 = 0;
     for (var i = 0, y = 0; y < h; ++y) {
-      var lineSum1 = 0, lineSum2 = 0;
+      var lineSum1 = 0, lineSum2 = 0, lineSumY1 = 0, lineSumY2 = 0;
       for (var x = 0; x < w; ++x, i += 4) {
         var r = data[i + 0], g = data[i + 1], b = data[i + 2];
+        var y0 = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
         lineSum1 += r + g + b;
         lineSum2 += r * r + g * g + b * b;
+        lineSumY1 += y0;
+        lineSumY2 += y0 * y0;
       }
       sum1 += lineSum1;
       sum2 += lineSum2;
+      sumY1 += lineSumY1;
+      sumY2 += lineSumY2;
     }
-    return [sum1, sum2];
+    return [sum1, sum2, sumY1, sumY2];
   };
   var sdsum2 = function(sum12) {
-    return sum12[1] * (w * h * 3) - sum12[0] * sum12[0];
+    return [
+      sum12[1] * (w * h * 3) - sum12[0] * sum12[0],
+      sum12[3] * (w * h) - sum12[2] * sum12[2]
+    ];
   };
   var calcNCC = function(dataA, dataB) {
     var sum12A = sum12(dataA), sum12B = sum12(dataB);
     var sdsumA = sdsum2(sum12A), sdsumB = sdsum2(sum12B);
-    var sum = 0;
+    var sum = 0, sumY = 0;
     for (var i = 0, y = 0; y < h; ++y) {
-      var lineSum = 0;
+      var lineSum = 0, lineSumY = 0;
       for (var x = 0; x < w; ++x, i += 4) {
-        var r = dataA[i + 0] * dataB[i + 0];
-        var g = dataA[i + 1] * dataB[i + 1];
-        var b = dataA[i + 2] * dataB[i + 2];
-        lineSum += r + g + b;
+        var r0 = dataA[i + 0], r1 = dataB[i + 0];
+        var g0 = dataA[i + 1], g1 = dataB[i + 1];
+        var b0 = dataA[i + 2], b1 = dataB[i + 2];
+        var y0 = Math.round(0.299 * r0 + 0.587 * g0 + 0.114 * b0);
+        var y1 = Math.round(0.299 * r1 + 0.587 * g1 + 0.114 * b1);
+        lineSum += r0 * r1 + g0 * g1 + b0 * b1;
+        lineSumY += y0 * y1;
       }
       sum += lineSum;
+      sumY += lineSumY;
     }
-    var den = Math.sqrt(sdsumA * sdsumB);
-    if (den === 0) {
-      return 0;
-    } else {
-      return (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
-    }
+    var den = Math.sqrt(sdsumA[0] * sdsumB[0]);
+    var denY = Math.sqrt(sdsumA[1] * sdsumB[1]);
+    var ncc = den === 0 ? 0 : (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
+    var y_ncc = denY === 0 ? 0 : (sumY * (w * h) - sum12A[2] * sum12B[2]) / denY;
+    return { ncc: ncc, y_ncc: y_ncc };
   };
-  result.ncc = calcNCC(a.data, b.data);
+  var ncc = calcNCC(a.data, b.data);
+  result.ncc = ncc.ncc;
+  result.y.ncc = ncc.y_ncc;
   var calcAE = function(a, b) {
     var countRgba = 0, countRgb = 0, countA = 0;
     for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
