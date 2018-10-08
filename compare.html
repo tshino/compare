@@ -643,6 +643,10 @@ var changeLang = function(lang) {
 					<span class="en">Image Quality Metrics</span>
 					<span class="ja">画質メトリクス</span>
 				</h3>
+				<div id="metricsMode" class="mode-sw">
+					<button class="current">1. RGB</button>
+					<button>2. <span class="en">Luminance</span><span class="ja">輝度</span></button>
+				</div>
 			</div>
 			<div>
 				<table id="metricsTable">
@@ -659,7 +663,7 @@ var changeLang = function(lang) {
 						</td>
 					</tr>
 					<tr id="psnrValue" class="num">
-						<td class="prop" rowspan="7" id="metricsModeLabel" style="min-width:auto;vertical-align:baseline">RGB</td>
+						<td class="prop" rowspan="7" style="min-width:auto;vertical-align:baseline"><span id="metricsModeLabel"></span></td>
 						<td class="prop">
 							<span class="en">PSNR (*)</span>
 							<span class="ja">PSNR (※)</span>

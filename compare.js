@@ -2646,33 +2646,37 @@
   };
   // Image Quality Metrics
   var metricsDialog = (function() {
+    var metricsMode = makeModeSwitch('#metricsMode', 0, function(type) {
+      updateTable();
+    });
     var metricsToString = function(metrics, imgA) {
       if (typeof metrics === 'string') {
         return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
       }
+      var m = metricsMode.current() === 0 ? metrics : metrics.y;
       return {
         psnr:
-            isNaN(metrics.psnr) ? '‐' :
-            metrics.psnr === Infinity ? '∞ dB' :
-            metrics.psnr.toFixed(2) + ' dB',
+            isNaN(m.psnr) ? '‐' :
+            m.psnr === Infinity ? '∞ dB' :
+            m.psnr.toFixed(2) + ' dB',
         rmse:
-            isNaN(metrics.mse) ? '‐' :
-            Math.sqrt(metrics.mse).toPrecision(6),
+            isNaN(m.mse) ? '‐' :
+            Math.sqrt(m.mse).toPrecision(6),
         mse:
-            isNaN(metrics.mse) ? '‐' :
-            metrics.mse.toPrecision(6),
+            isNaN(m.mse) ? '‐' :
+            m.mse.toPrecision(6),
         mae:
-            isNaN(metrics.mae) ? '‐' :
-            metrics.mae.toPrecision(6),
+            isNaN(m.mae) ? '‐' :
+            m.mae.toPrecision(6),
         ssd:
-            isNaN(metrics.ssd) ? '‐' :
-            compareUtil.addComma(metrics.ssd),
+            isNaN(m.ssd) ? '‐' :
+            compareUtil.addComma(m.ssd),
         sad:
-            isNaN(metrics.sad) ? '‐' :
-            compareUtil.addComma(metrics.sad),
+            isNaN(m.sad) ? '‐' :
+            compareUtil.addComma(m.sad),
         ncc:
-            isNaN(metrics.ncc) ? '‐' :
-            metrics.ncc.toFixed(6),
+            isNaN(m.ncc) ? '‐' :
+            m.ncc.toFixed(6),
         ae:
             isNaN(metrics.ae) ? '‐' :
             compareUtil.addComma(metrics.ae) +
@@ -2681,6 +2685,9 @@
     };
     var updateTable = function() {
       $('#metricsTable td:not(.prop)').remove();
+      textUtil.setText($('#metricsModeLabel'),
+        metricsMode.current() === 0 ? { en: 'RGB', ja: 'RGB' } : { en: 'Luminance', ja: '輝度' }
+      );
       var rowCount = $('#metricsTable tr').length;
       if (images.length === 0) {
         $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
@@ -2709,7 +2716,11 @@
       var a = entries[baseImageIndex];
       var b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
-        var invalid = { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN, ae: NaN, aeRgb: NaN, aeAlpha: NaN };
+        var invalid = {
+          psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN,
+          y: { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN },
+          ae: NaN, aeRgb: NaN, aeAlpha: NaN
+        };
         a.metrics[b.index] = invalid;
         b.metrics[a.index] = invalid;
       }
