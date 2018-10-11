@@ -55,11 +55,6 @@
             dialog.update();
             return false;
           }
-          if ($('#metrics').is(':visible') &&
-              index !== null && changeBaseImage(index)) {
-            dialog.update();
-            return false;
-          }
         }
         if ($('#vectorscope').is(':visible')) {
           if (false === vectorscopeDialog.processKeyDown(e)) {
