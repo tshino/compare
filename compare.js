@@ -2399,7 +2399,7 @@
           { r : -140, g : 140, b : -140, text : 'G', color : '#0f0' },
           { r : -140, g : -140, b : 140, text : 'B', color : '#00f' }
       ];
-      var axesLabels = [];
+      var axesLabelsSVG = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
         var fillColor = label.color;
@@ -2413,7 +2413,7 @@
           x : xy.x,
           y : xy.y
         };
-        axesLabels.push('<text>' + label.text + '</text>');
+        axesLabelsSVG.push('<text>' + label.text + '</text>');
         axesLabelsAttr.push(attr);
       }
       if (!fig.axes) {
@@ -2422,7 +2422,7 @@
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
           '</g>' +
-          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabels.join('') + '</g>' +
+          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabelsSVG.join('') + '</g>' +
         '</svg>');
       } else {
         $(fig.axes).find('g path').attr('d', axesDesc);
