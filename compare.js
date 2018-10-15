@@ -2349,15 +2349,21 @@
       var xr = scale * Math.cos(ay), yr = -scale * Math.sin(ay) * Math.sin(ax);
       var xg = -scale * Math.sin(ay), yg = -scale * Math.cos(ay) * Math.sin(ax);
       var yb = -scale * Math.cos(ax);
-      var orgx = 159.5 - xr * 127.5 - xg * 127.5;
-      var orgy = 159.5 - yr * 127.5 - yg * 127.5 - yb * 127.5;
+      var coef_xr = xr;
+      var coef_xg = xg;
+      var coef_xb = 0;
+      var coef_yr = yr;
+      var coef_yg = yg;
+      var coef_yb = yb;
+      var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
+      var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
         var r = rgb >> 16;
         var g = (rgb >> 8) & 255;
         var b = rgb & 255;
-        var plotx = Math.round(orgx + xr * r + xg * g);
-        var ploty = Math.round(orgy + yr * r + yg * g + yb * b);
+        var plotx = Math.round(orgx + coef_xr * r + coef_xg * g + coef_xb * b);
+        var ploty = Math.round(orgy + coef_yr * r + coef_yg * g + coef_yb * b);
         var offset = ploty * 320 + plotx;
         var count = counts[k];
         dist[offset] += count;
