@@ -2297,6 +2297,9 @@
     var colorDistZoom = 0;
     var colorDistDragState = null;
     var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
+    var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
+      updateFigureAll();
+    });
     var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
       for (var i = 0, img; img = images[i]; i++) {
         img.colorDist = null;
@@ -2349,12 +2352,21 @@
       var xr = scale * Math.cos(ay), yr = -scale * Math.sin(ay) * Math.sin(ax);
       var xg = -scale * Math.sin(ay), yg = -scale * Math.cos(ay) * Math.sin(ax);
       var yb = -scale * Math.cos(ax);
-      var coef_xr = xr;
-      var coef_xg = xg;
-      var coef_xb = 0;
-      var coef_yr = yr;
-      var coef_yg = yg;
-      var coef_yb = yb;
+      if (colorDistType.current() === 0) { // 0:RGB
+        var coef_xr = xr;
+        var coef_xg = xg;
+        var coef_xb = 0;
+        var coef_yr = yr;
+        var coef_yg = yg;
+        var coef_yb = yb;
+      } else { // 1:YCbCr
+        var coef_xr = -0.1687 * xr + 0.5000 * xg;
+        var coef_xg = -0.3313 * xr - 0.4187 * xg;
+        var coef_xb =  0.5000 * xr - 0.0813 * xg;
+        var coef_yr = -0.1687 * yr + 0.5000 * yg + 0.299 * yb;
+        var coef_yg = -0.3313 * yr - 0.4187 * yg + 0.587 * yb;
+        var coef_yb =  0.5000 * yr - 0.0813 * yg + 0.114 * yb;
+      }
       var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
       var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
       for (var k = 0, n = colors.length; k < n; k += 1) {
@@ -2391,20 +2403,35 @@
         return xy.x + ',' + xy.y;
       };
       var v = [];
-      for (var i = 0; i < 8; ++i) {
-        v[i] = colorToDesc(-128 + (i & 4) * 64, -128 + (i & 2) * 128, -128 + (i & 1) * 256);
+      for (var i = 0; i < 18; ++i) {
+        var posX = (Math.floor(i / 6) % 3) * 128;
+        var posY = (Math.floor(i / 2) % 3) * 128;
+        var posZ = (i % 2) * 256;
+        v[i] = colorToDesc(posX - 128, posY - 128, posZ - 128);
       }
-      var axesDesc =
-            'M ' + v[0] + ' L ' + v[1] + ' L ' + v[3] + ' L ' + v[2] + ' L ' + v[0] +
-            ' M ' + v[0] + ' L ' + v[4] + ' M ' + v[1] + ' L ' + v[5] +
-            ' M ' + v[2] + ' L ' + v[6] + ' M ' + v[3] + ' L ' + v[7] +
-            ' M ' + v[4] + ' L ' + v[5] + ' L ' + v[7] + ' L ' + v[6] + ' L ' + v[4];
-      var labels = [
+      var makeAxesDesc = function(lines) {
+        return lines.map(function(a) {
+          return (
+            'M ' + v[a[0]] +
+            a.slice(1).map(function(i) { return ' L ' + v[i]; }).join('')
+          );
+        });
+      };
+      var axesDesc = makeAxesDesc([
+        [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
+        [0, 12], [1, 13], [4, 16], [5, 17],
+      ]);
+      if (colorDistType.current() === 1) {
+        axesDesc += makeAxesDesc([
+          [2, 14], [6, 10], [8, 9], [3, 15], [7, 11]
+        ]);
+      }
+      var labels = colorDistType.current() === 0 ? [
           { r : -140, g : -140, b : -140, text : 'O', color : '#888' },
           { r : 140, g : -140, b : -140, text : 'R', color : '#f00' },
           { r : -140, g : 140, b : -140, text : 'G', color : '#0f0' },
           { r : -140, g : -140, b : 140, text : 'B', color : '#00f' }
-      ];
+      ] : [];
       var axesLabelsSVG = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
