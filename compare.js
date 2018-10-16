@@ -2427,22 +2427,22 @@
         ]);
       }
       var labels = colorDistType.current() === 0 ? [
-          { r : -140, g : -140, b : -140, text : 'O', color : '#888' },
-          { r : 140, g : -140, b : -140, text : 'R', color : '#f00' },
-          { r : -140, g : 140, b : -140, text : 'G', color : '#0f0' },
-          { r : -140, g : -140, b : 140, text : 'B', color : '#00f' }
-      ] : [];
+        { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
+        { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: (xr < 0 && yr < 0 && xg < 0) },
+        { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
+        { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
+      ] : [
+        { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
+        { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
+        { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
+        { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
+      ];
       var axesLabelsSVG = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
-        var fillColor = label.color;
-        if (i === 0 && xr < 0 && 0 < yr && 0 < xg) fillColor = 'transparent';
-        if (i === 1 && xr < 0 && yr < 0 && xg < 0) fillColor = 'transparent';
-        if (i === 2 && 0 < xg && yg < 0 && 0 < yr) fillColor = 'transparent';
-        if (i === 3 && xr < 0 && yr < 0 && 0 < xg) fillColor = 'transparent';
-        var xy = colorToXY(label.r, label.g, label.b);
+        var xy = colorToXY(label.pos[0], label.pos[1], label.pos[2]);
         var attr = {
-          fill : fillColor,
+          fill : label.hidden ? 'transparent' : label.color,
           x : xy.x,
           y : xy.y
         };
