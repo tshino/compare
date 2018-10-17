@@ -2363,9 +2363,12 @@
         var coef_xr = -0.1687 * xr + 0.5000 * xg;
         var coef_xg = -0.3313 * xr - 0.4187 * xg;
         var coef_xb =  0.5000 * xr - 0.0813 * xg;
-        var coef_yr = -0.1687 * yr + 0.5000 * yg + 0.299 * yb;
-        var coef_yg = -0.3313 * yr - 0.4187 * yg + 0.587 * yb;
-        var coef_yb =  0.5000 * yr - 0.0813 * yg + 0.114 * yb;
+        var coef_yr0 = -0.1687 * yr + 0.5000 * yg;
+        var coef_yg0 = -0.3313 * yr - 0.4187 * yg;
+        var coef_yb0 =  0.5000 * yr - 0.0813 * yg;
+        var coef_yr = coef_yr0 + 0.299 * yb;
+        var coef_yg = coef_yg0 + 0.587 * yb;
+        var coef_yb = coef_yb0 + 0.114 * yb;
       }
       var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
       var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
@@ -2393,21 +2396,23 @@
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 ' + 320 + ' ' + 320;
       var colorToXY = function(r, g, b) {
-        return {
-            x : 160 + xr * r + xg * g,
-            y : 160 + yr * r + yg * g + yb * b
-        };
-      };
-      var colorToDesc = function(r, g, b) {
-        var xy = colorToXY(r, g, b);
-        return xy.x + ',' + xy.y;
+        return [ 160 + xr * r + xg * g, 160 + yr * r + yg * g + yb * b ];
       };
       var v = [];
       for (var i = 0; i < 18; ++i) {
         var posX = (Math.floor(i / 6) % 3) * 128;
         var posY = (Math.floor(i / 2) % 3) * 128;
         var posZ = (i % 2) * 256;
-        v[i] = colorToDesc(posX - 128, posY - 128, posZ - 128);
+        v[i] = colorToXY(posX - 128, posY - 128, posZ - 128).join(',');
+      }
+      if (colorDistType.current() === 1) { // YCbCr
+        var ox = orgx + 0.5, oy = orgy + 0.5;
+        v[18] = [ox + coef_xr * 255, oy + coef_yr0 * 255].join(',');
+        v[19] = [ox + coef_xg * 255, oy + coef_yg0 * 255].join(',');
+        v[20] = [ox + coef_xb * 255, oy + coef_yb0 * 255].join(',');
+        v[21] = [ox + (coef_xr + coef_xg) * 255, oy + (coef_yr0 + coef_yg0) * 255].join(',');
+        v[22] = [ox + (coef_xg + coef_xb) * 255, oy + (coef_yg0 + coef_yb0) * 255].join(',');
+        v[23] = [ox + (coef_xb + coef_xr) * 255, oy + (coef_yb0 + coef_yr0) * 255].join(',');
       }
       var makeAxesDesc = function(lines) {
         return lines.map(function(a) {
@@ -2423,7 +2428,8 @@
       ]);
       if (colorDistType.current() === 1) {
         axesDesc += makeAxesDesc([
-          [2, 14], [6, 10], [8, 9], [3, 15], [7, 11]
+          [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
+          [18, 21, 19, 22, 20, 23, 18]
         ]);
       }
       var labels = colorDistType.current() === 0 ? [
@@ -2443,8 +2449,8 @@
         var xy = colorToXY(label.pos[0], label.pos[1], label.pos[2]);
         var attr = {
           fill : label.hidden ? 'transparent' : label.color,
-          x : xy.x,
-          y : xy.y
+          x : xy[0],
+          y : xy[1]
         };
         axesLabelsSVG.push('<text>' + label.text + '</text>');
         axesLabelsAttr.push(attr);
