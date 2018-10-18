@@ -2395,15 +2395,15 @@
       }
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 ' + 320 + ' ' + 320;
-      var colorToXY = function(r, g, b) {
-        return [ 160 + xr * r + xg * g, 160 + yr * r + yg * g + yb * b ];
+      var pos3DTo2D = function(x, y, z) {
+        return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
       };
       var v = [];
       for (var i = 0; i < 18; ++i) {
         var posX = (Math.floor(i / 6) % 3) * 128;
         var posY = (Math.floor(i / 2) % 3) * 128;
         var posZ = (i % 2) * 256;
-        v[i] = colorToXY(posX - 128, posY - 128, posZ - 128).join(',');
+        v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
       }
       if (colorDistType.current() === 1) { // YCbCr
         var ox = orgx + 0.5, oy = orgy + 0.5;
@@ -2446,7 +2446,7 @@
       var axesLabelsSVG = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
-        var xy = colorToXY(label.pos[0], label.pos[1], label.pos[2]);
+        var xy = pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
         var attr = {
           fill : label.hidden ? 'transparent' : label.color,
           x : xy[0],
