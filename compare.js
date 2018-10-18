@@ -2406,13 +2406,20 @@
         v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
       }
       if (colorDistType.current() === 1) { // YCbCr
-        var ox = orgx + 0.5, oy = orgy + 0.5;
-        v[18] = [ox + coef_xr * 255, oy + coef_yr0 * 255].join(',');
-        v[19] = [ox + coef_xg * 255, oy + coef_yg0 * 255].join(',');
-        v[20] = [ox + coef_xb * 255, oy + coef_yb0 * 255].join(',');
-        v[21] = [ox + (coef_xr + coef_xg) * 255, oy + (coef_yr0 + coef_yg0) * 255].join(',');
-        v[22] = [ox + (coef_xg + coef_xb) * 255, oy + (coef_yg0 + coef_yb0) * 255].join(',');
-        v[23] = [ox + (coef_xb + coef_xr) * 255, oy + (coef_yb0 + coef_yr0) * 255].join(',');
+        var makeHexagon = function(ox, oy) {
+          v = v.concat([
+            [coef_xr, coef_yr0],
+            [coef_xg, coef_yg0],
+            [coef_xb, coef_yb0],
+            [coef_xr + coef_xg, coef_yr0 + coef_yg0],
+            [coef_xg + coef_xb, coef_yg0 + coef_yb0],
+            [coef_xb + coef_xr, coef_yb0 + coef_yr0]
+          ].map(function(c) {
+            return (ox + c[0] * 255) + ',' + (oy + c[1] * 255);
+          }));
+        };
+        makeHexagon(orgx + 0.5, orgy + 0.5);
+        makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
       }
       var makeAxesDesc = function(lines) {
         return lines.map(function(a) {
@@ -2429,7 +2436,8 @@
       if (colorDistType.current() === 1) {
         axesDesc += makeAxesDesc([
           [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
-          [18, 21, 19, 22, 20, 23, 18]
+          [18, 21, 19, 22, 20, 23, 18], // lower hexagon
+          [24, 27, 25, 28, 26, 29, 24]  // upper hexagon
         ]);
       }
       var labels = colorDistType.current() === 0 ? [
