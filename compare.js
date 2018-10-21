@@ -2330,6 +2330,14 @@
         updateFigure(img, redrawOnly);
       }
     };
+    var makeAxesDesc = function(v, lines) {
+      return lines.map(function(a) {
+        return (
+          'M ' + v[a[0]] +
+          a.slice(1).map(function(i) { return ' L ' + v[i]; }).join('')
+        );
+      });
+    };
     var makeFigure = function(fig, colorTable) {
       var isColorMode = colorMode.current() === true;
       var context = fig.context;
@@ -2422,20 +2430,12 @@
         makeHexagon(orgx + 0.5, orgy + 0.5);
         makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
       }
-      var makeAxesDesc = function(lines) {
-        return lines.map(function(a) {
-          return (
-            'M ' + v[a[0]] +
-            a.slice(1).map(function(i) { return ' L ' + v[i]; }).join('')
-          );
-        });
-      };
-      var axesDesc = makeAxesDesc([
+      var axesDesc = makeAxesDesc(v, [
         [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
         [0, 12], [1, 13], [4, 16], [5, 17],
       ]);
       if (colorDistType.current() === 1) {
-        axesDesc += makeAxesDesc([
+        axesDesc += makeAxesDesc(v, [
           [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
           [18, 21, 19, 22, 20, 23, 18], // lower hexagon
           [24, 27, 25, 28, 26, 29, 24]  // upper hexagon
