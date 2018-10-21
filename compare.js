@@ -2357,10 +2357,12 @@
       var counts = colorTable.counts;
       var ax = Math.round(colorDistOrientation.x) * (Math.PI / 180);
       var ay = Math.round(colorDistOrientation.y) * (Math.PI / 180);
+      var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
+      var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
       var scale = 0.707;
-      var xr = scale * Math.cos(ay), yr = -scale * Math.sin(ay) * Math.sin(ax);
-      var xg = -scale * Math.sin(ay), yg = -scale * Math.cos(ay) * Math.sin(ax);
-      var yb = -scale * Math.cos(ax);
+      var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
+      var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
+      var yb = -scale * cos_ax;
       if (colorDistType.current() === 0) { // 0:RGB
         var coef_xr = xr;
         var coef_xg = xg;
