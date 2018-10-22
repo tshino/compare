@@ -2330,6 +2330,34 @@
         updateFigure(img, redrawOnly);
       }
     };
+    // RGB (sRGB) --> xyY
+    var makeXyyColorList = function(rgbColorList) {
+      var colors = rgbColorList;
+      var srgbToLinear = [];
+      for (var i = 0; i < 256; ++i) {
+        var c = i / 255;
+        srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      }
+      var xyyColors = new Uint32Array(colors.length);
+      for (var k = 0; k < colors.length; k++) {
+        var rgb = colors[k];
+        var r = rgb >> 16;
+        var g = (rgb >> 8) & 255;
+        var b = rgb & 255;
+        var linr = srgbToLinear[r];
+        var ling = srgbToLinear[g];
+        var linb = srgbToLinear[b];
+        var capX = 0.412391 * linr + 0.357584 * ling + 0.180481 * linb;
+        var capY = 0.212639 * linr + 0.715169 * ling + 0.072192 * linb;
+        var capZ = 0.019331 * linr + 0.119195 * ling + 0.950532 * linb;
+        var xyz = capX + capY + capZ;
+        var x8 = xyz === 0 ? 0 : Math.round(capX / xyz * 255);
+        var y8 = xyz === 0 ? 0 : Math.round(capY / xyz * 255);
+        var capY8 = Math.round(capY * 255);
+        xyyColors[k] = (x8 << 16) + (y8 << 8) + capY8;
+      }
+      return xyyColors;
+    };
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
@@ -2363,7 +2391,14 @@
       var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
-      if (colorDistType.current() === 0) { // 0:RGB
+      if (colorDistType.current() === 2) { // 2:CIE xyY
+        if (!colorTable.xyyColors) {
+          colorTable.xyyColors = makeXyyColorList(colors);
+        }
+        var rgbColors = colors;
+        colors = colorTable.xyyColors;
+      }
+      if (colorDistType.current() === 0 || colorDistType.current() === 2) { // 0:RGB, 2:CIE xyY
         var coef_xr = xr;
         var coef_xg = xg;
         var coef_xb = 0;
@@ -2394,6 +2429,12 @@
         var count = counts[k];
         dist[offset] += count;
         if (isColorMode) { // RGB with Color
+          if (rgbColors) {
+            rgb = rgbColors[k];
+            r = rgb >> 16;
+            g = (rgb >> 8) & 255;
+            b = rgb & 255;
+          }
           colorMap[offset] += count * r;
           colorMap[offset + 102400] += count * g;
           colorMap[offset + 204800] += count * b;
@@ -2442,18 +2483,31 @@
           [18, 21, 19, 22, 20, 23, 18], // lower hexagon
           [24, 27, 25, 28, 26, 29, 24]  // upper hexagon
         ]);
+      } else if (colorDistType.current() === 2) {
+        axesDesc += makeAxesDesc(v, [[4, 12], [5, 13]]);
       }
-      var labels = colorDistType.current() === 0 ? [
-        { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
-        { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: (xr < 0 && yr < 0 && xg < 0) },
-        { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
-        { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
-      ] : [
-        { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
-        { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
-        { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
-        { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
-      ];
+      if (colorDistType.current() === 0) {
+        var labels = [
+          { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
+          { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: (xr < 0 && yr < 0 && xg < 0) },
+          { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
+          { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
+        ];
+      } else if (colorDistType.current() === 1) {
+        var labels = [
+          { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
+          { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
+          { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
+          { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
+        ];
+      } else {
+        var labels = [
+          { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
+          { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
+          { pos: [-140, 140, -140], text: 'y', color: '#08f', hidden: false },
+          { pos: [-140, -140, 140], text: 'Y', color: '#ccc', hidden: false }
+        ];
+      }
       var axesLabelsSVG = [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
