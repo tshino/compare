@@ -2476,7 +2476,10 @@
         v = v.concat([
             pos3DTo2D(163 - 128, 84 - 128, 0 - 128).join(','),
             pos3DTo2D(76 - 128, 153 - 128, 0 - 128).join(','),
-            pos3DTo2D(38 - 128, 15 - 128, 0 - 128).join(',')
+            pos3DTo2D(38 - 128, 15 - 128, 0 - 128).join(','),
+            pos3DTo2D(163 - 128, 84 - 128, 255 - 128).join(','),
+            pos3DTo2D(76 - 128, 153 - 128, 255 - 128).join(','),
+            pos3DTo2D(38 - 128, 15 - 128, 255 - 128).join(',')
         ]);
       }
       var axesDesc = makeAxesDesc(v, [
@@ -2490,7 +2493,9 @@
           [24, 27, 25, 28, 26, 29, 24]  // upper hexagon
         ]);
       } else if (colorDistType.current() === 2) {
-        axesDesc += makeAxesDesc(v, [[4, 12], [5, 13], [18, 19, 20, 18]]);
+        axesDesc += makeAxesDesc(v, [
+          [4, 12], [5, 13], [18, 19, 20, 18], [21, 22, 23, 21]
+        ]);
       }
       if (colorDistType.current() === 0) {
         var labels = [
