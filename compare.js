@@ -2333,7 +2333,7 @@
     // RGB (sRGB) --> xyY
     var makeXyyColorList = function(rgbColorList) {
       var colors = rgbColorList;
-      var srgbToLinear = [];
+      var srgbToLinear = new Float32Array(256);
       for (var i = 0; i < 256; ++i) {
         var c = i / 255;
         srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -2477,9 +2477,9 @@
             pos3DTo2D(163 - 128, 84 - 128, 0 - 128).join(','),
             pos3DTo2D(76 - 128, 153 - 128, 0 - 128).join(','),
             pos3DTo2D(38 - 128, 15 - 128, 0 - 128).join(','),
-            pos3DTo2D(163 - 128, 84 - 128, 255 - 128).join(','),
-            pos3DTo2D(76 - 128, 153 - 128, 255 - 128).join(','),
-            pos3DTo2D(38 - 128, 15 - 128, 255 - 128).join(',')
+            pos3DTo2D(163 - 128, 84 - 128, 256 - 128).join(','),
+            pos3DTo2D(76 - 128, 153 - 128, 256 - 128).join(','),
+            pos3DTo2D(38 - 128, 15 - 128, 256 - 128).join(',')
         ]);
       }
       var axesDesc = makeAxesDesc(v, [
