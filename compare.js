@@ -2367,16 +2367,14 @@
       });
     };
     var makeFigure = function(fig, colorTable) {
-      var isColorMode = colorMode.current() === true;
       var context = fig.context;
       var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
       for (var i = 0; i < dist.length; ++i) {
         dist[i] = 0;
       }
-      var colorMap = null;
-      if (isColorMode) { // RGB with Color
-        colorMap = new Float32Array(320 * 320 * 3);
+      if (colorMode.current() === true) { // RGB with Color
+        var colorMap = new Float32Array(320 * 320 * 3);
         for (var i = 0; i < colorMap.length; ++i) {
           colorMap[i] = 0;
         }
@@ -2428,7 +2426,7 @@
         var offset = ploty * 320 + plotx;
         var count = counts[k];
         dist[offset] += count;
-        if (isColorMode) { // RGB with Color
+        if (colorMap) { // RGB with Color
           if (rgbColors) {
             rgb = rgbColors[k];
             r = rgb >> 16;
@@ -2440,7 +2438,7 @@
           colorMap[offset + 204800] += count * b;
         }
       }
-      if (isColorMode) { // RGB with Color
+      if (colorMap) { // RGB with Color
         var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       } else { // RGB without Color
         var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
