@@ -277,6 +277,7 @@
   })();
   // View management functions
   var viewManagement = (function() {
+    var IMAGEBOX_MARGIN = 6, IMAGEBOX_MIN_SIZE = 32;
     var currentImageIndex = 0;
     var isSingleView = false;
     var overlayMode = false;
@@ -404,9 +405,8 @@
       var numRows    = layoutMode !== 'x' ? numSlots : 1;
       var boxW = $('#view').width() / numColumns;
       var boxH = $('#view').height() / numRows;
-      var MARGIN = 6, MIN_SIZE = 32;
-      boxW = compareUtil.clamp(boxW, MIN_SIZE, boxW - MARGIN);
-      boxH = compareUtil.clamp(boxH, MIN_SIZE, boxH - MARGIN);
+      boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - IMAGEBOX_MARGIN);
+      boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - IMAGEBOX_MARGIN);
       return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
     };
     var updateImageBox = function(box, img, boxW, boxH) {
