@@ -4197,7 +4197,11 @@
         nowLoadingDialog.update();
       };
       reader.onload = function(e) {
-        setupEntryWithDataURI(entry, e.target.result);
+        try {
+          setupEntryWithDataURI(entry, e.target.result);
+        } catch (e) {
+          setEntryError(entry, 'Failed. ' + (e.message || ''));
+        }
       };
       reader.onerror = function(e) {
         setEntryError(entry, 'Failed. File could not be read. (' + reader.error.name + ')');
