@@ -2361,10 +2361,10 @@
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
-          'M ' + v[a[0]] +
-          a.slice(1).map(function(i) { return ' L ' + v[i]; }).join('')
+          'M' + v[a[0]] +
+          a.slice(1).map(function(i) { return 'L' + v[i]; }).join('')
         );
-      });
+      }).join('');
     };
     var makeFigure = function(fig, colorTable) {
       var context = fig.context;
