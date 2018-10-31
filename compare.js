@@ -2330,14 +2330,17 @@
         updateFigure(img, redrawOnly);
       }
     };
-    // RGB (sRGB) --> xyY
-    var makeXyyColorList = function(rgbColorList) {
-      var colors = rgbColorList;
+    var srgbToLinear = (function() {
       var srgbToLinear = new Float32Array(256);
       for (var i = 0; i < 256; ++i) {
         var c = i / 255;
         srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       }
+      return srgbToLinear;
+    })();
+    // RGB (sRGB) --> xyY
+    var makeXyyColorList = function(rgbColorList) {
+      var colors = rgbColorList;
       var xyyColors = new Uint32Array(colors.length);
       for (var k = 0; k < colors.length; k++) {
         var rgb = colors[k];
