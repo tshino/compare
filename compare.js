@@ -2330,37 +2330,6 @@
         updateFigure(img, redrawOnly);
       }
     };
-    var srgbToLinear = (function() {
-      var srgbToLinear = new Float32Array(256);
-      for (var i = 0; i < 256; ++i) {
-        var c = i / 255;
-        srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      }
-      return srgbToLinear;
-    })();
-    // RGB (sRGB) --> xyY
-    var makeXyyColorList = function(rgbColorList) {
-      var colors = rgbColorList;
-      var xyyColors = new Uint32Array(colors.length);
-      for (var k = 0; k < colors.length; k++) {
-        var rgb = colors[k];
-        var r = rgb >> 16;
-        var g = (rgb >> 8) & 255;
-        var b = rgb & 255;
-        var linr = srgbToLinear[r];
-        var ling = srgbToLinear[g];
-        var linb = srgbToLinear[b];
-        var capX = 0.412391 * linr + 0.357584 * ling + 0.180481 * linb;
-        var capY = 0.212639 * linr + 0.715169 * ling + 0.072192 * linb;
-        var capZ = 0.019331 * linr + 0.119195 * ling + 0.950532 * linb;
-        var xyz = capX + capY + capZ;
-        var x8 = xyz === 0 ? 0 : Math.round(capX / xyz * 255);
-        var y8 = xyz === 0 ? 0 : Math.round(capY / xyz * 255);
-        var capY8 = Math.round(capY * 255);
-        xyyColors[k] = (x8 << 16) + (y8 << 8) + capY8;
-      }
-      return xyyColors;
-    };
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
@@ -2394,7 +2363,7 @@
       var yb = -scale * cos_ax;
       if (colorDistType.current() === 2) { // 2:CIE xyY
         if (!colorTable.xyyColors) {
-          colorTable.xyyColors = makeXyyColorList(colors);
+          colorTable.xyyColors = compareUtil.convertColorListRgbToXyy(colors);
         }
         var rgbColors = colors;
         colors = colorTable.xyyColors;
