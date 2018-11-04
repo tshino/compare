@@ -1378,6 +1378,7 @@
     toSignedFixed:          toSignedFixed,
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,
+    srgb255ToLinear:        srgb255ToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,

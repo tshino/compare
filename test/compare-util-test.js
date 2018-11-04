@@ -110,6 +110,34 @@ TEST( 'compareUtil toHexTriplet', function test() {
   EXPECT_EQ( '#101010', compareUtil.toHexTriplet(15.9, 16, 16.1) );
 });
 
+TEST( 'compareUtil srgb255ToLinear', function test() {
+  EXPECT_EQ( 0.0, compareUtil.srgb255ToLinear[0] );
+  EXPECT( 1e-5 > Math.abs(0.0003035270 - compareUtil.srgb255ToLinear[1]) );
+  EXPECT( 1e-5 > Math.abs(0.0015176349 - compareUtil.srgb255ToLinear[5]) );
+  EXPECT( 1e-5 > Math.abs(0.0030352698 - compareUtil.srgb255ToLinear[10]) );
+  EXPECT( 1e-5 > Math.abs(0.0033465358 - compareUtil.srgb255ToLinear[11]) );
+  EXPECT( 1e-5 > Math.abs(0.0047769535 - compareUtil.srgb255ToLinear[15]) );
+  EXPECT( 1e-5 > Math.abs(0.2158605001 - compareUtil.srgb255ToLinear[128]) );
+  EXPECT( 1e-5 > Math.abs(0.5271151257 - compareUtil.srgb255ToLinear[192]) );
+  EXPECT( 1e-5 > Math.abs(0.9911020971 - compareUtil.srgb255ToLinear[254]) );
+  EXPECT_EQ( 1.0, compareUtil.srgb255ToLinear[255] );
+});
+
+TEST( 'compareUtil convertColorListRgbToXyy', function test() {
+  var rgb = [
+    0x000000, 0x808080, 0xffffff,
+    0xff0000, 0x00ff00, 0x0000ff
+  ];
+  var xyy = compareUtil.convertColorListRgbToXyy(rgb);
+  EXPECT_EQ( rgb.length, xyy.length );
+  EXPECT_EQ( 0x505400, xyy[0] );    // x=79.74, y=83.90, Y = 0
+  EXPECT_EQ( 0x505437, xyy[1] );    // x=79.74, y=83.90, Y = 55.04
+  EXPECT_EQ( 0x5054ff, xyy[2] );    // x=79.74, y=83.90, Y = 255
+  EXPECT_EQ( 0xa35436, xyy[3] );    // x=163.20, y=84.15, Y = 54.23
+  EXPECT_EQ( 0x4c99b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
+  EXPECT_EQ( 0x260f12, xyy[5] );    // x=38.25, y=15.30, Y = 18.40
+});
+
 TEST( 'compareUtil binaryFromDataURI', function test() {
   // Hello, world!\n
   var datauri = 'data:;base64,SGVsbG8sIHdvcmxkIQo=';
