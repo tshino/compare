@@ -196,12 +196,12 @@
       var linr = srgb255ToLinear[r];
       var ling = srgb255ToLinear[g];
       var linb = srgb255ToLinear[b];
-      var capX = 0.412391 * linr + 0.357584 * ling + 0.180481 * linb;
-      var capY = 0.212639 * linr + 0.715169 * ling + 0.072192 * linb;
-      var capZ = 0.019331 * linr + 0.119195 * ling + 0.950532 * linb;
+      var capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
+      var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
+      var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
       var xyz = capX + capY + capZ;
-      var x8 = xyz === 0 ? 0 : Math.round(capX / xyz * 255);
-      var y8 = xyz === 0 ? 0 : Math.round(capY / xyz * 255);
+      var x8 = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255);
+      var y8 = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255);
       var capY8 = Math.round(capY * 255);
       xyyColors[k] = (x8 << 16) + (y8 << 8) + capY8;
     }

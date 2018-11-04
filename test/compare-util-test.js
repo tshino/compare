@@ -134,7 +134,7 @@ TEST( 'compareUtil convertColorListRgbToXyy', function test() {
   EXPECT_EQ( 0x505437, xyy[1] );    // x=79.74, y=83.90, Y = 55.04
   EXPECT_EQ( 0x5054ff, xyy[2] );    // x=79.74, y=83.90, Y = 255
   EXPECT_EQ( 0xa35436, xyy[3] );    // x=163.20, y=84.15, Y = 54.23
-  EXPECT_EQ( 0x4c99b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
+  EXPECT_EQ( 0x4d99b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
   EXPECT_EQ( 0x260f12, xyy[5] );    // x=38.25, y=15.30, Y = 18.40
 });
 
