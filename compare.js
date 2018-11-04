@@ -2444,12 +2444,12 @@
         makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
       } else if (colorDistType.current() === 2) { // 2:CIE xyY
         v = v.concat([
-            pos3DTo2D(163 - 128, 84 - 128, 0 - 128).join(','),
-            pos3DTo2D(76 - 128, 153 - 128, 0 - 128).join(','),
-            pos3DTo2D(38 - 128, 15 - 128, 0 - 128).join(','),
-            pos3DTo2D(163 - 128, 84 - 128, 256 - 128).join(','),
-            pos3DTo2D(76 - 128, 153 - 128, 256 - 128).join(','),
-            pos3DTo2D(38 - 128, 15 - 128, 256 - 128).join(',')
+            pos3DTo2D(163.2 - 128, 84.15 - 128, 0 - 128).join(','),
+            pos3DTo2D(76.5 - 128, 153 - 128, 0 - 128).join(','),
+            pos3DTo2D(38.25 - 128, 15.3 - 128, 0 - 128).join(','),
+            pos3DTo2D(163.2 - 128, 84.15 - 128, 256 - 128).join(','),
+            pos3DTo2D(76.5 - 128, 153 - 128, 256 - 128).join(','),
+            pos3DTo2D(38.25 - 128, 15.3 - 128, 256 - 128).join(',')
         ]);
       }
       var axesDesc = makeAxesDesc(v, [
