@@ -207,6 +207,33 @@
     }
     return xyyColors;
   };
+  // RGB --> HSV Cylinder
+  var convertColorListRgbToHsv = function(rgbColorList) {
+    var colors = rgbColorList;
+    var hsvColors = new Uint32Array(colors.length);
+    for (var k = 0; k < colors.length; k++) {
+      var rgb = colors[k];
+      var r = rgb >> 16;
+      var g = (rgb >> 8) & 255;
+      var b = rgb & 255;
+      var max = Math.max(r, g, b);
+      var min = Math.min(r, g, b);
+      var h = (
+        min === max ? 0 :
+        max === r ? 60 * (g - b) / (max - min) :
+        max === g ? 60 * (2 + (b - r) / (max - min)) :
+        60 * (4 + (r - g) / (max - min))
+      );
+      var s = max === 0 ? 0 : (max - min) / max;
+      var v = max;
+      var radH = h * (Math.PI / 180);
+      var x = Math.round(127.5 * (1 + Math.cos(radH) * s));
+      var y = Math.round(127.5 * (1 + Math.sin(radH) * s));
+      var z = v;
+      hsvColors[k] = (x << 16) + (y << 8) + z;
+    }
+    return hsvColors;
+  };
 
   //
   // Make a binary view of a DataURI string
@@ -1380,6 +1407,7 @@
     toHexTriplet:           toHexTriplet,
     srgb255ToLinear:        srgb255ToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
+    convertColorListRgbToHsv:   convertColorListRgbToHsv,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
