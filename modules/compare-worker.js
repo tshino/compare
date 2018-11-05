@@ -172,12 +172,14 @@ function calcVectorscope( imageData, type, colorMode )
       var linr = srgbToLinear[r];
       var ling = srgbToLinear[g];
       var linb = srgbToLinear[b];
-      var x = 0.412391 * linr + 0.357584 * ling + 0.180481 * linb;
-      var y = 0.212639 * linr + 0.715169 * ling + 0.072192 * linb;
-      var z = 0.019331 * linr + 0.119195 * ling + 0.950532 * linb;
-      var xyz = x + y + z;
-      var plotx = 32 + (xyz === 0 ? 0 : Math.round(x / xyz * 255));
-      var ploty = 287 - (xyz === 0 ? 0 : Math.round(y / xyz * 255));
+      var capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
+      var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
+      var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
+      var xyz = capX + capY + capZ;
+      var x = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255);
+      var y = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255);
+      var plotx = 32 + x;
+      var ploty = 287 - y;
       var offset = ploty * 320 + plotx;
       dist[offset] += 1;
       if (colorMap) {
