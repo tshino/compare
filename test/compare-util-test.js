@@ -126,7 +126,8 @@ TEST( 'compareUtil srgb255ToLinear', function test() {
 TEST( 'compareUtil convertColorListRgbToXyy', function test() {
   var rgb = [
     0x000000, 0x808080, 0xffffff,
-    0xff0000, 0x00ff00, 0x0000ff
+    0xff0000, 0x00ff00, 0x0000ff,
+    0x800000, 0x008000, 0x000080
   ];
   var xyy = compareUtil.convertColorListRgbToXyy(rgb);
   EXPECT_EQ( rgb.length, xyy.length );
@@ -136,6 +137,9 @@ TEST( 'compareUtil convertColorListRgbToXyy', function test() {
   EXPECT_EQ( 0xa35436, xyy[3] );    // x=163.20, y=84.15, Y = 54.23
   EXPECT_EQ( 0x4d99b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
   EXPECT_EQ( 0x260f12, xyy[5] );    // x=38.25, y=15.30, Y = 18.40
+  EXPECT_EQ( 0xa3540c, xyy[6] );    // x=163.20, y=84.15, Y = 11.71
+  EXPECT_EQ( 0x4d9927, xyy[7] );    // x=76.50, y=153.00, Y = 39.36
+  EXPECT_EQ( 0x260f04, xyy[8] );    // x=38.25, y=15.30, Y = 3.97
 });
 
 TEST( 'compareUtil binaryFromDataURI', function test() {
