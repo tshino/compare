@@ -2361,21 +2361,29 @@
       var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
-      if (colorDistType.current() === 2) { // 2:CIE xyY
+      if (colorDistType.current() === 1) { // 1:SHV
+        if (!colorTable.hsvColors) {
+          colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
+        }
+        var rgbColors = colors;
+        colors = colorTable.hsvColors;
+      } else if (colorDistType.current() === 3) { // 3:CIE xyY
         if (!colorTable.xyyColors) {
           colorTable.xyyColors = compareUtil.convertColorListRgbToXyy(colors);
         }
         var rgbColors = colors;
         colors = colorTable.xyyColors;
       }
-      if (colorDistType.current() === 0 || colorDistType.current() === 2) { // 0:RGB, 2:CIE xyY
+      if (colorDistType.current() === 0 ||
+          colorDistType.current() === 1 ||
+          colorDistType.current() === 3) { // 0:RGB, 1:HSV, 3:CIE xyY
         var coef_xr = xr;
         var coef_xg = xg;
         var coef_xb = 0;
         var coef_yr = yr;
         var coef_yg = yg;
         var coef_yb = yb;
-      } else { // 1:YCbCr
+      } else { // 2:YCbCr
         var coef_xr = -0.1687 * xr + 0.5000 * xg;
         var coef_xg = -0.3313 * xr - 0.4187 * xg;
         var coef_xb =  0.5000 * xr - 0.0813 * xg;
@@ -2427,7 +2435,7 @@
         var posZ = (i % 2) * 256;
         v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
       }
-      if (colorDistType.current() === 1) { // 1:YCbCr
+      if (colorDistType.current() === 2) { // 2:YCbCr
         var makeHexagon = function(ox, oy) {
           v = v.concat([
             [coef_xr, coef_yr0],
@@ -2442,7 +2450,7 @@
         };
         makeHexagon(orgx + 0.5, orgy + 0.5);
         makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
-      } else if (colorDistType.current() === 2) { // 2:CIE xyY
+      } else if (colorDistType.current() === 3) { // 3:CIE xyY
         v = v.concat([
             pos3DTo2D(163.2 - 128, 84.15 - 128, 0 - 128).join(','),
             pos3DTo2D(76.5 - 128, 153 - 128, 0 - 128).join(','),
@@ -2456,14 +2464,14 @@
         [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
         [0, 12], [1, 13], [4, 16], [5, 17],
       ]);
-      if (colorDistType.current() === 1) {
+      if (colorDistType.current() === 2) { // 2:YCbCr
         axesDesc += makeAxesDesc(v, [
           [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
           [18, 21, 19, 22, 20, 23, 18], // lower hexagon
           [24, 27, 25, 28, 26, 29, 24], // upper hexagon
           [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
         ]);
-      } else if (colorDistType.current() === 2) {
+      } else if (colorDistType.current() === 3) { // 3:CIE xyY
         axesDesc += makeAxesDesc(v, [
           [4, 12], [5, 13], [18, 19, 20, 18], [21, 22, 23, 21],
           [18, 21], [19, 22], [20, 23]
@@ -2478,12 +2486,18 @@
         ];
       } else if (colorDistType.current() === 1) {
         var labels = [
+          { pos: [0, 0, 140], text: 'V', color: '#ccc', hidden: false },
+          { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
+          { pos: [140, 0, -140], text: 'S', color: '#08f', hidden: false }
+        ];
+      } else if (colorDistType.current() === 2) {
+        var labels = [
           { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
           { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
           { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
         ];
-      } else {
+      } else if (colorDistType.current() === 3) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
           { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
