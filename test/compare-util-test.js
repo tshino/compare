@@ -142,6 +142,29 @@ TEST( 'compareUtil convertColorListRgbToXyy', function test() {
   EXPECT_EQ( 0x260f04, xyy[8] );    // x=38.25, y=15.30, Y = 3.97
 });
 
+TEST( 'compareUtil convertColorListRgbToHsv', function test() {
+  var rgb = [
+    0x000000, 0x808080, 0xffffff,
+    0xff0000, 0x00ff00, 0x0000ff,
+    0x800000, 0x008000, 0x000080,
+    0xff8080, 0x80ff80, 0x8080ff
+  ];
+  var hsv = compareUtil.convertColorListRgbToHsv(rgb);
+  EXPECT_EQ( rgb.length, hsv.length );
+  EXPECT_EQ( 0x808000, hsv[0] );    // H=0, S=0, V=0
+  EXPECT_EQ( 0x808080, hsv[1] );    // H=0, S=0, V=50.2
+  EXPECT_EQ( 0x8080ff, hsv[2] );    // H=0, S=0, V=100
+  EXPECT_EQ( 0xff80ff, hsv[3] );    // H=0, S=100, V=100
+  EXPECT_EQ( 0x40eeff, hsv[4] );    // H=120, S=100, V=100
+  EXPECT_EQ( 0x4011ff, hsv[5] );    // H=240, S=100, V=100
+  EXPECT_EQ( 0xff8080, hsv[6] );    // H=0, S=100, V=50.2
+  EXPECT_EQ( 0x40ee80, hsv[7] );    // H=120, S=100, V=50.2
+  EXPECT_EQ( 0x401180, hsv[8] );    // H=240, S=100, V=50.2
+  EXPECT_EQ( 0xbf80ff, hsv[9] );    // H=0, S=49.2, V=100
+  EXPECT_EQ( 0x60b6ff, hsv[10] );   // H=120, S=49.2, V=100
+  EXPECT_EQ( 0x6049ff, hsv[11] );   // H=240, S=49.2, V=100
+});
+
 TEST( 'compareUtil binaryFromDataURI', function test() {
   // Hello, world!\n
   var datauri = 'data:;base64,SGVsbG8sIHdvcmxkIQo=';
