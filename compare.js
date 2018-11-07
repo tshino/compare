@@ -2429,11 +2429,28 @@
         return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
       };
       var v = [];
-      for (var i = 0; i < 18; ++i) {
-        var posX = (Math.floor(i / 6) % 3) * 128;
-        var posY = (Math.floor(i / 2) % 3) * 128;
-        var posZ = (i % 2) * 256;
-        v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
+      if (colorDistType.current() !== 1) { // 1:HSV
+        for (var i = 0; i < 18; ++i) {
+          var posX = (Math.floor(i / 6) % 3) * 128;
+          var posY = (Math.floor(i / 2) % 3) * 128;
+          var posZ = (i % 2) * 256;
+          v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
+        }
+      } else {
+        for (var i = 0; i < 36; ++i) {
+          var a = i / 18 * Math.PI;
+          var posX = 128 * Math.cos(a);
+          var posY = 128 * Math.sin(a);
+          v[i * 2] = pos3DTo2D(posX, posY, -128).join(',');
+          v[i * 2 + 1] = pos3DTo2D(posX, posY, 128).join(',');
+        }
+        var scale = 128 / Math.sqrt(yg * yg + yr * yr);
+        v[72] = pos3DTo2D(yg * scale, -yr * scale, -128).join(',');
+        v[73] = pos3DTo2D(yg * scale, -yr * scale, 128).join(',');
+        v[74] = pos3DTo2D(-yg * scale, yr * scale, -128).join(',');
+        v[75] = pos3DTo2D(-yg * scale, yr * scale, 128).join(',');
+        v[76] = pos3DTo2D(0, 0, -128).join(',');
+        v[77] = pos3DTo2D(0, 0, 128).join(',');
       }
       if (colorDistType.current() === 2) { // 2:YCbCr
         var makeHexagon = function(ox, oy) {
@@ -2460,10 +2477,23 @@
             pos3DTo2D(38.25 - 128, 15.3 - 128, 256 - 128).join(',')
         ]);
       }
-      var axesDesc = makeAxesDesc(v, [
-        [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
-        [0, 12], [1, 13], [4, 16], [5, 17],
-      ]);
+      if (colorDistType.current() !== 1) { // 1:HSV
+        var axesDesc = makeAxesDesc(v, [
+          [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
+          [0, 12], [1, 13], [4, 16], [5, 17],
+        ]);
+      } else {
+        var circles = [[], []];
+        for (var i = 0; i <= 36; ++i) {
+          circles[0][i] = (i % 36) * 2;
+          circles[1][i] = (i % 36) * 2 + 1;
+        }
+        var axesDesc = makeAxesDesc(v, [
+          circles[0], circles[1],
+          [72, 73], [74, 75],
+          [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
+        ]);
+      }
       if (colorDistType.current() === 2) { // 2:YCbCr
         axesDesc += makeAxesDesc(v, [
           [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
@@ -2488,7 +2518,9 @@
         var labels = [
           { pos: [0, 0, 140], text: 'V', color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
-          { pos: [140, 0, -140], text: 'S', color: '#08f', hidden: false }
+          { pos: [160, 0, -140], text: 'S H=0', color: '#f00', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
+          { pos: [-80, 140, -140], text: 'H=120', color: '#0f0', hidden: (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg)) },
+          { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg)) }
         ];
       } else if (colorDistType.current() === 2) {
         var labels = [
