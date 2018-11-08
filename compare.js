@@ -2333,8 +2333,8 @@
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
-          'M' + v[a[0]] +
-          a.slice(1).map(function(i) { return 'L' + v[i]; }).join('')
+          'M' + v[a[0]].join(',') +
+          a.slice(1).map(function(i) { return 'L' + v[i].join(','); }).join('')
         );
       }).join('');
     };
@@ -2434,23 +2434,23 @@
           var posX = (Math.floor(i / 6) % 3) * 128;
           var posY = (Math.floor(i / 2) % 3) * 128;
           var posZ = (i % 2) * 256;
-          v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128).join(',');
+          v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128);
         }
       } else {
         for (var i = 0; i < 36; ++i) {
           var a = i / 18 * Math.PI;
           var posX = 128 * Math.cos(a);
           var posY = 128 * Math.sin(a);
-          v[i * 2] = pos3DTo2D(posX, posY, -128).join(',');
-          v[i * 2 + 1] = pos3DTo2D(posX, posY, 128).join(',');
+          v[i * 2] = pos3DTo2D(posX, posY, -128);
+          v[i * 2 + 1] = pos3DTo2D(posX, posY, 128);
         }
         var scale = 128 / Math.sqrt(yg * yg + yr * yr);
-        v[72] = pos3DTo2D(yg * scale, -yr * scale, -128).join(',');
-        v[73] = pos3DTo2D(yg * scale, -yr * scale, 128).join(',');
-        v[74] = pos3DTo2D(-yg * scale, yr * scale, -128).join(',');
-        v[75] = pos3DTo2D(-yg * scale, yr * scale, 128).join(',');
-        v[76] = pos3DTo2D(0, 0, -128).join(',');
-        v[77] = pos3DTo2D(0, 0, 128).join(',');
+        v[72] = pos3DTo2D(yg * scale, -yr * scale, -128);
+        v[73] = pos3DTo2D(yg * scale, -yr * scale, 128);
+        v[74] = pos3DTo2D(-yg * scale, yr * scale, -128);
+        v[75] = pos3DTo2D(-yg * scale, yr * scale, 128);
+        v[76] = pos3DTo2D(0, 0, -128);
+        v[77] = pos3DTo2D(0, 0, 128);
       }
       if (colorDistType.current() === 2) { // 2:YCbCr
         var makeHexagon = function(ox, oy) {
@@ -2462,19 +2462,19 @@
             [coef_xg + coef_xb, coef_yg0 + coef_yb0],
             [coef_xb + coef_xr, coef_yb0 + coef_yr0]
           ].map(function(c) {
-            return (ox + c[0] * 255) + ',' + (oy + c[1] * 255);
+            return [ox + c[0] * 255, oy + c[1] * 255];
           }));
         };
         makeHexagon(orgx + 0.5, orgy + 0.5);
         makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
       } else if (colorDistType.current() === 3) { // 3:CIE xyY
         v = v.concat([
-            pos3DTo2D(163.2 - 128, 84.15 - 128, 0 - 128).join(','),
-            pos3DTo2D(76.5 - 128, 153 - 128, 0 - 128).join(','),
-            pos3DTo2D(38.25 - 128, 15.3 - 128, 0 - 128).join(','),
-            pos3DTo2D(163.2 - 128, 84.15 - 128, 256 - 128).join(','),
-            pos3DTo2D(76.5 - 128, 153 - 128, 256 - 128).join(','),
-            pos3DTo2D(38.25 - 128, 15.3 - 128, 256 - 128).join(',')
+            pos3DTo2D(163.2 - 128, 84.15 - 128, 0 - 128),
+            pos3DTo2D(76.5 - 128, 153 - 128, 0 - 128),
+            pos3DTo2D(38.25 - 128, 15.3 - 128, 0 - 128),
+            pos3DTo2D(163.2 - 128, 84.15 - 128, 256 - 128),
+            pos3DTo2D(76.5 - 128, 153 - 128, 256 - 128),
+            pos3DTo2D(38.25 - 128, 15.3 - 128, 256 - 128)
         ]);
       }
       if (colorDistType.current() !== 1) { // 1:HSV
