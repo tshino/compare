@@ -2330,6 +2330,55 @@
         updateFigure(img, redrawOnly);
       }
     };
+    var vertices3DCube = (function() {
+      var v = []
+      for (var i = 0; i < 18; ++i) {
+        var posX = (Math.floor(i / 6) % 3) * 128 - 128;
+        var posY = (Math.floor(i / 2) % 3) * 128 - 128;
+        var posZ = (i % 2) * 256 - 128;
+        v[i] = [posX, posY, posZ];
+      }
+      return v;
+    })();
+    var vertexIndicesCube = [
+      [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
+      [0, 12], [1, 13], [4, 16], [5, 17],
+    ];
+    var vertices3DCylinder = (function() {
+      var v = [];
+      for (var i = 0; i < 36; ++i) {
+        var a = i / 18 * Math.PI;
+        var posX = 128 * Math.cos(a);
+        var posY = 128 * Math.sin(a);
+        v[i * 2] = [posX, posY, -128];
+        v[i * 2 + 1] = [posX, posY, 128];
+      }
+      return v;
+    })();
+    var vertexIndicesCylinder = (function() {
+      var cylinder = [[], []];
+      for (var i = 0; i <= 36; ++i) {
+        cylinder[0][i] = (i % 36) * 2;
+        cylinder[1][i] = (i % 36) * 2 + 1;
+      }
+      return cylinder.concat([
+        [72, 73], [74, 75],
+        [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
+      ]);
+    })();
+    var vertices3DChromaticityPoints = [
+      [163.2 - 128, 84.15 - 128, -128],
+      [76.5 - 128, 153 - 128, -128],
+      [38.25 - 128, 15.3 - 128, -128],
+      [163.2 - 128, 84.15 - 128, 128],
+      [76.5 - 128, 153 - 128, 128],
+      [38.25 - 128, 15.3 - 128, 128]
+    ];
+    var vertexIndicesChromaticityPoints = [
+      [4, 12], [5, 13],
+      [18, 19, 20, 18], [21, 22, 23, 21],
+      [18, 21], [19, 22], [20, 23]
+    ];
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
@@ -2424,33 +2473,28 @@
         var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
       }
       context.putImageData(bits, 0, 0);
-      var vbox = '0 0 ' + 320 + ' ' + 320;
+      var vbox = '0 0 320 320';
       var pos3DTo2D = function(x, y, z) {
         return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
       };
+      var vertices3DTo2D = function(v) {
+        return v.map(function(pos) {
+          return pos3DTo2D(pos[0], pos[1], pos[2]);
+        });
+      };
       var v = [];
       if (colorDistType.current() !== 1) { // 1:HSV
-        for (var i = 0; i < 18; ++i) {
-          var posX = (Math.floor(i / 6) % 3) * 128;
-          var posY = (Math.floor(i / 2) % 3) * 128;
-          var posZ = (i % 2) * 256;
-          v[i] = pos3DTo2D(posX - 128, posY - 128, posZ - 128);
-        }
+        v = vertices3DTo2D(vertices3DCube);
       } else {
-        for (var i = 0; i < 36; ++i) {
-          var a = i / 18 * Math.PI;
-          var posX = 128 * Math.cos(a);
-          var posY = 128 * Math.sin(a);
-          v[i * 2] = pos3DTo2D(posX, posY, -128);
-          v[i * 2 + 1] = pos3DTo2D(posX, posY, 128);
-        }
         var scale = 128 / Math.sqrt(yg * yg + yr * yr);
-        v[72] = pos3DTo2D(yg * scale, -yr * scale, -128);
-        v[73] = pos3DTo2D(yg * scale, -yr * scale, 128);
-        v[74] = pos3DTo2D(-yg * scale, yr * scale, -128);
-        v[75] = pos3DTo2D(-yg * scale, yr * scale, 128);
-        v[76] = pos3DTo2D(0, 0, -128);
-        v[77] = pos3DTo2D(0, 0, 128);
+        v = vertices3DTo2D(vertices3DCylinder.concat([
+          [yg * scale, -yr * scale, -128],
+          [yg * scale, -yr * scale, 128],
+          [-yg * scale, yr * scale, -128],
+          [-yg * scale, yr * scale, 128],
+          [0, 0, -128],
+          [0, 0, 128]
+        ]));
       }
       if (colorDistType.current() === 2) { // 2:YCbCr
         var makeHexagon = function(ox, oy) {
@@ -2468,31 +2512,12 @@
         makeHexagon(orgx + 0.5, orgy + 0.5);
         makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
       } else if (colorDistType.current() === 3) { // 3:CIE xyY
-        v = v.concat([
-            pos3DTo2D(163.2 - 128, 84.15 - 128, 0 - 128),
-            pos3DTo2D(76.5 - 128, 153 - 128, 0 - 128),
-            pos3DTo2D(38.25 - 128, 15.3 - 128, 0 - 128),
-            pos3DTo2D(163.2 - 128, 84.15 - 128, 256 - 128),
-            pos3DTo2D(76.5 - 128, 153 - 128, 256 - 128),
-            pos3DTo2D(38.25 - 128, 15.3 - 128, 256 - 128)
-        ]);
+        v = v.concat(vertices3DTo2D(vertices3DChromaticityPoints));
       }
       if (colorDistType.current() !== 1) { // 1:HSV
-        var axesDesc = makeAxesDesc(v, [
-          [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
-          [0, 12], [1, 13], [4, 16], [5, 17],
-        ]);
+        var axesDesc = makeAxesDesc(v, vertexIndicesCube);
       } else {
-        var circles = [[], []];
-        for (var i = 0; i <= 36; ++i) {
-          circles[0][i] = (i % 36) * 2;
-          circles[1][i] = (i % 36) * 2 + 1;
-        }
-        var axesDesc = makeAxesDesc(v, [
-          circles[0], circles[1],
-          [72, 73], [74, 75],
-          [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
-        ]);
+        var axesDesc = makeAxesDesc(v, vertexIndicesCylinder);
       }
       if (colorDistType.current() === 2) { // 2:YCbCr
         axesDesc += makeAxesDesc(v, [
@@ -2502,10 +2527,7 @@
           [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
         ]);
       } else if (colorDistType.current() === 3) { // 3:CIE xyY
-        axesDesc += makeAxesDesc(v, [
-          [4, 12], [5, 13], [18, 19, 20, 18], [21, 22, 23, 21],
-          [18, 21], [19, 22], [20, 23]
-        ]);
+        axesDesc += makeAxesDesc(v, vertexIndicesChromaticityPoints);
       }
       if (colorDistType.current() === 0) {
         var labels = [
