@@ -2366,6 +2366,20 @@
         [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
       ]);
     })();
+    var vertices3DYCbCrHexagons = [
+      [-43.5, 128, -128],
+      [-85.0, -107.3, -128],
+      [128, -21.2, -128],
+      [-128, 21.2, -128],
+      [43.5, -128, -128],
+      [85.0, 107.3, -128],
+      [-43.5, 128, 128],
+      [-85.0, -107.3, 128],
+      [128, -21.2, 128],
+      [-128, 21.2, 128],
+      [43.5, -128, 128],
+      [85.0, 107.3, 128]
+    ];
     var vertices3DChromaticityPoints = [
       [163.2 - 128, 84.15 - 128, -128],
       [76.5 - 128, 153 - 128, -128],
@@ -2483,36 +2497,22 @@
         });
       };
       var v = [];
-      if (colorDistType.current() !== 1) { // 1:HSV
+      if (colorDistType.current() === 0) { // 0:RGB
         v = vertices3DTo2D(vertices3DCube);
-      } else {
-        var scale = 128 / Math.sqrt(yg * yg + yr * yr);
+      } else if (colorDistType.current() === 1) { // 1:HSV
+        var scale = 128 / Math.sqrt(xg * xg + xr * xr);
         v = vertices3DTo2D(vertices3DCylinder.concat([
-          [yg * scale, -yr * scale, -128],
-          [yg * scale, -yr * scale, 128],
-          [-yg * scale, yr * scale, -128],
-          [-yg * scale, yr * scale, 128],
+          [-xr * scale, -xg * scale, -128],
+          [-xr * scale, -xg * scale, 128],
+          [xr * scale, xg * scale, -128],
+          [xr * scale, xg * scale, 128],
           [0, 0, -128],
           [0, 0, 128]
         ]));
-      }
-      if (colorDistType.current() === 2) { // 2:YCbCr
-        var makeHexagon = function(ox, oy) {
-          v = v.concat([
-            [coef_xr, coef_yr0],
-            [coef_xg, coef_yg0],
-            [coef_xb, coef_yb0],
-            [coef_xr + coef_xg, coef_yr0 + coef_yg0],
-            [coef_xg + coef_xb, coef_yg0 + coef_yb0],
-            [coef_xb + coef_xr, coef_yb0 + coef_yr0]
-          ].map(function(c) {
-            return [ox + c[0] * 255, oy + c[1] * 255];
-          }));
-        };
-        makeHexagon(orgx + 0.5, orgy + 0.5);
-        makeHexagon(orgx + 0.5, orgy + 0.5 + yb * 255);
-      } else if (colorDistType.current() === 3) { // 3:CIE xyY
-        v = v.concat(vertices3DTo2D(vertices3DChromaticityPoints));
+      } else if (colorDistType.current() === 2) { // 2:YCbCr
+        v = vertices3DTo2D(vertices3DCube.concat(vertices3DYCbCrHexagons));
+      } else { // 3:CIE xyY
+        v = vertices3DTo2D(vertices3DCube.concat(vertices3DChromaticityPoints));
       }
       if (colorDistType.current() !== 1) { // 1:HSV
         var axesDesc = makeAxesDesc(v, vertexIndicesCube);
