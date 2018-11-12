@@ -2380,12 +2380,12 @@
       [43.5, -128, 128],
       [85.0, 107.3, 128]
     ];
-    var vertexIndicesYCbCrHexagons = [
+    var vertexIndicesYCbCr = vertexIndicesCube.concat([
       [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
       [18, 21, 19, 22, 20, 23, 18], // lower hexagon
       [24, 27, 25, 28, 26, 29, 24], // upper hexagon
       [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
-    ];
+    ]);
     var vertices3DChromaticityPoints = [
       [163.2 - 128, 84.15 - 128, -128],
       [76.5 - 128, 153 - 128, -128],
@@ -2394,11 +2394,11 @@
       [76.5 - 128, 153 - 128, 128],
       [38.25 - 128, 15.3 - 128, 128]
     ];
-    var vertexIndicesChromaticityPoints = [
+    var vertexIndicesCIEXyy = vertexIndicesCube.concat([
       [4, 12], [5, 13],
       [18, 19, 20, 18], [21, 22, 23, 21],
       [18, 21], [19, 22], [20, 23]
-    ];
+    ]);
     var makeAxesDesc = function(v, lines) {
       return lines.map(function(a) {
         return (
@@ -2520,15 +2520,14 @@
       } else { // 3:CIE xyY
         v = vertices3DTo2D(vertices3DCube.concat(vertices3DChromaticityPoints));
       }
-      if (colorDistType.current() !== 1) { // 1:HSV
+      if (colorDistType.current() === 0) { // 0:RGB
         var axesDesc = makeAxesDesc(v, vertexIndicesCube);
-      } else {
+      } else if (colorDistType.current() === 1) { // 1:HSV
         var axesDesc = makeAxesDesc(v, vertexIndicesCylinder);
-      }
-      if (colorDistType.current() === 2) { // 2:YCbCr
-        axesDesc += makeAxesDesc(v, vertexIndicesYCbCrHexagons);
+      } else if (colorDistType.current() === 2) { // 2:YCbCr
+        var axesDesc = makeAxesDesc(v, vertexIndicesYCbCr);
       } else if (colorDistType.current() === 3) { // 3:CIE xyY
-        axesDesc += makeAxesDesc(v, vertexIndicesChromaticityPoints);
+        var axesDesc = makeAxesDesc(v, vertexIndicesCIEXyy);
       }
       if (colorDistType.current() === 0) {
         var labels = [
