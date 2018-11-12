@@ -2366,34 +2366,34 @@
         [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
       ]);
     })();
-    var vertices3DYCbCrHexagons = [
-      [-43.5, 128, -128],
+    var vertices3DYCbCr = vertices3DCube.concat([
+      [-43.5, 128, -128],   // lower hexagon
       [-85.0, -107.3, -128],
       [128, -21.2, -128],
       [-128, 21.2, -128],
       [43.5, -128, -128],
       [85.0, 107.3, -128],
-      [-43.5, 128, 128],
+      [-43.5, 128, 128],    // upper hexagon
       [-85.0, -107.3, 128],
       [128, -21.2, 128],
       [-128, 21.2, 128],
       [43.5, -128, 128],
       [85.0, 107.3, 128]
-    ];
+    ]);
     var vertexIndicesYCbCr = vertexIndicesCube.concat([
       [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
       [18, 21, 19, 22, 20, 23, 18], // lower hexagon
       [24, 27, 25, 28, 26, 29, 24], // upper hexagon
       [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
     ]);
-    var vertices3DChromaticityPoints = [
-      [163.2 - 128, 84.15 - 128, -128],
+    var vertices3DCIEXyy = vertices3DCube.concat([
+      [163.2 - 128, 84.15 - 128, -128], // lower chromaticity points
       [76.5 - 128, 153 - 128, -128],
       [38.25 - 128, 15.3 - 128, -128],
-      [163.2 - 128, 84.15 - 128, 128],
+      [163.2 - 128, 84.15 - 128, 128],  // upper
       [76.5 - 128, 153 - 128, 128],
       [38.25 - 128, 15.3 - 128, 128]
-    ];
+    ]);
     var vertexIndicesCIEXyy = vertexIndicesCube.concat([
       [4, 12], [5, 13],
       [18, 19, 20, 18], [21, 22, 23, 21],
@@ -2516,9 +2516,9 @@
           [0, 0, 128]
         ]));
       } else if (colorDistType.current() === 2) { // 2:YCbCr
-        v = vertices3DTo2D(vertices3DCube.concat(vertices3DYCbCrHexagons));
+        v = vertices3DTo2D(vertices3DYCbCr);
       } else { // 3:CIE xyY
-        v = vertices3DTo2D(vertices3DCube.concat(vertices3DChromaticityPoints));
+        v = vertices3DTo2D(vertices3DCIEXyy);
       }
       if (colorDistType.current() === 0) { // 0:RGB
         var axesDesc = makeAxesDesc(v, vertexIndicesCube);
