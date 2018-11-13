@@ -2502,24 +2502,19 @@
           return pos3DTo2D(pos[0], pos[1], pos[2]);
         });
       };
-      var v = [];
-      if (colorDistType.current() === 0) { // 0:RGB
-        v = vertices3DTo2D(vertices3DCube);
-      } else if (colorDistType.current() === 1) { // 1:HSV
-        var scale = 128 / Math.sqrt(xg * xg + xr * xr);
-        v = vertices3DTo2D(vertices3DCylinder.concat([
-          [-xr * scale, -xg * scale, -128],
-          [-xr * scale, -xg * scale, 128],
-          [xr * scale, xg * scale, -128],
-          [xr * scale, xg * scale, 128],
-          [0, 0, -128],
-          [0, 0, 128]
-        ]));
-      } else if (colorDistType.current() === 2) { // 2:YCbCr
-        v = vertices3DTo2D(vertices3DYCbCr);
-      } else { // 3:CIE xyY
-        v = vertices3DTo2D(vertices3DCIEXyy);
-      }
+      var v = vertices3DTo2D(
+        colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
+        colorDistType.current() === 1 ? vertices3DCylinder.concat((function() {
+          var scale = 128 / Math.sqrt(xg * xg + xr * xr);
+          var hx = xr * scale, hy = xg * scale;
+          return [
+            [-hx, -hy, -128], [-hx, -hy, 128], [hx, hy, -128], [hx, hy, 128],
+            [0, 0, -128], [0, 0, 128]
+          ];
+        })()) : // 1:HSV
+        colorDistType.current() === 2 ? vertices3DYCbCr : // 2:YCbCr
+        vertices3DCIEXyy // 3:CIE xyY
+      );
       var axesDesc = makeAxesDesc(v,
           colorDistType.current() === 0 ? vertexIndicesCube : // 0:RGB
           colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
