@@ -2520,15 +2520,12 @@
       } else { // 3:CIE xyY
         v = vertices3DTo2D(vertices3DCIEXyy);
       }
-      if (colorDistType.current() === 0) { // 0:RGB
-        var axesDesc = makeAxesDesc(v, vertexIndicesCube);
-      } else if (colorDistType.current() === 1) { // 1:HSV
-        var axesDesc = makeAxesDesc(v, vertexIndicesCylinder);
-      } else if (colorDistType.current() === 2) { // 2:YCbCr
-        var axesDesc = makeAxesDesc(v, vertexIndicesYCbCr);
-      } else if (colorDistType.current() === 3) { // 3:CIE xyY
-        var axesDesc = makeAxesDesc(v, vertexIndicesCIEXyy);
-      }
+      var axesDesc = makeAxesDesc(v,
+          colorDistType.current() === 0 ? vertexIndicesCube : // 0:RGB
+          colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
+          colorDistType.current() === 2 ? vertexIndicesYCbCr : // 2:YCbCr
+          vertexIndicesCIEXyy // 3:CIE xyY
+      );
       if (colorDistType.current() === 0) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
