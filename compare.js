@@ -2430,13 +2430,19 @@
       var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
-      if (colorDistType.current() === 1) { // 1:SHV
+      if (colorDistType.current() === 1) { // 1:HSV
         if (!colorTable.hsvColors) {
           colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
         }
         var rgbColors = colors;
         colors = colorTable.hsvColors;
-      } else if (colorDistType.current() === 3) { // 3:CIE xyY
+      } else if (colorDistType.current() === 2) { // 2:HSL
+        if (!colorTable.hslColors) {
+          colorTable.hslColors = compareUtil.convertColorListRgbToHsl(colors);
+        }
+        var rgbColors = colors;
+        colors = colorTable.hslColors;
+      } else if (colorDistType.current() === 4) { // 4:CIE xyY
         if (!colorTable.xyyColors) {
           colorTable.xyyColors = compareUtil.convertColorListRgbToXyy(colors);
         }
@@ -2445,14 +2451,15 @@
       }
       if (colorDistType.current() === 0 ||
           colorDistType.current() === 1 ||
-          colorDistType.current() === 3) { // 0:RGB, 1:HSV, 3:CIE xyY
+          colorDistType.current() === 2 ||
+          colorDistType.current() === 4) { // 0:RGB, 1:HSV, 2:HSL, 4:CIE xyY
         var coef_xr = xr;
         var coef_xg = xg;
         var coef_xb = 0;
         var coef_yr = yr;
         var coef_yg = yg;
         var coef_yb = yb;
-      } else { // 2:YCbCr
+      } else { // 3:YCbCr
         var coef_xr = -0.1687 * xr + 0.5000 * xg;
         var coef_xg = -0.3313 * xr - 0.4187 * xg;
         var coef_xb =  0.5000 * xr - 0.0813 * xg;
@@ -2504,22 +2511,23 @@
       };
       var v = vertices3DTo2D(
         colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
-        colorDistType.current() === 1 ? vertices3DCylinder.concat((function() {
+        (colorDistType.current() === 1 || colorDistType.current() === 2) ? vertices3DCylinder.concat((function() {
           var scale = 128 / Math.sqrt(xg * xg + xr * xr);
           var hx = xr * scale, hy = xg * scale;
           return [
             [-hx, -hy, -128], [-hx, -hy, 128], [hx, hy, -128], [hx, hy, 128],
             [0, 0, -128], [0, 0, 128]
           ];
-        })()) : // 1:HSV
-        colorDistType.current() === 2 ? vertices3DYCbCr : // 2:YCbCr
-        vertices3DCIEXyy // 3:CIE xyY
+        })()) : // 1:HSV, 2:HSL
+        colorDistType.current() === 3 ? vertices3DYCbCr : // 3:YCbCr
+        vertices3DCIEXyy // 4:CIE xyY
       );
       var axesDesc = makeAxesDesc(v,
           colorDistType.current() === 0 ? vertexIndicesCube : // 0:RGB
           colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
-          colorDistType.current() === 2 ? vertexIndicesYCbCr : // 2:YCbCr
-          vertexIndicesCIEXyy // 3:CIE xyY
+          colorDistType.current() === 2 ? vertexIndicesCylinder : // 2:HSL
+          colorDistType.current() === 3 ? vertexIndicesYCbCr : // 3:YCbCr
+          vertexIndicesCIEXyy // 4:CIE xyY
       );
       if (colorDistType.current() === 0) {
         var labels = [
@@ -2528,22 +2536,22 @@
           { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
           { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
         ];
-      } else if (colorDistType.current() === 1) {
+      } else if (colorDistType.current() === 1 || colorDistType.current() === 2) {
         var labels = [
-          { pos: [0, 0, 140], text: 'V', color: '#ccc', hidden: false },
+          { pos: [0, 0, 140], text: (colorDistType.current() === 1 ? 'V' : 'L'), color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
           { pos: [160, 0, -140], text: 'S H=0', color: '#f00', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
           { pos: [-80, 140, -140], text: 'H=120', color: '#0f0', hidden: (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg)) },
           { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg)) }
         ];
-      } else if (colorDistType.current() === 2) {
+      } else if (colorDistType.current() === 3) {
         var labels = [
           { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
           { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
           { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
         ];
-      } else if (colorDistType.current() === 3) {
+      } else if (colorDistType.current() === 4) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
           { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
