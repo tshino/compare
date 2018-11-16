@@ -2411,14 +2411,8 @@
       var context = fig.context;
       var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
-      for (var i = 0; i < dist.length; ++i) {
-        dist[i] = 0;
-      }
       if (colorMode.current() === true) { // RGB with Color
         var colorMap = new Float32Array(320 * 320 * 3);
-        for (var i = 0; i < colorMap.length; ++i) {
-          colorMap[i] = 0;
-        }
       }
       var colors = colorTable.colors;
       var counts = colorTable.counts;
