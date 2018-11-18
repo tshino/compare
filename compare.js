@@ -1966,9 +1966,6 @@
     };
     var makeFigure = function(type, w, h, histW, hist) {
       var histN = new Uint32Array(histW);
-      for (var i = 0; i < histW; ++i) {
-        histN[i] = 0;
-      }
       for (var i = 0; i < w; ++i) {
         var x = Math.round((i + 0.5) / w * histW - 0.5);
         ++histN[x];
