@@ -2454,12 +2454,9 @@
         var coef_xr = -0.1687 * xr + 0.5000 * xg;
         var coef_xg = -0.3313 * xr - 0.4187 * xg;
         var coef_xb =  0.5000 * xr - 0.0813 * xg;
-        var coef_yr0 = -0.1687 * yr + 0.5000 * yg;
-        var coef_yg0 = -0.3313 * yr - 0.4187 * yg;
-        var coef_yb0 =  0.5000 * yr - 0.0813 * yg;
-        var coef_yr = coef_yr0 + 0.299 * yb;
-        var coef_yg = coef_yg0 + 0.587 * yb;
-        var coef_yb = coef_yb0 + 0.114 * yb;
+        var coef_yr = -0.1687 * yr + 0.5000 * yg + 0.299 * yb;
+        var coef_yg = -0.3313 * yr - 0.4187 * yg + 0.587 * yb;
+        var coef_yb =  0.5000 * yr - 0.0813 * yg + 0.114 * yb;
       }
       var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
       var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
