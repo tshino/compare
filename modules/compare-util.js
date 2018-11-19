@@ -1238,9 +1238,7 @@
     var processMouseMove = function(e, selector, target) {
       if (dragLastPoint) {
         if (e.buttons !== 1) {
-          clickPoint = null;
-          dragStartPoint = null;
-          dragLastPoint = null;
+          resetDragState();
         } else {
           var index = selector ? $(selector).index(target) : null;
           if (clickPoint) {
