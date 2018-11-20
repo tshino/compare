@@ -220,6 +220,10 @@ button.close
     margin          : 0px;
     padding         : 0px;
 }
+#view.dragging .imageBox
+{
+    cursor: move;
+}
 .pixelated
 {
     -ms-interpolation-mode: nearest-neighbor;

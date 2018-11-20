@@ -1102,6 +1102,7 @@
     var clickPoint = null;
     var dragStartPoint = null;
     var dragLastPoint = null;
+    var dragStateCallback = null;
     var touchFilter = makeTouchEventFilter();
     o.enable = function(options) {
       options = options !== undefined ? options : {};
@@ -1207,10 +1208,17 @@
     var setPointCallback = function(callback) {
       pointCallback = callback;
     };
+    var setDragStateCallback = function(callback) {
+      dragStateCallback = callback;
+    };
     var resetDragState = function() {
+      var last = dragLastPoint;
       clickPoint = null;
       dragStartPoint = null;
       dragLastPoint = null;
+      if (last && dragStateCallback) {
+        dragStateCallback(false);
+      }
     };
     var positionFromMouseEvent = function(e, target, index) {
       var base = getBaseSize(index);
@@ -1231,7 +1239,11 @@
     var processMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
+        var last = dragLastPoint;
         dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
+        if (!last && dragStateCallback) {
+          dragStateCallback(true);
+        }
         return false;
       }
     };
@@ -1371,6 +1383,7 @@
     //o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
     o.setPointCallback = setPointCallback;
+    o.setDragStateCallback = setDragStateCallback;
     o.positionFromMouseEvent = positionFromMouseEvent;
     o.resetDragState = resetDragState;
     //o.processMouseDown = processMouseDown;

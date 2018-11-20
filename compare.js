@@ -217,6 +217,13 @@
       crossCursor.processClick(e);
     }
   });
+  viewZoom.setDragStateCallback(function(dragging) {
+    if (dragging) {
+      $('#view').addClass('dragging');
+    } else {
+      $('#view').removeClass('dragging');
+    }
+  });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
     var selector = '#view > div.imageBox';
     return crossCursor.processMouseMove(e, selector, this);
