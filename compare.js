@@ -233,6 +233,13 @@
       opticalFlowDialog.processClick(e);
     }
   });
+  figureZoom.setDragStateCallback(function(dragging) {
+    if (dragging) {
+      $('div.dialog').addClass('dragging');
+    } else {
+      $('div.dialog').removeClass('dragging');
+    }
+  });
 
   hud.initialize();
   colorHUD.initialize();
