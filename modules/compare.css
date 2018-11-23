@@ -224,6 +224,10 @@ button.close
 {
     cursor: move;
 }
+#view.dragging.horizontal-dragging .imageBox, div.dialog.dragging.horizontal-dragging td.fig
+{
+    cursor: ew-resize;
+}
 .pixelated
 {
     -ms-interpolation-mode: nearest-neighbor;

@@ -217,12 +217,20 @@
       crossCursor.processClick(e);
     }
   });
-  viewZoom.setDragStateCallback(function(dragging) {
+  var setDragStateClass = function(target, dragging, horizontal) {
     if (dragging) {
-      $('#view').addClass('dragging');
+      $(target).addClass('dragging');
     } else {
-      $('#view').removeClass('dragging');
+      $(target).removeClass('dragging');
     }
+    if (horizontal) {
+      $(target).addClass('horizontal-dragging');
+    } else {
+      $(target).removeClass('horizontal-dragging');
+    }
+  };
+  viewZoom.setDragStateCallback(function(dragging, horizontal) {
+    setDragStateClass('#view', dragging, horizontal);
   });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
     var selector = '#view > div.imageBox';
@@ -233,12 +241,8 @@
       opticalFlowDialog.processClick(e);
     }
   });
-  figureZoom.setDragStateCallback(function(dragging) {
-    if (dragging) {
-      $('div.dialog').addClass('dragging');
-    } else {
-      $('div.dialog').removeClass('dragging');
-    }
+  figureZoom.setDragStateCallback(function(dragging, horizontal) {
+    setDragStateClass('div.dialog', dragging, horizontal);
   });
 
   hud.initialize();

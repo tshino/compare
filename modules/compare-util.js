@@ -1109,6 +1109,7 @@
       enabled = true;
       zoomXOnly = options.zoomXOnly !== undefined ? options.zoomXOnly : zoomXOnly;
       getBaseSize = options.getBaseSize || getBaseSize;
+      resetDragState();
     };
     o.disable = function() { enabled = false; };
     var setZoom = function(z) {
@@ -1217,7 +1218,7 @@
       dragStartPoint = null;
       dragLastPoint = null;
       if (last && dragStateCallback) {
-        dragStateCallback(false);
+        dragStateCallback(false, zoomXOnly);
       }
     };
     var positionFromMouseEvent = function(e, target, index) {
@@ -1242,7 +1243,7 @@
         var last = dragLastPoint;
         dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
         if (!last && dragStateCallback) {
-          dragStateCallback(true);
+          dragStateCallback(true, zoomXOnly);
         }
         return false;
       }
