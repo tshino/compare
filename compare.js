@@ -2634,6 +2634,8 @@
     var processMouseDown = function(e) {
       if (e.which === 1) {
         colorDistDragState = { x: e.clientX, y: e.clientY };
+        $('#colorDist').addClass('dragging');
+        $('#colorDist').removeClass('horizontal-dragging');
         return false;
       }
     };
@@ -2641,6 +2643,7 @@
       if (colorDistDragState) {
         if (e.buttons !== 1) {
           colorDistDragState = null;
+          $('#colorDist').removeClass('dragging');
         } else {
           var dx = e.clientX - colorDistDragState.x;
           var dy = e.clientY - colorDistDragState.y;
@@ -2650,12 +2653,21 @@
         }
       }
     };
+    var processMouseUp = function(e) {
+      if (colorDistDragState) {
+        colorDistDragState = null;
+        $('#colorDist').removeClass('dragging');
+      }
+    };
     var enableMouseAndTouch = function(root, filter, deepFilter) {
       $(root).on('mousedown', deepFilter, function(e) {
         return processMouseDown(e);
       });
       $(root).on('mousemove', filter, function(e) {
         return processMouseMove(e);
+      });
+      $(root).on('mouseup', filter, function(e) {
+        return processMouseUp(e);
       });
       $(root).on('wheel', filter, function(e) {
         return compareUtil.processWheelEvent(e, {

@@ -1213,11 +1213,10 @@
       dragStateCallback = callback;
     };
     var resetDragState = function() {
-      var last = dragLastPoint;
       clickPoint = null;
       dragStartPoint = null;
       dragLastPoint = null;
-      if (last && dragStateCallback) {
+      if (dragStateCallback) {
         dragStateCallback(false, zoomXOnly);
       }
     };
