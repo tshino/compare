@@ -224,7 +224,7 @@ button.close
 {
     cursor: move;
 }
-#view.dragging.horizontal-dragging .imageBox, div.dialog.dragging.horizontal-dragging td.fig
+div.dialog.dragging.horizontal-dragging td.fig
 {
     cursor: ew-resize;
 }
