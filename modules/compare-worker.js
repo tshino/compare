@@ -58,9 +58,6 @@ function calcHistogram( imageData, type )
   var w = imageData.width;
   var h = imageData.height;
   var hist = new Uint32Array(256 * (type === 0 ? 3 : 1));
-  for (var i = 0; i < hist.length; ++i) {
-    hist[i] = 0;
-  }
   if (type === 0) { // RGB
     for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       hist[imageData.data[i + 0]] += 1;
@@ -84,9 +81,6 @@ function calcWaveform( imageData, histW, transposed, flipped, type )
   var h = transposed ? imageData.width : imageData.height;
   var hist = new Uint32Array(256 * histW * (type === 0 ? 3 : 1));
   var histOff = new Uint32Array(w);
-  for (var i = 0; i < hist.length; ++i) {
-    hist[i] = 0;
-  }
   for (var i = 0; i < w; ++i) {
     var x = Math.round((i + 0.5) / w * histW - 0.5);
     histOff[flipped ? w - 1 - i : i] = x * 256;
@@ -131,15 +125,9 @@ function calcVectorscope( imageData, type, colorMode )
   var w = imageData.width;
   var h = imageData.height;
   var dist = new Uint32Array(320 * 320);
-  for (var i = 0; i < dist.length; ++i) {
-    dist[i] = 0;
-  }
   var colorMap = null;
   if (colorMode) {
     colorMap = new Float32Array(320 * 320 * 3);
-    for (var i = 0; i < colorMap.length; ++i) {
-      colorMap[i] = 0;
-    }
   }
   var k = 0;
   if (type === 0) { // Cb-Cr
@@ -572,9 +560,6 @@ var calcToneMap = function(a, b, type) {
     compareImageUtil.resize(sampleB, b);
   }
   var dist = new Uint32Array(256 * 256 * (type === 0 ? 3 : 1));
-  for (var i = 0; i < dist.length; ++i) {
-    dist[i] = 0;
-  }
   if (type === 0) { // RGB
     for (var y = 0; y < h; ++y) {
       var ka = 4 * (sampleA.offset + y * sampleA.pitch);
