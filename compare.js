@@ -217,18 +217,6 @@
       crossCursor.processClick(e);
     }
   });
-  var setDragStateClass = function(target, dragging, horizontal) {
-    if (dragging) {
-      $(target).addClass('dragging');
-    } else {
-      $(target).removeClass('dragging');
-    }
-    if (horizontal) {
-      $(target).addClass('horizontal-dragging');
-    } else {
-      $(target).removeClass('horizontal-dragging');
-    }
-  };
   viewZoom.setDragStateCallback(function(dragging, horizontal) {
     setDragStateClass('#view', dragging, horizontal);
   });
@@ -270,6 +258,18 @@
   });
   var baseImageIndex = null;
   var targetImageIndex = null;
+  var setDragStateClass = function(target, dragging, horizontal) {
+    if (dragging) {
+      $(target).addClass('dragging');
+    } else {
+      $(target).removeClass('dragging');
+    }
+    if (horizontal) {
+      $(target).addClass('horizontal-dragging');
+    } else {
+      $(target).removeClass('horizontal-dragging');
+    }
+  };
 
   var textUtil = (function() {
     var toggleLang = function() {
@@ -2634,8 +2634,7 @@
     var processMouseDown = function(e) {
       if (e.which === 1) {
         colorDistDragState = { x: e.clientX, y: e.clientY };
-        $('#colorDist').addClass('dragging');
-        $('#colorDist').removeClass('horizontal-dragging');
+        setDragStateClass('#colorDist', true, false);
         return false;
       }
     };
@@ -2643,7 +2642,7 @@
       if (colorDistDragState) {
         if (e.buttons !== 1) {
           colorDistDragState = null;
-          $('#colorDist').removeClass('dragging');
+          setDragStateClass('#colorDist', false, false);
         } else {
           var dx = e.clientX - colorDistDragState.x;
           var dy = e.clientY - colorDistDragState.y;
@@ -2656,7 +2655,7 @@
     var processMouseUp = function(e) {
       if (colorDistDragState) {
         colorDistDragState = null;
-        $('#colorDist').removeClass('dragging');
+        setDragStateClass('#colorDist', false, false);
       }
     };
     var enableMouseAndTouch = function(root, filter, deepFilter) {
