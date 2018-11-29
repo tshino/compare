@@ -220,7 +220,7 @@ button.close
     margin          : 0px;
     padding         : 0px;
 }
-#view.dragging .imageBox, div.dialog.dragging td.fig
+#view.dragging .imageBox, div.dialog.dragging td.fig, div.dialog .header.dragging
 {
     cursor: move;
 }

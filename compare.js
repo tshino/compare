@@ -1209,20 +1209,30 @@
         var offset = dlg.offset();
         dlg.offset({ left: offset.left + dx, top: offset.top + dy });
       };
+      var header = $(target).find('.header');
       target.on('mousedown', '.header', function(e) {
         if (e.which === 1 && !$(e.target).is('a, select')) {
           draggingPoint = { x: e.clientX, y: e.clientY };
+          setDragStateClass(header, true, false);
           return false;
         }
       }).on('mousemove', function(e) {
-        if (!draggingPoint || e.buttons !== 1) {
-          draggingPoint = null;
-        } else {
+        if (draggingPoint) {
+          if (e.buttons !== 1) {
+            draggingPoint = null;
+            setDragStateClass(header, false, false);
+            return;
+          }
           var dx = e.clientX - draggingPoint.x;
           var dy = e.clientY - draggingPoint.y;
           draggingPoint = { x: e.clientX, y: e.clientY };
           moveDialog(dx, dy);
           return false;
+        }
+      }).on('mouseup', function(e) {
+        if (draggingPoint) {
+          draggingPoint = null;
+          setDragStateClass(header, false, false);
         }
       });
     };
