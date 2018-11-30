@@ -1241,9 +1241,6 @@
       if (getBaseSize(index) && e.which === 1) {
         var last = dragLastPoint;
         dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
-        if (!last && dragStateCallback) {
-          dragStateCallback(true, zoomXOnly);
-        }
         return false;
       }
     };
@@ -1259,6 +1256,9 @@
             if (3 <= Math.max(ax, ay)) {
               clickPoint = null;
             }
+          }
+          if (dragLastPoint.x === dragStartPoint.x && dragLastPoint.y === dragStartPoint.y) {
+            dragStateCallback(true, zoomXOnly);
           }
           var dx = e.clientX - dragLastPoint.x;
           var dy = e.clientY - dragLastPoint.y;
