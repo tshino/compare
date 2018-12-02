@@ -2575,21 +2575,11 @@
           { pos: [-140, -140, 140], text: 'Y', color: '#ccc', hidden: false }
         ];
       }
-      var axesLabelsSVG = fig.axes ? null : [];
-      var axesLabelsAttr = [];
-      for (var i = 0, label; label = labels[i]; ++i) {
-        var xy = pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
-        var attr = {
-          fill : label.hidden ? 'transparent' : label.color,
-          x : xy[0],
-          y : xy[1]
-        };
-        if (axesLabelsSVG) {
+      if (!fig.axes) {
+        var axesLabelsSVG = [];
+        for (var i = 0, label; label = labels[i]; ++i) {
           axesLabelsSVG.push('<text>' + label.text + '</text>');
         }
-        axesLabelsAttr.push(attr);
-      }
-      if (!fig.axes) {
         fig.axes = $(
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
@@ -2600,9 +2590,15 @@
       } else {
         $(fig.axes).find('g path').attr('d', axesDesc);
       }
-      for (var i = 0, a; a = axesLabelsAttr[i]; ++i) {
-        $(fig.axes).find('g.labels text').eq(i).attr(a);
-      }
+      $(fig.axes).find('g.labels text').each(function(i) {
+        var label = labels[i];
+        var xy = pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
+        $(this).attr({
+          fill : label.hidden ? 'transparent' : label.color,
+          x : xy[0],
+          y : xy[1]
+        });
+      });
     };
     var updateFigure = function(img, redrawOnly) {
       var fig = redrawOnly ? {
