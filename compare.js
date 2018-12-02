@@ -2575,7 +2575,7 @@
           { pos: [-140, -140, 140], text: 'Y', color: '#ccc', hidden: false }
         ];
       }
-      var axesLabelsSVG = [];
+      var axesLabelsSVG = fig.axes ? null : [];
       var axesLabelsAttr = [];
       for (var i = 0, label; label = labels[i]; ++i) {
         var xy = pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
@@ -2584,7 +2584,9 @@
           x : xy[0],
           y : xy[1]
         };
-        axesLabelsSVG.push('<text>' + label.text + '</text>');
+        if (axesLabelsSVG) {
+          axesLabelsSVG.push('<text>' + label.text + '</text>');
+        }
         axesLabelsAttr.push(attr);
       }
       if (!fig.axes) {
