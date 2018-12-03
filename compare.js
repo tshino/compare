@@ -2576,16 +2576,15 @@
         ];
       }
       if (!fig.axes) {
-        var axesLabelsSVG = [];
-        for (var i = 0, label; label = labels[i]; ++i) {
-          axesLabelsSVG.push('<text>' + label.text + '</text>');
-        }
+        var labelsSVG = labels.map(function(label) {
+          return '<text>' + label.text + '</text>';
+        }).join('');
         fig.axes = $(
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
           '</g>' +
-          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + axesLabelsSVG.join('') + '</g>' +
+          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
         '</svg>');
       } else {
         $(fig.axes).find('g path').attr('d', axesDesc);
