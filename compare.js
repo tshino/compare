@@ -843,13 +843,28 @@
       desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
       return desc;
     };
+    var makeLabelAttr = function(img, x, y) {
+      var pos = img.interpretXY(x, y);
+      var attr = [
+        { x: x, y: 0, 'transform-origin': x + ' 0' },
+        { x: 0, y: y, 'transform-origin': '0 ' + y }
+      ];
+      return attr;
+    };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
       var vbox = '0 0 ' + size.w + ' ' + size.h;
+      var textElem = '<text filter="url(#drop-shadow)"></text>';
       img.cursor = $(
         '<svg class="imageOverlay cursor" viewBox="' + vbox + '">' +
+          '<defs><filter id="drop-shadow">' +
+            '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
+            '<feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>' +
+          '</filter></defs>' +
           '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
+          '<g class="labels" font-size="16" dominant-baseline="hanging" fill="white">' +
+          textElem + textElem + '</g>' +
         '</svg>').
         width(size.w).
         height(size.h);
@@ -869,12 +884,16 @@
       y = compareUtil.clamp(y, 0, img.height - 1);
       positions[img.index] = { x: x, y: y, fixed: fixedPosition };
       var desc = makePathDesc(img, x, y);
+      var labelsAttr = makeLabelAttr(img, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
       } else {
         img.cursor.find('path').attr('d', desc);
       }
       img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
+      img.cursor.find('g.labels text').each(function(i) {
+        $(this).attr(labelsAttr[i]).text(i === 0 ? x : y);
+      });
     };
     var setPosition = function(index, x, y, fixed) {
       fixed = fixed !== undefined ? fixed : fixedPosition;
@@ -961,10 +980,11 @@
     };
     var onUpdateTransformEach = function(ent, commonStyle) {
       if (ent.cursor) {
-        var strokeWidth = ent.width / (ent.baseWidth * viewZoom.scale);
+        var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
-          $(this).attr('stroke-width', strokeWidth * [2, 1][i]);
+          $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
+        $(ent.cursor).find('g.labels text').attr('transform', 'scale(' + baseScale + ')');
       }
     };
     var onUpdateTransform = function() {
