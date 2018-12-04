@@ -846,10 +846,10 @@
     var makeLabelAttr = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var attr = [
-        { x: x, y: 0, 'transform-origin': x + ' 0' },
-        { x: 0, y: y, 'transform-origin': '0 ' + y }
+        { x: pos.x, y: 0, 'transform-origin': pos.x + ' 0' },
+        { x: 0, y: pos.y, 'transform-origin': '0 ' + pos.y }
       ];
-      return attr;
+      return img.transposed ? [attr[1], attr[0]] : attr;
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
