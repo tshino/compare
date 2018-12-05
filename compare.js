@@ -845,11 +845,9 @@
     };
     var makeLabelAttr = function(img, x, y) {
       var pos = img.interpretXY(x, y);
-      var attr = [
-        { x: pos.x, y: 0, 'transform-origin': pos.x + ' 0' },
-        { x: 0, y: pos.y, 'transform-origin': '0 ' + pos.y }
-      ];
-      return img.transposed ? [attr[1], attr[0]] : attr;
+      var attrX = { x: pos.x, y: 0, 'transform-origin': pos.x + ' 0' };
+      var attrY = { x: 0, y: pos.y, 'transform-origin': '0 ' + pos.y };
+      return img.transposed ? [attrY, attrX] : [attrX, attrY];
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
