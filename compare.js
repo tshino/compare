@@ -1999,15 +1999,13 @@
       updateTable();
     });
     var updateAsync = function(img) {
-      var leftTop = img.interpretXY(0, 0);
-      var flipped = img.transposed ? (leftTop.y !== 0) : (leftTop.x !== 0);
       taskQueue.addTask({
         cmd:      'calcWaveform',
         type:     waveformType.current(),
         index:    [img.index],
         histW:    Math.min(img.width, 1024),
         transposed: img.transposed,
-        flipped:  flipped
+        flipped:  img.transposed ? img.flippedY : img.flippedX
       }, attachImageDataToTask);
     };
     var makeFigure = function(type, w, h, histW, hist) {
@@ -4160,6 +4158,9 @@
     entry.interpretXY = function(x, y) {
       return compareUtil.orientationUtil.interpretXY(entry.orientation, w, h, x, y);
     };
+    var leftTop = entry.interpretXY(0, 0);
+    entry.flippedX = leftTop.x !== 0;
+    entry.flippedY = leftTop.y !== 0;
     //
     updateDOM();
     nowLoadingDialog.update();
