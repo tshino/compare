@@ -876,6 +876,9 @@
     };
     var interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
       var w = canvasWidth - 1, h = canvasHeight - 1;
+      return interpretXY2(orientation, w, h, x, y);
+    };
+    var interpretXY2 = function(orientation, w, h, x, y) {
       if (orientation === 2) { return { x: w-x, y: y };
       } else if (orientation === 3) { return { x: w-x, y: h-y };
       } else if (orientation === 4) { return { x: x, y: h-y };
@@ -890,7 +893,8 @@
       toString: toString,
       isTransposed: isTransposed,
       getCSSTransform: getCSSTransform,
-      interpretXY: interpretXY
+      interpretXY: interpretXY,
+      interpretXY2: interpretXY2
     };
   })();
   var aspectRatioUtil = (function() {

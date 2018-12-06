@@ -295,6 +295,17 @@ TEST( 'compareUtil orientationUtil interpretXY', function test() {
   EXPECT_EQ( 10, interpretXY(null, 40, 30, 10, 5).x );
   EXPECT_EQ( 5, interpretXY(null, 40, 30, 10, 5).y );
 });
+TEST( 'compareUtil orientationUtil interpretXY2', function test() {
+  var interpretXY2 = compareUtil.orientationUtil.interpretXY2;
+  EXPECT_EQ( 10, interpretXY2(1, 40, 30, 10, 5).x );
+  EXPECT_EQ( 5, interpretXY2(1, 40, 30, 10, 5).y );
+  EXPECT_EQ( 30, interpretXY2(3, 40, 30, 10, 5).x );
+  EXPECT_EQ( 25, interpretXY2(3, 40, 30, 10, 5).y );
+  EXPECT_EQ( 5, interpretXY2(5, 30, 40, 10, 5).x );
+  EXPECT_EQ( 10, interpretXY2(5, 30, 40, 10, 5).y );
+  EXPECT_EQ( 25, interpretXY2(7, 30, 40, 10, 5).x );
+  EXPECT_EQ( 30, interpretXY2(7, 30, 40, 10, 5).y );
+});
 
 (function(){
   // aspectRatioUtil
