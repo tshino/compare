@@ -844,10 +844,23 @@
       return desc;
     };
     var makeLabelAttr = function(img, x, y) {
-      var pos = img.interpretXY(x, y);
+      var pos = img.interpretXY2(x, y);
       var attrX = { x: pos.x, y: 0, 'transform-origin': pos.x + ' 0' };
       var attrY = { x: 0, y: pos.y, 'transform-origin': '0 ' + pos.y };
+      var ta = img.flippedX ? 'end' : '';
+      var db = img.flippedY ? 'baseline' : 'hanging';
+      attrY['text-anchor'] = attrX['text-anchor'] = ta;
+      attrY['dominant-baseline'] = attrX['dominant-baseline'] = db;
       return img.transposed ? [attrY, attrX] : [attrX, attrY];
+    };
+    var makeLabelTransform = function(ent, baseScale) {
+      var sx = ent.flippedX ? -baseScale : baseScale;
+      var sy = ent.flippedY ? -baseScale : baseScale;
+      var t = 'scale(' + sx + ',' + sy + ')';
+      if (ent.transposed) {
+        t = 'matrix(0,1,1,0,0,0) ' + t;
+      }
+      return t;
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
@@ -861,7 +874,7 @@
           '</filter></defs>' +
           '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
-          '<g class="labels" font-size="16" dominant-baseline="hanging" fill="white">' +
+          '<g class="labels" font-size="16" fill="white">' +
           textElem + textElem + '</g>' +
         '</svg>').
         width(size.w).
@@ -982,7 +995,8 @@
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
-        $(ent.cursor).find('g.labels text').attr('transform', 'scale(' + baseScale + ')');
+        var transform = makeLabelTransform(ent, baseScale);
+        $(ent.cursor).find('g.labels text').attr('transform', transform);
       }
     };
     var onUpdateTransform = function() {
@@ -4158,7 +4172,10 @@
     entry.interpretXY = function(x, y) {
       return compareUtil.orientationUtil.interpretXY(entry.orientation, w, h, x, y);
     };
-    var leftTop = entry.interpretXY(0, 0);
+    entry.interpretXY2 = function(x, y) {
+      return compareUtil.orientationUtil.interpretXY2(entry.orientation, w, h, x, y);
+    };
+    var leftTop = entry.interpretXY2(0, 0);
     entry.flippedX = leftTop.x !== 0;
     entry.flippedY = leftTop.y !== 0;
     //
