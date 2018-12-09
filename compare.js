@@ -845,12 +845,10 @@
     };
     var makeLabelAttr = function(img, x, y) {
       var pos = img.interpretXY2(x, y);
-      var attrX = { x: pos.x, y: 0, 'transform-origin': pos.x + ' 0' };
-      var attrY = { x: 0, y: pos.y, 'transform-origin': '0 ' + pos.y };
-      var ta = img.flippedX ? 'end' : '';
-      var db = img.flippedY ? 'baseline' : 'hanging';
-      attrY['text-anchor'] = attrX['text-anchor'] = ta;
-      attrY['dominant-baseline'] = attrX['dominant-baseline'] = db;
+      var baseX = img.flippedX ? img.canvasWidth : 0;
+      var baseY = img.flippedY ? img.canvasHeight : 0;
+      var attrX = { x: pos.x, y: baseY, 'transform-origin': pos.x + ' ' + baseY };
+      var attrY = { x: baseX, y: pos.y, 'transform-origin': baseX + ' ' + pos.y };
       return img.transposed ? [attrY, attrX] : [attrX, attrY];
     };
     var makeLabelTransform = function(ent, baseScale) {
@@ -858,7 +856,8 @@
       var sy = ent.flippedY ? -baseScale : baseScale;
       var t = 'scale(' + sx + ',' + sy + ')';
       if (ent.transposed) {
-        t = 'matrix(0,1,1,0,0,0) ' + t;
+        var mat = ent.flippedX == ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
+        t = mat + t;
       }
       return t;
     };
@@ -874,7 +873,7 @@
           '</filter></defs>' +
           '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
-          '<g class="labels" font-size="16" fill="white">' +
+          '<g class="labels" font-size="16" dominant-baseline="hanging" fill="white">' +
           textElem + textElem + '</g>' +
         '</svg>').
         width(size.w).
