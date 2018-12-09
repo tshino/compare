@@ -851,10 +851,10 @@
       var attrY = { x: baseX, y: pos.y, 'transform-origin': baseX + ' ' + pos.y };
       return img.transposed ? [attrY, attrX] : [attrX, attrY];
     };
-    var makeLabelTransform = function(ent, baseScale) {
-      var sx = ent.flippedX ? -baseScale : baseScale;
-      var sy = ent.flippedY ? -baseScale : baseScale;
-      var t = 'scale(' + sx + ',' + sy + ')';
+    var makeLabelTransform = function(ent, baseScale, roi) {
+      var sx = ent.flippedX ? -1 : 1;
+      var sy = ent.flippedY ? -1 : 1;
+      var t = 'translate(0 ' + roi[1] * sy + ') scale(' + baseScale * sx + ',' + baseScale * sy + ')';
       if (ent.transposed) {
         var mat = ent.flippedX == ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
         t = mat + t;
@@ -994,7 +994,16 @@
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
-        var transform = makeLabelTransform(ent, baseScale);
+        var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
+        var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
+        var center = viewZoom.getCenter();
+        var roi = [
+          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
+          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
+        ];
+        var transform = makeLabelTransform(ent, baseScale, roi);
         $(ent.cursor).find('g.labels text').attr('transform', transform);
       }
     };
