@@ -854,12 +854,15 @@
     var makeLabelTransform = function(ent, baseScale, roi) {
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
-      var t = 'translate(0 ' + roi[1] * sy + ') scale(' + baseScale * sx + ',' + baseScale * sy + ')';
+      var s = 'scale(' + baseScale * sx + ',' + baseScale * sy + ')';
+      var tx = 'translate(0 ' + roi[1] * sy + ') ';
+      var ty = 'translate(' + roi[0] * sx + ' 0) ';
       if (ent.transposed) {
-        var mat = ent.flippedX == ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        t = mat + t;
+        var mat = ent.flippedX === ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
+        return [mat + tx + s, mat + ty + s];
+      } else {
+        return [tx + s, ty + s];
       }
-      return t;
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
@@ -1003,8 +1006,10 @@
           ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
           ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
         ];
-        var transform = makeLabelTransform(ent, baseScale, roi);
-        $(ent.cursor).find('g.labels text').attr('transform', transform);
+        var transforms = makeLabelTransform(ent, baseScale, roi);
+        $(ent.cursor).find('g.labels text').each(function(i) {
+          $(this).attr('transform', transforms[i]);
+        });
       }
     };
     var onUpdateTransform = function() {
