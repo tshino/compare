@@ -851,18 +851,19 @@
       var attrY = { x: baseX, y: pos.y, 'transform-origin': baseX + ' ' + pos.y };
       return img.transposed ? [attrY, attrX] : [attrX, attrY];
     };
-    var makeLabelTransform = function(ent, baseScale, roi) {
+    var makeLabelAttrOnTransform = function(ent, baseScale, roi) {
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
       var s = 'scale(' + baseScale * sx + ',' + baseScale * sy + ')';
-      var tx = 'translate(0 ' + roi[1] * sy + ') ';
-      var ty = 'translate(' + roi[0] * sx + ' 0) ';
+      var attr = [{}, {}];
+      attr[0].transform = 'translate(0 ' + roi[1] * sy + ') ' + s;
+      attr[1].transform = 'translate(' + roi[0] * sx + ' 0) ' + s;
       if (ent.transposed) {
         var mat = ent.flippedX === ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        return [mat + tx + s, mat + ty + s];
-      } else {
-        return [tx + s, ty + s];
+        attr[0].transform = mat + attr[0].transform;
+        attr[1].transform = mat + attr[1].transform;
       }
+      return attr;
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
@@ -1006,9 +1007,9 @@
           ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
           ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
         ];
-        var transforms = makeLabelTransform(ent, baseScale, roi);
+        var attr = makeLabelAttrOnTransform(ent, baseScale, roi);
         $(ent.cursor).find('g.labels text').each(function(i) {
-          $(this).attr('transform', transforms[i]);
+          $(this).attr(attr[i]);
         });
       }
     };
