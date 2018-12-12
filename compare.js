@@ -868,10 +868,11 @@
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
       var vbox = '0 0 ' + size.w + ' ' + size.h;
-      var textElem = '<text filter="url(#drop-shadow)"></text>';
+      var filter_id = 'drop-shadow' + img.index;
+      var textElem = '<text filter="url(#' + filter_id + ')"></text>';
       img.cursor = $(
         '<svg class="imageOverlay cursor" viewBox="' + vbox + '">' +
-          '<defs><filter id="drop-shadow">' +
+          '<defs><filter id="' + filter_id + '">' +
             '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
             '<feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>' +
           '</filter></defs>' +
