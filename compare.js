@@ -849,7 +849,10 @@
       var baseY = img.flippedY ? img.canvasHeight : 0;
       var attrX = { x: pos.x, y: baseY, 'transform-origin': pos.x + ' ' + baseY };
       var attrY = { x: baseX, y: pos.y, 'transform-origin': baseX + ' ' + pos.y };
-      return img.transposed ? [attrY, attrX] : [attrX, attrY];
+      var attr = img.transposed ? [attrY, attrX] : [attrX, attrY];
+      attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
+      attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
+      return attr;
     };
     var makeLabelAttrOnTransform = function(ent, baseScale, roi) {
       var sx = ent.flippedX ? -1 : 1;
