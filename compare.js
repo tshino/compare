@@ -844,27 +844,47 @@
       return desc;
     };
     var makeLabelAttr = function(img, x, y) {
-      var pos = img.interpretXY2(x, y);
-      var baseX = img.flippedX ? img.canvasWidth : 0;
-      var baseY = img.flippedY ? img.canvasHeight : 0;
-      var attrX = { x: pos.x, y: baseY, 'transform-origin': pos.x + ' ' + baseY };
-      var attrY = { x: baseX, y: pos.y, 'transform-origin': baseX + ' ' + pos.y };
-      var attr = img.transposed ? [attrY, attrX] : [attrX, attrY];
+      var attr = makeLabelAttrOnTransform(img, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
+      attr[0]['dominant-baseline'] = 'hanging';
       attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
       return attr;
     };
-    var makeLabelAttrOnTransform = function(ent, baseScale, roi) {
+    var makeLabelAttrOnTransform = function(ent, x, y) {
+      var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
+      var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
+      var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
+      var center = viewZoom.getCenter();
+      var roi = [
+          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
+          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
+      ];
+      var pos = ent.interpretXY2(x, y);
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
       var s = 'scale(' + baseScale * sx + ',' + baseScale * sy + ')';
+      var baseX = ent.flippedX ? ent.canvasWidth : 0;
+      var baseY = ent.flippedY ? ent.canvasHeight : 0;
+      var t = ent.transposed ? [baseX, pos.y, pos.x, baseY] : [pos.x, baseY, baseX, pos.y];
       var attr = [{}, {}];
-      attr[0].transform = 'translate(0 ' + roi[1] * sy + ') ' + s;
-      attr[1].transform = 'translate(' + roi[0] * sx + ' 0) ' + s;
+      if (ent.transposed) {
+        t[0] += roi[1] * sx;
+        t[3] += roi[0] * sy;
+      } else {
+        t[1] += roi[1] * sy;
+        t[2] += roi[0] * sx;
+      }
+      attr[0].transform = 'translate(' + t[0] + ' ' + t[1] + ') ';
+      attr[1].transform = 'translate(' + t[2] + ' ' + t[3] + ') ';
       if (ent.transposed) {
         var mat = ent.flippedX === ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        attr[0].transform = mat + attr[0].transform;
-        attr[1].transform = mat + attr[1].transform;
+        attr[0].transform = attr[0].transform + mat + s;
+        attr[1].transform = attr[1].transform + mat + s;
+      } else {
+        attr[0].transform = attr[0].transform + s;
+        attr[1].transform = attr[1].transform + s;
       }
       return attr;
     };
@@ -881,7 +901,7 @@
           '</filter></defs>' +
           '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
           '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
-          '<g class="labels" font-size="16" dominant-baseline="hanging" fill="white">' +
+          '<g class="labels" font-size="16" fill="white">' +
           textElem + textElem + '</g>' +
         '</svg>').
         width(size.w).
@@ -1002,16 +1022,8 @@
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
-        var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
-        var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
-        var center = viewZoom.getCenter();
-        var roi = [
-          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
-          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
-        ];
-        var attr = makeLabelAttrOnTransform(ent, baseScale, roi);
+        var pos = positions[ent.index];
+        var attr = makeLabelAttrOnTransform(ent, pos.x, pos.y);
         $(ent.cursor).find('g.labels text').each(function(i) {
           $(this).attr(attr[i]);
         });
