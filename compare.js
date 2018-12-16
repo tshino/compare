@@ -858,33 +858,26 @@
       var roi = [
           ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
           ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
-          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
+          //ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
+          //ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
       ];
-      var pos = ent.interpretXY2(x, y);
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
       var s = 'scale(' + baseScale * sx + ',' + baseScale * sy + ')';
-      var baseX = ent.flippedX ? ent.canvasWidth : 0;
-      var baseY = ent.flippedY ? ent.canvasHeight : 0;
-      var t = ent.transposed ? [baseX, pos.y, pos.x, baseY] : [pos.x, baseY, baseX, pos.y];
+      var pos = ent.interpretXY2(x, y);
+      var base = ent.interpretXY2(0, 0);
+      base.x += sx * (ent.transposed ? roi[1] : roi[0]);
+      base.y += sy * (ent.transposed ? roi[0] : roi[1]);
+      var t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
+      var t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
       var attr = [{}, {}];
       if (ent.transposed) {
-        t[0] += roi[1] * sx;
-        t[3] += roi[0] * sy;
+        var mat = sx === sy ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
+        attr[0].transform = t1 + mat + s;
+        attr[1].transform = t0 + mat + s;
       } else {
-        t[1] += roi[1] * sy;
-        t[2] += roi[0] * sx;
-      }
-      attr[0].transform = 'translate(' + t[0] + ' ' + t[1] + ') ';
-      attr[1].transform = 'translate(' + t[2] + ' ' + t[3] + ') ';
-      if (ent.transposed) {
-        var mat = ent.flippedX === ent.flippedY ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        attr[0].transform = attr[0].transform + mat + s;
-        attr[1].transform = attr[1].transform + mat + s;
-      } else {
-        attr[0].transform = attr[0].transform + s;
-        attr[1].transform = attr[1].transform + s;
+        attr[0].transform = t0 + s;
+        attr[1].transform = t1 + s;
       }
       return attr;
     };
