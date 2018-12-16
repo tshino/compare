@@ -846,8 +846,13 @@
     var makeLabelAttr = function(img, x, y) {
       var attr = makeLabelAttrOnTransform(img, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
-      attr[0]['dominant-baseline'] = 'hanging';
-      attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
+      if (compareUtil.browserName === 'msie') {
+        attr[0]['dy'] = '40%';
+        attr[1]['dy'] = img.height * 0.9 < y ? '0%' : '40%';
+      } else {
+        attr[0]['dominant-baseline'] = 'hanging';
+        attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
+      }
       return attr;
     };
     var makeLabelAttrOnTransform = function(ent, x, y) {
