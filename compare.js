@@ -875,16 +875,12 @@
       base.y += sy * (ent.transposed ? roi[0] : roi[1]);
       var t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
       var t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
-      var attr = [{}, {}];
       if (ent.transposed) {
         var mat = sx === sy ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        attr[0].transform = t1 + mat + s;
-        attr[1].transform = t0 + mat + s;
-      } else {
-        attr[0].transform = t0 + s;
-        attr[1].transform = t1 + s;
+        s = mat + s;
       }
-      return attr;
+      var a0 = { transform: t0 + s }, a1 = { transform: t1 + s };
+      return ent.transposed ? [a1, a0] : [a0, a1];
     };
     var addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
