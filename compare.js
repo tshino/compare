@@ -846,7 +846,7 @@
     var makeLabelAttr = function(img, x, y) {
       var attr = makeLabelAttrOnTransform(img, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
-      if (compareUtil.browserName === 'msie') {
+      if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
         attr[0]['dy'] = '40%';
         attr[1]['dy'] = img.height * 0.9 < y ? '0%' : '40%';
       } else {
