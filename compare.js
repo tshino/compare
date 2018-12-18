@@ -868,18 +868,15 @@
       ];
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
-      var s = 'scale(' + baseScale * sx + ',' + baseScale * sy + ')';
       var pos = ent.interpretXY2(x, y);
       var base = ent.interpretXY2(0, 0);
       base.x += sx * (ent.transposed ? roi[1] : roi[0]);
       base.y += sy * (ent.transposed ? roi[0] : roi[1]);
       var t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
       var t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
-      if (ent.transposed) {
-        var mat = sx === sy ? 'matrix(0,1,1,0,0,0) ' : 'matrix(0,-1,-1,0,0,0) ';
-        s = mat + s;
-      }
-      var a0 = { transform: t0 + s }, a1 = { transform: t1 + s };
+      var s = 'scale(' + baseScale * sx + ' ' + baseScale * sy + ')';
+      var m = ent.transposed ? ' matrix(0 1 1 0 0 0)' : '';
+      var a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
       return ent.transposed ? [a1, a0] : [a0, a1];
     };
     var addCrossCursor = function(img, desc) {
