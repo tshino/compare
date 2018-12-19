@@ -885,7 +885,7 @@
       var filter_id = 'drop-shadow' + img.index;
       var textElem = '<text filter="url(#' + filter_id + ')"></text>';
       img.cursor = $(
-        '<svg class="imageOverlay cursor" viewBox="' + vbox + '">' +
+        '<svg class="imageOverlay cursor" viewBox="' + vbox + '" style="overflow:visible">' +
           '<defs><filter id="' + filter_id + '">' +
             '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
             '<feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>' +
