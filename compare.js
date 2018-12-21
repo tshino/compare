@@ -538,6 +538,7 @@
       if (targetImageIndex === index) {
         targetImageIndex = null;
       }
+      crossCursor.onRemoveEntry(index);
       toneCurveDialog.onRemoveEntry(index);
       opticalFlowDialog.onRemoveEntry(index);
       diffDialog.onRemoveEntry(index);
@@ -834,6 +835,23 @@
     var isFixed = function() {
       return fixedPosition;
     };
+    var onRemoveEntry = function(index) {
+      if (enableCrossCursor && primaryIndex === index) {
+        primaryIndex = null;
+        for (var i = 0; i < images.length; i++) {
+          if (index !== images[i].index) {
+            primaryIndex = images[i].index;
+            break;
+          }
+        }
+        if (primaryIndex === null) {
+          enableCrossCursor = false;
+          if (onRemoveCallback) {
+            onRemoveCallback();
+          }
+        }
+      }
+    };
     var makePathDesc = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var desc = '';
@@ -1036,6 +1054,7 @@
       getPosition: getPosition,
       getIndex: getIndex,
       isFixed: isFixed,
+      onRemoveEntry: onRemoveEntry,
       setPosition: setPosition,
       processKeyDown: processKeyDown,
       processClick: processClick,
