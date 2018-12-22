@@ -1168,8 +1168,8 @@
     };
     var addColorHUD = function(img) {
       img.colorHUD = $(
-        '<div class="dark hud" style="pointer-events: auto; min-width: 280px">' +
-          '<span style="display: inline-block">' +
+        '<div class="dark hud" style="pointer-events: auto; min-width: 180px">' +
+          '<span style="display: inline-block; font-size: 12px">' +
             '<span class="colorSample" style="' +
                 'display: inline-block; ' +
                 'width: 1em; height: 1em; vertical-align: middle; ' +
@@ -1185,9 +1185,9 @@
               '<br>' +
               '<span style="display: inline-block; background:#00f; height:5px;"></span>' +
             '</span>' +
-            '<span class="colorCSS"></span>' +
             '<br>' +
-            '<span class="colorRGB">RGB: <span></span>,<span></span>,<span></span></span>' +
+            '<span class="colorCSS"></span>' +
+            ' <span class="colorRGB">(<span></span>,<span></span>,<span></span>)</span>' +
             '<br>' +
             '<span class="colorXY">XY: <span></span>,<span></span></span>' +
           '</span>' +
