@@ -1139,9 +1139,9 @@
         var imageData = context.getImageData(pos.x, pos.y, 1, 1);
         var rgb = imageData.data;
         var css = compareUtil.toHexTriplet(rgb[0], rgb[1], rgb[2]);
-        img.colorHUD.find('.colorSample').show().css('background', css);
-        img.colorHUD.find('.colorBar').show().find('span').each(function(index) {
-          $(this).css('width', (rgb[index]*127.5/255)+'px');
+        img.colorHUD.find('.colorSample').show().attr('fill', css);
+        img.colorHUD.find('.colorBar').show().find('rect').each(function(index) {
+          $(this).attr('width', (rgb[index]*127.5/255));
         });
         img.colorHUD.find('.colorCSS').text(css);
         img.colorHUD.find('.colorRGB span').each(function(i) {
@@ -1170,21 +1170,15 @@
       img.colorHUD = $(
         '<div class="dark hud" style="pointer-events: auto; min-width: 180px">' +
           '<span style="display: inline-block; font-size: 12px">' +
-            '<span class="colorSample" style="' +
-                'display: inline-block; ' +
-                'width: 1em; height: 1em; vertical-align: middle; ' +
-                '">' +
-            '</span>' +
-            '<span class="colorBar" style="' +
-                'display: inline-block; background: #000; ' +
-                'line-height: 0.1; width: 127.5px; vertical-align: middle; ' +
-                '">' +
-              '<span style="display: inline-block; background:#f00; height:5px;"></span>' +
-              '<br>' +
-              '<span style="display: inline-block; background:#0f0; height:5px;"></span>' +
-              '<br>' +
-              '<span style="display: inline-block; background:#00f; height:5px;"></span>' +
-            '</span>' +
+            '<svg width="142.5" height="15" viewBox="0 0 142.5 15">' +
+              '<rect x="0" y="0" width="142.5" height="15" fill="#000"></rect>' +
+              '<rect class="colorSample" x="0" y="0" width="15" height="15" fill="#000"></rect>' +
+              '<g class="colorBar">' +
+                '<rect x="15" y="0" width="0" height="5" fill="#f00"></rect>' +
+                '<rect x="15" y="5" width="0" height="5" fill="#0f0"></rect>' +
+                '<rect x="15" y="10" width="0" height="5" fill="#00f"></rect>' +
+              '</g>' +
+            '</svg>' +
             '<br>' +
             '<span class="colorCSS"></span>' +
             ' <span class="colorRGB">(<span></span>,<span></span>,<span></span>)</span>' +
