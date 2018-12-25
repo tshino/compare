@@ -303,6 +303,8 @@
     var layoutMode = null;
     var backgroundColor = '#000000';
     var imageScaling = 'smooth';
+    $('#prev').click(function() { viewManagement.flipSingleView(false); });
+    $('#next').click(function() { viewManagement.flipSingleView(true); });
     var isOverlayMode = function() {
       return overlayMode;
     };
@@ -464,6 +466,11 @@
       var param = makeImageLayoutParam();
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
+      if (isSingleView && 2 <= images.length) {
+        $('#navBox').show();
+      } else {
+        $('#navBox').hide();
+      }
       $('#view > div.imageBox').each(function(index) {
         var hide = isSingleView && 0 > indices.indexOf(index);
         var img = entries[index];
