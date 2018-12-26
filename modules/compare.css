@@ -264,6 +264,9 @@ div.dialog.dragging.horizontal-dragging td.fig
 {
     display         : none;
     margin          : 15px;
+}
+#view .hudContainer .hud
+{
     box-shadow      : 1px 2px 5px #000;
 }
 #view .hudContainer .light.hud

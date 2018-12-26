@@ -109,14 +109,14 @@ var changeLang = function(lang) {
 	<div id="viewContainer">
 		<div id="view">
 			<div class="hudContainer">
-				<div id="mode" class="transparent light hud">
-					<div class="header">
+				<span id="mode" class="transparent light hud">
+					<div class="header" style="display:inline-block">
 						<h3>
 							<span class="en"></span>
 							<span class="ja"></span>
 						</h3>
 					</div>
-				</div>
+				</span>
 				<div id="map" class="transparent dark hud">
 					<svg>
 						<clipPath id="mapClip">
@@ -128,8 +128,11 @@ var changeLang = function(lang) {
 						</g>
 					</svg>
 				</div>
-				<div id="navBox" class="dark hud">
-					<span><button id="prev">&lt;</button><button id="next">&gt;</button></span>
+				<div id="navBox" style="position:relative; width:calc(100% - 50px)">
+					<span class="dark hud" style="position:absolute; bottom:12px; left:50%; transform:translateX(-50%) translateX(12px)">
+						<button id="prev">&lt;</button>
+						<button id="next">&gt;</button>
+					</span>
 				</div>
 			</div>
 			<div class="emptyBox" id="drop">

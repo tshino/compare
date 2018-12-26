@@ -467,8 +467,10 @@
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       if (isSingleView && 2 <= images.length) {
+        $('#view > .hudContainer').css('width',param.boxW);
         $('#navBox').show();
       } else {
+        $('#view > .hudContainer').css('width','');
         $('#navBox').hide();
       }
       $('#view > div.imageBox').each(function(index) {
@@ -4102,11 +4104,11 @@
         textUtil.setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
           ja: 'オーバーレイモード : ' + modeDesc });
-        $('#mode').css({ display : 'block' });
+        $('#mode').show();
         $('#overlay').addClass('current');
       } else {
         $('#mode h3 span').text('');
-        $('#mode').css({ display : '' });
+        $('#mode').hide();
         $('#overlay').removeClass('current');
       }
     };
