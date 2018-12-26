@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg version="1.2" baseProfile="tiny" width="40mm" height="40mm" viewBox="0 0 4000 4000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+ <g visibility="visible" id="MasterSlide_1_標準">
+  <desc>Master slide
+  </desc>
+  <rect fill="none" stroke="none" x="0" y="0" width="4000" height="4000"/>
+ </g>
+ <g visibility="visible" id="Slide_1_page14">
+  <g>
+   <path fill="rgb(0,0,0)" stroke="none" d="M 1568,500 L 3068,2000 1568,3500 1268,3200 2468,2000 1268,800 1568,500 Z"/>
+   <path fill="none" stroke="rgb(0,0,0)" id="Drawing_1_0" stroke-width="200" stroke-linejoin="round" stroke-linecap="round" d="M 1568,500 L 3068,2000 1568,3500 1268,3200 2468,2000 1268,800 1568,500 Z"/>
+  </g>
+ </g>
+</svg>
