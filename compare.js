@@ -295,7 +295,8 @@
   })();
   // View management functions
   var viewManagement = (function() {
-    var IMAGEBOX_MARGIN = 6, IMAGEBOX_MIN_SIZE = 32;
+    var IMAGEBOX_MIN_SIZE = 32;
+    var IMAGEBOX_MARGIN = 6, IMAGEBOX_MARGIN_SINGLE_H = 76;
     var currentImageIndex = 0;
     var isSingleView = false;
     var overlayMode = false;
@@ -425,8 +426,10 @@
       var numRows    = layoutMode !== 'x' ? numSlots : 1;
       var boxW = $('#view').width() / numColumns;
       var boxH = $('#view').height() / numRows;
-      boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - IMAGEBOX_MARGIN);
-      boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - IMAGEBOX_MARGIN);
+      var marginW = IMAGEBOX_MARGIN;
+      var marginH = isSingleView ? IMAGEBOX_MARGIN_SINGLE_H : IMAGEBOX_MARGIN;
+      boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - marginW);
+      boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - marginH);
       return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
     };
     var updateImageBox = function(box, img, boxW, boxH) {
