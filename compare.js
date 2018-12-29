@@ -346,10 +346,9 @@
       currentImageIndex = 0;
       updateLayout();
     };
-    var toggleSingleView = function(index) {
+    var toSingleImageView = function(index) {
       var prevImageIndex = currentImageIndex;
       if (index === null ||
-          index + 1 === currentImageIndex ||
           !entries[index].visible) {
         currentImageIndex = 0;
       } else {
@@ -357,6 +356,13 @@
       }
       if (prevImageIndex !== currentImageIndex) {
         updateLayout();
+      }
+    };
+    var toggleSingleView = function(index) {
+      if (index + 1 === currentImageIndex) {
+        toAllImageView();
+      } else {
+        toSingleImageView(index);
       }
     };
     var flipSingleView = function(forward) {
@@ -522,6 +528,7 @@
       getLayoutMode: getLayoutMode,
       resetLayoutState: resetLayoutState,
       toAllImageView: toAllImageView,
+      toSingleImageView: toSingleImageView,
       toggleSingleView: toggleSingleView,
       flipSingleView: flipSingleView,
       onResize: onResize,
@@ -4062,18 +4069,12 @@
       var number = viewManagement.numberFromIndex(index);
       var button = $('<button/>').addClass('selector').
         text(number).
-        append(
-          textUtil.setText($('<span class="tooltip"/>'), {
-            en: 'Select picture ',
-            ja: '画像を選択 '
-          })
-        ).
-        click(function(e) { viewManagement.toggleSingleView(index); });
+        click(function(e) { viewManagement.toSingleImageView(index); });
       if (number <= 9) {
         button.find('span.tooltip span').addClass('keys flat').
             append($('<span/>').text(number));
       }
-      $('#overlay').before(button);
+      $('#next').before(button);
       return button;
     };
     var updateSelectorButtons = function() {
