@@ -296,7 +296,7 @@
   // View management functions
   var viewManagement = (function() {
     var IMAGEBOX_MIN_SIZE = 32;
-    var IMAGEBOX_MARGIN = 6, IMAGEBOX_MARGIN_SINGLE_H = 76;
+    var IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     var currentImageIndex = 0;
     var isSingleView = false;
     var overlayMode = false;
@@ -430,13 +430,18 @@
       var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
       var numColumns = layoutMode === 'x' ? numSlots : 1;
       var numRows    = layoutMode !== 'x' ? numSlots : 1;
-      var boxW = $('#view').width() / numColumns;
-      var boxH = $('#view').height() / numRows;
-      var marginW = IMAGEBOX_MARGIN;
-      var marginH = isSingleView ? IMAGEBOX_MARGIN_SINGLE_H : IMAGEBOX_MARGIN;
-      boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - marginW);
-      boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - marginH);
-      return { numVisibleEntries: numVisibleEntries, numSlots: numSlots, boxW: boxW, boxH: boxH };
+      var viewW = $('#view').width();
+      var viewH = $('#view').height();
+      var boxW = viewW / numColumns;
+      var boxH = viewH / numRows;
+      boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - IMAGEBOX_MARGIN_W);
+      boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - IMAGEBOX_MARGIN_H);
+      return {
+        numVisibleEntries: numVisibleEntries,
+        numSlots: numSlots,
+        viewW: viewW, viewH: viewH,
+        boxW: boxW, boxH: boxH
+      };
     };
     var updateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
@@ -475,11 +480,10 @@
       var param = makeImageLayoutParam();
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
-      if (isSingleView && 2 <= images.length) {
-        $('#view > .hudContainer').css('width',param.boxW);
+      $('#view > .hudContainer').css('width', param.viewW);
+      if (2 <= images.length) {
         $('#navBox').show();
       } else {
-        $('#view > .hudContainer').css('width','');
         $('#navBox').hide();
       }
       $('#view > div.imageBox').each(function(index) {
