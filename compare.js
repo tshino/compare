@@ -480,7 +480,7 @@
       var param = makeImageLayoutParam();
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
-      $('#view > .hudContainer').css('width', param.viewW);
+      $('#viewHud').css('width', param.viewW);
       if (1 <= images.length) {
         $('#navBox').show();
       } else {

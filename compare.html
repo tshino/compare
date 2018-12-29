@@ -92,8 +92,8 @@ var changeLang = function(lang) {
 		</div>
 	</div>
 	<div id="viewContainer">
-		<div id="view">
-			<div class="hudContainer">
+		<div style="height:100%; position:relative; overflow:hidden">
+			<div id="viewHud" class="hudContainer">
 				<span id="mode" class="transparent light hud">
 					<div class="header" style="display:inline-block">
 						<h3>
@@ -137,16 +137,18 @@ var changeLang = function(lang) {
 					</span>
 				</div>
 			</div>
-			<div class="emptyBox" id="drop">
-				<div class="dropHere">
-					<span class="en">Drop image files here</span>
-					<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+			<div id="view">
+				<div class="emptyBox" id="drop">
+					<div class="dropHere">
+						<span class="en">Drop image files here</span>
+						<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+					</div>
 				</div>
-			</div>
-			<div class="emptyBox">
-				<div class="dropHere">
-					<span class="en">Drop image files here</span>
-					<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+				<div class="emptyBox">
+					<div class="dropHere">
+						<span class="en">Drop image files here</span>
+						<span class="ja">ここに画像ファイルをドラッグ＆ドロップ</span>
+					</div>
 				</div>
 			</div>
 		</div>
