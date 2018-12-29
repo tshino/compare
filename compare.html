@@ -52,21 +52,6 @@ var changeLang = function(lang) {
 			<span class="tooltip keys en">Show analysis tools <span>a</span></span>
 			<span class="tooltip keys ja">分析ツールを表示 <span>a</span></span>
 		</button>
-		<button id="zoomIn">
-			<img src="res/zoomin.svg" alt="zoom in">
-			<span class="tooltip keys en">Zoom in <span>+</span></span>
-			<span class="tooltip keys ja">拡大 <span>+</span></span>
-		</button>
-		<button id="zoomOut">
-			<img src="res/zoomout.svg" alt="zoom out">
-			<span class="tooltip keys en">Zoom out <span>-</span></span>
-			<span class="tooltip keys ja">縮小 <span>-</span></span>
-		</button>
-		<button id="arrange">
-			<img src="res/layout_x.svg" alt="arrange layout">
-			<span class="tooltip keys en">Arrange layout <span>/</span></span>
-			<span class="tooltip keys ja">レイアウト変更 <span>/</span></span>
-		</button>
 		<button id="overlay">
 			<img src="res/overlay.svg" alt="overlay mode">
 			<span class="tooltip keys en">Overlay mode <span>Shift</span>+<span>o</span></span>
@@ -131,9 +116,23 @@ var changeLang = function(lang) {
 				<div id="navBox" style="position:relative; width:calc(100% - 50px); opacity:0.7;">
 					<span class="dark hud" style="position:absolute; padding:3px; bottom:1px; left:50%; transform:translateX(-50%) translateX(12px);">
 						<button id="prev" style="border-radius:50%">
-							<img src="res/prev.svg" alt="prev" style="width:24px; vertical-align:bottom;">
+							<img src="res/prev.svg" alt="prev">
 						</button><button id="next" style="border-radius:50%">
-							<img src="res/next.svg" alt="next" style="width:24px; vertical-align:bottom;">
+							<img src="res/next.svg" alt="next">
+						</button>
+						<button id="arrange">
+							<img src="res/layout_x.svg" alt="arrange layout">
+							<span class="tooltip keys en">Arrange layout <span>/</span></span>
+							<span class="tooltip keys ja">レイアウト変更 <span>/</span></span>
+						</button>
+						<button id="zoomIn">
+							<img src="res/zoomin.svg" alt="zoom in">
+							<span class="tooltip keys en">Zoom in <span>+</span></span>
+							<span class="tooltip keys ja">拡大 <span>+</span></span>
+						</button><button id="zoomOut">
+							<img src="res/zoomout.svg" alt="zoom out">
+							<span class="tooltip keys en">Zoom out <span>-</span></span>
+							<span class="tooltip keys ja">縮小 <span>-</span></span>
 						</button>
 					</span>
 				</div>

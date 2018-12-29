@@ -294,6 +294,15 @@ div.dialog.dragging.horizontal-dragging td.fig
     white-space : nowrap;
     vertical-align:bottom;
 }
+#navBox button img
+{
+    width   : 24px;
+    vertical-align  : bottom;
+}
+#navBox span.tooltip
+{
+    bottom  : 10px;
+}
 div.dialog
 {
     display         : none;

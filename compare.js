@@ -481,10 +481,15 @@
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       $('#view > .hudContainer').css('width', param.viewW);
-      if (2 <= images.length) {
+      if (1 <= images.length) {
         $('#navBox').show();
       } else {
         $('#navBox').hide();
+      }
+      if (2 <= images.length) {
+        $('#prev,#next').show();
+      } else {
+        $('#prev,#next').hide();
       }
       $('#view > div.imageBox').each(function(index) {
         var hide = isSingleView && 0 > indices.indexOf(index);
