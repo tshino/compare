@@ -35,6 +35,9 @@
 
   $(window).resize(viewManagement.onResize);
   var onKeyDownOnDialogs = function(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey) {
+          return true;
+        }
         // BS (8)
         if (e.keyCode === 8 && !e.shiftKey) {
           dialog.close();
@@ -73,9 +76,13 @@
         return true;
   };
   var onKeyDownOnViews = function(e) {
+      if (e.ctrlKey || e.altKey || e.metaKey) {
+        return true;
+      }
+      var shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
       // '0' - '9' (48-57 or 96-105 for numpad)
-      if ((48 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
-          (96 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
+      if ((48 <= e.keyCode && e.keyCode <= 57 && shift === '') ||
+          (96 <= e.keyCode && e.keyCode <= 105 && shift === '')) {
         var number = e.keyCode % 48;
         if (number === 0) {
           viewManagement.toAllImageView();
@@ -94,7 +101,7 @@
         return false;
       }
       // View switching: Cursor keys
-      if ((37 <= e.keyCode || e.keyCode <= 40) && (viewZoom.scale === 1 && !e.shiftKey)) {
+      if ((37 <= e.keyCode || e.keyCode <= 40) && (viewZoom.scale === 1 && shift === '')) {
         if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
           if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
             return false;
@@ -109,13 +116,13 @@
         }
       }
       // View switching: TAB (9)
-      if (e.keyCode === 9) {
-        if (false === viewManagement.flipSingleView(!e.shiftKey)) {
+      if (e.keyCode === 9 && (shift === '' || shift === 's')) {
+        if (false === viewManagement.flipSingleView(shift === '')) {
           return false;
         }
       }
       // ESC (27)
-      if (e.keyCode === 27 && !e.shiftKey) {
+      if (e.keyCode === 27 && shift === '') {
         if (crossCursor.isEnabled()) {
           crossCursor.disable();
         } else if (altView.active()) {
@@ -129,7 +136,7 @@
         return false;
       }
       // Delete (46)
-      if (e.keyCode === 46 && !e.shiftKey && 0 < images.length) {
+      if (e.keyCode === 46 && shift === '' && 0 < images.length) {
         var index = viewManagement.getCurrentIndexOr(images[0].index);
         removeEntry(index);
         return false;
@@ -137,11 +144,11 @@
       //alert('keydown: '+e.keyCode);
   };
   $(window).keydown(function(e) {
-      if (e.ctrlKey || e.altKey || e.metaKey) {
+      if (e.altKey || e.metaKey) {
         return true;
       }
       // ESC (27)
-      if (dialog && e.keyCode === 27 && !e.shiftKey) {
+      if (dialog && e.keyCode === 27 && !e.shiftKey && !e.ctrlKey) {
         dialog.close();
         return false;
       }
@@ -1016,6 +1023,9 @@
       }
     };
     var processKeyDown = function(e) {
+      if (e.ctrlKey || e.altKey || e.metaKey) {
+        return true;
+      }
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {

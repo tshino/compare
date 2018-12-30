@@ -942,6 +942,9 @@
     return rect;
   };
   var processKeyDownEvent = function(e, callback) {
+    if (e.ctrlKey || e.altKey || e.metaKey) {
+      return true;
+    }
     // '+;' (59, 187 or 107 for numpad) / PageUp (33)
     if (e.keyCode === 59 || e.keyCode === 187 || e.keyCode === 107 ||
         (e.keyCode === 33 && !e.shiftKey)) {
