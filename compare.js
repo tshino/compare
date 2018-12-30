@@ -93,7 +93,22 @@
       if (false === viewZoom.processKeyDown(e)) {
         return false;
       }
-      // TAB (9)
+      // View switching: Cursor keys
+      if ((37 <= e.keyCode || e.keyCode <= 40) && (viewZoom.scale === 1 && !e.shiftKey)) {
+        if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
+          if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
+            return false;
+          }
+        } else if (e.keyCode === 38 && !viewManagement.isSingleView()) { // Up
+          if (false === viewManagement.flipSingleView(true)) {
+            return false;
+          }
+        } else if (e.keyCode === 40 && viewManagement.isSingleView()) { // Down
+          viewManagement.toAllImageView();
+          return false;
+        }
+      }
+      // View switching: TAB (9)
       if (e.keyCode === 9) {
         if (false === viewManagement.flipSingleView(!e.shiftKey)) {
           return false;
@@ -298,7 +313,7 @@
     var IMAGEBOX_MIN_SIZE = 32;
     var IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     var currentImageIndex = 0;
-    var isSingleView = false;
+    var singleView = false;
     var overlayMode = false;
     var overlayBaseIndex = null;
     var layoutMode = null;
@@ -306,6 +321,9 @@
     var imageScaling = 'smooth';
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
+    var isSingleView = function() {
+      return singleView;
+    };
     var isOverlayMode = function() {
       return overlayMode;
     };
@@ -325,7 +343,7 @@
     };
     var getSelectedImageIndices = function() {
       var indices = [];
-      if (isSingleView) {
+      if (singleView) {
         indices.push(currentImageIndex - 1);
         if (overlayMode && overlayBaseIndex !== currentImageIndex - 1) {
           indices.push(overlayBaseIndex);
@@ -388,7 +406,7 @@
       updateLayout();
     };
     var arrangeLayout = function() {
-      if (isSingleView) {
+      if (singleView) {
         currentImageIndex = 0;
       } else if (layoutMode === 'x') {
         layoutMode = 'y';
@@ -412,10 +430,10 @@
       }
     };
     var update = function() {
-      isSingleView =
+      singleView =
               currentImageIndex !== 0 &&
               currentImageIndex <= entries.length;
-      if (!isSingleView && overlayMode) {
+      if (!singleView && overlayMode) {
         overlayMode = false;
       }
       if (layoutMode === null) {
@@ -423,11 +441,11 @@
       }
     };
     var getCurrentIndexOr = function(defaultIndex) {
-      return isSingleView ? currentImageIndex - 1 : defaultIndex;
+      return singleView ? currentImageIndex - 1 : defaultIndex;
     };
     var makeImageLayoutParam = function() {
       var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
-      var numSlots = isSingleView ? 1 : Math.max(numVisibleEntries, 2);
+      var numSlots = singleView ? 1 : Math.max(numVisibleEntries, 2);
       var numColumns = layoutMode === 'x' ? numSlots : 1;
       var numRows    = layoutMode !== 'x' ? numSlots : 1;
       var viewW = $('#view').width();
@@ -492,7 +510,7 @@
         $('#prev,#next').hide();
       }
       $('#view > div.imageBox').each(function(index) {
-        var hide = isSingleView && 0 > indices.indexOf(index);
+        var hide = singleView && 0 > indices.indexOf(index);
         var img = entries[index];
         if (hide || !img || !img.visible) {
           $(this).css({ display : 'none' });
@@ -501,7 +519,7 @@
         }
       });
       $('#view > div.emptyBox').each(function(index) {
-        var hide = isSingleView || param.numVisibleEntries + index >= param.numSlots;
+        var hide = singleView || param.numVisibleEntries + index >= param.numSlots;
         $(this).css({ display : (hide ? 'none' : '') });
       });
       updateImageScaling();
@@ -530,6 +548,7 @@
       updateImageScaling();
     };
     return {
+      isSingleView: isSingleView,
       isOverlayMode: isOverlayMode,
       numberFromIndex: numberFromIndex,
       indexFromNumber: indexFromNumber,
