@@ -76,7 +76,7 @@
         return true;
   };
   var onKeyDownOnViews = function(e) {
-      if (e.ctrlKey || e.altKey || e.metaKey) {
+      if (e.altKey || e.metaKey) {
         return true;
       }
       var shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
@@ -101,7 +101,8 @@
         return false;
       }
       // View switching: Cursor keys
-      if ((37 <= e.keyCode || e.keyCode <= 40) && (viewZoom.scale === 1 && shift === '')) {
+      if ((37 <= e.keyCode || e.keyCode <= 40) &&
+          ((viewZoom.scale === 1 && shift === '') || shift === 'c')) {
         if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
           if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
             return false;
