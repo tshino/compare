@@ -3547,12 +3547,12 @@
         diffResult.result = null;
       }
     };
-    var updateOptionsDOM = function() {
+    var updateOptionsDOM = function(styles) {
       $('.diffDimension').css({display:'none'});
       $('#diffDimensionReport *').remove();
       $('#diffDetectedMaxAE').text('');
       $('#diffIgnoreAEResult').text('');
-      $('#diffResult *').remove();
+      $('#diffResult').css(styles.cellStyle).children().remove();
       $('#diffSummary *').remove();
       $('#diffSaveFigure').hide();
       $('.diffDimensionOption').
@@ -3630,7 +3630,8 @@
       diffResult.baseWidth = styles.baseW;
       diffResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
-      $('#diffResult').append($(fig.canvas).css(styles.style).addClass('figMain')).css(styles.cellStyle);
+      var figMain = $(fig.canvas).css(styles.style).addClass('figMain');
+      $('#diffResult').css(styles.cellStyle).append(figMain);
       diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
       if (diffResult.grid) {
         $('#diffResult').append(diffResult.grid);
@@ -3684,8 +3685,15 @@
       var gridbtn = $('#diffGridBtn');
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
+    var figureStyles = function() {
+      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
+      var figH = Math.max(320, Math.round($('#view').height() * 0.55));
+      var figMargin = 8;
+      return makeFigureStyles(figW, figH, figMargin, '#000');
+    };
     var updateTableDOM = function() {
-      if (false === updateOptionsDOM()) {
+      var styles = figureStyles();
+      if (false === updateOptionsDOM(styles)) {
         return;
       }
       if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
@@ -3697,9 +3705,6 @@
           diffResult.offsetY !== diffOptions.offsetY) {
         updateAsync();
       }
-      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
-      var figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
-      var styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (diffResult.result === null) {
         $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         textUtil.setText($('#diffSummary'), {
