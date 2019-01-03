@@ -3686,7 +3686,7 @@
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
     var figureStyles = function() {
-      var figW = Math.max(600, Math.round($('#view').width() * 0.80));
+      var figW = Math.max(480, Math.round($('#view').width() * 0.5));
       var figH = Math.max(320, Math.round($('#view').height() * 0.55));
       var figMargin = 8;
       return makeFigureStyles(figW, figH, figMargin, '#000');

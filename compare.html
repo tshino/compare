@@ -874,7 +874,7 @@ var changeLang = function(lang) {
 		</div>
 	</div>
 	<div id="diff" class="dialog">
-		<div>
+		<div style="min-width:90vw">
 			<div class="header">
 				<h3>
 					<img src="res/diff.svg" width="20" alt="icon">
@@ -885,25 +885,27 @@ var changeLang = function(lang) {
 					<img src="res/grid.svg" alt="show grid" style="width:24px; vertical-align:bottom;">
 				</button>
 			</div>
-			<div>
+			<div style="display:inline-block; vertical-align:top">
 				<table>
 					<tr>
 						<td class="prop">
 							<span class="en">Base Image</span>
 							<span class="ja">基準画像</span>
 						</td>
-						<td id="diffBaseName" style="min-width: 216px"></td>
+						<td id="diffBaseName"></td>
+					</tr>
+					<tr>
 						<td class="prop">
 							<span class="en">Target Image</span>
 							<span class="ja">対象画像</span>
 						</td>
-						<td id="diffTargetName" style="min-width: 216px"></td>
+						<td id="diffTargetName"></td>
 					</tr>
 					<tr>
-						<td id="diffResult" class="fig" colspan="4"></td>
+						<td id="diffResult" class="fig" colspan="2"></td>
 					</tr>
 					<tr>
-						<td class="output" colspan="4" style="text-align:center">
+						<td class="output" colspan="2" style="text-align:center">
 							<span id="diffSummary"></span>
 							<span style="float:right">
 								<a id="diffSaveFigure" href="#">
@@ -923,22 +925,20 @@ var changeLang = function(lang) {
 						※ 2つの画像の異なる部分を色で示しています
 					</span>
 				</div>
-				<table style="display:inline-block; vertical-align:top;">
+			</div>
+			<div style="display:inline-block; vertical-align:top; min-width:auto">
+				<b class="diffDimension">
+					<span class="en">Dimension</span>
+					<span class="ja">画像サイズ</span>
+				</b>
+				<table>
 					<tr class="num diffDimension">
-						<td class="prop" rowspan="3">
-							<span class="en">Dimension</span>
-							<span class="ja">画像サイズ</span>
-						</td>
 						<td class="output" colspan="2">
 							&nbsp;<span id="diffDimensionReport"></span>
 						</td>
 					</tr>
 					<tr class="diffDimension">
-						<td class="input">
-							<span class="en">dimension option:</span>
-							<span class="ja">画像サイズオプション:</span>
-						</td>
-						<td class="input">
+						<td class="input" colspan="2">
 							<select class="diffDimensionOption en">
 								<option value="resize">resize to fit to larger one</option>
 								<option value="max">no resize (compare in larger dimension)</option>
@@ -965,11 +965,13 @@ var changeLang = function(lang) {
 							</select>
 						</td>
 					</tr>
+				</table>
+				<b>
+					<span class="en">Offset</span>
+					<span class="ja">オフセット</span>
+				</b>
+				<table>
 					<tr>
-						<td class="prop" rowspan="2">
-							<span class="en">Offset</span>
-							<span class="ja">オフセット</span>
-						</td>
 						<td class="input">
 							<span class="en">horizontal [px]</span>
 							<span class="ja">水平 [px]</span>
@@ -984,23 +986,23 @@ var changeLang = function(lang) {
 						<td class="input" style="min-width:auto"><input id="diffOffsetY" type="number" min="-9999" max="9999" value="0"></td>
 					</tr>
 				</table>
-				<table style="display:inline-block; vertical-align:top;">
-					<tr>
-						<td class="prop" rowspan="3">
-							<span class="en">RGBA error</span>
-							<span class="ja">RGBA誤差</span>
-						</td>
+				<b>
+					<span class="en">RGBA error</span>
+					<span class="ja">RGBA誤差</span>
+				</b>
+				<table>
+					<tr class="prop">
 						<td class="output">
-							<span class="en">detected maximum error value:</span>
+							<span class="en">detected max value:</span>
 							<span class="ja">検出した最大誤差:</span>
 						</td>
 						<td class="output" id="diffDetectedMaxAE"></td>
 					</tr>
 					<tr class="num">
 						<td class="input">
-							<span class="en">maximum error to ignore</span>
+							<span class="en">max value to ignore</span>
 							<span class="ja">無視する誤差の大きさ</span>
-							(0 - 255)
+							(0-255)
 						</td>
 						<td class="input" style="min-width:auto"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
 					</tr>
