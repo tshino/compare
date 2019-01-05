@@ -1105,6 +1105,7 @@
       offset: { x: 0.5, y: 0.5 }
     };
     var enabled = true;
+    var zoomOrigin = null;
     var pointCallback = null;
     var clickPoint = null;
     var dragStartPoint = null;
@@ -1213,6 +1214,12 @@
         }
       });
     };
+    var setZoomOrigin = function(pos) {
+      zoomOrigin = pos;
+    };
+    var resetZoomOrigin = function() {
+      zoomOrigin = null;
+    };
     var setPointCallback = function(callback) {
       pointCallback = callback;
     };
@@ -1293,7 +1300,9 @@
     var processWheel = function(e, selector, relSelector, target) {
       return processWheelEvent(e, {
         zoom: function(steps) {
-          if (selector && relSelector) {
+          if (zoomOrigin) {
+            zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, zoomOrigin);
+          } else if (selector && relSelector) {
             var index = $(selector).index(target);
             target = $(target).find(relSelector);
             if (target.length !== 0) {
@@ -1389,6 +1398,8 @@
     //o.moveRelativePx = moveRelativePx;
     //o.zoomTo = zoomTo;
     o.processKeyDown = processKeyDown;
+    o.setZoomOrigin = setZoomOrigin;
+    o.resetZoomOrigin = resetZoomOrigin;
     o.setPointCallback = setPointCallback;
     o.setDragStateCallback = setDragStateCallback;
     o.positionFromMouseEvent = positionFromMouseEvent;

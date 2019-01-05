@@ -234,6 +234,18 @@
   figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
   colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
 
+  crossCursor.addObserver(
+    null,
+    function(pointChanged) {
+      if (pointChanged) {
+        var pos = crossCursor.getNormalizedPosition();
+        viewZoom.setZoomOrigin(pos);
+      }
+    },
+    function() {
+      viewZoom.resetZoomOrigin();
+    }
+  );
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
       crossCursor.enable();
@@ -829,9 +841,9 @@
     var primaryIndex = null;
     var fixedPosition = false;
     var positions = [];
-    var onShowCallback = null;
-    var onUpdateCallback = null;
-    var onRemoveCallback = null;
+    var onShowCallback = [];
+    var onUpdateCallback = [];
+    var onRemoveCallback = [];
     var makeInitialPosition = function(index) {
       var img = entries[index];
       var center = viewZoom.getCenter();
@@ -839,10 +851,16 @@
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var setObserver = function(onShow, onUpdate, onRemove) {
-      onShowCallback = onShow;
-      onUpdateCallback = onUpdate;
-      onRemoveCallback = onRemove;
+    var addObserver = function(onShow, onUpdate, onRemove) {
+      if (onShow) {
+        onShowCallback.push(onShow);
+      }
+      if (onUpdate) {
+        onUpdateCallback.push(onUpdate);
+      }
+      if (onRemove) {
+        onRemoveCallback.push(onRemove);
+      }
     };
     var enable = function() {
       var index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
@@ -850,9 +868,7 @@
         enableCrossCursor = true;
         primaryIndex = index;
         fixedPosition = false;
-        if (onShowCallback) {
-          onShowCallback();
-        }
+        onShowCallback.forEach(function(val) { val(); });
         var pos = makeInitialPosition(index);
         setPosition(index, pos.x, pos.y);
         updateLayout();
@@ -862,9 +878,7 @@
     var disable = function() {
       if (enableCrossCursor) {
         enableCrossCursor = false;
-        if (onRemoveCallback) {
-          onRemoveCallback();
-        }
+        onRemoveCallback.forEach(function(val) { val(); });
         primaryIndex = null;
         updateLayout();
       }
@@ -887,6 +901,12 @@
     var getIndex = function() {
       return primaryIndex;
     };
+    var getNormalizedPosition = function() {
+      return {
+        x: (0.5 + positions[primaryIndex].x) / entries[primaryIndex].width,
+        y: (0.5 + positions[primaryIndex].y) / entries[primaryIndex].height
+      };
+    };
     var isFixed = function() {
       return fixedPosition;
     };
@@ -901,9 +921,7 @@
         }
         if (primaryIndex === null) {
           enableCrossCursor = false;
-          if (onRemoveCallback) {
-            onRemoveCallback();
-          }
+          onRemoveCallback.forEach(function(val) { val(); });
         }
       }
     };
@@ -1007,9 +1025,7 @@
         var iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
         updateCrossCursor(img, ix, iy);
       }
-      if (onUpdateCallback) {
-        onUpdateCallback(true);
-      }
+      onUpdateCallback.forEach(function(val) { val(true); });
     };
     var adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
       var img = entries[primaryIndex];
@@ -1098,19 +1114,18 @@
     };
     var onUpdateTransform = function() {
       if (enableCrossCursor) {
-        if (onUpdateCallback) {
-          onUpdateCallback(false);
-        }
+        onUpdateCallback.forEach(function(val) { val(false); });
       }
     };
     return {
-      setObserver: setObserver,
+      addObserver: addObserver,
       enable: enable,
       disable: disable,
       toggle: toggle,
       isEnabled: function() { return enableCrossCursor; },
       getPosition: getPosition,
       getIndex: getIndex,
+      getNormalizedPosition: getNormalizedPosition,
       isFixed: isFixed,
       onRemoveEntry: onRemoveEntry,
       setPosition: setPosition,
@@ -1263,7 +1278,7 @@
       }
     };
     var initialize = function() {
-      crossCursor.setObserver(showHUD, updateHUD, removeHUD);
+      crossCursor.addObserver(showHUD, updateHUD, removeHUD);
       hud.setObserver(onUpdateLayout);
     };
     return {
