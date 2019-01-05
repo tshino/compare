@@ -1181,10 +1181,10 @@
           var s2 = o.scale;
           var px = x - 0.5;
           var py = y - 0.5;
-          var c2x = px - s1 * (px - c1.x) / s2;
-          var c2y = py - s1 * (py - c1.y) / s2;
-          var o2x = c2x * o.scale / (o.scale - 1) + 0.5;
-          var o2y = c2y * o.scale / (o.scale - 1) + 0.5;
+          var c2x = s2 * px - s1 * (px - c1.x);
+          var c2y = s2 * py - s1 * (py - c1.y);
+          var o2x = c2x / (o.scale - 1) + 0.5;
+          var o2y = c2y / (o.scale - 1) + 0.5;
           setOffset(o2x, o2y);
         }
         update();
