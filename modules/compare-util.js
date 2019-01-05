@@ -1174,17 +1174,17 @@
         }
         var c1 = getCenter();
         var s1 = o.scale;
-        setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
+        setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL)); // o.scale changes here
         if (1 < o.scale) {
           var x = clamp(pos.x, 0, 1);
           var y = clamp(pos.y, 0, 1);
           var s2 = o.scale;
           var px = x - 0.5;
           var py = y - 0.5;
-          var c2x = px - s1 * pos.baseW * (px - c1.x) / (s2 * pos.baseW);
-          var c2y = py - s1 * pos.baseH * (py - c1.y) / (s2 * pos.baseH);
-          var o2x = c2x / (1 - 1 / o.scale) + 0.5;
-          var o2y = c2y / (1 - 1 / o.scale) + 0.5;
+          var c2x = px - s1 * (px - c1.x) / s2;
+          var c2y = py - s1 * (py - c1.y) / s2;
+          var o2x = c2x * o.scale / (o.scale - 1) + 0.5;
+          var o2y = c2y * o.scale / (o.scale - 1) + 0.5;
           setOffset(o2x, o2y);
         }
         update();
