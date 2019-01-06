@@ -1131,8 +1131,20 @@
         return true;
       }
     };
-    var zoomIn = function() { return zoomRelative(+ZOOM_STEP_KEY); };
-    var zoomOut = function() { return zoomRelative(-ZOOM_STEP_KEY); };
+    var zoomIn = function() {
+      if (zoomOrigin) {
+        return zoomRelativeToPoint(0, 0, +ZOOM_STEP_KEY, zoomOrigin);
+      } else {
+        return zoomRelative(+ZOOM_STEP_KEY);
+      }
+    };
+    var zoomOut = function() {
+      if (zoomOrigin) {
+        return zoomRelativeToPoint(0, 0, -ZOOM_STEP_KEY, zoomOrigin);
+      } else {
+        return zoomRelative(-ZOOM_STEP_KEY);
+      }
+    };
     var setOffset = function(x, y) {
       x = clamp(x, 0, 1);
       y = zoomXOnly ? 0.5 : clamp(y, 0, 1);
