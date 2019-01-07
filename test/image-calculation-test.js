@@ -689,4 +689,68 @@
       }
     ])(done);
   });
+  TEST( 'compare-worker.js calcDiff', function test(done) {
+    var image1 = { width: 3, height: 2, data: [
+      0,0,0,0,     85,85,85,85,     170,170,170,170,
+      85,85,85,85, 170,170,170,170, 255,255,255,255
+    ]};
+    var image2 = { width: 3, height: 2, data: [
+      0,0,0,0,     80,80,80,80,     160,160,160,160,
+      80,80,80,80, 160,160,160,160, 255,255,255,255
+    ]};
+    var task = {
+      cmd: 'calcDiff', imageData: [image1, image2],
+      options: {
+        ignoreAE: 0,
+        ignoreRemainder: false,
+        resizeToLarger: true,
+        resizeMethod: 'lanczos3',
+        offsetX: 0,
+        offsetY: 0,
+        orientationA: null,
+        orientationB: null,
+      }
+    };
+    jsTestUtil.makeSequentialTest([
+      function(done) {
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcDiff', data.cmd );
+          EXPECT_EQ( 3, data.result.image.width );
+          EXPECT_EQ( 2, data.result.image.height );
+          EXPECT_EQ( 3 * 2 * 4, data.result.image.data.length );
+          EXPECT_EQ( 4, data.result.summary.unmatch );
+          EXPECT_EQ( 2, data.result.summary.match );
+          EXPECT_EQ( 6, data.result.summary.total );
+          EXPECT_EQ( 0, data.result.summary.countIgnoreAE );
+          EXPECT_EQ( 10, data.result.summary.maxAE );
+          EXPECT_EQ( task.options.ignoreAE, data.options.ignoreAE );
+          EXPECT_EQ( task.options.ignoreRemainder, data.options.ignoreRemainder );
+          EXPECT_EQ( task.options.resizeToLarger, data.options.resizeToLarger );
+          EXPECT_EQ( task.options.resizeMethod, data.options.resizeMethod );
+          EXPECT_EQ( task.options.offsetX, data.options.offsetX );
+          EXPECT_EQ( task.options.offsetY, data.options.offsetY );
+          EXPECT_EQ( task.options.orentationA, data.options.orentationA );
+          EXPECT_EQ( task.options.orentationB, data.options.orentationB );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 5;
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcDiff', data.cmd );
+          EXPECT_EQ( 3, data.result.image.width );
+          EXPECT_EQ( 2, data.result.image.height );
+          EXPECT_EQ( 3 * 2 * 4, data.result.image.data.length );
+          EXPECT_EQ( 2, data.result.summary.unmatch );
+          EXPECT_EQ( 4, data.result.summary.match );
+          EXPECT_EQ( 6, data.result.summary.total );
+          EXPECT_EQ( 2, data.result.summary.countIgnoreAE );
+          EXPECT_EQ( 10, data.result.summary.maxAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      }
+    ])(done);
+  });
 })();
