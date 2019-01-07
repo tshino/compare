@@ -1033,10 +1033,12 @@
       var rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
       var ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
       if (0.45 < Math.abs(rx) && 0 < dx * rx) {
-        viewZoom.moveRelative(0 < rx ? 0.25 : -0.25, 0);
+        var delta = Math.max(0.25, Math.abs(rx) - 0.45);
+        viewZoom.moveRelative(0 < rx ? delta : -delta, 0);
       }
       if (0.45 < Math.abs(ry) && 0 < dy * ry) {
-        viewZoom.moveRelative(0, 0 < ry ? 0.25 : -0.25);
+        var delta = Math.max(0.25, Math.abs(ry) - 0.45);
+        viewZoom.moveRelative(0, 0 < ry ? delta : -delta);
       }
     };
     var processKeyDown = function(e) {
