@@ -738,15 +738,61 @@
       function(done) {
         task.options.ignoreAE = 5;
         taskCallback = function(data) {
-          EXPECT_EQ( 'calcDiff', data.cmd );
-          EXPECT_EQ( 3, data.result.image.width );
-          EXPECT_EQ( 2, data.result.image.height );
-          EXPECT_EQ( 3 * 2 * 4, data.result.image.data.length );
           EXPECT_EQ( 2, data.result.summary.unmatch );
           EXPECT_EQ( 4, data.result.summary.match );
           EXPECT_EQ( 6, data.result.summary.total );
           EXPECT_EQ( 2, data.result.summary.countIgnoreAE );
           EXPECT_EQ( 10, data.result.summary.maxAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 1;
+        taskCallback = function(data) {
+          EXPECT_EQ( 4, data.result.summary.unmatch );
+          EXPECT_EQ( 2, data.result.summary.match );
+          EXPECT_EQ( 0, data.result.summary.countIgnoreAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 4;
+        taskCallback = function(data) {
+          EXPECT_EQ( 4, data.result.summary.unmatch );
+          EXPECT_EQ( 2, data.result.summary.match );
+          EXPECT_EQ( 0, data.result.summary.countIgnoreAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 6;
+        taskCallback = function(data) {
+          EXPECT_EQ( 2, data.result.summary.unmatch );
+          EXPECT_EQ( 4, data.result.summary.match );
+          EXPECT_EQ( 2, data.result.summary.countIgnoreAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 10;
+        taskCallback = function(data) {
+          EXPECT_EQ( 0, data.result.summary.unmatch );
+          EXPECT_EQ( 6, data.result.summary.match );
+          EXPECT_EQ( 4, data.result.summary.countIgnoreAE );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.ignoreAE = 11;
+        taskCallback = function(data) {
+          EXPECT_EQ( 0, data.result.summary.unmatch );
+          EXPECT_EQ( 6, data.result.summary.match );
+          EXPECT_EQ( 4, data.result.summary.countIgnoreAE );
           done();
         };
         taskQueue.addTask(task);
