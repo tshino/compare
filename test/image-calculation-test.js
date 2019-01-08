@@ -722,6 +722,13 @@
           EXPECT_EQ( 2, data.result.summary.match );
           EXPECT_EQ( 6, data.result.summary.total );
           EXPECT_EQ( 0, data.result.summary.countIgnoreAE );
+          EXPECT_EQ( 256, data.result.summary.histogram.length );
+          EXPECT_EQ( 2, data.result.summary.histogram[0] );
+          EXPECT_EQ( 0, data.result.summary.histogram[1] );
+          EXPECT_EQ( 2, data.result.summary.histogram[5] );
+          EXPECT_EQ( 2, data.result.summary.histogram[10] );
+          EXPECT_EQ( 0, data.result.summary.histogram[15] );
+          EXPECT_EQ( 0, data.result.summary.histogram[255] );
           EXPECT_EQ( 10, data.result.summary.maxAE );
           EXPECT_EQ( task.options.ignoreAE, data.options.ignoreAE );
           EXPECT_EQ( task.options.ignoreRemainder, data.options.ignoreRemainder );
@@ -743,6 +750,12 @@
           EXPECT_EQ( 6, data.result.summary.total );
           EXPECT_EQ( 2, data.result.summary.countIgnoreAE );
           EXPECT_EQ( 10, data.result.summary.maxAE );
+          EXPECT_EQ( 2, data.result.summary.histogram[0] );
+          EXPECT_EQ( 0, data.result.summary.histogram[1] );
+          EXPECT_EQ( 2, data.result.summary.histogram[5] );
+          EXPECT_EQ( 2, data.result.summary.histogram[10] );
+          EXPECT_EQ( 0, data.result.summary.histogram[15] );
+          EXPECT_EQ( 0, data.result.summary.histogram[255] );
           done();
         };
         taskQueue.addTask(task);
