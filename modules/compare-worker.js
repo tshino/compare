@@ -687,7 +687,6 @@ function calcDiff( a, b, options ) {
 
   var makeDiff = function(a, b, out, summary) {
     var unmatch = 0;
-    var maxAE = 0;
     var histogram = summary.histogram;
     var d0 = a.data, d1 = b.data, o = out.data;
     var w = a.width, h = a.height;
@@ -701,7 +700,6 @@ function calcDiff( a, b, options ) {
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
         var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
         histogram[ae] += 1;
-        maxAE = Math.max(maxAE, ae);
         if (ae <= ignoreAE) {
           o[k    ] = mean;
           o[k + 2] = mean;
@@ -717,9 +715,15 @@ function calcDiff( a, b, options ) {
       j += (b.pitch - w) * 4;
       k += (out.pitch - w) * 4;
     }
+    var maxAE = 0;
     var countIgnoreAE = 0;
-    for (var ae = 1; ae <= ignoreAE; ae++) {
-      countIgnoreAE += histogram[ae];
+    for (var ae = 0; ae < 256; ae++) {
+      if (0 < histogram[ae]) {
+        maxAE = ae;
+      }
+      if (0 < ae && ae <= ignoreAE) {
+        countIgnoreAE += histogram[ae];
+      }
     }
     summary.unmatch += unmatch;
     summary.maxAE = Math.max(summary.maxAE, maxAE);
