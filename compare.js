@@ -3569,6 +3569,7 @@
       $('#diffDimensionReport *').remove();
       $('#diffDetectedMaxAE').text('');
       $('#diffIgnoreAEResult').text('');
+      $('#diffAEHistogram canvas').remove();
       $('#diffResult').css(styles.cellStyle).children().remove();
       $('#diffSummary *').remove();
       $('#diffSaveFigure').hide();
@@ -3627,6 +3628,25 @@
         }, attachImageDataToTask);
       }
     };
+    var makeHistogramFigure = function(hist) {
+      var fig = figureUtil.makeBlankFigure(256 * 3, 320);
+      var context = fig.context;
+      context.fillStyle = '#222';
+      context.fillRect(0,0,256*3,320);
+      var max = 0;
+      for (var i = 0; i < hist.length; ++i) {
+        max = Math.max(max, hist[i]);
+      }
+      var drawHistogram = function(color, offset) {
+        context.fillStyle = color;
+        for (var i = 0; i < 256; ++i) {
+          var h = 320 * Math.pow(hist[i + offset] / max, 0.5);
+          context.fillRect(i*3, 320-h, 3, h);
+        }
+      };
+      drawHistogram('#fff', 0);
+      return fig.canvas;
+    };
     var updateReport = function(styles) {
       if (diffResult.result.summary.maxAE !== 0) {
         var e = diffResult.result.summary.maxAE;
@@ -3637,6 +3657,8 @@
         var percent = compareUtil.toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
       }
+      var histFig = makeHistogramFigure(diffResult.result.summary.histogram);
+      $('#diffAEHistogram').append($(histFig).css({ width: '320px', height: '160px' }));
       var w = diffResult.result.image.width;
       var h = diffResult.result.image.height;
       var fig = figureUtil.makeBlankFigure(w, h);
@@ -3723,6 +3745,7 @@
         updateAsync();
       }
       if (diffResult.result === null) {
+        $('#diffAEHistogram').append($(figureUtil.makeBlankFigure(8,8).canvas).css({width:'320px',height:'160px'}));
         $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         textUtil.setText($('#diffSummary'), {
           en: 'calculating...',
