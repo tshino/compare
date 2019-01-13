@@ -3628,23 +3628,25 @@
         }, attachImageDataToTask);
       }
     };
-    var makeHistogramFigure = function(hist) {
+    var makeHistogramFigure = function(hist, ignoreAE) {
       var fig = figureUtil.makeBlankFigure(256 * 3, 320);
       var context = fig.context;
       context.fillStyle = '#222';
       context.fillRect(0,0,256*3,320);
+      context.fillStyle = '#66f';
+      context.fillRect(0,0,(ignoreAE + 1)*3,320);
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
-      var drawHistogram = function(color, offset) {
-        context.fillStyle = color;
+      var drawHistogram = function(color1, color2, offset) {
         for (var i = 0; i < 256; ++i) {
-          var h = 320 * Math.pow(hist[i + offset] / max, 0.5);
+          context.fillStyle = i <= ignoreAE ? color1 : color2;
+          var h = 300 * Math.pow(hist[i + offset] / max, 0.5);
           context.fillRect(i*3, 320-h, 3, h);
         }
       };
-      drawHistogram('#fff', 0);
+      drawHistogram('#ccc', '#fff', 0);
       return fig.canvas;
     };
     var updateReport = function(styles) {
@@ -3657,7 +3659,7 @@
         var percent = compareUtil.toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
       }
-      var histFig = makeHistogramFigure(diffResult.result.summary.histogram);
+      var histFig = makeHistogramFigure(diffResult.result.summary.histogram, diffOptions.ignoreAE);
       $('#diffAEHistogram').append($(histFig).css({ width: '320px', height: '160px' }));
       var w = diffResult.result.image.width;
       var h = diffResult.result.image.height;
