@@ -696,15 +696,15 @@ function calcDiff( a, b, options ) {
         var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
         var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
-        var mean = Math.round((y0 * a0 + y1 * a1) * (0.25 / 255));
+        var mean = Math.round((y0 * a0 + y1 * a1) * (0.30 / 255));
         var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
         histogram[ae] += 1;
-        if (ae <= ignoreAE) {
+        if (ae === 0) {
           o[k    ] = mean;
           o[k + 2] = mean;
         } else {
-          o[k    ] = y0 >= y1 ? 255 : mean;
-          o[k + 2] = y0 <= y1 ? 255 : mean;
+          o[k    ] = ae > ignoreAE ? 255 : mean;
+          o[k + 2] = ae <= ignoreAE ? 255 : mean;
         }
         o[k + 1] = mean;
         o[k + 3] = 255;

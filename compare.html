@@ -918,12 +918,18 @@ var changeLang = function(lang) {
 					</tr>
 				</table>
 				<div class="footnote">
-					<span class="en">
-						* Different parts of the two images are indicated in color.
-					</span>
-					<span class="ja">
-						※ 2つの画像の異なる部分を色で示しています
-					</span>
+					<svg viewBox="0 0 40 40" style="width:20px; vertical-align:bottom;">
+						<path fill="#444444" stroke="#888" stroke-width="1.5" stroke-linejoin="round" d="M 20,35 L 5,35 5,5 35,5 35,35 20,35 Z"/>
+					</svg>
+					<span class="en">Matched</span><span class="ja">一致</span>
+					<svg viewBox="0 0 40 40" style="width:20px; vertical-align:bottom;">
+						<path fill="#4444ff" stroke="#888" stroke-width="1.5" stroke-linejoin="round" d="M 20,35 L 5,35 5,5 35,5 35,35 20,35 Z"/>
+					</svg>
+					<span class="en">Ignored Unmatched</span><span class="ja">無視した不一致</span>
+					<svg viewBox="0 0 40 40" style="width:20px; vertical-align:bottom;">
+						<path fill="#ff4444" stroke="#888" stroke-width="1.5" stroke-linejoin="round" d="M 20,35 L 5,35 5,5 35,5 35,35 20,35 Z"/>
+					</svg>
+					<span class="en">Unmatched</span><span class="ja">不一致</span>
 				</div>
 			</div>
 			<div style="display:inline-block; vertical-align:top; min-width:auto">
