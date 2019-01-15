@@ -3687,7 +3687,7 @@
         var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
         var percent = compareUtil.toPercent(matchRate);
         textUtil.setText($('#diffSummary'), {
-          en: percent + ' pixels are match',
+          en: percent + ' pixels are matched',
           ja: percent + ' のピクセルが一致しました'
         });
       }
