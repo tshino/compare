@@ -3655,6 +3655,11 @@
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
         var percent = compareUtil.toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
+        $('#diffIgnoredUnmatchedRange').text('(≦' + diffOptions.ignoreAE + ')');
+        $('#diffUnmatchedRange').text('(>' + diffOptions.ignoreAE + ')');
+      } else {
+        $('#diffIgnoredUnmatchedRange').text('');
+        $('#diffUnmatchedRange').text('');
       }
       var histFig = makeHistogramFigure(diffResult.result.summary.histogram, diffOptions.ignoreAE);
       $('#diffAEHistogram').append($(histFig).css({ width: '320px', height: '160px' }));
