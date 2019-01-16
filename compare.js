@@ -3650,10 +3650,7 @@
       return fig.canvas;
     };
     var updateReport = function(styles) {
-      if (diffResult.result.summary.maxAE !== 0) {
-        var e = diffResult.result.summary.maxAE;
-        $('#diffDetectedMaxAE').text(e);
-      }
+      $('#diffDetectedMaxAE').text(diffResult.result.summary.maxAE);
       if (diffOptions.ignoreAE !== 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
         var percent = compareUtil.toPercent(rate);
