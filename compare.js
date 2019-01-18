@@ -246,6 +246,14 @@
       viewZoom.resetZoomOrigin();
     }
   );
+  var updateNavBox = function() {
+    if (1 <= images.length && !dialog) {
+      $('#navBox').show();
+    } else {
+      $('#navBox').hide();
+    }
+  };
+  dialogUtil.addObserver(updateNavBox, updateNavBox);
   viewZoom.setPointCallback(function(e) {
     if (entries[e.index].ready()) {
       crossCursor.enable();
@@ -519,7 +527,7 @@
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       $('#viewHud').css('width', param.viewW);
-      if (1 <= images.length) {
+      if (1 <= images.length && !dialog) {
         $('#navBox').show();
       } else {
         $('#navBox').hide();
@@ -1296,6 +1304,15 @@
     }
   };
   var dialogUtil = (function() {
+    var onShow = [], onHide = [];
+    var addObserver = function(show, hide) {
+      if (show) {
+        onShow.push(show);
+      }
+      if (hide) {
+        onHide.push(hide);
+      }
+    };
     var hideDialog = function() {
       if (dialog) {
         if (dialog.onclose) {
@@ -1304,6 +1321,7 @@
         dialog.element.hide();
         dialog = null;
         figureZoom.disable();
+        onHide.forEach(function(val) { val(); });
       }
     };
     var showDialog = function(target, parent, update, onclose, initialFocus) {
@@ -1316,6 +1334,7 @@
       target.css({ display: 'block' });
       initialFocus = initialFocus || target.children().find('.dummyFocusTarget');
       initialFocus.focus();
+      onShow.forEach(function(val) { val(); });
     };
     var initFigureZoom = function(options) {
       if (options.enableZoom) {
@@ -1405,6 +1424,7 @@
       };
     };
     return {
+      addObserver: addObserver,
       hideDialog: hideDialog,
       showDialog: showDialog,
       initFigureZoom: initFigureZoom,
