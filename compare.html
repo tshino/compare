@@ -978,7 +978,7 @@ var changeLang = function(lang) {
 					<span class="en">RGBA error</span>
 					<span class="ja">RGBA誤差</span>
 				</b>
-				<table>
+				<table width="380">
 					<tr class="prop">
 						<td class="output">
 							<span class="en">detected max value:</span>
@@ -992,7 +992,7 @@ var changeLang = function(lang) {
 							<span class="ja">無視する誤差の大きさ</span>
 							(0-255)
 						</td>
-						<td class="input" style="min-width:auto"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
+						<td class="input"><input id="diffIgnoreAE" type="number" min="0" max="255" value="0"></td>
 					</tr>
 					<tr class="prop">
 						<td class="output">
@@ -1013,20 +1013,11 @@ var changeLang = function(lang) {
 					<span class="en">Offset before compare</span>
 					<span class="ja">オフセットして比較</span>
 				</b>
-				<table>
-					<tr>
-						<td class="input">
-							<span class="en">horizontal [px]</span>
-							<span class="ja">水平 [px]</span>
-						</td>
-						<td class="input" style="min-width:auto"><input id="diffOffsetX" type="number" min="-9999" max="9999" value="0"></td>
-					</tr>
+				<table width="380">
 					<tr class="num">
-						<td class="input">
-							<span class="en">vertical [px]</span>
-							<span class="ja">垂直 [px]</span>
-						</td>
-						<td class="input" style="min-width:auto"><input id="diffOffsetY" type="number" min="-9999" max="9999" value="0"></td>
+						<td class="input">X,Y [px]</td>
+						<td class="input"><input id="diffOffsetX" type="number" min="-9999" max="9999" value="0"></td>
+						<td class="input"><input id="diffOffsetY" type="number" min="-9999" max="9999" value="0"></td>
 					</tr>
 				</table>
 			</div>

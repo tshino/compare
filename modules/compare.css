@@ -355,6 +355,10 @@ input:invalid
 {
     border          : 2px solid red;
 }
+input[type=number]
+{
+    width           : 80px;
+}
 div.dialog table td, div.dialog table th
 {
     padding         : 0.2em 0.5em;
