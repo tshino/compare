@@ -3586,7 +3586,6 @@
     };
     var updateOptionsDOM = function(styles) {
       $('.diffDimension').css({display:'none'});
-      $('#diffDimensionReport *').remove();
       $('#diffDetectedMaxAE').text('');
       $('#diffIgnoreAEResult').text('');
       $('#diffAEHistogram canvas').remove();
@@ -3613,10 +3612,6 @@
         $('.diffDimension').css({display:'none'});
       } else {
         $('.diffDimension').css({display:''});
-        textUtil.setText($('#diffDimensionReport'), {
-          en: 'dimensions are different',
-          ja: '画像サイズが異なります'
-        });
       }
       return true;
     };

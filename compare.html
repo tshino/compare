@@ -935,45 +935,6 @@ var changeLang = function(lang) {
 				</div>
 			</div>
 			<div style="display:inline-block; vertical-align:top; min-width:auto">
-				<b class="diffDimension">
-					<span class="en">Dimension</span>
-					<span class="ja">画像サイズ</span>
-				</b>
-				<table>
-					<tr class="num diffDimension">
-						<td class="output" colspan="2">
-							&nbsp;<span id="diffDimensionReport"></span>
-						</td>
-					</tr>
-					<tr class="diffDimension">
-						<td class="input" colspan="2">
-							<select class="diffDimensionOption en">
-								<option value="resize">resize to fit to larger one</option>
-								<option value="max">no resize (compare in larger dimension)</option>
-								<option value="min">no resize (compare in smaller dimension)</option>
-							</select>
-							<select class="diffDimensionOption ja">
-								<option value="resize">大きい方に合わせてリサイズ</option>
-								<option value="max">リサイズなし（大きいサイズで比較）</option>
-								<option value="min">リサイズなし（小さいサイズで比較）</option>
-							</select>
-						</td>
-					</tr>
-					<tr class="diffDimension">
-						<td class="input">
-							<span class="en">resize method:</span>
-							<span class="ja">リサイズ方法:</span>
-						</td>
-						<td class="input">
-							<select id="diffResizeMethod">
-								<option value="lanczos3">Lanczos3</option>
-								<option value="lanczos2">Lanczos2</option>
-								<option value="bilinear">Bilinear</option>
-								<option value="nn">Nearest neighbor</option>
-							</select>
-						</td>
-					</tr>
-				</table>
 				<b>
 					<span class="en">RGBA error</span>
 					<span class="ja">RGBA誤差</span>
@@ -1006,6 +967,40 @@ var changeLang = function(lang) {
 							<span class="en">Error Histogram:</span>
 							<span class="ja">誤差ヒストグラム:</span>
 							<br>
+						</td>
+					</tr>
+				</table>
+				<b class="diffDimension">
+					<span class="en">Dimension option</span>
+					<span class="ja">画像サイズオプション</span>
+				</b>
+				<table class="diffDimension" width="380">
+					<tr>
+						<td class="input" colspan="2">
+							<select class="diffDimensionOption en">
+								<option value="resize">resize to fit to larger one</option>
+								<option value="max">no resize (compare in larger dimension)</option>
+								<option value="min">no resize (compare in smaller dimension)</option>
+							</select>
+							<select class="diffDimensionOption ja">
+								<option value="resize">大きい方に合わせてリサイズ</option>
+								<option value="max">リサイズなし（大きいサイズで比較）</option>
+								<option value="min">リサイズなし（小さいサイズで比較）</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="input">
+							<span class="en">resize method:</span>
+							<span class="ja">リサイズ方法:</span>
+						</td>
+						<td class="input">
+							<select id="diffResizeMethod">
+								<option value="lanczos3">Lanczos3</option>
+								<option value="lanczos2">Lanczos2</option>
+								<option value="bilinear">Bilinear</option>
+								<option value="nn">Nearest neighbor</option>
+							</select>
 						</td>
 					</tr>
 				</table>
