@@ -184,6 +184,22 @@
     }
     return srgb255ToLinear;
   })();
+  // RGB (sRGB) --> Linear RGB
+  var convertColorListRgbToLinear = function(rgbColorList) {
+    var colors = rgbColorList;
+    var linearColors = new Uint32Array(colors.length);
+    for (var k = 0; k < colors.length; k++) {
+      var rgb = colors[k];
+      var r = rgb >> 16;
+      var g = (rgb >> 8) & 255;
+      var b = rgb & 255;
+      var linr = Math.round(srgb255ToLinear[r] * 255);
+      var ling = Math.round(srgb255ToLinear[g] * 255);
+      var linb = Math.round(srgb255ToLinear[b] * 255);
+      linearColors[k] = (linr << 16) + (ling << 8) + linb;
+    }
+    return linearColors;
+  };
   // RGB (sRGB) --> xyY
   var convertColorListRgbToXyy = function(rgbColorList) {
     var colors = rgbColorList;
@@ -1474,6 +1490,7 @@
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,
     srgb255ToLinear:        srgb255ToLinear,
+    convertColorListRgbToLinear:    convertColorListRgbToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
     convertColorListRgbToHsv:   convertColorListRgbToHsv,
     convertColorListRgbToHsl:   convertColorListRgbToHsl,
