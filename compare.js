@@ -2483,6 +2483,7 @@
     var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       updateFigureAll();
+      updateAuxOption();
     });
     var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
       for (var i = 0, img; img = images[i]; i++) {
@@ -2491,6 +2492,17 @@
       }
       updateFigureAll();
     });
+    var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
+      updateFigureAll();
+    });
+    var updateAuxOption = function() {
+      if (colorDistType.current() === 0) { // 0:RGB
+        $('#colorDistAuxOption').show();
+      } else {
+        $('#colorDistAuxOption').hide();
+      }
+    };
+    updateAuxOption();
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcColorTable',
@@ -2608,7 +2620,15 @@
       var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
-      if (colorDistType.current() === 1) { // 1:HSV
+      if (colorDistType.current() === 0) { // 0:RGB
+        if (colorDistAuxType.current() === 1) { // 1:Linear
+          if (!colorTable.linearColors) {
+            colorTable.linearColors = compareUtil.convertColorListRgbToLinear(colors);
+          }
+          var rgbColors = colors;
+          colors = colorTable.linearColors;
+        }
+      } else if (colorDistType.current() === 1) { // 1:HSV
         if (!colorTable.hsvColors) {
           colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
         }
