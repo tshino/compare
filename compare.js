@@ -2620,31 +2620,28 @@
       var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
+      var rgbColors = colors;
       if (colorDistType.current() === 0) { // 0:RGB
         if (colorDistAuxType.current() === 1) { // 1:Linear
           if (!colorTable.linearColors) {
             colorTable.linearColors = compareUtil.convertColorListRgbToLinear(colors);
           }
-          var rgbColors = colors;
           colors = colorTable.linearColors;
         }
       } else if (colorDistType.current() === 1) { // 1:HSV
         if (!colorTable.hsvColors) {
           colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
         }
-        var rgbColors = colors;
         colors = colorTable.hsvColors;
       } else if (colorDistType.current() === 2) { // 2:HSL
         if (!colorTable.hslColors) {
           colorTable.hslColors = compareUtil.convertColorListRgbToHsl(colors);
         }
-        var rgbColors = colors;
         colors = colorTable.hslColors;
       } else if (colorDistType.current() === 4) { // 4:CIE xyY
         if (!colorTable.xyyColors) {
           colorTable.xyyColors = compareUtil.convertColorListRgbToXyy(colors);
         }
-        var rgbColors = colors;
         colors = colorTable.xyyColors;
       }
       if (colorDistType.current() === 0 ||
@@ -2678,7 +2675,7 @@
         var count = counts[k];
         dist[offset] += count;
         if (colorMap) { // RGB with Color
-          if (rgbColors) {
+          if (rgbColors !== colors) {
             rgb = rgbColors[k];
             r = rgb >> 16;
             g = (rgb >> 8) & 255;
