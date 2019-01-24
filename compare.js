@@ -2622,35 +2622,25 @@
       var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
       var yb = -scale * cos_ax;
       var rgbColors = colors;
+      var convertOption = null;
       if (colorDistType.current() === 0) { // 0:RGB
-        if (colorDistAuxType.current() === 1) { // 1:Linear
-          if (!colorTable.linearColors) {
-            colorTable.linearColors = compareUtil.convertColorListRgbToLinear(colors);
-          }
-          colors = colorTable.linearColors;
-        }
+        convertOption = colorDistAuxType.current() === 0 ?
+            null :
+            ['linearColors', compareUtil.convertColorListRgbToLinear];
       } else if (colorDistType.current() === 1) { // 1:HSV
-        if (colorDistAuxType.current() === 0) { // 0:sRGB
-          if (!colorTable.hsvColors) {
-            colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
-          }
-          colors = colorTable.hsvColors;
-        } else { // 1:Linear
-          if (!colorTable.hsvLinearColors) {
-            colorTable.hsvLinearColors = compareUtil.convertColorListRgbToHsvLinear(colors);
-          }
-          colors = colorTable.hsvLinearColors;
-        }
+        convertOption = colorDistAuxType.current() === 0 ?
+            ['hsvColors', compareUtil.convertColorListRgbToHsv] :
+            ['hsvLinearColors', compareUtil.convertColorListRgbToHsvLinear];
       } else if (colorDistType.current() === 2) { // 2:HSL
-        if (!colorTable.hslColors) {
-          colorTable.hslColors = compareUtil.convertColorListRgbToHsl(colors);
-        }
-        colors = colorTable.hslColors;
+        convertOption = ['hslColors', compareUtil.convertColorListRgbToHsl];
       } else if (colorDistType.current() === 4) { // 4:CIE xyY
-        if (!colorTable.xyyColors) {
-          colorTable.xyyColors = compareUtil.convertColorListRgbToXyy(colors);
+        convertOption = ['xyyColors', compareUtil.convertColorListRgbToXyy];
+      }
+      if (convertOption) {
+        if (!colorTable[convertOption[0]]) {
+          colorTable[convertOption[0]] = convertOption[1](colors);
         }
-        colors = colorTable.xyyColors;
+        colors = colorTable[convertOption[0]];
       }
       if (colorDistType.current() === 0 ||
           colorDistType.current() === 1 ||
