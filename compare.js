@@ -2496,7 +2496,8 @@
       updateFigureAll();
     });
     var updateAuxOption = function() {
-      if (colorDistType.current() === 0) { // 0:RGB
+      if (colorDistType.current() === 0 ||
+          colorDistType.current() === 1) { // 0:RGB, 1:HSV
         $('#colorDistAuxOption').show();
       } else {
         $('#colorDistAuxOption').hide();
@@ -2629,10 +2630,17 @@
           colors = colorTable.linearColors;
         }
       } else if (colorDistType.current() === 1) { // 1:HSV
-        if (!colorTable.hsvColors) {
-          colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
+        if (colorDistAuxType.current() === 0) { // 0:sRGB
+          if (!colorTable.hsvColors) {
+            colorTable.hsvColors = compareUtil.convertColorListRgbToHsv(colors);
+          }
+          colors = colorTable.hsvColors;
+        } else { // 1:Linear
+          if (!colorTable.hsvLinearColors) {
+            colorTable.hsvLinearColors = compareUtil.convertColorListRgbToHsvLinear(colors);
+          }
+          colors = colorTable.hsvLinearColors;
         }
-        colors = colorTable.hsvColors;
       } else if (colorDistType.current() === 2) { // 2:HSL
         if (!colorTable.hslColors) {
           colorTable.hslColors = compareUtil.convertColorListRgbToHsl(colors);
