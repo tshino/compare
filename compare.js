@@ -2497,7 +2497,8 @@
     });
     var updateAuxOption = function() {
       if (colorDistType.current() === 0 ||
-          colorDistType.current() === 1) { // 0:RGB, 1:HSV
+          colorDistType.current() === 1 ||
+          colorDistType.current() === 2) { // 0:RGB, 1:HSV, 2:HSL
         $('#colorDistAuxOption').show();
       } else {
         $('#colorDistAuxOption').hide();
@@ -2632,7 +2633,9 @@
             ['hsvColors', compareUtil.convertColorListRgbToHsv] :
             ['hsvLinearColors', compareUtil.convertColorListRgbToHsvLinear];
       } else if (colorDistType.current() === 2) { // 2:HSL
-        convertOption = ['hslColors', compareUtil.convertColorListRgbToHsl];
+        convertOption = colorDistAuxType.current() === 0 ?
+            ['hslColors', compareUtil.convertColorListRgbToHsl] :
+            ['hslLinearColors', compareUtil.convertColorListRgbToHslLinear];
       } else if (colorDistType.current() === 4) { // 4:CIE xyY
         convertOption = ['xyyColors', compareUtil.convertColorListRgbToXyy];
       }

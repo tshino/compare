@@ -271,6 +271,24 @@
     return hsvColors;
   };
   // RGB --> HSL Cylinder
+  var convertRgbToHslCylinder = function(r,g,b) {
+    var max = Math.max(r, g, b);
+    var min = Math.min(r, g, b);
+    var h = (
+      min === max ? 0 :
+      max === r ? 60 * (g - b) / (max - min) :
+      max === g ? 60 * (2 + (b - r) / (max - min)) :
+      60 * (4 + (r - g) / (max - min))
+    );
+    var l = (max + min) / 2;
+    var s = (l === 0 || l === 255) ? 0 : (max - min) / (255 - Math.abs(2 * l - 255));
+    var radH = h * (Math.PI / 180);
+    var x = Math.round(127.5 * (1 + Math.cos(radH) * s));
+    var y = Math.round(127.5 * (1 + Math.sin(radH) * s));
+    var z = Math.round(l);
+    return (x << 16) + (y << 8) + z;
+  };
+  // RGB --> HSL Cylinder
   var convertColorListRgbToHsl = function(rgbColorList) {
     var colors = rgbColorList;
     var hslColors = new Uint32Array(colors.length);
@@ -279,21 +297,23 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var max = Math.max(r, g, b);
-      var min = Math.min(r, g, b);
-      var h = (
-        min === max ? 0 :
-        max === r ? 60 * (g - b) / (max - min) :
-        max === g ? 60 * (2 + (b - r) / (max - min)) :
-        60 * (4 + (r - g) / (max - min))
-      );
-      var l = (max + min) / 2;
-      var s = (l === 0 || l === 255) ? 0 : (max - min) / (255 - Math.abs(2 * l - 255));
-      var radH = h * (Math.PI / 180);
-      var x = Math.round(127.5 * (1 + Math.cos(radH) * s));
-      var y = Math.round(127.5 * (1 + Math.sin(radH) * s));
-      var z = Math.round(l);
-      hslColors[k] = (x << 16) + (y << 8) + z;
+      hslColors[k] = convertRgbToHslCylinder(r, g, b);
+    }
+    return hslColors;
+  };
+  // RGB --> HSL Cylinder (Linear)
+  var convertColorListRgbToHslLinear = function(rgbColorList) {
+    var colors = rgbColorList;
+    var hslColors = new Uint32Array(colors.length);
+    for (var k = 0; k < colors.length; k++) {
+      var rgb = colors[k];
+      var r = rgb >> 16;
+      var g = (rgb >> 8) & 255;
+      var b = rgb & 255;
+      var linr = srgb255ToLinear[r] * 255;
+      var ling = srgb255ToLinear[g] * 255;
+      var linb = srgb255ToLinear[b] * 255;
+      hslColors[k] = convertRgbToHslCylinder(linr, ling, linb);
     }
     return hslColors;
   };
@@ -1515,6 +1535,7 @@
     convertColorListRgbToHsv:   convertColorListRgbToHsv,
     convertColorListRgbToHsvLinear: convertColorListRgbToHsvLinear,
     convertColorListRgbToHsl:   convertColorListRgbToHsl,
+    convertColorListRgbToHslLinear: convertColorListRgbToHslLinear,
     binaryFromDataURI:      binaryFromDataURI,
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
