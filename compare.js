@@ -3714,17 +3714,31 @@
         updateGridStyle();
       }
       if (diffResult.result.summary.unmatch === 0) {
-        textUtil.setText($('#diffSummary'), {
-          en: 'Perfect match',
-          ja: '完全に一致しました'
-        });
+        if (0 === diffResult.result.summary.countIgnoreAE) {
+          textUtil.setText($('#diffSummary'), {
+            en: 'Perfect match',
+            ja: '完全に一致しました'
+          });
+        } else {
+          textUtil.setText($('#diffSummary'), {
+            en: 'Perfect match (including ignored unmatched)',
+            ja: '完全に一致しました（無視した不一致を含む）'
+          });
+        }
       } else {
         var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
         var percent = compareUtil.toPercent(matchRate);
-        textUtil.setText($('#diffSummary'), {
-          en: percent + ' pixels are matched',
-          ja: percent + ' のピクセルが一致しました'
-        });
+        if (0 === diffResult.result.summary.countIgnoreAE) {
+          textUtil.setText($('#diffSummary'), {
+            en: percent + ' pixels are matched',
+            ja: percent + ' のピクセルが一致しました'
+          });
+        } else {
+          textUtil.setText($('#diffSummary'), {
+            en: percent + ' pixels are matched (including ignored unmatched)',
+            ja: percent + ' のピクセルが一致しました（無視した不一致を含む）'
+          });
+        }
       }
       $('#diffSaveFigure').show().off('click').click(function() {
         var msg = openMessageBox({
