@@ -186,6 +186,21 @@ TEST( 'compareUtil convertColorListRgbToHsv', function test() {
   EXPECT_EQ( 0x6049ff, hsv[11] );   // H=240, S=49.2, V=100
 });
 
+TEST( 'compareUtil convertColorListRgbToHsvLinear', function test() {
+  var rgb = [
+    0x000000, 0x808080, 0xffffff,
+    0xff0000, 0x00ff00, 0x0000ff
+  ];
+  var hsv = compareUtil.convertColorListRgbToHsvLinear(rgb);
+  EXPECT_EQ( rgb.length, hsv.length );
+  EXPECT_EQ( 0x808000, hsv[0] );    // H=0, S=0, V=0
+  EXPECT_EQ( 0x808037, hsv[1] );    // H=0, S=0, V=21.6
+  EXPECT_EQ( 0x8080ff, hsv[2] );    // H=0, S=0, V=100
+  EXPECT_EQ( 0xff80ff, hsv[3] );    // H=0, S=100, V=100
+  EXPECT_EQ( 0x40eeff, hsv[4] );    // H=120, S=100, V=100
+  EXPECT_EQ( 0x4011ff, hsv[5] );    // H=240, S=100, V=100
+});
+
 TEST( 'compareUtil convertColorListRgbToHsl', function test() {
   var rgb = [
     0x000000, 0x808080, 0xffffff,
@@ -207,6 +222,21 @@ TEST( 'compareUtil convertColorListRgbToHsl', function test() {
   EXPECT_EQ( 0xff80c0, hsl[9] );    // H=0, S=100, L=75.1
   EXPECT_EQ( 0x40eec0, hsl[10] );   // H=120, S=100, L=75.1
   EXPECT_EQ( 0x4011c0, hsl[11] );   // H=240, S=100, L=75.1
+});
+
+TEST( 'compareUtil convertColorListRgbToHslLinear', function test() {
+  var rgb = [
+    0x000000, 0x808080, 0xffffff,
+    0xff0000, 0x00ff00, 0x0000ff
+  ];
+  var hsl = compareUtil.convertColorListRgbToHslLinear(rgb);
+  EXPECT_EQ( rgb.length, hsl.length );
+  EXPECT_EQ( 0x808000, hsl[0] );    // H=0, S=0, L=0
+  EXPECT_EQ( 0x808037, hsl[1] );    // H=0, S=0, L=21.6
+  EXPECT_EQ( 0x8080ff, hsl[2] );    // H=0, S=0, L=100
+  EXPECT_EQ( 0xff8080, hsl[3] );    // H=0, S=100, L=50
+  EXPECT_EQ( 0x40ee80, hsl[4] );    // H=120, S=100, L=50
+  EXPECT_EQ( 0x401180, hsl[5] );    // H=240, S=100, L=50
 });
 
 TEST( 'compareUtil binaryFromDataURI', function test() {
