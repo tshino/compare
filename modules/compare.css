@@ -34,7 +34,7 @@ body:not(.ja) *.ja, body:not(.en) *.en
     height  : 5px;
     margin  : 5px;
 }
-#sidebar button
+div.vertical-toolbar > button
 {
     display : block;
     width   : 35px;
@@ -49,17 +49,17 @@ body:not(.ja) *.ja, body:not(.en) *.en
     overflow    : hidden;
     white-space : nowrap;
 }
-#sidebar button img, #sidebar button svg
+div.vertical-toolbar > button > img, div.vertical-toolbar > button > svg
 {
     width       : 35px;
 }
-#sidebar button.current, button.current
+div.vertical-toolbar > button.current, button.current
 {
     background  : #7af;
     color       : white;
     text-shadow : 0px 0px 10px #36f;
 }
-#sidebar button:not(.current):hover
+div.vertical-toolbar > button:not(.current):hover
 {
     background  : #9bf;
 }
