@@ -88,7 +88,9 @@
           viewManagement.toAllImageView();
         } else {
           var index = viewManagement.indexFromNumber(number);
-          viewManagement.toggleSingleView(index);
+          if (index !== null) {
+            viewManagement.toggleSingleView(index);
+          }
         }
         return false;
       }
