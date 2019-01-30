@@ -110,9 +110,8 @@
             return false;
           }
         } else if (e.keyCode === 38 && !viewManagement.isSingleView()) { // Up
-          if (false === viewManagement.flipSingleView(true)) {
-            return false;
-          }
+          viewManagement.toggleSingleView();
+          return false;
         } else if (e.keyCode === 40 && viewManagement.isSingleView()) { // Down
           viewManagement.toAllImageView();
           return false;
@@ -343,6 +342,7 @@
     var IMAGEBOX_MIN_SIZE = 32;
     var IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     var currentImageIndex = 0;
+    var lastSingleViewImageIndex = 0;
     var singleView = false;
     var overlayMode = false;
     var overlayBaseIndex = null;
@@ -401,12 +401,20 @@
         currentImageIndex = 0;
       } else {
         currentImageIndex = index + 1;
+        lastSingleViewImageIndex = currentImageIndex;
       }
       if (prevImageIndex !== currentImageIndex) {
         updateLayout();
       }
     };
     var toggleSingleView = function(index) {
+      if (index === null || index === undefined) {
+        if (0 === lastSingleViewImageIndex) {
+          flipSingleView(true);
+          return;
+        }
+        index = lastSingleViewImageIndex - 1;
+      }
       if (index + 1 === currentImageIndex) {
         toAllImageView();
       } else {
@@ -427,6 +435,7 @@
           }
         }
         currentImageIndex = 1 + images[k].index;
+        lastSingleViewImageIndex = currentImageIndex;
         updateLayout();
         return false;
       }
@@ -449,12 +458,14 @@
       if (!overlayMode && 2 <= images.length) {
         if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
           currentImageIndex = images[1].index + 1;
+          lastSingleViewImageIndex = currentImageIndex;
         }
         overlayMode = true;
         overlayBaseIndex = images[0].index;
         updateLayout();
       } else if (overlayMode) {
         currentImageIndex = overlayBaseIndex + 1;
+        lastSingleViewImageIndex = currentImageIndex;
         overlayMode = false;
         updateLayout();
       }
