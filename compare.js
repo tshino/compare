@@ -4251,7 +4251,8 @@
     var updateOverlayModeIndicator = function() {
       if (viewManagement.isOverlayMode()) {
         var indices = viewManagement.getSelectedImageIndices();
-        var numbers = indices.map(function(i) { return i + 1; });
+        var numbers = indices.map(function(i) { return viewManagement.numberFromIndex(i); });
+        numbers.sort();
         var modeDesc = numbers.join(' + ') + (numbers.length === 1 ? ' only' : '');
         textUtil.setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
