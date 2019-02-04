@@ -377,6 +377,13 @@ div.dialog table td.fig > *
     display         : block;
     position        : absolute;
 }
+div.dialog table td.fig .figMain
+{
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering:        -moz-crisp-edges;
+    image-rendering:        crisp-edges;
+    image-rendering : pixelated;
+}
 div.footnote
 {
     font-size:      0.8em;
