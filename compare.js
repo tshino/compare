@@ -2512,9 +2512,9 @@
       if (colorDistType.current() === 0 ||
           colorDistType.current() === 1 ||
           colorDistType.current() === 2) { // 0:RGB, 1:HSV, 2:HSL
-        $('#colorDistAuxOption').show();
+        $('#colorDistAuxType').show();
       } else {
-        $('#colorDistAuxOption').hide();
+        $('#colorDistAuxType').hide();
       }
     };
     updateAuxOption();
