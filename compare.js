@@ -2499,10 +2499,6 @@
       updateAuxOption();
     });
     var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
-      for (var i = 0, img; img = images[i]; i++) {
-        img.colorDist = null;
-        img.colorDistAxes = null;
-      }
       updateFigureAll();
     });
     var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
