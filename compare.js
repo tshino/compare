@@ -2311,6 +2311,7 @@
         cmd:      'calcVectorscope',
         type:     vectorscopeType.current(),
         color:    colorMode.current(),
+        auxType:  0,
         index:    [img.index]
       }, attachImageDataToTask);
     };

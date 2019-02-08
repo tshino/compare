@@ -25,7 +25,8 @@ self.addEventListener('message', function(e) {
   case 'calcVectorscope':
     result.type   = data.type;
     result.color  = data.color;
-    result.result = calcVectorscope(data.imageData[0], data.type, data.color);
+    result.auxType  = data.auxType;
+    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType);
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;
@@ -120,7 +121,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type )
   return hist;
 }
 
-function calcVectorscope( imageData, type, colorMode )
+function calcVectorscope( imageData, type, colorMode, auxType )
 {
   var w = imageData.width;
   var h = imageData.height;
@@ -128,6 +129,11 @@ function calcVectorscope( imageData, type, colorMode )
   var colorMap = null;
   if (colorMode) {
     colorMap = new Float32Array(320 * 320 * 3);
+  }
+  var srgbToLinear = [];
+  for (var i = 0; i < 256; ++i) {
+    var c = i / 255;
+    srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   }
   var k = 0;
   if (type === 0) { // Cb-Cr
@@ -148,11 +154,6 @@ function calcVectorscope( imageData, type, colorMode )
       }
     }
   } else if (type === 1) { // x-y
-    var srgbToLinear = [];
-    for (var i = 0; i < 256; ++i) {
-      var c = i / 255;
-      srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    }
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
@@ -180,8 +181,15 @@ function calcVectorscope( imageData, type, colorMode )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      var plotx = 32 + g;
-      var ploty = 287 - b;
+      if (auxType === 0) { // sRGB
+        var plotx = 32 + g;
+        var ploty = 287 - b;
+      } else { // Linear sRGB
+        var ling = Math.round(srgbToLinear[g] * 255);
+        var linb = Math.round(srgbToLinear[b] * 255);
+        var plotx = 32 + ling;
+        var ploty = 287 - linb;
+      }
       var offset = ploty * 320 + plotx;
       dist[offset] += 1;
       if (colorMap) {
@@ -194,8 +202,15 @@ function calcVectorscope( imageData, type, colorMode )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
-      var plotx = 32 + g;
-      var ploty = 287 - r;
+      if (auxType === 0) { // sRGB
+        var plotx = 32 + g;
+        var ploty = 287 - r;
+      } else { // Linear sRGB
+        var linr = Math.round(srgbToLinear[r] * 255);
+        var ling = Math.round(srgbToLinear[g] * 255);
+        var plotx = 32 + ling;
+        var ploty = 287 - linr;
+      }
       var offset = ploty * 320 + plotx;
       dist[offset] += 1;
       if (colorMap) {
@@ -208,8 +223,15 @@ function calcVectorscope( imageData, type, colorMode )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k];
       var b = imageData.data[k + 2];
-      var plotx = 32 + b;
-      var ploty = 287 - r;
+      if (auxType === 0) { // sRGB
+        var plotx = 32 + b;
+        var ploty = 287 - r;
+      } else { // Linear sRGB
+        var linr = Math.round(srgbToLinear[r] * 255);
+        var linb = Math.round(srgbToLinear[b] * 255);
+        var plotx = 32 + linb;
+        var ploty = 287 - linr;
+      }
       var offset = ploty * 320 + plotx;
       dist[offset] += 1;
       if (colorMap) {
