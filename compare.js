@@ -2304,14 +2304,28 @@
       }
       updateTable();
     };
-    var vectorscopeType = makeModeSwitch('#vectorscopeType', 0, repaint);
+    var vectorscopeType = makeModeSwitch('#vectorscopeType', 0, function() {
+      repaint();
+      updateAuxOption();
+    });
     var colorMode = makeToggleSwitch('#vectorscopeColor', false, repaint);
+    var vectorscopeAuxType = makeModeSwitch('#vectorscopeAuxType', 0, repaint);
+    var updateAuxOption = function() {
+      if (vectorscopeType.current() === 2 ||
+          vectorscopeType.current() === 3 ||
+          vectorscopeType.current() === 4) { // 2:G-B, 3:G-R, 4:B-R
+        $('#vectorscopeAuxType').show();
+      } else {
+        $('#vectorscopeAuxType').hide();
+      }
+    };
+    updateAuxOption();
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcVectorscope',
         type:     vectorscopeType.current(),
         color:    colorMode.current(),
-        auxType:  0,
+        auxType:  vectorscopeAuxType.current(),
         index:    [img.index]
       }, attachImageDataToTask);
     };
