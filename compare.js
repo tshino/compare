@@ -1995,7 +1995,7 @@
       waveformDialog.updateFigure(data.type, img, data.histW, data.result);
       break;
     case 'calcVectorscope':
-      vectorscopeDialog.updateFigure(data.type, data.color, entries[data.index[0]], data.result);
+      vectorscopeDialog.updateFigure(data.type, data.color, data.auxType, entries[data.index[0]], data.result);
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
@@ -2454,8 +2454,9 @@
       }
       return fig.canvas;
     };
-    var updateFigure = function(type, color, img, result) {
-      if (type !== vectorscopeType.current() || color !== colorMode.current()) {
+    var updateFigure = function(type, color, auxType, img, result) {
+      if (type !== vectorscopeType.current() || color !== colorMode.current() ||
+          auxType !== vectorscopeAuxType.current()) {
         return;
       }
       var w = img.canvasWidth;
