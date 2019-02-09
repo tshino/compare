@@ -2807,7 +2807,9 @@
         context : img.colorDist.getContext('2d'),
         axes : img.colorDistAxes
       } : figureUtil.makeBlankFigure(320, 320);
-      makeFigure(fig, img.colorTable);
+      if (img.colorTable) {
+        makeFigure(fig, img.colorTable);
+      }
       if (!redrawOnly) {
         img.colorDist = fig.canvas;
         img.colorDistAxes = fig.axes;
