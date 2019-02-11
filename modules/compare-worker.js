@@ -33,6 +33,10 @@ self.addEventListener('message', function(e) {
   case 'calcColorTable':
     result.result = compareImageUtil.getUniqueColors(data.imageData[0]);
     break;
+  case 'calc3DWaveform':
+    result.type   = data.type;
+    result.result = calc3DWaveform(data.imageData[0], data.type);
+    break;
   case 'calcReducedColorTable':
     result.result = calcReducedColorTable(data.imageData[0]);
     break;
@@ -244,6 +248,44 @@ function calcVectorscope( imageData, type, colorMode, auxType )
   return {
     dist: dist,
     colorMap: colorMap
+  };
+}
+
+function calc3DWaveform(imageData, type)
+{
+  var BASE = 256;
+  var w = imageData.width;
+  var h = imageData.height;
+  if (w < h) {
+    w = Math.max(1, Math.round(BASE * w / h));
+    h = BASE;
+  } else {
+    h = Math.max(1, Math.round(BASE * h / w));
+    w = BASE;
+  }
+  var input = compareImageUtil.makeImage(imageData);
+  var resized = compareImageUtil.makeImage(w, h);
+  compareImageUtil.resize(resized, input);
+  var waveform3d = new Uint8Array(w * h * (type === 0 ? 3 : 1));
+  if (type === 0) { // RGB
+    for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 3) {
+      waveform3d[k + 0] = resized.data[i + 0];
+      waveform3d[k + 1] = resized.data[i + 1];
+      waveform3d[k + 2] = resized.data[i + 2];
+    }
+  } else { // Luminance
+    for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k++) {
+      var r = resized.data[i + 0];
+      var g = resized.data[i + 1];
+      var b = resized.data[i + 2];
+      var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+      waveform3d[k] = y;
+    }
+  }
+  return {
+    width: w,
+    height: h,
+    waveform: waveform3d
   };
 }
 
