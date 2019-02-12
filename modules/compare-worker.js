@@ -265,7 +265,7 @@ function calc3DWaveform(imageData, type)
   }
   var input = compareImageUtil.makeImage(imageData);
   var resized = compareImageUtil.makeImage(w, h);
-  compareImageUtil.resize(resized, input);
+  compareImageUtil.resizeNN(resized, input);
   var waveform3d = new Uint8Array(w * h * (type === 0 ? 3 : 1));
   if (type === 0) { // RGB
     for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 3) {

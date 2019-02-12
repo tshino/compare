@@ -83,6 +83,77 @@
       },
     ])(done);
   });
+  TEST( 'compare-worker.js calc3DWaveform', function test(done) {
+    var makeAsyncTest = function(label, input, expected) {
+      label = ' in case ' + label;
+      return function(done) {
+        var task = {
+          cmd: 'calc3DWaveform',
+          type: input.type,
+          imageData: [input.imageData]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calc3DWaveform', data.cmd, 'cmd' + label );
+          EXPECT_EQ( expected.type, data.type, 'type' + label );
+          EXPECT_EQ( expected.width, data.result.width, 'width' + label );
+          EXPECT_EQ( expected.height, data.result.height, 'height' + label );
+          EXPECT_EQ( expected.waveform.length, data.result.waveform.length, 'waveform.length' + label );
+          if (expected.waveform.length === data.result.waveform.length) {
+            var errorCount = 0;
+            for (var i = 0; i < expected.waveform.length; i++) {
+              if (expected.waveform[i] !== data.result.waveform[i]) {
+                errorCount += 1;
+                if (3 < errorCount) {
+                  ERROR('...Too many errors' + label);
+                  break;
+                }
+                EXPECT_EQ( expected.waveform[i], data.result.waveform[i], 'waveform[' + i + ']' + label );
+              }
+            }
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      };
+    };
+    var makeImage = compareImageUtil.makeImage;
+    var makeRegion = compareImageUtil.makeRegion;
+    var fill = compareImageUtil.fill;
+    var image40x30 = makeImage(40, 30);
+    var image30x40 = makeImage(30, 40);
+    fill(image40x30, 0, 0, 0, 255);
+    fill(image30x40, 0, 0, 0, 255);
+    fill(makeRegion(image40x30, 0, 15, 20, 15), 0, 0, 255, 255);
+    fill(makeRegion(image30x40, 15, 0, 15, 20), 0, 255, 0, 255);
+    var expected40x30 = new Uint8Array(256 * 192 * 3);
+    var expected30x40 = new Uint8Array(192 * 256 * 3);
+    for (var y = 96; y < 192; y++) {
+      for (var x = 0; x < 128; x++) {
+        expected40x30[(y * 256 + x) * 3 + 2] = 255;
+        expected30x40[(x * 192 + y) * 3 + 1] = 255;
+      }
+    }
+    var tests = [];
+    tests.push(makeAsyncTest('image40x30', {
+      type: 0,
+      imageData: image40x30
+    }, {
+      type: 0,
+      width: 256,
+      height: 192,
+      waveform: expected40x30
+    }));
+    tests.push(makeAsyncTest('image30x40', {
+      type: 0,
+      imageData: image30x40
+    }, {
+      type: 0,
+      width: 192,
+      height: 256,
+      waveform: expected30x40
+    }));
+    jsTestUtil.makeSequentialTest(tests)(done);
+  });
   TEST( 'compare-worker.js calcReducedColorTable', function test(done) {
     var makeAsyncTest = function(label, input, expected) {
       return function(done) {
