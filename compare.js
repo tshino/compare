@@ -2501,7 +2501,7 @@
       processKeyDown: processKeyDown
     };
   })();
-  var makeRotationMouseFilter = function(target, rotate) {
+  var makeRotationMouseFilter = function(target, rotate, zoom) {
     var dragState = null;
     var processMouseDown = function(e) {
       if (e.which === 1) {
@@ -2530,10 +2530,19 @@
         setDragStateClass(target, false, false);
       }
     };
+    var processWheelEvent = function(e) {
+      return compareUtil.processWheelEvent(e, {
+        zoom: function(steps) {
+          var ZOOM_STEP_WHEEL = 0.0625;
+          zoom(-steps * ZOOM_STEP_WHEEL);
+        }
+      });
+    };
     return {
       processMouseDown: processMouseDown,
       processMouseMove: processMouseMove,
-      processMouseUp: processMouseUp
+      processMouseUp: processMouseUp,
+      processWheelEvent: processWheelEvent
     };
   };
   // 3D Color Distribution
@@ -2876,19 +2885,12 @@
         }
       });
     };
-    var rotationMouseFilter = makeRotationMouseFilter('#colorDist', rotateColorDist);
+    var rotationMouseFilter = makeRotationMouseFilter('#colorDist', rotateColorDist, zoomColorDist);
     var enableMouseAndTouch = function(root, filter, deepFilter) {
       $(root).on('mousedown', deepFilter, rotationMouseFilter.processMouseDown);
       $(root).on('mousemove', filter, rotationMouseFilter.processMouseMove);
       $(root).on('mouseup', filter, rotationMouseFilter.processMouseUp);
-      $(root).on('wheel', filter, function(e) {
-        return compareUtil.processWheelEvent(e, {
-          zoom: function(steps) {
-            var ZOOM_STEP_WHEEL = 0.0625;
-            zoomColorDist(-steps * ZOOM_STEP_WHEEL);
-          }
-        });
-      });
+      $(root).on('wheel', filter, rotationMouseFilter.processWheelEvent);
       $(root).on('touchmove', filter, function(e) {
         return colorDistTouchFilter.onTouchMove(e, {
           move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
