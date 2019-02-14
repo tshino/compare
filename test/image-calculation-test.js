@@ -121,8 +121,12 @@
     var fill = compareImageUtil.fill;
     var image40x30 = makeImage(40, 30);
     var image30x40 = makeImage(30, 40);
+    var image1x999 = makeImage(1, 999);
+    var image999x1 = makeImage(999,1);
     fill(image40x30, 0, 0, 0, 255);
     fill(image30x40, 0, 0, 0, 255);
+    fill(image1x999, 255, 0, 0, 255);
+    fill(image999x1, 0, 255, 0, 255);
     fill(makeRegion(image40x30, 0, 15, 20, 15), 0, 0, 255, 255);
     fill(makeRegion(image30x40, 15, 0, 15, 20), 0, 255, 0, 255);
     var expected40x30 = new Uint8Array(256 * 192 * 3);
@@ -132,6 +136,12 @@
         expected40x30[(y * 256 + x) * 3 + 2] = 255;
         expected30x40[(x * 192 + y) * 3 + 1] = 255;
       }
+    }
+    var expected1x999 = new Uint8Array(1 * 256 * 3);
+    var expected999x1 = new Uint8Array(256 * 1 * 3);
+    for (var y = 0; y < 256; y++) {
+      expected1x999[y * 3] = 255;
+      expected999x1[y * 3 + 1] = 255;
     }
     var tests = [];
     tests.push(makeAsyncTest('image40x30', {
@@ -151,6 +161,24 @@
       width: 192,
       height: 256,
       waveform: expected30x40
+    }));
+    tests.push(makeAsyncTest('image1x999', {
+      type: 0,
+      imageData: image1x999
+    }, {
+      type: 0,
+      width: 1,
+      height: 256,
+      waveform: expected1x999
+    }));
+    tests.push(makeAsyncTest('image999x1', {
+      type: 0,
+      imageData: image999x1
+    }, {
+      type: 0,
+      width: 256,
+      height: 1,
+      waveform: expected999x1
     }));
     jsTestUtil.makeSequentialTest(tests)(done);
   });
