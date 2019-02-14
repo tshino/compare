@@ -2501,7 +2501,19 @@
       processKeyDown: processKeyDown
     };
   })();
-  var makeRotationMouseFilter = function(target, rotate, zoom) {
+  var makeRotationInputFilter = function(target, rotate, zoom) {
+    var processKeyDown = function(e) {
+      return compareUtil.processKeyDownEvent(e, {
+        zoomIn: function() { zoom(0.25); return false; },
+        zoomOut: function() { zoom(-0.25); return false; },
+        cursor: function() {
+          var step = e.shiftKey ? 10 : 1;
+          var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
+          rotate(d.x, d.y, step);
+          return false;
+        }
+      });
+    };
     var dragState = null;
     var processMouseDown = function(e) {
       if (e.which === 1) {
@@ -2538,11 +2550,24 @@
         }
       });
     };
+    var touchFilter = compareUtil.makeTouchEventFilter();
+    var processTouchMove = function(e) {
+      return touchFilter.onTouchMove(e, {
+        move: function(dx, dy) { rotate(dx, dy, 0.3); },
+        zoom: function(dx, dy, delta) { zoom(delta); }
+      });
+    };
+    var processTouchEnd = function(e) {
+      touchFilter.resetState();
+    };
     return {
+      processKeyDown: processKeyDown,
       processMouseDown: processMouseDown,
       processMouseMove: processMouseMove,
       processMouseUp: processMouseUp,
-      processWheelEvent: processWheelEvent
+      processWheelEvent: processWheelEvent,
+      processTouchMove: processTouchMove,
+      processTouchEnd: processTouchEnd
     };
   };
   // 3D Color Distribution
@@ -2552,7 +2577,6 @@
       y: -30
     };
     var colorDistZoom = 0;
-    var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       updateFigureAll();
       updateAuxOption();
@@ -2869,37 +2893,21 @@
     var toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
       onOpen: function() { colorDistZoom = 0; }
     });
+    var rotationInputFilter = makeRotationInputFilter('#colorDist', rotateColorDist, zoomColorDist);
     var processKeyDown = function(e) {
       if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
         return false;
       }
-      return compareUtil.processKeyDownEvent(e, {
-        zoomIn: function() { zoomColorDist(0.25); return false; },
-        zoomOut: function() { zoomColorDist(-0.25); return false; },
-        cursor: function() {
-          var step = e.shiftKey ? 10 : 1;
-          var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
-          rotateColorDist(d.x, d.y, step);
-          return false;
-        }
-      });
+      return rotationInputFilter.processKeyDown(e);
     };
-    var rotationMouseFilter = makeRotationMouseFilter('#colorDist', rotateColorDist, zoomColorDist);
     var enableMouseAndTouch = function(root, filter, deepFilter) {
-      $(root).on('mousedown', deepFilter, rotationMouseFilter.processMouseDown);
-      $(root).on('mousemove', filter, rotationMouseFilter.processMouseMove);
-      $(root).on('mouseup', filter, rotationMouseFilter.processMouseUp);
-      $(root).on('wheel', filter, rotationMouseFilter.processWheelEvent);
-      $(root).on('touchmove', filter, function(e) {
-        return colorDistTouchFilter.onTouchMove(e, {
-          move: function(dx, dy) { rotateColorDist(dx, dy, 0.3); },
-          zoom: function(dx, dy, delta) { zoomColorDist(delta); }
-        });
-      });
-      $(root).on('touchend', filter, function(e) {
-        colorDistTouchFilter.resetState();
-      });
+      $(root).on('mousedown', deepFilter, rotationInputFilter.processMouseDown);
+      $(root).on('mousemove', filter, rotationInputFilter.processMouseMove);
+      $(root).on('mouseup', filter, rotationInputFilter.processMouseUp);
+      $(root).on('wheel', filter, rotationInputFilter.processWheelEvent);
+      $(root).on('touchmove', filter, rotationInputFilter.processTouchMove);
+      $(root).on('touchend', filter, rotationInputFilter.processTouchEnd);
     };
     return {
       updateFigure: updateFigure,
