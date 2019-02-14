@@ -2501,6 +2501,41 @@
       processKeyDown: processKeyDown
     };
   })();
+  var makeRotationMouseFilter = function(target, rotate) {
+    var dragState = null;
+    var processMouseDown = function(e) {
+      if (e.which === 1) {
+        dragState = { x: e.clientX, y: e.clientY };
+        setDragStateClass(target, true, false);
+        return false;
+      }
+    };
+    var processMouseMove = function(e) {
+      if (dragState) {
+        if (e.buttons !== 1) {
+          dragState = null;
+          setDragStateClass(target, false, false);
+        } else {
+          var dx = e.clientX - dragState.x;
+          var dy = e.clientY - dragState.y;
+          dragState = { x: e.clientX, y: e.clientY };
+          rotate(dx, dy, 0.5);
+          return false;
+        }
+      }
+    };
+    var processMouseUp = function(e) {
+      if (dragState) {
+        dragState = null;
+        setDragStateClass(target, false, false);
+      }
+    };
+    return {
+      processMouseDown: processMouseDown,
+      processMouseMove: processMouseMove,
+      processMouseUp: processMouseUp
+    };
+  };
   // 3D Color Distribution
   var colorDistDialog = (function() {
     var colorDistOrientation = {
@@ -2508,7 +2543,6 @@
       y: -30
     };
     var colorDistZoom = 0;
-    var colorDistDragState = null;
     var colorDistTouchFilter = compareUtil.makeTouchEventFilter();
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       updateFigureAll();
@@ -2842,43 +2876,11 @@
         }
       });
     };
-    var processMouseDown = function(e) {
-      if (e.which === 1) {
-        colorDistDragState = { x: e.clientX, y: e.clientY };
-        setDragStateClass('#colorDist', true, false);
-        return false;
-      }
-    };
-    var processMouseMove = function(e) {
-      if (colorDistDragState) {
-        if (e.buttons !== 1) {
-          colorDistDragState = null;
-          setDragStateClass('#colorDist', false, false);
-        } else {
-          var dx = e.clientX - colorDistDragState.x;
-          var dy = e.clientY - colorDistDragState.y;
-          colorDistDragState = { x: e.clientX, y: e.clientY };
-          rotateColorDist(dx, dy, 0.5);
-          return false;
-        }
-      }
-    };
-    var processMouseUp = function(e) {
-      if (colorDistDragState) {
-        colorDistDragState = null;
-        setDragStateClass('#colorDist', false, false);
-      }
-    };
+    var rotationMouseFilter = makeRotationMouseFilter('#colorDist', rotateColorDist);
     var enableMouseAndTouch = function(root, filter, deepFilter) {
-      $(root).on('mousedown', deepFilter, function(e) {
-        return processMouseDown(e);
-      });
-      $(root).on('mousemove', filter, function(e) {
-        return processMouseMove(e);
-      });
-      $(root).on('mouseup', filter, function(e) {
-        return processMouseUp(e);
-      });
+      $(root).on('mousedown', deepFilter, rotationMouseFilter.processMouseDown);
+      $(root).on('mousemove', filter, rotationMouseFilter.processMouseMove);
+      $(root).on('mouseup', filter, rotationMouseFilter.processMouseUp);
       $(root).on('wheel', filter, function(e) {
         return compareUtil.processWheelEvent(e, {
           zoom: function(steps) {
