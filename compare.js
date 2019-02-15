@@ -2608,16 +2608,18 @@
       colorDistOrientation.y += dx * scale;
       colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
       colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
-      updateFigureAll(/* redrawOnly = */ true);
+      for (var i = 0; img = images[i]; i++) {
+        redrawFigure(img);
+      }
     };
     var zoomColorDist = function(delta) {
       var MAX_ZOOM_LEVEL = 6;
       colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
       updateTable(/* transformOnly = */ true);
     };
-    var updateFigureAll = function(redrawOnly) {
+    var updateFigureAll = function() {
       for (var i = 0; img = images[i]; i++) {
-        updateFigure(img, redrawOnly);
+        updateFigure(img);
       }
     };
     var vertices3DCube = (function() {
@@ -2868,20 +2870,24 @@
         });
       });
     };
-    var updateFigure = function(img, redrawOnly) {
-      var fig = redrawOnly ? {
-        canvas : img.colorDist,
-        context : img.colorDist.getContext('2d'),
-        axes : img.colorDistAxes
-      } : figureUtil.makeBlankFigure(320, 320);
+    var redrawFigure = function(img) {
+      if (img.colorTable) {
+        var fig = {
+          canvas : img.colorDist,
+          context : img.colorDist.getContext('2d'),
+          axes : img.colorDistAxes
+        };
+        makeFigure(fig, img.colorTable);
+      }
+    };
+    var updateFigure = function(img) {
+      var fig = figureUtil.makeBlankFigure(320, 320);
       if (img.colorTable) {
         makeFigure(fig, img.colorTable);
       }
-      if (!redrawOnly) {
-        img.colorDist = fig.canvas;
-        img.colorDistAxes = fig.axes;
-        updateTable();
-      }
+      img.colorDist = fig.canvas;
+      img.colorDistAxes = fig.axes;
+      updateTable();
     };
     var updateTable = function(transformOnly) {
       var w = 320, h = 320, margin = 10;
