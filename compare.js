@@ -2524,15 +2524,55 @@
       vertices3DTo2D: vertices3DTo2D
     };
   };
-  var makeRotationInputFilter = function(target, rotate, zoom) {
+  var makeAxesDesc = function(v, lines) {
+    return lines.map(function(a) {
+      return (
+        'M' + v[a[0]].join(',') +
+        a.slice(1).map(function(i) { return 'L' + v[i].join(','); }).join('')
+      );
+    }).join('');
+  };
+  var makeRotationController = function(onrotate, onzoom) {
+    var orientation = {
+      x: 30,
+      y: -30
+    };
+    var zoomLevel = 0;
+    var resetZoom = function() {
+      zoomLevel = 0;
+    };
+    var getScale = function() {
+      return Math.round(Math.pow(2, zoomLevel) * 100) / 100;
+    };
+    var rotate = function(dx, dy, scale) {
+      orientation.x += dy * scale;
+      orientation.y += dx * scale;
+      orientation.x = compareUtil.clamp(orientation.x, -90, 90);
+      orientation.y -= Math.floor(orientation.y / 360) * 360;
+      onrotate();
+    };
+    var zoom = function(delta) {
+      var MAX_ZOOM_LEVEL = 6;
+      zoomLevel = compareUtil.clamp(zoomLevel + delta, 0, MAX_ZOOM_LEVEL);
+      onzoom();
+    };
+    return {
+      orientation: orientation,
+      getScale: getScale,
+      resetZoom: resetZoom,
+      rotate: rotate,
+      zoom: zoom
+    };
+  };
+  var makeRotationInputFilter = function(target, controller) {
     var processKeyDown = function(e) {
       return compareUtil.processKeyDownEvent(e, {
-        zoomIn: function() { zoom(0.25); return false; },
-        zoomOut: function() { zoom(-0.25); return false; },
+        zoomIn: function() { controller.zoom(0.25); return false; },
+        zoomOut: function() { controller.zoom(-0.25); return false; },
         cursor: function() {
           var step = e.shiftKey ? 10 : 1;
           var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
-          rotate(d.x, d.y, step);
+          controller.rotate(d.x, d.y, step);
           return false;
         }
       });
@@ -2554,7 +2594,7 @@
           var dx = e.clientX - dragState.x;
           var dy = e.clientY - dragState.y;
           dragState = { x: e.clientX, y: e.clientY };
-          rotate(dx, dy, 0.5);
+          controller.rotate(dx, dy, 0.5);
           return false;
         }
       }
@@ -2569,15 +2609,15 @@
       return compareUtil.processWheelEvent(e, {
         zoom: function(steps) {
           var ZOOM_STEP_WHEEL = 0.0625;
-          zoom(-steps * ZOOM_STEP_WHEEL);
+          controller.zoom(-steps * ZOOM_STEP_WHEEL);
         }
       });
     };
     var touchFilter = compareUtil.makeTouchEventFilter();
     var processTouchMove = function(e) {
       return touchFilter.onTouchMove(e, {
-        move: function(dx, dy) { rotate(dx, dy, 0.3); },
-        zoom: function(dx, dy, delta) { zoom(delta); }
+        move: function(dx, dy) { controller.rotate(dx, dy, 0.3); },
+        zoom: function(dx, dy, delta) { controller.zoom(delta); }
       });
     };
     var processTouchEnd = function(e) {
@@ -2595,11 +2635,6 @@
   };
   // 3D Color Distribution
   var colorDistDialog = (function() {
-    var colorDistOrientation = {
-      x: 30,
-      y: -30
-    };
-    var colorDistZoom = 0;
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       updateFigureAll();
       updateAuxOption();
@@ -2626,20 +2661,10 @@
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var rotateColorDist = function(dx, dy, scale) {
-      colorDistOrientation.x += dy * scale;
-      colorDistOrientation.y += dx * scale;
-      colorDistOrientation.x = compareUtil.clamp(colorDistOrientation.x, -90, 90);
-      colorDistOrientation.y -= Math.floor(colorDistOrientation.y / 360) * 360;
-      for (var i = 0; img = images[i]; i++) {
-        redrawFigure(img);
-      }
-    };
-    var zoomColorDist = function(delta) {
-      var MAX_ZOOM_LEVEL = 6;
-      colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
-      updateTable(/* transformOnly = */ true);
-    };
+    var rotationController = makeRotationController(
+      function() { redrawFigureAll(); },
+      function() { updateTable(/* transformOnly = */ true); }
+    );
     var vertices3DCube = (function() {
       var v = []
       for (var i = 0; i < 18; ++i) {
@@ -2709,14 +2734,6 @@
       [18, 19, 20, 18], [21, 22, 23, 21],
       [18, 21], [19, 22], [20, 23]
     ]);
-    var makeAxesDesc = function(v, lines) {
-      return lines.map(function(a) {
-        return (
-          'M' + v[a[0]].join(',') +
-          a.slice(1).map(function(i) { return 'L' + v[i].join(','); }).join('')
-        );
-      }).join('');
-    };
     var makeFigure = function(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
@@ -2726,7 +2743,7 @@
       }
       var colors = colorTable.colors;
       var counts = colorTable.counts;
-      var rotation = makeRotationCoefs(colorDistOrientation);
+      var rotation = makeRotationCoefs(rotationController.orientation);
       var xr = rotation.xr, yr = rotation.yr;
       var xg = rotation.xg, yg = rotation.yg;
       var yb = rotation.yb;
@@ -2876,14 +2893,16 @@
         });
       });
     };
-    var redrawFigure = function(img) {
-      if (img.colorTable) {
-        var fig = {
-          canvas : img.colorDist,
-          context : img.colorDist.getContext('2d'),
-          axes : img.colorDistAxes
-        };
-        makeFigure(fig, img.colorTable);
+    var redrawFigureAll = function() {
+      for (var i = 0; img = images[i]; i++) {
+        if (img.colorTable) {
+          var fig = {
+            canvas : img.colorDist,
+            context : img.colorDist.getContext('2d'),
+            axes : img.colorDistAxes
+          };
+          makeFigure(fig, img.colorTable);
+        }
       }
     };
     var createFigure = function(img) {
@@ -2907,14 +2926,14 @@
     var updateTable = function(transformOnly) {
       var w = 320, h = 320, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#444');
-      var scale = Math.round(Math.pow(2, colorDistZoom) * 100) / 100;
+      var scale = rotationController.getScale();
       styles.style.transform += ' scale(' + scale + ')';
       updateFigureTable('#colorDistTable', 'colorDist', updateAsync, styles, transformOnly);
     };
     var toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
-      onOpen: function() { colorDistZoom = 0; }
+      onOpen: rotationController.resetZoom
     });
-    var rotationInputFilter = makeRotationInputFilter('#colorDist', rotateColorDist, zoomColorDist);
+    var rotationInputFilter = makeRotationInputFilter('#colorDist', rotationController);
     var processKeyDown = function(e) {
       if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
