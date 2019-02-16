@@ -2501,6 +2501,29 @@
       processKeyDown: processKeyDown
     };
   })();
+  var makeRotationCoefs = function(orientation) {
+    var ax = Math.round(orientation.x) * (Math.PI / 180);
+    var ay = Math.round(orientation.y) * (Math.PI / 180);
+    var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
+    var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
+    var scale = 0.707;
+    var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
+    var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
+    var yb = -scale * cos_ax;
+    var pos3DTo2D = function(x, y, z) {
+      return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
+    };
+    var vertices3DTo2D = function(v) {
+      return v.map(function(pos) {
+        return pos3DTo2D(pos[0], pos[1], pos[2]);
+      });
+    };
+    return {
+      xr: xr, yr: yr, xg: xg, yg: yg, yb: yb,
+      pos3DTo2D: pos3DTo2D,
+      vertices3DTo2D: vertices3DTo2D
+    };
+  };
   var makeRotationInputFilter = function(target, rotate, zoom) {
     var processKeyDown = function(e) {
       return compareUtil.processKeyDownEvent(e, {
@@ -2703,14 +2726,10 @@
       }
       var colors = colorTable.colors;
       var counts = colorTable.counts;
-      var ax = Math.round(colorDistOrientation.x) * (Math.PI / 180);
-      var ay = Math.round(colorDistOrientation.y) * (Math.PI / 180);
-      var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
-      var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
-      var scale = 0.707;
-      var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
-      var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
-      var yb = -scale * cos_ax;
+      var rotation = makeRotationCoefs(colorDistOrientation);
+      var xr = rotation.xr, yr = rotation.yr;
+      var xg = rotation.xg, yg = rotation.yg;
+      var yb = rotation.yb;
       var rgbColors = colors;
       var convertOption = null;
       if (colorDistType.current() === 0) { // 0:RGB
@@ -2783,15 +2802,7 @@
       }
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
-      var pos3DTo2D = function(x, y, z) {
-        return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
-      };
-      var vertices3DTo2D = function(v) {
-        return v.map(function(pos) {
-          return pos3DTo2D(pos[0], pos[1], pos[2]);
-        });
-      };
-      var v = vertices3DTo2D(
+      var v = rotation.vertices3DTo2D(
         colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
         (colorDistType.current() === 1 || colorDistType.current() === 2) ? vertices3DCylinder.concat((function() {
           var scale = 128 / Math.sqrt(xg * xg + xr * xr);
@@ -2857,7 +2868,7 @@
       }
       $(fig.axes).find('g.labels text').each(function(i) {
         var label = labels[i];
-        var xy = pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
+        var xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
         $(this).attr({
           fill : label.hidden ? 'transparent' : label.color,
           x : xy[0],
