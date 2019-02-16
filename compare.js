@@ -2617,11 +2617,6 @@
       colorDistZoom = compareUtil.clamp(colorDistZoom + delta, 0, MAX_ZOOM_LEVEL);
       updateTable(/* transformOnly = */ true);
     };
-    var updateFigureAll = function() {
-      for (var i = 0; img = images[i]; i++) {
-        updateFigure(img);
-      }
-    };
     var vertices3DCube = (function() {
       var v = []
       for (var i = 0; i < 18; ++i) {
@@ -2880,13 +2875,22 @@
         makeFigure(fig, img.colorTable);
       }
     };
-    var updateFigure = function(img) {
+    var createFigure = function(img) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       if (img.colorTable) {
         makeFigure(fig, img.colorTable);
       }
       img.colorDist = fig.canvas;
       img.colorDistAxes = fig.axes;
+    };
+    var updateFigureAll = function() {
+      for (var i = 0; img = images[i]; i++) {
+        createFigure(img);
+      }
+      updateTable();
+    };
+    var updateFigure = function(img) {
+      createFigure(img);
       updateTable();
     };
     var updateTable = function(transformOnly) {
