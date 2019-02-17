@@ -2623,14 +2623,17 @@
     var processTouchEnd = function(e) {
       touchFilter.resetState();
     };
+    var enableMouseAndTouch = function(root, filter, deepFilter) {
+      $(root).on('mousedown', deepFilter, processMouseDown);
+      $(root).on('mousemove', filter, processMouseMove);
+      $(root).on('mouseup', filter, processMouseUp);
+      $(root).on('wheel', filter, processWheelEvent);
+      $(root).on('touchmove', filter, processTouchMove);
+      $(root).on('touchend', filter, processTouchEnd);
+    };
     return {
       processKeyDown: processKeyDown,
-      processMouseDown: processMouseDown,
-      processMouseMove: processMouseMove,
-      processMouseUp: processMouseUp,
-      processWheelEvent: processWheelEvent,
-      processTouchMove: processTouchMove,
-      processTouchEnd: processTouchEnd
+      enableMouseAndTouch: enableMouseAndTouch
     };
   };
   // 3D Color Distribution
@@ -2941,19 +2944,11 @@
       }
       return rotationInputFilter.processKeyDown(e);
     };
-    var enableMouseAndTouch = function(root, filter, deepFilter) {
-      $(root).on('mousedown', deepFilter, rotationInputFilter.processMouseDown);
-      $(root).on('mousemove', filter, rotationInputFilter.processMouseMove);
-      $(root).on('mouseup', filter, rotationInputFilter.processMouseUp);
-      $(root).on('wheel', filter, rotationInputFilter.processWheelEvent);
-      $(root).on('touchmove', filter, rotationInputFilter.processTouchMove);
-      $(root).on('touchend', filter, rotationInputFilter.processTouchEnd);
-    };
     return {
       updateFigure: updateFigure,
       toggle: toggle,
       processKeyDown: processKeyDown,
-      enableMouseAndTouch: enableMouseAndTouch
+      enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
   })();
   var colorFreqDialog = (function() {
