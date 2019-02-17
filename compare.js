@@ -2501,6 +2501,48 @@
       processKeyDown: processKeyDown
     };
   })();
+  var vertexUtil = (function() {
+    var makeCube = function(sx, sy, sz) {
+      var v = [];
+      var cx = sx / 2, cy = sy / 2, cz = sz / 2;
+      for (var i = 0; i < 18; ++i) {
+        var posX = (Math.floor(i / 6) % 3) * cx - cx;
+        var posY = (Math.floor(i / 2) % 3) * cy - cy;
+        var posZ = (i % 2) * sz - cz;
+        v[i] = [posX, posY, posZ];
+      }
+      return v;
+    };
+    var cubeIndices = [
+      [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
+      [0, 12], [1, 13], [4, 16], [5, 17],
+    ];
+    var make3DCylinder = function(r, sz) {
+      var v = [], cz = sz / 2;
+      for (var i = 0; i < 36; ++i) {
+        var a = i / 18 * Math.PI;
+        var posX = r * Math.cos(a);
+        var posY = r * Math.sin(a);
+        v[i * 2] = [posX, posY, -cz];
+        v[i * 2 + 1] = [posX, posY, cz];
+      }
+      return v;
+    };
+    var cylinderIndices = (function() {
+      var indices = [[], []];
+      for (var i = 0; i <= 36; ++i) {
+        indices[0][i] = (i % 36) * 2;
+        indices[1][i] = (i % 36) * 2 + 1;
+      }
+      return indices;
+    })();
+    return {
+      makeCube: makeCube,
+      cubeIndices: cubeIndices,
+      make3DCylinder: make3DCylinder,
+      cylinderIndices: cylinderIndices
+    };
+  }());
   var makeRotationCoefs = function(orientation) {
     var ax = Math.round(orientation.x) * (Math.PI / 180);
     var ay = Math.round(orientation.y) * (Math.PI / 180);
@@ -2668,42 +2710,13 @@
       function() { redrawFigureAll(); },
       function() { updateTable(/* transformOnly = */ true); }
     );
-    var vertices3DCube = (function() {
-      var v = []
-      for (var i = 0; i < 18; ++i) {
-        var posX = (Math.floor(i / 6) % 3) * 128 - 128;
-        var posY = (Math.floor(i / 2) % 3) * 128 - 128;
-        var posZ = (i % 2) * 256 - 128;
-        v[i] = [posX, posY, posZ];
-      }
-      return v;
-    })();
-    var vertexIndicesCube = [
-      [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
-      [0, 12], [1, 13], [4, 16], [5, 17],
-    ];
-    var vertices3DCylinder = (function() {
-      var v = [];
-      for (var i = 0; i < 36; ++i) {
-        var a = i / 18 * Math.PI;
-        var posX = 128 * Math.cos(a);
-        var posY = 128 * Math.sin(a);
-        v[i * 2] = [posX, posY, -128];
-        v[i * 2 + 1] = [posX, posY, 128];
-      }
-      return v;
-    })();
-    var vertexIndicesCylinder = (function() {
-      var cylinder = [[], []];
-      for (var i = 0; i <= 36; ++i) {
-        cylinder[0][i] = (i % 36) * 2;
-        cylinder[1][i] = (i % 36) * 2 + 1;
-      }
-      return cylinder.concat([
-        [72, 73], [74, 75],
-        [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
-      ]);
-    })();
+    var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
+    var vertexIndicesCube = vertexUtil.cubeIndices;
+    var vertices3DCylinder = vertexUtil.make3DCylinder(128, 256);
+    var vertexIndicesCylinder = vertexUtil.cylinderIndices.concat([
+      [72, 73], [74, 75],
+      [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
+    ]);
     var vertices3DYCbCr = vertices3DCube.concat([
       [-43.5, 128, -128],   // lower hexagon
       [-85.0, -107.3, -128],
