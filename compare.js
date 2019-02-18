@@ -2574,6 +2574,29 @@
       );
     }).join('');
   };
+  var makeAxesSVG = function(vbox, labels, axesDesc) {
+    var labelsSVG = labels.map(function(label) {
+      return '<text>' + label.text + '</text>';
+    }).join('');
+    return $(
+    '<svg viewBox="' + vbox + '">' +
+      '<g stroke="white" fill="none">' +
+        '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
+      '</g>' +
+      '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
+    '</svg>');
+  };
+  var updateAxesLabels = function(svg, labels, rotation) {
+    $(svg).find('g.labels text').each(function(i) {
+      var label = labels[i];
+      var xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
+      $(this).attr({
+        fill : label.hidden ? 'transparent' : label.color,
+        x : xy[0],
+        y : xy[1]
+      });
+    });
+  };
   var makeRotationController = function(onrotate, onzoom) {
     var orientation = {
       x: 30,
@@ -2886,28 +2909,11 @@
         ];
       }
       if (!fig.axes) {
-        var labelsSVG = labels.map(function(label) {
-          return '<text>' + label.text + '</text>';
-        }).join('');
-        fig.axes = $(
-        '<svg viewBox="' + vbox + '">' +
-          '<g stroke="white" fill="none">' +
-            '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
-          '</g>' +
-          '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
-        '</svg>');
+        fig.axes = makeAxesSVG(vbox, labels, axesDesc);
       } else {
         $(fig.axes).find('g path').attr('d', axesDesc);
       }
-      $(fig.axes).find('g.labels text').each(function(i) {
-        var label = labels[i];
-        var xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
-        $(this).attr({
-          fill : label.hidden ? 'transparent' : label.color,
-          x : xy[0],
-          y : xy[1]
-        });
-      });
+      updateAxesLabels(fig.axes, labels, rotation);
     };
     var redrawFigureAll = function() {
       for (var i = 0; img = images[i]; i++) {
