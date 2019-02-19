@@ -2704,14 +2704,14 @@
   // 3D Color Distribution
   var colorDistDialog = (function() {
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
-      updateFigureAll();
+      updateFigure();
       updateAuxOption();
     });
     var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
-      updateFigureAll();
+      updateFigure();
     });
     var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
-      updateFigureAll();
+      updateFigure();
     });
     var updateAuxOption = function() {
       if (colorDistType.current() === 0 ||
@@ -2916,7 +2916,7 @@
       updateAxesLabels(fig.axes, labels, rotation);
     };
     var redrawFigureAll = function() {
-      for (var i = 0; img = images[i]; i++) {
+      for (var i = 0, img; img = images[i]; i++) {
         if (img.colorTable) {
           var fig = {
             canvas : img.colorDist,
@@ -2935,14 +2935,14 @@
       img.colorDist = fig.canvas;
       img.colorDistAxes = fig.axes;
     };
-    var updateFigureAll = function() {
-      for (var i = 0; img = images[i]; i++) {
+    var updateFigure = function(img) {
+      if (img === undefined) {
+        for (var i = 0; img = images[i]; i++) {
+          createFigure(img);
+        }
+      } else {
         createFigure(img);
       }
-      updateTable();
-    };
-    var updateFigure = function(img) {
-      createFigure(img);
       updateTable();
     };
     var updateTable = function(transformOnly) {
