@@ -349,6 +349,10 @@ var changeLang = function(lang) {
 					<td><span class="en">3D color distribution</span><span class="ja">3次元色分布</span></td>
 				</tr>
 				<tr>
+					<td class="keys"><span>Shift</span>+<span>w</span></td>
+					<td><span class="en">3D waveform</span><span class="ja">3次元波形</span></td>
+				</tr>
+				<tr>
 					<td class="keys"><span>m</span></td>
 					<td><span class="en">image quality metrics</span><span class="ja">画質メトリクス</span></td>
 				</tr>
@@ -503,6 +507,12 @@ var changeLang = function(lang) {
 					<span class="ja">3次元色分布</span>
 					<span class="flat keys"><span>c</span></span>
 				</button>
+				<button id="waveform3Dbtn">
+					<img src="res/colordist.svg" width="20" alt="icon">
+					<span class="en">3D Waveform</span>
+					<span class="ja">3次元波形</span>
+					<span class="flat keys"><span>Shift</span>+<span>w</span></span>
+				</button>
 				<button id="colorfreqbtn">
 					<img src="res/histogram.svg" width="20" alt="icon">
 					<span class="en">Frequency of Colors</span>
@@ -640,6 +650,21 @@ var changeLang = function(lang) {
 					<button>Linear sRGB</button>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div id="waveform3D" class="dialog">
+		<div>
+			<div class="header">
+				<h3>
+					<img src="res/colordist.svg" width="20" alt="icon">
+					<span class="en">3D Waveform</span>
+					<span class="ja">3次元波形</span>
+				</h3>
+			</div>
+			<table id="waveform3DTable">
+				<tr><td></tr>
+				<tr><td></tr>
+			</table>
 		</div>
 	</div>
 	<div id="colorFreq" class="dialog">

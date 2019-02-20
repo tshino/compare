@@ -26,6 +26,7 @@
   $('#waveformbtn').click(waveformDialog.toggle);
   $('#vectorscopebtn').click(vectorscopeDialog.toggle);
   $('#colordistbtn').click(colorDistDialog.toggle);
+  $('#waveform3Dbtn').click(waveform3DDialog.toggle);
   $('#colorfreqbtn').click(colorFreqDialog.toggle);
   $('#metricsbtn').click(metricsDialog.toggle);
   $('#tonecurvebtn').click(toneCurveDialog.toggle);
@@ -66,6 +67,11 @@
         }
         if ($('#colorDist').is(':visible')) {
           if (false === colorDistDialog.processKeyDown(e)) {
+            return false;
+          }
+        }
+        if ($('#waveform3D').is(':visible')) {
+          if (false === waveform3DDialog.processKeyDown(e)) {
             return false;
           }
         }
@@ -185,6 +191,8 @@
     118 : { global: true, func: vectorscopeDialog.toggle },
     // 'c' (99)
     99 : { global: true, func: colorDistDialog.toggle },
+    // 'W' (87)
+    87 : { global: true, func: waveform3DDialog.toggle },
     // 'm' (109)
     109 : { global: true, func: metricsDialog.toggle },
     // 't' (116)
@@ -234,6 +242,7 @@
   viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
   figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
   colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
+  waveform3DDialog.enableMouseAndTouch('#waveform3D', 'td.fig', 'td.fig > *');
 
   crossCursor.addObserver(
     null,
@@ -639,6 +648,9 @@
       ent.colorTable = null;
       ent.colorDist = null;
       ent.colorDistAxes = null;
+      ent.waveform3D = null;
+      ent.waveform3DFig = null;
+      ent.waveform3DFigAxes = null;
       ent.reducedColorTable = null;
       discardTasksOfEntryByIndex(index);
       viewManagement.resetLayoutState();
@@ -2001,6 +2013,10 @@
       entries[data.index[0]].colorTable = data.result;
       colorDistDialog.updateFigure(entries[data.index[0]]);
       break;
+    case 'calc3DWaveform':
+      entries[data.index[0]].waveform3D = data.result;
+      waveform3DDialog.updateFigure(entries[data.index[0]]);
+      break;
     case 'calcReducedColorTable':
       entries[data.index[0]].reducedColorTable = data.result;
       colorFreqDialog.updateFigure(entries[data.index[0]]);
@@ -2967,6 +2983,122 @@
       updateFigure: updateFigure,
       toggle: toggle,
       processKeyDown: processKeyDown,
+      enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
+    };
+  })();
+  // 3D Waveform
+  var waveform3DDialog = (function() {
+    var updateAsync = function(img) {
+      taskQueue.addTask({
+        cmd:      'calc3DWaveform',
+        type:     0,
+        index:    [img.index]
+      }, attachImageDataToTask);
+    };
+    var rotationController = makeRotationController(
+      function() { redrawFigureAll(); },
+      function() { updateTable(/* transformOnly = */ true); }
+    );
+    var vertexIndicesCube = vertexUtil.cubeIndices;
+    var makeFigure = function(fig, waveform3D) {
+      var context = fig.context;
+      var w = waveform3D.width;
+      var h = waveform3D.height;
+      var waveform = waveform3D.waveform;
+      var distMax = 3 * w * h;
+      var dist = new Uint32Array(320 * 320);
+      var colorMap = new Float32Array(320 * 320 * 3);
+      var vertices3DCube = vertexUtil.makeCube(h, w, 256);
+      var rotation = makeRotationCoefs(rotationController.orientation);
+      var xr = rotation.xr, yr = rotation.yr;
+      var xg = rotation.xg, yg = rotation.yg;
+      var yb = rotation.yb;
+      var orgx = 159.5 - ((h - 1) / 2 * xr + (w - 1) / 2 * xg);
+      var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
+      for (var y = 0, k = 0; y < h; y += 1) {
+        for (var x = 0; x < w; x += 1, k += 3) {
+          var r = waveform[k];
+          var g = waveform[k + 1];
+          var b = waveform[k + 2];
+          var plotx = Math.round(orgx + xr * y + xg * x);
+          var ploty0 = orgy + yr * y + yg * x;
+          var plotyR = Math.round(ploty0 + yb * r);
+          var plotyG = Math.round(ploty0 + yb * g);
+          var plotyB = Math.round(ploty0 + yb * b);
+          var offsetR = plotyR * 320 + plotx;
+          var offsetG = plotyG * 320 + plotx;
+          var offsetB = plotyB * 320 + plotx;
+          dist[offsetR] += 1;
+          dist[offsetG] += 1;
+          dist[offsetB] += 1;
+          colorMap[offsetR] += r;
+          colorMap[offsetG + 102400] += g;
+          colorMap[offsetB + 204800] += b;
+        }
+      }
+      var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
+      context.putImageData(bits, 0, 0);
+      var vbox = '0 0 320 320';
+      var v = rotation.vertices3DTo2D(vertices3DCube);
+      var axesDesc = makeAxesDesc(v, vertexIndicesCube);
+      var labels = [
+          { pos: [-h/2-20, -w/2-20, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
+          { pos: [h/2+20, -w/2-20, -140], text: 'Y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
+          { pos: [-h/2-20, w/2+20, -140], text: 'X', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
+          { pos: [-h/2-20, -w/2-20, 140], text: 'R,G,B', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
+      ];
+      if (!fig.axes) {
+        fig.axes = makeAxesSVG(vbox, labels, axesDesc);
+      } else {
+        $(fig.axes).find('g path').attr('d', axesDesc);
+      }
+      updateAxesLabels(fig.axes, labels, rotation);
+    };
+    var redrawFigureAll = function() {
+      for (var i = 0, img; img = images[i]; i++) {
+        if (img.waveform3D) {
+          var fig = {
+            canvas : img.waveform3DFig,
+            context : img.waveform3DFig.getContext('2d'),
+            axes : img.waveform3DFigAxes
+          };
+          makeFigure(fig, img.waveform3D);
+        }
+      }
+    };
+    var createFigure = function(img) {
+      var fig = figureUtil.makeBlankFigure(320, 320);
+      if (img.waveform3D) {
+        makeFigure(fig, img.waveform3D);
+      }
+      img.waveform3DFig = fig.canvas;
+      img.waveform3DFigAxes = fig.axes;
+    };
+    var updateFigure = function(img) {
+      if (img === undefined) {
+        for (var i = 0; img = images[i]; i++) {
+          createFigure(img);
+        }
+      } else {
+        createFigure(img);
+      }
+      updateTable();
+    };
+    var updateTable = function(transformOnly) {
+      var w = 320, h = 320, margin = 10;
+      var styles = makeFigureStyles(w, h, margin, '#444');
+      var scale = rotationController.getScale();
+      styles.style.transform += ' scale(' + scale + ')';
+      updateFigureTable('#waveform3DTable', 'waveform3DFig', updateAsync, styles, transformOnly);
+    };
+    var toggle = dialogUtil.defineDialog($('#waveform3D'), updateTable, toggleAnalysis, {
+      onOpen: rotationController.resetZoom
+    });
+    var rotationInputFilter = makeRotationInputFilter('#waveform3D', rotationController);
+    return {
+      updateFigure: updateFigure,
+      toggle: toggle,
+      processKeyDown: rotationInputFilter.processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
   })();
@@ -4537,6 +4669,8 @@
             vectorscope : null,
             colorTable  : null,
             colorDist   : null,
+            waveform3D  : null,
+            waveform3DFig : null,
             reducedColorTable: null,
             metrics     : [],
             loading     : true,
