@@ -35,7 +35,7 @@ self.addEventListener('message', function(e) {
     break;
   case 'calc3DWaveform':
     result.type   = data.type;
-    result.result = calc3DWaveform(data.imageData[0], data.type);
+    result.result = calc3DWaveform(data.imageData[0], data.type, data.baseSize);
     break;
   case 'calcReducedColorTable':
     result.result = calcReducedColorTable(data.imageData[0]);
@@ -251,17 +251,17 @@ function calcVectorscope( imageData, type, colorMode, auxType )
   };
 }
 
-function calc3DWaveform(imageData, type)
+function calc3DWaveform(imageData, type, baseSize)
 {
-  var BASE = 256;
+  baseSize = baseSize || 256;
   var w = imageData.width;
   var h = imageData.height;
   if (w < h) {
-    w = Math.max(1, Math.round(BASE * w / h));
-    h = BASE;
+    w = Math.max(1, Math.round(baseSize * w / h));
+    h = baseSize;
   } else {
-    h = Math.max(1, Math.round(BASE * h / w));
-    w = BASE;
+    h = Math.max(1, Math.round(baseSize * h / w));
+    w = baseSize;
   }
   var input = compareImageUtil.makeImage(imageData);
   var resized = compareImageUtil.makeImage(w, h);

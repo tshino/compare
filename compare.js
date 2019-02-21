@@ -2559,15 +2559,18 @@
       cylinderIndices: cylinderIndices
     };
   }());
-  var makeRotationCoefs = function(orientation) {
+  var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
     var ax = Math.round(orientation.x) * (Math.PI / 180);
     var ay = Math.round(orientation.y) * (Math.PI / 180);
     var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
     var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
     var scale = 0.707;
-    var xr = scale * cos_ay, yr = -scale * sin_ay * sin_ax;
-    var xg = -scale * sin_ay, yg = -scale * cos_ay * sin_ax;
-    var yb = -scale * cos_ax;
+    var sr = scale * (scale_r || 1);
+    var sg = scale * (scale_g || 1);
+    var sb = scale * (scale_b || 1);
+    var xr = sr * cos_ay, yr = -sr * sin_ay * sin_ax;
+    var xg = -sg * sin_ay, yg = -sg * cos_ay * sin_ax;
+    var yb = -sb * cos_ax;
     var pos3DTo2D = function(x, y, z) {
       return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
     };
@@ -2992,6 +2995,7 @@
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
         type:     0,
+        baseSize: 512,
         index:    [img.index]
       }, attachImageDataToTask);
     };
@@ -3009,7 +3013,8 @@
       var dist = new Uint32Array(320 * 320);
       var colorMap = new Float32Array(320 * 320 * 3);
       var vertices3DCube = vertexUtil.makeCube(h, w, 256);
-      var rotation = makeRotationCoefs(rotationController.orientation);
+      var scale = 256 / Math.max(w, h);
+      var rotation = makeRotationCoefs(rotationController.orientation, scale, scale, 1);
       var xr = rotation.xr, yr = rotation.yr;
       var xg = rotation.xg, yg = rotation.yg;
       var yb = rotation.yb;
@@ -3041,11 +3046,12 @@
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
+      var s = 12 / scale;
       var labels = [
-          { pos: [-h/2-20, -w/2-20, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
-          { pos: [h/2+20, -w/2-20, -140], text: 'Y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
-          { pos: [-h/2-20, w/2+20, -140], text: 'X', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
-          { pos: [-h/2-20, -w/2-20, 140], text: 'R,G,B', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
+          { pos: [-h/2-s, -w/2-s, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
+          { pos: [h/2+s, -w/2-s, -140], text: 'Y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
+          { pos: [-h/2-s, w/2+s, -140], text: 'X', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
+          { pos: [-h/2-s, -w/2-s, 140], text: 'R,G,B', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
       ];
       if (!fig.axes) {
         fig.axes = makeAxesSVG(vbox, labels, axesDesc);
