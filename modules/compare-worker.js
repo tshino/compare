@@ -266,20 +266,23 @@ function calc3DWaveform(imageData, type, baseSize)
   var input = compareImageUtil.makeImage(imageData);
   var resized = compareImageUtil.makeImage(w, h);
   compareImageUtil.resizeNN(resized, input);
-  var waveform3d = new Uint8Array(w * h * (type === 0 ? 3 : 1));
+  var waveform3d = new Uint8Array(w * h * (type === 0 ? 3 : 4));
   if (type === 0) { // RGB
     for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 3) {
       waveform3d[k + 0] = resized.data[i + 0];
       waveform3d[k + 1] = resized.data[i + 1];
       waveform3d[k + 2] = resized.data[i + 2];
     }
-  } else { // Luminance
-    for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k++) {
+  } else { // RGB + Luminance
+    for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 4) {
       var r = resized.data[i + 0];
       var g = resized.data[i + 1];
       var b = resized.data[i + 2];
       var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-      waveform3d[k] = y;
+      waveform3d[k + 0] = r;
+      waveform3d[k + 1] = g;
+      waveform3d[k + 2] = b;
+      waveform3d[k + 3] = y;
     }
   }
   return {

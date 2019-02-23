@@ -2994,7 +2994,7 @@
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
-        type:     0,
+        type:     1,
         baseSize: 512,
         index:    [img.index]
       }, attachImageDataToTask);
@@ -3005,11 +3005,12 @@
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
     var makeFigure = function(fig, waveform3D) {
+      var type = 1; //
       var context = fig.context;
       var w = waveform3D.width;
       var h = waveform3D.height;
       var waveform = waveform3D.waveform;
-      var distMax = 3 * w * h;
+      var distMax = w * h * (type === 0 ? 3 : 1);
       var dist = new Uint32Array(320 * 320);
       var colorMap = new Float32Array(320 * 320 * 3);
       var vertices3DCube = vertexUtil.makeCube(h, w, 256);
@@ -3021,24 +3022,37 @@
       var orgx = 159.5 - ((h - 1) / 2 * xr + (w - 1) / 2 * xg);
       var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
       for (var y = 0, k = 0; y < h; y += 1) {
-        for (var x = 0; x < w; x += 1, k += 3) {
+        for (var x = 0; x < w; x += 1) {
           var r = waveform[k];
           var g = waveform[k + 1];
           var b = waveform[k + 2];
-          var plotx = Math.round(orgx + xr * y + xg * x);
-          var ploty0 = orgy + yr * y + yg * x;
-          var plotyR = Math.round(ploty0 + yb * r);
-          var plotyG = Math.round(ploty0 + yb * g);
-          var plotyB = Math.round(ploty0 + yb * b);
-          var offsetR = plotyR * 320 + plotx;
-          var offsetG = plotyG * 320 + plotx;
-          var offsetB = plotyB * 320 + plotx;
-          dist[offsetR] += 1;
-          dist[offsetG] += 1;
-          dist[offsetB] += 1;
-          colorMap[offsetR] += r;
-          colorMap[offsetG + 102400] += g;
-          colorMap[offsetB + 204800] += b;
+          if (type === 0) {
+            var plotx = Math.round(orgx + xr * y + xg * x);
+            var ploty0 = orgy + yr * y + yg * x;
+            var plotyR = Math.round(ploty0 + yb * r);
+            var plotyG = Math.round(ploty0 + yb * g);
+            var plotyB = Math.round(ploty0 + yb * b);
+            var offsetR = plotyR * 320 + plotx;
+            var offsetG = plotyG * 320 + plotx;
+            var offsetB = plotyB * 320 + plotx;
+            dist[offsetR] += 1;
+            dist[offsetG] += 1;
+            dist[offsetB] += 1;
+            colorMap[offsetR] += r;
+            colorMap[offsetG + 102400] += g;
+            colorMap[offsetB + 204800] += b;
+            k += 3;
+          } else { // type === 1
+            var c = waveform[k + 3];
+            var plotx = Math.round(orgx + xr * y + xg * x);
+            var ploty = Math.round(orgy + yr * y + yg * x + yb * c);
+            var offset = ploty * 320 + plotx;
+            dist[offset] += 1;
+            colorMap[offset] += r;
+            colorMap[offset + 102400] += g;
+            colorMap[offset + 204800] += b;
+            k += 4;
+          }
         }
       }
       var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
@@ -3049,9 +3063,9 @@
       var s = 12 / scale;
       var labels = [
           { pos: [-h/2-s, -w/2-s, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
-          { pos: [h/2+s, -w/2-s, -140], text: 'Y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
-          { pos: [-h/2-s, w/2+s, -140], text: 'X', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
-          { pos: [-h/2-s, -w/2-s, 140], text: 'R,G,B', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
+          { pos: [h/2+s, -w/2-s, -140], text: 'y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
+          { pos: [-h/2-s, w/2+s, -140], text: 'x', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
+          { pos: [-h/2-s, -w/2-s, 140], text: 'Y', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
       ];
       if (!fig.axes) {
         fig.axes = makeAxesSVG(vbox, labels, axesDesc);
