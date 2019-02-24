@@ -3004,6 +3004,31 @@
       function() { updateTable(/* transformOnly = */ true); }
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
+    var makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
+      var grad = ctx.createLinearGradient(x0,y0,x1,y1);
+      for (var i = 0; i < stops.length; i++) {
+        grad.addColorStop(stops[i][0], stops[i][1]);
+      }
+      return grad;
+    };
+    var drawVerticalColorBar = function(ctx, v, color1, color2) {
+      var bar = (function() {
+        var x = 320/2, y0, y1;
+        for (var i = 0, corners = [0, 4, 12, 16]; i < 4; i++) {
+          var k = corners[i];
+          if (x > v[k][0]) {
+            x = v[k][0];
+            y0 = v[k + 1][1];
+            y1 = v[k][1];
+          }
+        }
+        return [x - 12, y0, x - 1, y1];
+      })();
+      ctx.fillStyle = makeLinearGradient(
+        ctx, bar[0], bar[3], bar[0], bar[1], [[0, color1], [1, color2]]
+      );
+      ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
+    };
     var makeFigure = function(fig, waveform3D) {
       var type = 1; //
       var context = fig.context;
@@ -3059,6 +3084,7 @@
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
+      drawVerticalColorBar(context, v, '#000', '#fff');
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
       var s = 12 / scale;
       var labels = [
