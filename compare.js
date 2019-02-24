@@ -1915,6 +1915,13 @@
         dest.data[i] = src.data[i];
       }
     };
+    var makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
+      var grad = ctx.createLinearGradient(x0,y0,x1,y1);
+      for (var i = 0; i < stops.length; i++) {
+        grad.addColorStop(stops[i][0], stops[i][1]);
+      }
+      return grad;
+    };
     var drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
       var dLen = Math.sqrt(dx * dx + dy * dy);
       var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
@@ -1940,6 +1947,7 @@
       makeBlankFigure: makeBlankFigure,
       canvasFromImage: canvasFromImage,
       copyImageBits: copyImageBits,
+      makeLinearGradient: makeLinearGradient,
       drawAxes: drawAxes
     };
   })();
@@ -3004,13 +3012,6 @@
       function() { updateTable(/* transformOnly = */ true); }
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
-    var makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
-      var grad = ctx.createLinearGradient(x0,y0,x1,y1);
-      for (var i = 0; i < stops.length; i++) {
-        grad.addColorStop(stops[i][0], stops[i][1]);
-      }
-      return grad;
-    };
     var drawVerticalColorBar = function(ctx, v, color1, color2) {
       var bar = (function() {
         var x = 320/2, y0, y1;
@@ -3024,7 +3025,7 @@
         }
         return [x - 12, y0, x - 1, y1];
       })();
-      ctx.fillStyle = makeLinearGradient(
+      ctx.fillStyle = figureUtil.makeLinearGradient(
         ctx, bar[0], bar[3], bar[0], bar[1], [[0, color1], [1, color2]]
       );
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
