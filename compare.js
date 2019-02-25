@@ -2999,6 +2999,9 @@
   })();
   // 3D Waveform
   var waveform3DDialog = (function() {
+    var waveform3DType = makeModeSwitch('#waveform3DType', 0, function(type) {
+      updateFigure();
+    });
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
@@ -3031,12 +3034,12 @@
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
     };
     var makeFigure = function(fig, waveform3D) {
-      var type = 1; //
+      var type = waveform3DType.current();
       var context = fig.context;
       var w = waveform3D.width;
       var h = waveform3D.height;
       var waveform = waveform3D.waveform;
-      var distMax = w * h * (type === 0 ? 3 : 1);
+      var distMax = w * h * 1; // common for all type;
       var dist = new Uint32Array(320 * 320);
       var colorMap = new Float32Array(320 * 320 * 3);
       var vertices3DCube = vertexUtil.makeCube(h, w, 256);
@@ -3052,40 +3055,31 @@
           var r = waveform[k];
           var g = waveform[k + 1];
           var b = waveform[k + 2];
-          if (type === 0) {
-            var plotx = Math.round(orgx + xr * y + xg * x);
-            var ploty0 = orgy + yr * y + yg * x;
-            var plotyR = Math.round(ploty0 + yb * r);
-            var plotyG = Math.round(ploty0 + yb * g);
-            var plotyB = Math.round(ploty0 + yb * b);
-            var offsetR = plotyR * 320 + plotx;
-            var offsetG = plotyG * 320 + plotx;
-            var offsetB = plotyB * 320 + plotx;
-            dist[offsetR] += 1;
-            dist[offsetG] += 1;
-            dist[offsetB] += 1;
-            colorMap[offsetR] += r;
-            colorMap[offsetG + 102400] += g;
-            colorMap[offsetB + 204800] += b;
-            k += 3;
-          } else { // type === 1
-            var c = waveform[k + 3];
-            var plotx = Math.round(orgx + xr * y + xg * x);
-            var ploty = Math.round(orgy + yr * y + yg * x + yb * c);
-            var offset = ploty * 320 + plotx;
-            dist[offset] += 1;
-            colorMap[offset] += r;
-            colorMap[offset + 102400] += g;
-            colorMap[offset + 204800] += b;
-            k += 4;
-          }
+          var c =
+              type === 0 ? waveform[k + 3] : // Y
+              type === 1 ? r : // R
+              type === 2 ? g : // G
+              b; // B
+          var plotx = Math.round(orgx + xr * y + xg * x);
+          var ploty = Math.round(orgy + yr * y + yg * x + yb * c);
+          var offset = ploty * 320 + plotx;
+          dist[offset] += 1;
+          colorMap[offset] += r;
+          colorMap[offset + 102400] += g;
+          colorMap[offset + 204800] += b;
+          k += 4;
         }
       }
       var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
-      drawVerticalColorBar(context, v, '#000', '#fff');
+      var color2 =
+          type === 0 ? '#fff' :
+          type === 1 ? '#f00' :
+          type === 2 ? '#0f0' :
+          '#00f';
+      drawVerticalColorBar(context, v, '#000', color2);
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
       var s = 12 / scale;
       var labels = [
@@ -3094,6 +3088,16 @@
           { pos: [-h/2-s, w/2+s, -140], text: 'x', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
           { pos: [-h/2-s, -w/2-s, 140], text: 'Y', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
       ];
+      if (type === 1) {
+        labels[3].text = 'R';
+        labels[3].color = '#f00';
+      } else if (type === 2) {
+        labels[3].text = 'G';
+        labels[3].color = '#0f0';
+      } else if (type === 3) {
+        labels[3].text = 'B';
+        labels[3].color = '#00f';
+      }
       if (!fig.axes) {
         fig.axes = makeAxesSVG(vbox, labels, axesDesc);
       } else {
