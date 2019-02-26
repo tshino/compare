@@ -2624,14 +2624,15 @@
       });
     });
   };
-  var makeRotationController = function(onrotate, onzoom) {
+  var makeRotationController = function(onrotate, onzoom, initialOrientation) {
+    initialOrientation = initialOrientation || { x: 30, y: -30 };
     var orientation = {
-      x: 30,
-      y: -30
+      x: initialOrientation.x,
+      y: initialOrientation.y
     };
-    var zoomLevel = 0;
+    var zoomLevel = 0.12;
     var resetZoom = function() {
-      zoomLevel = 0;
+      zoomLevel = 0.12;
     };
     var getScale = function() {
       return Math.round(Math.pow(2, zoomLevel) * 100) / 100;
@@ -2758,7 +2759,8 @@
     };
     var rotationController = makeRotationController(
       function() { redrawFigureAll(); },
-      function() { updateTable(/* transformOnly = */ true); }
+      function() { updateTable(/* transformOnly = */ true); },
+      { x: 20, y: -60 }
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
     var vertexIndicesCube = vertexUtil.cubeIndices;
@@ -3012,7 +3014,8 @@
     };
     var rotationController = makeRotationController(
       function() { redrawFigureAll(); },
-      function() { updateTable(/* transformOnly = */ true); }
+      function() { updateTable(/* transformOnly = */ true); },
+      { x: 20, y: -110 }
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
     var drawVerticalColorBar = function(ctx, v, color1, color2) {
