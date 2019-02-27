@@ -137,7 +137,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
   var srgbToLinear = [];
   for (var i = 0; i < 256; ++i) {
     var c = i / 255;
-    srgbToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    srgbToLinear[i] = linear * 255;
   }
   var k = 0;
   if (type === 0) { // Cb-Cr
@@ -189,8 +190,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + g;
         var ploty = 287 - b;
       } else { // Linear sRGB
-        var ling = Math.round(srgbToLinear[g] * 255);
-        var linb = Math.round(srgbToLinear[b] * 255);
+        var ling = Math.round(srgbToLinear[g]);
+        var linb = Math.round(srgbToLinear[b]);
         var plotx = 32 + ling;
         var ploty = 287 - linb;
       }
@@ -210,8 +211,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + g;
         var ploty = 287 - r;
       } else { // Linear sRGB
-        var linr = Math.round(srgbToLinear[r] * 255);
-        var ling = Math.round(srgbToLinear[g] * 255);
+        var linr = Math.round(srgbToLinear[r]);
+        var ling = Math.round(srgbToLinear[g]);
         var plotx = 32 + ling;
         var ploty = 287 - linr;
       }
@@ -231,8 +232,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + b;
         var ploty = 287 - r;
       } else { // Linear sRGB
-        var linr = Math.round(srgbToLinear[r] * 255);
-        var linb = Math.round(srgbToLinear[b] * 255);
+        var linr = Math.round(srgbToLinear[r]);
+        var linb = Math.round(srgbToLinear[b]);
         var plotx = 32 + linb;
         var ploty = 287 - linr;
       }
