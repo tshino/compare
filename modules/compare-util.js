@@ -176,13 +176,14 @@
         HexDigits[g >> 4] + HexDigits[g % 16] +
         HexDigits[b >> 4] + HexDigits[b % 16];
   };
-  var srgb255ToLinear = (function() {
-    var srgb255ToLinear = new Float32Array(256);
+  var srgb255ToLinear255 = (function() {
+    var srgb255ToLinear255 = new Float32Array(256);
     for (var i = 0; i < 256; ++i) {
       var c = i / 255;
-      srgb255ToLinear[i] = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      srgb255ToLinear255[i] = linear * 255;
     }
-    return srgb255ToLinear;
+    return srgb255ToLinear255;
   })();
   // RGB (sRGB) --> Linear RGB
   var convertColorListRgbToLinear = function(rgbColorList) {
@@ -193,9 +194,9 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var linr = Math.round(srgb255ToLinear[r] * 255);
-      var ling = Math.round(srgb255ToLinear[g] * 255);
-      var linb = Math.round(srgb255ToLinear[b] * 255);
+      var linr = Math.round(srgb255ToLinear255[r]);
+      var ling = Math.round(srgb255ToLinear255[g]);
+      var linb = Math.round(srgb255ToLinear255[b]);
       linearColors[k] = (linr << 16) + (ling << 8) + linb;
     }
     return linearColors;
@@ -209,16 +210,16 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var linr = srgb255ToLinear[r];
-      var ling = srgb255ToLinear[g];
-      var linb = srgb255ToLinear[b];
+      var linr = srgb255ToLinear255[r];
+      var ling = srgb255ToLinear255[g];
+      var linb = srgb255ToLinear255[b];
       var capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
       var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
       var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
       var xyz = capX + capY + capZ;
       var x8 = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255);
       var y8 = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255);
-      var capY8 = Math.round(capY * 255);
+      var capY8 = Math.round(capY);
       xyyColors[k] = (x8 << 16) + (y8 << 8) + capY8;
     }
     return xyyColors;
@@ -263,9 +264,9 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var linr = srgb255ToLinear[r] * 255;
-      var ling = srgb255ToLinear[g] * 255;
-      var linb = srgb255ToLinear[b] * 255;
+      var linr = srgb255ToLinear255[r];
+      var ling = srgb255ToLinear255[g];
+      var linb = srgb255ToLinear255[b];
       hsvColors[k] = convertRgbToHsvCylinder(linr, ling, linb);
     }
     return hsvColors;
@@ -310,9 +311,9 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var linr = srgb255ToLinear[r] * 255;
-      var ling = srgb255ToLinear[g] * 255;
-      var linb = srgb255ToLinear[b] * 255;
+      var linr = srgb255ToLinear255[r];
+      var ling = srgb255ToLinear255[g];
+      var linb = srgb255ToLinear255[b];
       hslColors[k] = convertRgbToHslCylinder(linr, ling, linb);
     }
     return hslColors;
@@ -1529,7 +1530,7 @@
     toSignedFixed:          toSignedFixed,
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,
-    srgb255ToLinear:        srgb255ToLinear,
+    srgb255ToLinear255:     srgb255ToLinear255,
     convertColorListRgbToLinear:    convertColorListRgbToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
     convertColorListRgbToHsv:   convertColorListRgbToHsv,

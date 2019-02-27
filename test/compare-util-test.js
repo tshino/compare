@@ -110,17 +110,17 @@ TEST( 'compareUtil toHexTriplet', function test() {
   EXPECT_EQ( '#101010', compareUtil.toHexTriplet(15.9, 16, 16.1) );
 });
 
-TEST( 'compareUtil srgb255ToLinear', function test() {
-  EXPECT_EQ( 0.0, compareUtil.srgb255ToLinear[0] );
-  EXPECT( 1e-5 > Math.abs(0.0003035270 - compareUtil.srgb255ToLinear[1]) );
-  EXPECT( 1e-5 > Math.abs(0.0015176349 - compareUtil.srgb255ToLinear[5]) );
-  EXPECT( 1e-5 > Math.abs(0.0030352698 - compareUtil.srgb255ToLinear[10]) );
-  EXPECT( 1e-5 > Math.abs(0.0033465358 - compareUtil.srgb255ToLinear[11]) );
-  EXPECT( 1e-5 > Math.abs(0.0047769535 - compareUtil.srgb255ToLinear[15]) );
-  EXPECT( 1e-5 > Math.abs(0.2158605001 - compareUtil.srgb255ToLinear[128]) );
-  EXPECT( 1e-5 > Math.abs(0.5271151257 - compareUtil.srgb255ToLinear[192]) );
-  EXPECT( 1e-5 > Math.abs(0.9911020971 - compareUtil.srgb255ToLinear[254]) );
-  EXPECT_EQ( 1.0, compareUtil.srgb255ToLinear[255] );
+TEST( 'compareUtil srgb255ToLinear255', function test() {
+  EXPECT_EQ( 0.0, compareUtil.srgb255ToLinear255[0] );
+  EXPECT( 1e-5 > Math.abs(0.077399385 - compareUtil.srgb255ToLinear255[1]) );
+  EXPECT( 1e-5 > Math.abs(0.386996900 - compareUtil.srgb255ToLinear255[5]) );
+  EXPECT( 1e-5 > Math.abs(0.773993799 - compareUtil.srgb255ToLinear255[10]) );
+  EXPECT( 1e-5 > Math.abs(0.853366629 - compareUtil.srgb255ToLinear255[11]) );
+  EXPECT( 1e-5 > Math.abs(1.218123143 - compareUtil.srgb255ToLinear255[15]) );
+  EXPECT( 1e-5 > Math.abs(55.044427526 - compareUtil.srgb255ToLinear255[128]) );
+  EXPECT( 1e-5 > Math.abs(134.414357054 - compareUtil.srgb255ToLinear255[192]) );
+  EXPECT( 1e-5 > Math.abs(252.731034761 - compareUtil.srgb255ToLinear255[254]) );
+  EXPECT_EQ( 255.0, compareUtil.srgb255ToLinear255[255] );
 });
 
 TEST( 'compareUtil convertColorListRgbToLinear', function test() {
