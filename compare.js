@@ -986,7 +986,7 @@
       var center = viewZoom.getCenter();
       var roi = [
           ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1)
           //ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
           //ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
       ];
@@ -2413,7 +2413,7 @@
         { pos: { x: 159.5, y: 32    } , color: '',     types: [] },
         { pos: { x: 159.5, y: 287   } , color: '',     types: [] },
         { pos: { x: 32,    y: 159.5 } , color: '',     types: [] },
-        { pos: { x: 287,   y: 159.5 } , color: '',     types: [] },
+        { pos: { x: 287,   y: 159.5 } , color: '',     types: [] }
       ];
       var mainAxesColor = '#06c';
       var auxAxesColor = color ? '#555' : '#024';
@@ -2539,7 +2539,7 @@
     };
     var cubeIndices = [
       [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
-      [0, 12], [1, 13], [4, 16], [5, 17],
+      [0, 12], [1, 13], [4, 16], [5, 17]
     ];
     var make3DCylinder = function(r, sz) {
       var v = [], cz = sz / 2;
@@ -3362,7 +3362,7 @@
           index:    [a.index, b.index],
           options:  {
             orientationA: entries[a.index].orientation,
-            orientationB: entries[b.index].orientation,
+            orientationB: entries[b.index].orientation
           }
         }, attachImageDataToTask);
       }
@@ -3693,7 +3693,7 @@
           index:    [baseImageIndex, targetImageIndex],
           options:  {
             orientationA: entries[baseImageIndex].orientation,
-            orientationB: entries[targetImageIndex].orientation,
+            orientationB: entries[targetImageIndex].orientation
           }
         }, attachImageDataToTask);
       }
@@ -3935,7 +3935,7 @@
             offsetX: diffOptions.offsetX,
             offsetY: diffOptions.offsetY,
             orientationA: entries[baseImageIndex].orientation,
-            orientationB: entries[targetImageIndex].orientation,
+            orientationB: entries[targetImageIndex].orientation
           }
         }, attachImageDataToTask);
       }
@@ -4134,7 +4134,7 @@
   })();
   var resetMouseDrag = function() {
     viewZoom.resetDragState();
-  }
+  };
   var toggleFullscreen = function() {
     resetMouseDrag();
     compareUtil.toggleFullscreen($('#viewroot').get(0));
@@ -4332,7 +4332,7 @@
         for (var x = 0; x < w; ++x, ++i) {
           if (ch[i] !== ch[i + w]) {
             if (start === null) {
-              paths.push([x, y + 1, x + 1, y + 1])
+              paths.push([x, y + 1, x + 1, y + 1]);
               start = paths.length - 1;
             } else {
               paths[start][2] = x + 1;
@@ -4347,7 +4347,7 @@
         for (var y = 0, i = x; y < h; ++y, i += w) {
           if (ch[i] !== ch[i + 1]) {
             if (start === null) {
-              paths.push([x + 1, y, x + 1, y + 1])
+              paths.push([x + 1, y, x + 1, y + 1]);
               start = paths.length - 1;
             } else {
               paths[start][3] = y + 1;
@@ -4739,7 +4739,7 @@
   var addCapturedImage = function(canvas) {
       var file = {
         name: 'captured image',
-        lastModified: Date.now(),
+        lastModified: Date.now()
       };
       var entry = newEntry(file);
       entry.index = entries.length;
