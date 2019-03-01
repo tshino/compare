@@ -123,6 +123,19 @@ TEST( 'compareUtil srgb255ToLinear255', function test() {
   EXPECT_EQ( 255.0, compareUtil.srgb255ToLinear255[255] );
 });
 
+TEST( 'compareUtil srgb255ToLinear8', function test() {
+  EXPECT_EQ( 0, compareUtil.srgb255ToLinear8[0] );
+  EXPECT_EQ( 0, compareUtil.srgb255ToLinear8[1] );
+  EXPECT_EQ( 0, compareUtil.srgb255ToLinear8[5] );
+  EXPECT_EQ( 1, compareUtil.srgb255ToLinear8[10] );
+  EXPECT_EQ( 1, compareUtil.srgb255ToLinear8[11] );
+  EXPECT_EQ( 1, compareUtil.srgb255ToLinear8[15] );
+  EXPECT_EQ( 55, compareUtil.srgb255ToLinear8[128] );
+  EXPECT_EQ( 134, compareUtil.srgb255ToLinear8[192] );
+  EXPECT_EQ( 253, compareUtil.srgb255ToLinear8[254] );
+  EXPECT_EQ( 255, compareUtil.srgb255ToLinear8[255] );
+});
+
 TEST( 'compareUtil convertColorListRgbToLinear', function test() {
   var rgb = [
     0x000000, 0x808080, 0xffffff, 0xff0000, 0x00ff00, 0x0000ff,

@@ -185,6 +185,13 @@
     }
     return srgb255ToLinear255;
   })();
+  var srgb255ToLinear8 = (function() {
+    var srgb255ToLinear8 = new Uint8Array(256);
+    for (var i = 0; i < 256; ++i) {
+      srgb255ToLinear8[i] = Math.round(srgb255ToLinear255[i]);
+    }
+    return srgb255ToLinear8;
+  })();
   // RGB (sRGB) --> Linear RGB
   var convertColorListRgbToLinear = function(rgbColorList) {
     var colors = rgbColorList;
@@ -194,9 +201,9 @@
       var r = rgb >> 16;
       var g = (rgb >> 8) & 255;
       var b = rgb & 255;
-      var linr = Math.round(srgb255ToLinear255[r]);
-      var ling = Math.round(srgb255ToLinear255[g]);
-      var linb = Math.round(srgb255ToLinear255[b]);
+      var linr = srgb255ToLinear8[r];
+      var ling = srgb255ToLinear8[g];
+      var linb = srgb255ToLinear8[b];
       linearColors[k] = (linr << 16) + (ling << 8) + linb;
     }
     return linearColors;
@@ -1531,6 +1538,7 @@
     toPercent:              toPercent,
     toHexTriplet:           toHexTriplet,
     srgb255ToLinear255:     srgb255ToLinear255,
+    srgb255ToLinear8:       srgb255ToLinear8,
     convertColorListRgbToLinear:    convertColorListRgbToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
     convertColorListRgbToHsv:   convertColorListRgbToHsv,
