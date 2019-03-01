@@ -3003,7 +3003,21 @@
   var waveform3DDialog = (function() {
     var waveform3DType = makeModeSwitch('#waveform3DType', 0, function(type) {
       updateFigure();
+      updateAuxOption();
     });
+    var waveform3DAuxType = makeModeSwitch('#waveform3DAuxType', 0, function(type) {
+      updateFigure();
+    });
+    var updateAuxOption = function() {
+      if (waveform3DType.current() === 1 ||
+          waveform3DType.current() === 2 ||
+          waveform3DType.current() === 3) { // R,G,B
+        $('#waveform3DAuxType').show();
+      } else {
+        $('#waveform3DAuxType').hide();
+      }
+    };
+    updateAuxOption();
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
@@ -3038,6 +3052,9 @@
     };
     var makeFigure = function(fig, waveform3D) {
       var type = waveform3DType.current();
+      if (waveform3DAuxType.current() === 1 && 1 <= type && type <= 3 ) {
+        type += 3;
+      }
       var context = fig.context;
       var w = waveform3D.width;
       var h = waveform3D.height;
@@ -3053,6 +3070,7 @@
       var yb = rotation.yb;
       var orgx = 159.5 - ((h - 1) / 2 * xr + (w - 1) / 2 * xg);
       var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
+      var toLinear = compareUtil.srgb255ToLinear8;
       for (var y = 0, k = 0; y < h; y += 1) {
         for (var x = 0; x < w; x += 1) {
           var r = waveform[k];
@@ -3062,7 +3080,10 @@
               type === 0 ? waveform[k + 3] : // Y
               type === 1 ? r : // R
               type === 2 ? g : // G
-              b; // B
+              type === 3 ? b : // B
+              type === 4 ? toLinear[r] : // Linear R
+              type === 5 ? toLinear[g] : // Linear G
+              toLinear[b]; // Linear B
           var plotx = Math.round(orgx + xr * y + xg * x);
           var ploty = Math.round(orgy + yr * y + yg * x + yb * c);
           var offset = ploty * 320 + plotx;
@@ -3079,8 +3100,8 @@
       var v = rotation.vertices3DTo2D(vertices3DCube);
       var color2 =
           type === 0 ? '#fff' :
-          type === 1 ? '#f00' :
-          type === 2 ? '#0f0' :
+          (type === 1 || type === 4) ? '#f00' :
+          (type === 2 || type === 5) ? '#0f0' :
           '#00f';
       drawVerticalColorBar(context, v, '#000', color2);
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
@@ -3091,13 +3112,13 @@
           { pos: [-h/2-s, w/2+s, -140], text: 'x', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
           { pos: [-h/2-s, -w/2-s, 140], text: 'Y', color: '#ccc', hidden: (xr < 0 && yr < 0 && 0 < xg) }
       ];
-      if (type === 1) {
+      if (type === 1 || type === 4) {
         labels[3].text = 'R';
         labels[3].color = '#f00';
-      } else if (type === 2) {
+      } else if (type === 2 || type === 5) {
         labels[3].text = 'G';
         labels[3].color = '#0f0';
-      } else if (type === 3) {
+      } else if (type === 3 || type === 6) {
         labels[3].text = 'B';
         labels[3].color = '#00f';
       }
