@@ -3032,7 +3032,7 @@
       { x: 20, y: -110 }
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
-    var drawVerticalColorBar = function(ctx, v, color1, color2) {
+    var drawVerticalColorBar = function(ctx, v, colorStops) {
       var bar = (function() {
         var x = 320/2, y0, y1;
         for (var i = 0, corners = [0, 4, 12, 16]; i < 4; i++) {
@@ -3046,7 +3046,7 @@
         return [x - 12, y0, x - 1, y1];
       })();
       ctx.fillStyle = figureUtil.makeLinearGradient(
-        ctx, bar[0], bar[3], bar[0], bar[1], [[0, color1], [1, color2]]
+        ctx, bar[0], bar[3], bar[0], bar[1], colorStops
       );
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
     };
@@ -3103,7 +3103,18 @@
           (type === 1 || type === 4) ? '#f00' :
           (type === 2 || type === 5) ? '#0f0' :
           '#00f';
-      drawVerticalColorBar(context, v, '#000', color2);
+      if (type <= 3) {
+        var colorStops = [[0, '#000'], [1, color2]];
+      } else {
+        var colorStops = [[0, '#000']];
+        var prefix = type === 4 ? '#' : type === 5 ? '#0' : '#00';
+        var suffix = type === 4 ? '00' : type === 5 ? '0' : '';
+        for (var i = 1; i < 16; i++) {
+          var c = compareUtil.srgb255ToLinear255[i * 0x11] / 255;
+          colorStops.push([c, prefix + i.toString(16) + suffix]);
+        }
+      }
+      drawVerticalColorBar(context, v, colorStops);
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
       var s = 12 / scale;
       var labels = [
