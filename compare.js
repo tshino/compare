@@ -3032,6 +3032,32 @@
       { x: 20, y: -110 }
     );
     var vertexIndicesCube = vertexUtil.cubeIndices;
+    var makeColorGradientStops = function(type) {
+      var color2 =
+          type === 0 ? '#fff' :
+          (type === 1 || type === 4) ? '#f00' :
+          (type === 2 || type === 5) ? '#0f0' :
+          '#00f';
+      if (type <= 3) {
+        var colorStops = [[0, '#000'], [1, color2]];
+      } else {
+        var colorStops = [[0, '#000']];
+        var prefix = type === 4 ? '#' : type === 5 ? '#0' : '#00';
+        var suffix = type === 4 ? '00' : type === 5 ? '0' : '';
+        for (var i = 1; i < 16; i++) {
+          var c = compareUtil.srgb255ToLinear255[i * 0x11] / 255;
+          colorStops.push([c, prefix + i.toString(16) + suffix]);
+        }
+      }
+      return colorStops;
+    };
+    var colorStopsForType = (function(){
+      colorStopsForType = [];
+      for (var type = 0; type < 7; type++) {
+        colorStopsForType.push(makeColorGradientStops(type));
+      }
+      return colorStopsForType;
+    })();
     var drawVerticalColorBar = function(ctx, v, colorStops) {
       var bar = (function() {
         var x = 320/2, y0, y1;
@@ -3098,23 +3124,7 @@
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
-      var color2 =
-          type === 0 ? '#fff' :
-          (type === 1 || type === 4) ? '#f00' :
-          (type === 2 || type === 5) ? '#0f0' :
-          '#00f';
-      if (type <= 3) {
-        var colorStops = [[0, '#000'], [1, color2]];
-      } else {
-        var colorStops = [[0, '#000']];
-        var prefix = type === 4 ? '#' : type === 5 ? '#0' : '#00';
-        var suffix = type === 4 ? '00' : type === 5 ? '0' : '';
-        for (var i = 1; i < 16; i++) {
-          var c = compareUtil.srgb255ToLinear255[i * 0x11] / 255;
-          colorStops.push([c, prefix + i.toString(16) + suffix]);
-        }
-      }
-      drawVerticalColorBar(context, v, colorStops);
+      drawVerticalColorBar(context, v, colorStopsForType[type]);
       var axesDesc = makeAxesDesc(v, vertexIndicesCube);
       var s = 12 / scale;
       var labels = [
