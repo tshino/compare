@@ -19,7 +19,8 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcWaveform':
     result.type   = data.type;
-    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.flipped, data.type);
+    result.auxType  = data.auxType;
+    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.flipped, data.type, data.auxType);
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
@@ -58,6 +59,16 @@ self.addEventListener('message', function(e) {
   self.postMessage( result );
 }, false);
 
+var srgb255ToLinear255 = (function() {
+  var srgb255ToLinear255 = new Float32Array(256);
+  for (var i = 0; i < 256; ++i) {
+    var c = i / 255;
+    var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    srgb255ToLinear255[i] = linear * 255;
+  }
+  return srgb255ToLinear255;
+})();
+
 function calcHistogram( imageData, type )
 {
   var w = imageData.width;
@@ -80,7 +91,7 @@ function calcHistogram( imageData, type )
   }
   return hist;
 }
-function calcWaveform( imageData, histW, transposed, flipped, type )
+function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
 {
   var w = transposed ? imageData.height : imageData.width;
   var h = transposed ? imageData.width : imageData.height;
@@ -102,6 +113,11 @@ function calcWaveform( imageData, histW, transposed, flipped, type )
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
+        if (auxType === 1) {
+          r = Math.round(srgb255ToLinear255[r]);
+          g = Math.round(srgb255ToLinear255[g]);
+          b = Math.round(srgb255ToLinear255[b]);
+        }
         hist[rOff + r] += 1;
         hist[gOff + g] += 1;
         hist[bOff + b] += 1;
@@ -134,12 +150,6 @@ function calcVectorscope( imageData, type, colorMode, auxType )
   if (colorMode) {
     colorMap = new Float32Array(320 * 320 * 3);
   }
-  var srgbToLinear = [];
-  for (var i = 0; i < 256; ++i) {
-    var c = i / 255;
-    var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    srgbToLinear[i] = linear * 255;
-  }
   var k = 0;
   if (type === 0) { // Cb-Cr
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
@@ -163,9 +173,9 @@ function calcVectorscope( imageData, type, colorMode, auxType )
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      var linr = srgbToLinear[r];
-      var ling = srgbToLinear[g];
-      var linb = srgbToLinear[b];
+      var linr = srgb255ToLinear255[r];
+      var ling = srgb255ToLinear255[g];
+      var linb = srgb255ToLinear255[b];
       var capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
       var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
       var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
@@ -190,8 +200,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + g;
         var ploty = 287 - b;
       } else { // Linear sRGB
-        var ling = Math.round(srgbToLinear[g]);
-        var linb = Math.round(srgbToLinear[b]);
+        var ling = Math.round(srgb255ToLinear255[g]);
+        var linb = Math.round(srgb255ToLinear255[b]);
         var plotx = 32 + ling;
         var ploty = 287 - linb;
       }
@@ -211,8 +221,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + g;
         var ploty = 287 - r;
       } else { // Linear sRGB
-        var linr = Math.round(srgbToLinear[r]);
-        var ling = Math.round(srgbToLinear[g]);
+        var linr = Math.round(srgb255ToLinear255[r]);
+        var ling = Math.round(srgb255ToLinear255[g]);
         var plotx = 32 + ling;
         var ploty = 287 - linr;
       }
@@ -232,8 +242,8 @@ function calcVectorscope( imageData, type, colorMode, auxType )
         var plotx = 32 + b;
         var ploty = 287 - r;
       } else { // Linear sRGB
-        var linr = Math.round(srgbToLinear[r]);
-        var linb = Math.round(srgbToLinear[b]);
+        var linr = Math.round(srgb255ToLinear255[r]);
+        var linb = Math.round(srgb255ToLinear255[b]);
         var plotx = 32 + linb;
         var ploty = 287 - linr;
       }
