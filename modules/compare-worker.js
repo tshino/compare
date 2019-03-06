@@ -27,7 +27,7 @@ self.addEventListener('message', function(e) {
     result.type   = data.type;
     result.color  = data.color;
     result.auxType  = data.auxType;
-    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType);
+    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType, 0);
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;
@@ -141,7 +141,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
   return hist;
 }
 
-function calcVectorscope( imageData, type, colorMode, auxType )
+function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
 {
   var w = imageData.width;
   var h = imageData.height;
@@ -156,8 +156,13 @@ function calcVectorscope( imageData, type, colorMode, auxType )
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
-      var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
+      if (auxType2 === 0) { // 0: bt601
+        var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
+        var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
+      } else { // 1: bt709
+        var cb = -0.1146 * r - 0.3854 * g + 0.5000 * b;
+        var cr =  0.5000 * r - 0.4542 * g - 0.0458 * b;
+      }
       var plotx = Math.round(159.5 + cb);
       var ploty = Math.round(159.5 - cr);
       var offset = ploty * 320 + plotx;
