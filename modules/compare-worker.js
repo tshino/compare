@@ -27,7 +27,8 @@ self.addEventListener('message', function(e) {
     result.type   = data.type;
     result.color  = data.color;
     result.auxType  = data.auxType;
-    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType, 0);
+    result.auxType2  = data.auxType2;
+    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType, data.auxType2);
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;

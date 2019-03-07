@@ -2015,7 +2015,7 @@
       waveformDialog.updateFigure(data.type, data.auxType, img, data.histW, data.result);
       break;
     case 'calcVectorscope':
-      vectorscopeDialog.updateFigure(data.type, data.color, data.auxType, entries[data.index[0]], data.result);
+      vectorscopeDialog.updateFigure(data.type, data.color, data.auxType, data.auxType2, entries[data.index[0]], data.result);
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
@@ -2348,13 +2348,19 @@
     });
     var colorMode = makeToggleSwitch('#vectorscopeColor', false, repaint);
     var vectorscopeAuxType = makeModeSwitch('#vectorscopeAuxType', 0, repaint);
+    var vectorscopeAuxType2 = makeModeSwitch('#vectorscopeAuxType2', 0, repaint);
     var updateAuxOption = function() {
-      if (vectorscopeType.current() === 2 ||
+      if (vectorscopeType.current() === 0) { // 0:Cb-Cr
+        $('#vectorscopeAuxType').hide();
+        $('#vectorscopeAuxType2').show();
+      } else if (vectorscopeType.current() === 2 ||
           vectorscopeType.current() === 3 ||
           vectorscopeType.current() === 4) { // 2:G-B, 3:G-R, 4:B-R
         $('#vectorscopeAuxType').show();
+        $('#vectorscopeAuxType2').hide();
       } else {
         $('#vectorscopeAuxType').hide();
+        $('#vectorscopeAuxType2').hide();
       }
     };
     updateAuxOption();
@@ -2364,10 +2370,11 @@
         type:     vectorscopeType.current(),
         color:    colorMode.current(),
         auxType:  vectorscopeAuxType.current(),
+        auxType2: vectorscopeAuxType2.current(),
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var makeFigure = function(type, color, fig, w, h, result) {
+    var makeFigure = function(type, auxType2, color, fig, w, h, result) {
       var context = fig.context;
       if (color) { // with color
         var bits = makeDistributionImageDataRGBA(context, 320, 320, result.dist, result.colorMap, w * h, 255);
@@ -2380,8 +2387,13 @@
       };
       var calcxy = function(r, g, b) {
         if (type === 0) { // Cb-Cr
-          var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
-          var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
+          if (auxType2 === 0) { // 0: bt601
+            var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
+            var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
+          } else { // 1: bt709
+            var cb = -0.1146 * r - 0.3854 * g + 0.5000 * b;
+            var cr =  0.5000 * r - 0.4542 * g - 0.0458 * b;
+          }
           return { x: 159.5 + cb, y: 159.5 - cr };
         } else if (type === 1) { // x-y
           r = srgbToLinear(r / 255);
@@ -2492,9 +2504,10 @@
       }
       return fig.canvas;
     };
-    var updateFigure = function(type, color, auxType, img, result) {
+    var updateFigure = function(type, color, auxType, auxType2, img, result) {
       if (type !== vectorscopeType.current() || color !== colorMode.current() ||
-          auxType !== vectorscopeAuxType.current()) {
+          auxType !== vectorscopeAuxType.current() ||
+          auxType2 !== vectorscopeAuxType2.current()) {
         return;
       }
       var w = img.canvasWidth;
@@ -2507,7 +2520,7 @@
       if (type === 1) { // x-y
         var bg = new Image;
         bg.onload = function() {
-          makeFigure(type, color, fig, w, h, result);
+          makeFigure(type, auxType2, color, fig, w, h, result);
           fig.context.globalAlpha = color ? 0.7 : 0.3;
           fig.context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
           fig.context.drawImage(bg, 0, 0, 320, 320);
@@ -2515,7 +2528,7 @@
         };
         bg.src = color ? 'res/xy-chromaticity-diagram-gray.png' : 'res/xy-chromaticity-diagram.png';
       } else {
-        makeFigure(type, color, fig, w, h, result);
+        makeFigure(type, auxType2, color, fig, w, h, result);
         notify();
       }
     };
