@@ -2015,7 +2015,7 @@
       waveformDialog.updateFigure(data.type, data.auxType, img, data.histW, data.result);
       break;
     case 'calcVectorscope':
-      vectorscopeDialog.updateFigure(data.type, data.color, data.auxType, data.auxType2, entries[data.index[0]], data.result);
+      vectorscopeDialog.updateFigure(data.type, data.color, data.auxTypes, entries[data.index[0]], data.result);
       break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
@@ -2369,8 +2369,7 @@
         cmd:      'calcVectorscope',
         type:     vectorscopeType.current(),
         color:    colorMode.current(),
-        auxType:  vectorscopeAuxType.current(),
-        auxType2: vectorscopeAuxType2.current(),
+        auxTypes: [vectorscopeAuxType.current(), vectorscopeAuxType2.current()],
         index:    [img.index]
       }, attachImageDataToTask);
     };
@@ -2504,10 +2503,10 @@
       }
       return fig.canvas;
     };
-    var updateFigure = function(type, color, auxType, auxType2, img, result) {
+    var updateFigure = function(type, color, auxTypes, img, result) {
       if (type !== vectorscopeType.current() || color !== colorMode.current() ||
-          auxType !== vectorscopeAuxType.current() ||
-          auxType2 !== vectorscopeAuxType2.current()) {
+          auxTypes[0] !== vectorscopeAuxType.current() ||
+          auxTypes[1] !== vectorscopeAuxType2.current()) {
         return;
       }
       var w = img.canvasWidth;
@@ -2520,7 +2519,7 @@
       if (type === 1) { // x-y
         var bg = new Image;
         bg.onload = function() {
-          makeFigure(type, auxType2, color, fig, w, h, result);
+          makeFigure(type, auxTypes[1], color, fig, w, h, result);
           fig.context.globalAlpha = color ? 0.7 : 0.3;
           fig.context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
           fig.context.drawImage(bg, 0, 0, 320, 320);
@@ -2528,7 +2527,7 @@
         };
         bg.src = color ? 'res/xy-chromaticity-diagram-gray.png' : 'res/xy-chromaticity-diagram.png';
       } else {
-        makeFigure(type, auxType2, color, fig, w, h, result);
+        makeFigure(type, auxTypes[1], color, fig, w, h, result);
         notify();
       }
     };

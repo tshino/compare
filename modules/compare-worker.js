@@ -26,9 +26,8 @@ self.addEventListener('message', function(e) {
   case 'calcVectorscope':
     result.type   = data.type;
     result.color  = data.color;
-    result.auxType  = data.auxType;
-    result.auxType2  = data.auxType2;
-    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxType, data.auxType2);
+    result.auxTypes  = data.auxTypes;
+    result.result = calcVectorscope(data.imageData[0], data.type, data.color, data.auxTypes);
     result.w = data.imageData[0].width;
     result.h = data.imageData[0].height;
     break;
@@ -142,7 +141,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
   return hist;
 }
 
-function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
+function calcVectorscope( imageData, type, colorMode, auxTypes )
 {
   var w = imageData.width;
   var h = imageData.height;
@@ -157,7 +156,7 @@ function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      if (auxType2 === 0) { // 0: bt601
+      if (auxTypes[1] === 0) { // 0: bt601
         var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
         var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
       } else { // 1: bt709
@@ -202,7 +201,7 @@ function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var g = imageData.data[k + 1];
       var b = imageData.data[k + 2];
-      if (auxType === 0) { // sRGB
+      if (auxTypes[0] === 0) { // sRGB
         var plotx = 32 + g;
         var ploty = 287 - b;
       } else { // Linear sRGB
@@ -223,7 +222,7 @@ function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k];
       var g = imageData.data[k + 1];
-      if (auxType === 0) { // sRGB
+      if (auxTypes[0] === 0) { // sRGB
         var plotx = 32 + g;
         var ploty = 287 - r;
       } else { // Linear sRGB
@@ -244,7 +243,7 @@ function calcVectorscope( imageData, type, colorMode, auxType, auxType2 )
     for (var k = 0, n = 4 * w * h; k < n; k += 4) {
       var r = imageData.data[k];
       var b = imageData.data[k + 2];
-      if (auxType === 0) { // sRGB
+      if (auxTypes[0] === 0) { // sRGB
         var plotx = 32 + b;
         var ploty = 287 - r;
       } else { // Linear sRGB
