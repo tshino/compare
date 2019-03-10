@@ -2790,7 +2790,17 @@
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
     var vertexIndicesCube = vertexUtil.cubeIndices;
-    var vertices3DCylinder = vertexUtil.make3DCylinder(128, 256);
+    var makeVertices3DCylinder = (function(){
+      var vertices = vertexUtil.make3DCylinder(128, 256);
+      return function(rotation) {
+        var scale = 128 / Math.sqrt(rotation.xg * rotation.xg + rotation.xr * rotation.xr);
+        var hx = rotation.xr * scale, hy = rotation.xg * scale;
+        return vertices.concat([
+            [-hx, -hy, -128], [-hx, -hy, 128], [hx, hy, -128], [hx, hy, 128],
+            [0, 0, -128], [0, 0, 128]
+        ]);
+      };
+    })();
     var vertexIndicesCylinder = vertexUtil.cylinderIndices.concat([
       [72, 73], [74, 75],
       [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
@@ -2915,14 +2925,8 @@
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(
         colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
-        (colorDistType.current() === 1 || colorDistType.current() === 2) ? vertices3DCylinder.concat((function() {
-          var scale = 128 / Math.sqrt(xg * xg + xr * xr);
-          var hx = xr * scale, hy = xg * scale;
-          return [
-            [-hx, -hy, -128], [-hx, -hy, 128], [hx, hy, -128], [hx, hy, 128],
-            [0, 0, -128], [0, 0, 128]
-          ];
-        })()) : // 1:HSV, 2:HSL
+        (colorDistType.current() === 1 ||
+         colorDistType.current() === 2) ? makeVertices3DCylinder(rotation) : // 1:HSV, 2:HSL
         colorDistType.current() === 3 ? vertices3DYCbCr : // 3:YCbCr
         vertices3DCIEXyy // 4:CIE xyY
       );
