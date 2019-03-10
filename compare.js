@@ -19,6 +19,23 @@
   $('#view .dropHere').click(function() {
     $('#file').click();
   });
+  // Paste clipboard image on the page (Ctrl+V)
+  $(document.body).on('paste', function(e) {
+    var data = e.originalEvent.clipboardData;
+    if (data && data.items) {
+      var files = [];
+      for (var i = 0, item; item = data.items[i]; i++) {
+        var file = item.getAsFile();
+        if (file) {
+          files.push(file);
+        }
+      }
+      if (0 < files.length) {
+        addFiles(files);
+        return false;
+      }
+    }
+  });
 
   // Menus and dialogs
   $('#infobtn').click(infoDialog.toggle);
