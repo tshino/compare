@@ -2902,12 +2902,17 @@
         var coef_yg = yg;
         var coef_yb = yb;
       } else { // 3:YCbCr
-        var coef_xr = -0.1687 * xr + 0.5000 * xg;
-        var coef_xg = -0.3313 * xr - 0.4187 * xg;
-        var coef_xb =  0.5000 * xr - 0.0813 * xg;
-        var coef_yr = -0.1687 * yr + 0.5000 * yg + 0.299 * yb;
-        var coef_yg = -0.3313 * yr - 0.4187 * yg + 0.587 * yb;
-        var coef_yb =  0.5000 * yr - 0.0813 * yg + 0.114 * yb;
+        var mat = [ // bt601
+          [  0.299,   0.587,   0.114 ],
+          [ -0.1687, -0.3313,  0.5000 ],
+          [  0.5000, -0.4187, -0.0813 ]
+        ];
+        var coef_xr = mat[1][0] * xr + mat[2][0] * xg;
+        var coef_xg = mat[1][1] * xr + mat[2][1] * xg;
+        var coef_xb = mat[1][2] * xr + mat[2][2] * xg;
+        var coef_yr = mat[1][0] * yr + mat[2][0] * yg + mat[0][0] * yb;
+        var coef_yg = mat[1][1] * yr + mat[2][1] * yg + mat[0][1] * yb;
+        var coef_yb = mat[1][2] * yr + mat[2][2] * yg + mat[0][2] * yb;
       }
       var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
       var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
