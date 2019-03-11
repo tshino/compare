@@ -192,6 +192,18 @@
     }
     return srgb255ToLinear8;
   })();
+  // BT.601: R'G'B' --> Y'CbCr
+  var colorMatrixBT601 = [
+    [  0.2990,  0.5870,  0.1140 ],
+    [ -0.1687, -0.3313,  0.5000 ],
+    [  0.5000, -0.4187, -0.0813 ]
+  ];
+  // BT.709: R'G'B' --> Y'CbCr
+  var colorMatrixBT709 = [
+    [  0.2126,  0.7152,  0.0722 ],
+    [ -0.1146, -0.3854,  0.5000 ],
+    [  0.5000, -0.4542, -0.0458 ]
+  ]
   // RGB (sRGB) --> Linear RGB
   var convertColorListRgbToLinear = function(rgbColorList) {
     var colors = rgbColorList;
@@ -1539,6 +1551,8 @@
     toHexTriplet:           toHexTriplet,
     srgb255ToLinear255:     srgb255ToLinear255,
     srgb255ToLinear8:       srgb255ToLinear8,
+    colorMatrixBT601:       colorMatrixBT601,
+    colorMatrixBT709:       colorMatrixBT709,
     convertColorListRgbToLinear:    convertColorListRgbToLinear,
     convertColorListRgbToXyy:   convertColorListRgbToXyy,
     convertColorListRgbToHsv:   convertColorListRgbToHsv,

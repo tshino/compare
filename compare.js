@@ -2401,15 +2401,13 @@
       var srgbToLinear = function(c) {
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       };
+      var mat = auxType2 === 0 ?
+            compareUtil.colorMatrixBT601 :  // 0: bt601
+            compareUtil.colorMatrixBT709;   // 1: bt709
       var calcxy = function(r, g, b) {
         if (type === 0) { // Cb-Cr
-          if (auxType2 === 0) { // 0: bt601
-            var cb = -0.1687 * r - 0.3313 * g + 0.5000 * b;
-            var cr =  0.5000 * r - 0.4187 * g - 0.0813 * b;
-          } else { // 1: bt709
-            var cb = -0.1146 * r - 0.3854 * g + 0.5000 * b;
-            var cr =  0.5000 * r - 0.4542 * g - 0.0458 * b;
-          }
+          var cb = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
+          var cr = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
           return { x: 159.5 + cb, y: 159.5 - cr };
         } else if (type === 1) { // x-y
           r = srgbToLinear(r / 255);
@@ -2845,14 +2843,7 @@
         p3d(256, 0, 256, 256)
       ]);
     };
-    var vertices3DYCbCr = (function(){
-      var mat = [ // bt601
-        [  0.299,   0.587,   0.114 ],
-        [ -0.1687, -0.3313,  0.5000 ],
-        [  0.5000, -0.4187, -0.0813 ]
-      ];
-      return makeVertices3DYCbCr(mat);
-    })();
+    var vertices3DYCbCr = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
     var vertexIndicesYCbCr = vertexIndicesCube.concat([
       [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
       [18, 21, 19, 22, 20, 23, 18], // lower hexagon
@@ -2919,11 +2910,7 @@
         var coef_yg = yg;
         var coef_yb = yb;
       } else { // 3:YCbCr
-        var mat = [ // bt601
-          [  0.299,   0.587,   0.114 ],
-          [ -0.1687, -0.3313,  0.5000 ],
-          [  0.5000, -0.4187, -0.0813 ]
-        ];
+        var mat = compareUtil.colorMatrixBT601;
         var coef_xr = mat[1][0] * xr + mat[2][0] * xg;
         var coef_xg = mat[1][1] * xr + mat[2][1] * xg;
         var coef_xb = mat[1][2] * xr + mat[2][2] * xg;
