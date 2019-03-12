@@ -2782,13 +2782,21 @@
     var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
       updateFigure();
     });
+    var colorDistAuxType2 = makeModeSwitch('#colorDistAuxType2', 0, function(type) {
+      updateFigure();
+    });
     var updateAuxOption = function() {
       if (colorDistType.current() === 0 ||
           colorDistType.current() === 1 ||
           colorDistType.current() === 2) { // 0:RGB, 1:HSV, 2:HSL
         $('#colorDistAuxType').show();
+        $('#colorDistAuxType2').hide();
+      } else if (colorDistType.current() === 3) { // 3:YCbCr
+        $('#colorDistAuxType').hide();
+        $('#colorDistAuxType2').show();
       } else {
         $('#colorDistAuxType').hide();
+        $('#colorDistAuxType2').hide();
       }
     };
     updateAuxOption();
@@ -2843,7 +2851,8 @@
         p3d(256, 0, 256, 256)
       ]);
     };
-    var vertices3DYCbCr = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
+    var vertices3DYCbCr601 = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
+    var vertices3DYCbCr709 = makeVertices3DYCbCr(compareUtil.colorMatrixBT709);
     var vertexIndicesYCbCr = vertexIndicesCube.concat([
       [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
       [18, 21, 19, 22, 20, 23, 18], // lower hexagon
@@ -2910,7 +2919,9 @@
         var coef_yg = yg;
         var coef_yb = yb;
       } else { // 3:YCbCr
-        var mat = compareUtil.colorMatrixBT601;
+        var mat = colorDistAuxType2.current() === 0 ?
+            compareUtil.colorMatrixBT601 :
+            compareUtil.colorMatrixBT709;
         var coef_xr = mat[1][0] * xr + mat[2][0] * xg;
         var coef_xg = mat[1][1] * xr + mat[2][1] * xg;
         var coef_xb = mat[1][2] * xr + mat[2][2] * xg;
@@ -2953,8 +2964,9 @@
         colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
         (colorDistType.current() === 1 ||
          colorDistType.current() === 2) ? makeVertices3DCylinder(rotation) : // 1:HSV, 2:HSL
-        colorDistType.current() === 3 ? vertices3DYCbCr : // 3:YCbCr
-        vertices3DCIEXyy // 4:CIE xyY
+        colorDistType.current() === 3 ? ( // 3:YCbCr
+          colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
+        ) : vertices3DCIEXyy // 4:CIE xyY
       );
       var axesDesc = makeAxesDesc(v,
           colorDistType.current() === 0 ? vertexIndicesCube : // 0:RGB
