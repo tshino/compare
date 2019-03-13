@@ -2025,7 +2025,7 @@
     switch (data.cmd) {
     case 'calcHistogram':
       var img = entries[data.index[0]];
-      histogramDialog.updateFigure(data.type, img, data.result);
+      histogramDialog.updateFigure(data.type, data.auxTypes, img, data.result);
       break;
     case 'calcWaveform':
       var img = entries[data.index[0]];
@@ -2104,21 +2104,35 @@
   };
   // Histogram
   var histogramDialog = (function() {
-    var histogramType = makeModeSwitch('#histogramType', 0, function(type) {
+    var repaint = function() {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
         img.histogram = null;
       }
       updateTable();
+    };
+    var histogramType = makeModeSwitch('#histogramType', 0, function() {
+      repaint();
+      updateAuxOption();
     });
+    var histogramAuxType2 = makeModeSwitch('#histogramAuxType2', 0, repaint);
+    var updateAuxOption = function() {
+      if (histogramType.current() === 1) {
+        $('#histogramAuxType2').show();
+      } else {
+        $('#histogramAuxType2').hide();
+      }
+    };
+    updateAuxOption();
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcHistogram',
         type:     histogramType.current(),
+        auxTypes: [histogramAuxType2.current()],
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var makeFigure = function(type, hist) {
+    var makeFigure = function(type, auxType2, hist) {
       var margin = 32;
       var fig = figureUtil.makeBlankFigure(768, 512 + margin);
       var context = fig.context;
@@ -2166,9 +2180,9 @@
       figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
       return fig.canvas;
     };
-    var updateFigure = function(type, img, hist) {
-      if (type === histogramType.current()) {
-        img.histogram = makeFigure(type, hist);
+    var updateFigure = function(type, auxTypes, img, hist) {
+      if (type === histogramType.current() && auxTypes[0] === histogramAuxType2.current()) {
+        img.histogram = makeFigure(type, auxTypes[0], hist);
         updateTable();
       }
     };

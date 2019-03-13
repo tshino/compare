@@ -15,7 +15,8 @@ self.addEventListener('message', function(e) {
   switch (data.cmd) {
   case 'calcHistogram':
     result.type   = data.type;
-    result.result   = calcHistogram(data.imageData[0], data.type);
+    result.auxTypes = data.auxTypes;
+    result.result   = calcHistogram(data.imageData[0], data.type, data.auxTypes);
     break;
   case 'calcWaveform':
     result.type   = data.type;
@@ -69,7 +70,7 @@ var srgb255ToLinear255 = (function() {
   return srgb255ToLinear255;
 })();
 
-function calcHistogram( imageData, type )
+function calcHistogram( imageData, type, auxTypes )
 {
   var w = imageData.width;
   var h = imageData.height;
@@ -81,11 +82,16 @@ function calcHistogram( imageData, type )
       hist[imageData.data[i + 2] + 512] += 1;
     }
   } else { // Luminance
+    if (auxTypes[0] === 0) { // 0: bt601
+      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+    } else { // 1: bt709
+      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    }
     for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       var r = imageData.data[i + 0];
       var g = imageData.data[i + 1];
       var b = imageData.data[i + 2];
-      var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+      var y = Math.round(m0 * r + m1 * g + m2 * b);
       hist[y] += 1;
     }
   }
@@ -687,7 +693,7 @@ var calcToneCurve = function(a, b, type, options) {
       components : []
   };
   // tone curve by Histogram
-  var hist = [calcHistogram(a, type), calcHistogram(b, type)];
+  var hist = [calcHistogram(a, type, [0]), calcHistogram(b, type, [0])];
   var total = [a.width * a.height, b.width * b.height ];
   if (type === 0) { // RGB
     result.components[0] = calcToneCurveByHistogram(hist, 0, total);

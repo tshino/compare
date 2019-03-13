@@ -20,6 +20,7 @@
         var task = {
           cmd: 'calcHistogram',
           type: 0, // RGB
+          auxTypes: [0],
           imageData: [{
             width: 4,
             height: 4,
@@ -55,6 +56,7 @@
         var task = {
           cmd: 'calcHistogram',
           type: 1, // Grayscale
+          auxTypes: [0],
           imageData: [{
             width: 4,
             height: 4,
