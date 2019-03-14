@@ -20,8 +20,8 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcWaveform':
     result.type   = data.type;
-    result.auxType  = data.auxType;
-    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.flipped, data.type, data.auxType);
+    result.auxTypes = data.auxTypes;
+    result.result = calcWaveform(data.imageData[0], data.histW, data.transposed, data.flipped, data.type, data.auxTypes);
     result.histW = data.histW;
     break;
   case 'calcVectorscope':
@@ -97,7 +97,7 @@ function calcHistogram( imageData, type, auxTypes )
   }
   return hist;
 }
-function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
+function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
 {
   var w = transposed ? imageData.height : imageData.width;
   var h = transposed ? imageData.width : imageData.height;
@@ -119,7 +119,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
-        if (auxType === 1) {
+        if (auxTypes[0] === 1) {
           r = Math.round(srgb255ToLinear255[r]);
           g = Math.round(srgb255ToLinear255[g]);
           b = Math.round(srgb255ToLinear255[b]);
@@ -132,6 +132,11 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
   } else { // Luminance
     var sx = transposed ? h * 4 : 4;
     var sy = transposed ? 4 : w * 4;
+    if (auxTypes[1] === 0) { // 0: bt601
+      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+    } else { // 1: bt709
+      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    }
     for (var x = 0; x < w; ++x) {
       var i = x * sx;
       var off = histOff[x];
@@ -139,7 +144,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxType )
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
-        var my = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        var my = Math.round(m0 * r + m1 * g + m2 * b);
         hist[off + my] += 1;
       }
     }

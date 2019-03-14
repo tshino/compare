@@ -2029,7 +2029,7 @@
       break;
     case 'calcWaveform':
       var img = entries[data.index[0]];
-      waveformDialog.updateFigure(data.type, data.auxType, img, data.histW, data.result);
+      waveformDialog.updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
       break;
     case 'calcVectorscope':
       vectorscopeDialog.updateFigure(data.type, data.color, data.auxTypes, entries[data.index[0]], data.result);
@@ -2214,11 +2214,14 @@
       updateAuxOption();
     });
     var waveformAuxType = makeModeSwitch('#waveformAuxType', 0, repaint);
+    var waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
     var updateAuxOption = function() {
       if (waveformType.current() === 0) {
         $('#waveformAuxType').show();
+        $('#waveformAuxType2').hide();
       } else {
         $('#waveformAuxType').hide();
+        $('#waveformAuxType2').show();
       }
     };
     updateAuxOption();
@@ -2226,7 +2229,7 @@
       taskQueue.addTask({
         cmd:      'calcWaveform',
         type:     waveformType.current(),
-        auxType:  waveformAuxType.current(),
+        auxTypes: [waveformAuxType.current(), waveformAuxType2.current()],
         index:    [img.index],
         histW:    Math.min(img.width, 1024),
         transposed: img.transposed,
@@ -2286,8 +2289,10 @@
       context.stroke();
       return fig.canvas;
     };
-    var updateFigure = function(type, auxType, img, histW, hist) {
-      if (type === waveformType.current() && auxType === waveformAuxType.current()) {
+    var updateFigure = function(type, auxTypes, img, histW, hist) {
+      if (type === waveformType.current() &&
+          auxTypes[0] === waveformAuxType.current() &&
+          auxTypes[1] === waveformAuxType2.current()) {
         var w = img.width;
         var h = img.height;
         img.waveform = makeFigure(type, w, h, histW, hist);
