@@ -3108,7 +3108,7 @@
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
-        type:     1,
+        type:     0,
         baseSize: 512,
         index:    [img.index]
       }, attachImageDataToTask);
@@ -3172,6 +3172,19 @@
       var w = waveform3D.width;
       var h = waveform3D.height;
       var waveform = waveform3D.waveform;
+      if (type === 0) { // Y
+        if (waveform3D.Y601 === undefined) {
+          waveform3D.Y601 = new Uint8Array(w * h);
+          for (var k = 0, n = w * h; k < n; k++) {
+            var r = waveform[k * 3];
+            var g = waveform[k * 3 + 1];
+            var b = waveform[k * 3 + 2];
+            var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+            waveform3D.Y601[k] = y;
+          }
+        }
+        var waveformY = waveform3D.Y601;
+      }
       var distMax = w * h * 1; // common for all type;
       var dist = new Uint32Array(320 * 320);
       var colorMap = new Float32Array(320 * 320 * 3);
@@ -3185,12 +3198,12 @@
       var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
       var toLinear = compareUtil.srgb255ToLinear8;
       for (var y = 0, k = 0; y < h; y += 1) {
-        for (var x = 0; x < w; x += 1) {
-          var r = waveform[k];
-          var g = waveform[k + 1];
-          var b = waveform[k + 2];
+        for (var x = 0; x < w; x += 1, k += 1) {
+          var r = waveform[k * 3];
+          var g = waveform[k * 3 + 1];
+          var b = waveform[k * 3 + 2];
           var c =
-              type === 0 ? waveform[k + 3] : // Y
+              type === 0 ? waveformY[k] : // Y
               type === 1 ? r : // R
               type === 2 ? g : // G
               type === 3 ? b : // B
@@ -3204,7 +3217,6 @@
           colorMap[offset] += r;
           colorMap[offset + 102400] += g;
           colorMap[offset + 204800] += b;
-          k += 4;
         }
       }
       var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
