@@ -3584,6 +3584,24 @@
         toneCurveResult.result = null;
       }
     };
+    var updateAsync = function() {
+      toneCurveResult.base   = baseImageIndex;
+      toneCurveResult.target = targetImageIndex;
+      toneCurveResult.type   = toneCurveType.current();
+      toneCurveResult.result = null;
+      discardTasksOfCommand('calcToneCurve');
+      if (baseImageIndex !== targetImageIndex) {
+        taskQueue.addTask({
+          cmd:      'calcToneCurve',
+          type:     toneCurveType.current(),
+          index:    [baseImageIndex, targetImageIndex],
+          options:  {
+            orientationA: entries[baseImageIndex].orientation,
+            orientationB: entries[targetImageIndex].orientation
+          }
+        }, attachImageDataToTask);
+      }
+    };
     var makeToneMapFigure = function(toneMapData, type) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       var dist = toneMapData.dist;
@@ -3660,22 +3678,7 @@
       if (toneCurveResult.base !== baseImageIndex ||
           toneCurveResult.target !== targetImageIndex ||
           toneCurveResult.type !== toneCurveType.current()) {
-        toneCurveResult.base   = baseImageIndex;
-        toneCurveResult.target = targetImageIndex;
-        toneCurveResult.type   = toneCurveType.current();
-        toneCurveResult.result = null;
-        discardTasksOfCommand('calcToneCurve');
-        if (baseImageIndex !== targetImageIndex) {
-          taskQueue.addTask({
-            cmd:      'calcToneCurve',
-            type:     toneCurveType.current(),
-            index:    [a.index, b.index],
-            options:  {
-              orientationA: entries[a.index].orientation,
-              orientationB: entries[b.index].orientation
-            }
-          }, attachImageDataToTask);
-        }
+        updateAsync();
       }
       var figW = 320, figH = 320, figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
