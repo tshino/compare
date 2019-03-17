@@ -3108,7 +3108,6 @@
     var updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
-        type:     0,
         baseSize: 512,
         index:    [img.index]
       }, attachImageDataToTask);

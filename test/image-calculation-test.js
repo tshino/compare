@@ -91,12 +91,10 @@
       return function(done) {
         var task = {
           cmd: 'calc3DWaveform',
-          type: input.type,
           imageData: [input.imageData]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calc3DWaveform', data.cmd, 'cmd' + label );
-          EXPECT_EQ( expected.type, data.type, 'type' + label );
           EXPECT_EQ( expected.width, data.result.width, 'width' + label );
           EXPECT_EQ( expected.height, data.result.height, 'height' + label );
           EXPECT_EQ( expected.waveform.length, data.result.waveform.length, 'waveform.length' + label );
@@ -147,37 +145,29 @@
     }
     var tests = [];
     tests.push(makeAsyncTest('image40x30', {
-      type: 0,
       imageData: image40x30
     }, {
-      type: 0,
       width: 256,
       height: 192,
       waveform: expected40x30
     }));
     tests.push(makeAsyncTest('image30x40', {
-      type: 0,
       imageData: image30x40
     }, {
-      type: 0,
       width: 192,
       height: 256,
       waveform: expected30x40
     }));
     tests.push(makeAsyncTest('image1x999', {
-      type: 0,
       imageData: image1x999
     }, {
-      type: 0,
       width: 1,
       height: 256,
       waveform: expected1x999
     }));
     tests.push(makeAsyncTest('image999x1', {
-      type: 0,
       imageData: image999x1
     }, {
-      type: 0,
       width: 256,
       height: 1,
       waveform: expected999x1
