@@ -3095,13 +3095,18 @@
     var waveform3DAuxType = makeModeSwitch('#waveform3DAuxType', 0, function(type) {
       updateFigure();
     });
+    var waveform3DAuxType2 = makeModeSwitch('#waveform3DAuxType2', 0, function(type) {
+      updateFigure();
+    });
     var updateAuxOption = function() {
       if (waveform3DType.current() === 1 ||
           waveform3DType.current() === 2 ||
           waveform3DType.current() === 3) { // R,G,B
         $('#waveform3DAuxType').show();
+        $('#waveform3DAuxType2').hide();
       } else {
         $('#waveform3DAuxType').hide();
+        $('#waveform3DAuxType2').show();
       }
     };
     updateAuxOption();
@@ -3172,17 +3177,28 @@
       var h = waveform3D.height;
       var waveform = waveform3D.waveform;
       if (type === 0) { // Y
-        if (waveform3D.Y601 === undefined) {
-          waveform3D.Y601 = new Uint8Array(w * h);
+        var makeWaveformY = function(waveform, mat) {
+          var m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
+          var waveformY = new Uint8Array(w * h);
           for (var k = 0, n = w * h; k < n; k++) {
             var r = waveform[k * 3];
             var g = waveform[k * 3 + 1];
             var b = waveform[k * 3 + 2];
-            var y = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
-            waveform3D.Y601[k] = y;
+            waveformY[k] = Math.round(m0 * r + m1 * g + m2 * b);
           }
+          return waveformY;
+        };
+        if (waveform3DAuxType2.current() === 0) { // 0:bt601
+          if (waveform3D.Y601 === undefined) {
+            waveform3D.Y601 = makeWaveformY(waveform, compareUtil.colorMatrixBT601);
+          }
+          var waveformY = waveform3D.Y601;
+        } else { // 1:bt709
+          if (waveform3D.Y709 === undefined) {
+            waveform3D.Y709 = makeWaveformY(waveform, compareUtil.colorMatrixBT709);
+          }
+          var waveformY = waveform3D.Y709;
         }
-        var waveformY = waveform3D.Y601;
       }
       var distMax = w * h * 1; // common for all type;
       var dist = new Uint32Array(320 * 320);
