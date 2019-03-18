@@ -2052,7 +2052,7 @@
       metricsDialog.updateTable();
       break;
     case 'calcToneCurve':
-      toneCurveDialog.updateFigure(data.type, data.index[0], data.index[1], data.result);
+      toneCurveDialog.updateFigure(data.type, data.auxTypes, data.index[0], data.index[1], data.result);
       break;
     case 'calcOpticalFlow':
       opticalFlowDialog.updateFigure(data.index[0], data.index[1], data.result);
@@ -3573,11 +3573,23 @@
   // Tone Curve Estimation
   var toneCurveDialog = (function() {
     var toneCurveResult = {};
-    var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
+    var repaint = function() {
       discardTasksOfCommand('calcToneCurve');
       toneCurveResult = {};
       updateTable();
+    };
+    var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
+      repaint();
+      updateAuxOption();
     });
+    var toneCurveAuxType2 = makeModeSwitch('#toneCurveAuxType2', 0, repaint);
+    var updateAuxOption = function() {
+      if (toneCurveType.current() === 0) {
+        $('#toneCurveAuxType2').hide();
+      } else {
+        $('#toneCurveAuxType2').show();
+      }
+    };
     var onRemoveEntry = function(index) {
       if (toneCurveResult.base === index || toneCurveResult.target === index) {
         $('#toneCurveResult *').remove();
@@ -3588,12 +3600,14 @@
       toneCurveResult.base   = baseImageIndex;
       toneCurveResult.target = targetImageIndex;
       toneCurveResult.type   = toneCurveType.current();
+      toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
       toneCurveResult.result = null;
       discardTasksOfCommand('calcToneCurve');
       if (baseImageIndex !== targetImageIndex) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
           type:     toneCurveType.current(),
+          auxTypes: [toneCurveAuxType2.current()],
           index:    [baseImageIndex, targetImageIndex],
           options:  {
             orientationA: entries[baseImageIndex].orientation,
@@ -3677,7 +3691,8 @@
       var b = entries[targetImageIndex];
       if (toneCurveResult.base !== baseImageIndex ||
           toneCurveResult.target !== targetImageIndex ||
-          toneCurveResult.type !== toneCurveType.current()) {
+          toneCurveResult.type !== toneCurveType.current() ||
+          toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
         updateAsync();
       }
       var figW = 320, figH = 320, figMargin = 8;
@@ -3699,11 +3714,13 @@
         updateTableDOM();
       }
     };
-    var updateFigure = function(type, baseIndex, targetIndex, result) {
+    var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveType.current() &&
+          auxTypes[0] === toneCurveAuxType2.current() &&
           baseIndex === toneCurveResult.base &&
           targetIndex === toneCurveResult.target) {
         toneCurveResult.type = type;
+        toneCurveResult.auxTypes = auxTypes;
         toneCurveResult.result = result;
       }
       updateTable();

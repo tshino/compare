@@ -728,10 +728,11 @@
     ]};
     jsTestUtil.makeSequentialTest([
       function(done) {
-        var task = { cmd: 'calcToneCurve', type: 0, imageData: [image1, image2] };
+        var task = { cmd: 'calcToneCurve', type: 0, auxTypes: [0], imageData: [image1, image2] };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcToneCurve', data.cmd );
           EXPECT_EQ( 0, data.type );
+          EXPECT_EQ( 0, data.auxTypes[0] );
           EXPECT_EQ( 3, data.result.components.length );
           EXPECT( data.result.toneMap );
           EXPECT_EQ( 256 * 256 * 3, data.result.toneMap.dist.length );
@@ -754,10 +755,11 @@
       },
       function(done) {
         var options = { orientationA: 1, orientationB: 8 };
-        var task = { cmd: 'calcToneCurve', type: 0, imageData: [image1, image3], options };
+        var task = { cmd: 'calcToneCurve', type: 0, auxTypes: [0], imageData: [image1, image3], options };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcToneCurve', data.cmd );
           EXPECT_EQ( 0, data.type );
+          EXPECT_EQ( 0, data.auxTypes[0] );
           EXPECT_EQ( 3, data.result.components.length );
           EXPECT( data.result.toneMap );
           EXPECT_EQ( 256 * 256 * 3, data.result.toneMap.dist.length );

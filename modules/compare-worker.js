@@ -46,7 +46,8 @@ self.addEventListener('message', function(e) {
     break;
   case 'calcToneCurve':
     result.type   = data.type;
-    result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type, data.options);
+    result.auxTypes   = data.auxTypes;
+    result.result = calcToneCurve(data.imageData[0], data.imageData[1], data.type, data.auxTypes, data.options);
     break;
   case 'calcOpticalFlow':
     result.result = calcOpticalFlow(data.imageData[0], data.imageData[1], data.options);
@@ -627,7 +628,7 @@ var calcToneCurveByHistogram = function(hist, offset, total) {
   }
   return result;
 };
-var calcToneMap = function(a, b, type) {
+var calcToneMap = function(a, b, type, auxTypes) {
   var w = Math.min(a.width, b.width);
   var h = Math.min(a.height, b.height);
   var sampleA = compareImageUtil.makeImage(a);
@@ -658,6 +659,11 @@ var calcToneMap = function(a, b, type) {
       }
     }
   } else { // Luminance
+    if (auxTypes[0] === 0) { // 0: bt601
+      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+    } else { // 1: bt709
+      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    }
     for (var y = 0; y < h; ++y) {
       var ka = 4 * (sampleA.offset + y * sampleA.pitch);
       var kb = 4 * (sampleB.offset + y * sampleB.pitch);
@@ -665,11 +671,11 @@ var calcToneMap = function(a, b, type) {
         var ra = sampleA.data[ka + 0];
         var ga = sampleA.data[ka + 1];
         var ba = sampleA.data[ka + 2];
-        var ya = Math.round(0.299 * ra + 0.587 * ga + 0.114 * ba);
+        var ya = Math.round(m0 * ra + m1 * ga + m2 * ba);
         var rb = sampleB.data[kb + 0];
         var gb = sampleB.data[kb + 1];
         var bb = sampleB.data[kb + 2];
-        var yb = Math.round(0.299 * rb + 0.587 * gb + 0.114 * bb);
+        var yb = Math.round(m0 * rb + m1 * gb + m2 * bb);
         dist[ya + 256 * (255 - yb)] += 1;
       }
     }
@@ -679,13 +685,13 @@ var calcToneMap = function(a, b, type) {
     max : w * h
   };
 };
-var calcToneCurve = function(a, b, type, options) {
+var calcToneCurve = function(a, b, type, auxTypes, options) {
   options = options || {};
   var result = {
       components : []
   };
   // tone curve by Histogram
-  var hist = [calcHistogram(a, type, [0]), calcHistogram(b, type, [0])];
+  var hist = [calcHistogram(a, type, auxTypes), calcHistogram(b, type, auxTypes)];
   var total = [a.width * a.height, b.width * b.height ];
   if (type === 0) { // RGB
     result.components[0] = calcToneCurveByHistogram(hist, 0, total);
@@ -703,7 +709,7 @@ var calcToneCurve = function(a, b, type, options) {
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  result.toneMap = calcToneMap(a, b, type);
+  result.toneMap = calcToneMap(a, b, type, auxTypes);
   return result;
 };
 
