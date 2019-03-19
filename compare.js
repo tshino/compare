@@ -3167,6 +3167,17 @@
       );
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
     };
+    var makeWaveformY = function(n, waveform, mat) {
+      var m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
+      var waveformY = new Uint8Array(n);
+      for (var k = 0; k < n; k++) {
+        var r = waveform[k * 3];
+        var g = waveform[k * 3 + 1];
+        var b = waveform[k * 3 + 2];
+        waveformY[k] = Math.round(m0 * r + m1 * g + m2 * b);
+      }
+      return waveformY;
+    };
     var makeFigure = function(fig, waveform3D) {
       var type = waveform3DType.current();
       if (waveform3DAuxType.current() === 1 && 1 <= type && type <= 3 ) {
@@ -3177,25 +3188,14 @@
       var h = waveform3D.height;
       var waveform = waveform3D.waveform;
       if (type === 0) { // Y
-        var makeWaveformY = function(waveform, mat) {
-          var m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
-          var waveformY = new Uint8Array(w * h);
-          for (var k = 0, n = w * h; k < n; k++) {
-            var r = waveform[k * 3];
-            var g = waveform[k * 3 + 1];
-            var b = waveform[k * 3 + 2];
-            waveformY[k] = Math.round(m0 * r + m1 * g + m2 * b);
-          }
-          return waveformY;
-        };
         if (waveform3DAuxType2.current() === 0) { // 0:bt601
           if (waveform3D.Y601 === undefined) {
-            waveform3D.Y601 = makeWaveformY(waveform, compareUtil.colorMatrixBT601);
+            waveform3D.Y601 = makeWaveformY(w * h, waveform, compareUtil.colorMatrixBT601);
           }
           var waveformY = waveform3D.Y601;
         } else { // 1:bt709
           if (waveform3D.Y709 === undefined) {
-            waveform3D.Y709 = makeWaveformY(waveform, compareUtil.colorMatrixBT709);
+            waveform3D.Y709 = makeWaveformY(w * h, waveform, compareUtil.colorMatrixBT709);
           }
           var waveformY = waveform3D.Y709;
         }
