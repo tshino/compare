@@ -494,6 +494,17 @@
     });
   };
 
+  var enumWebPChunks = function(binary) {
+    var chunks = [];
+    for (var p = 12; p + 8 <= binary.length; ) {
+      var chunk = binary.big32(p);
+      var len = binary.little32(p + 4);
+      chunks.push(chunk);
+      p += 8 + len + (len % 2);
+    }
+    return chunks;
+  };
+
   var formatReader = (function() {
      var formatInfo = function(desc, color) {
        return {
@@ -872,7 +883,27 @@
       return formatInfo('TIFF', color);
     };
     var detectWebP = function(binary) {
-      return formatInfo('WebP');
+      var magic4 = binary.length < 16 ? 0 : binary.big32(12);
+      var desc = 'WebP';
+      if (magic4 === 0x56503820 /* 'VP8 ' */) {
+        desc += ' (Lossy)';
+      } else if (magic4 === 0x5650384C /* 'VP8L' */) {
+        desc += ' (Lossless)';
+      } else if (magic4 === 0x56503858 /* 'VP8X' */) {
+        var flags = binary.length < 24 ? 0 : binary.big32(20);
+        var animated = (flags & 0x02000000) !== 0;
+        if (animated) {
+          desc += ' (Animated)';
+        } else {
+          var chunks = enumWebPChunks(binary);
+          if (0 <= chunks.indexOf(0x56503820 /* 'VP8 ' */)) {
+            desc += ' (Lossy)';
+          } else if (0 <= chunks.indexOf(0x5650384C /* 'VP8L' */)) {
+            desc += ' (Lossless)';
+          }
+        }
+      }
+      return formatInfo(desc);
     };
     var detectSVG = function(binary, magic, magic2) {
       if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
