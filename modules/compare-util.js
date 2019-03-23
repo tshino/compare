@@ -910,7 +910,12 @@
       if (binary.length < offset + 5 || binary.at(offset) != 0x2F) {
         return 'unknown';
       }
-      hasAlpha = hasAlpha || (binary.at(offset + 4) & 0x10) !== 0;
+      var flags = binary.at(offset + 4) & 0xf0;
+      var version = flags & 0xe0;
+      if (version !== 0) {
+        return 'unknown';
+      }
+      hasAlpha = hasAlpha || (flags & 0x10) !== 0;
       if (hasAlpha) {
         return 'RGBA 8.8.8.8 (32bpp)';
       } else {
