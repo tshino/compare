@@ -905,6 +905,18 @@
         return 'YCbCr 8.8.8 (12bpp 4:2:0)';
       }
     };
+    var readWebPLosslessColorFormat = function(binary, offset, hasAlpha) {
+      // check signature
+      if (binary.length < offset + 5 || binary.at(offset) != 0x2F) {
+        return 'unknown';
+      }
+      hasAlpha = hasAlpha || (binary.at(offset + 4) & 0x10) !== 0;
+      if (hasAlpha) {
+        return 'RGBA 8.8.8.8 (32bpp)';
+      } else {
+        return 'RGB 8.8.8 (24bpp)';
+      }
+    };
     var detectWebP = function(binary) {
       var magic4 = binary.length < 16 ? 0 : binary.big32(12);
       var desc = 'WebP';
@@ -914,6 +926,7 @@
         color = readVP8ColorFormat(binary, 20, false);
       } else if (magic4 === 0x5650384C /* 'VP8L' */) {
         desc += ' (Lossless)';
+        color = readWebPLosslessColorFormat(binary, 20, false);
       } else if (magic4 === 0x56503858 /* 'VP8X' */) {
         var flags = binary.length < 24 ? 0 : binary.big32(20);
         var animated = (flags & 0x02000000) !== 0;
@@ -935,6 +948,9 @@
               }
               lossy += 1;
             } else if (f === 0x5650384C /* 'VP8L' */) {
+              if (lossless === 0) {
+                color = readWebPLosslessColorFormat(binary, p + 8, hasAlpha);
+              }
               lossless += 1;
             } else {
               unknown += 1;
@@ -959,6 +975,7 @@
             color = readVP8ColorFormat(binary, vp8[0] + 8, hasAlpha);
           } else if (0 < vp8l.length) {
             desc += ' (Lossless)';
+            color = readWebPLosslessColorFormat(binary, vp8l[0] + 8, hasAlpha);
           }
         }
       }
