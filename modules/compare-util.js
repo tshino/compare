@@ -917,6 +917,7 @@
       } else if (magic4 === 0x56503858 /* 'VP8X' */) {
         var flags = binary.length < 24 ? 0 : binary.big32(20);
         var animated = (flags & 0x02000000) !== 0;
+        var hasAlpha = (flags & 0x10000000) !== 0;
         if (animated) {
           var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
           var lossy = 0, lossless = 0, unknown = 0;
@@ -924,7 +925,7 @@
             p += 24;
             var f = binary.length < p + 8 ? 0 : binary.big32(p);
             if (f === 0x414C5048 /* 'ALPH' */) {
-              var hasAlpha = true;
+              hasAlpha = true;
               p += 8 + ((binary.little32(p + 4) + 1) & 0xfffffffe);
               f = binary.length < p + 8 ? 0 : binary.big32(p);
             }
@@ -954,7 +955,7 @@
           var vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
           if (0 < vp8.length) {
             desc += ' (Lossy)';
-            var hasAlpha = 0 < alpha.length && alpha[0] < vp8[0];
+            hasAlpha = hasAlpha || (0 < alpha.length && alpha[0] < vp8[0]);
             color = readVP8ColorFormat(binary, vp8[0] + 8, hasAlpha);
           } else if (0 < vp8l.length) {
             desc += ' (Lossless)';
