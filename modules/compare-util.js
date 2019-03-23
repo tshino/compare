@@ -494,15 +494,17 @@
     });
   };
 
-  var enumWebPChunks = function(binary) {
-    var chunks = [];
+  var findWebPChunk = function(binary, target) {
+    var offsets = [];
     for (var p = 12; p + 8 <= binary.length; ) {
       var chunk = binary.big32(p);
       var len = binary.little32(p + 4);
-      chunks.push(chunk);
+      if (chunk === target) {
+        offsets.push(p);
+      }
       p += 8 + len + (len % 2);
     }
-    return chunks;
+    return offsets;
   };
 
   var formatReader = (function() {
@@ -893,12 +895,37 @@
         var flags = binary.length < 24 ? 0 : binary.big32(20);
         var animated = (flags & 0x02000000) !== 0;
         if (animated) {
-          desc += ' (Animated)';
+          var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
+          var lossy = 0, lossless = 0, unknown = 0;
+          for (var i = 0, p; p = anmf[i]; i++) {
+            var f = binary.length < p + 32 ? 0 : binary.big32(p + 24);
+            if (f === 0x414C5048 /* 'ALPH' */) {
+              p += 32 + ((binary.little32(p + 28) + 1) & 0xfffffffe);
+              f = binary.length < p + 8 ? 0 : binary.big32(p);
+            }
+            if (f === 0x56503820 /* 'VP8 ' */) {
+              lossy += 1;
+            } else if (f === 0x5650384C /* 'VP8L' */) {
+              lossless += 1;
+            } else {
+              unknown += 1;
+            }
+          }
+          if (0 < lossy && 0 === lossless && unknown === 0) {
+            desc += ' (Animated Lossy)';
+          } else if (0 === lossy && 0 < lossless && unknown === 0) {
+            desc += ' (Animated Lossless)';
+          } else if (0 < lossy && 0 < lossless && unknown === 0) {
+            desc += ' (Animated Lossy+Lossless)';
+          } else {
+            desc += ' (Animated)';
+          }
         } else {
-          var chunks = enumWebPChunks(binary);
-          if (0 <= chunks.indexOf(0x56503820 /* 'VP8 ' */)) {
+          var vp8 = findWebPChunk(binary, 0x56503820 /* 'VP8 ' */);
+          var vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
+          if (0 < vp8.length) {
             desc += ' (Lossy)';
-          } else if (0 <= chunks.indexOf(0x5650384C /* 'VP8L' */)) {
+          } else if (0 < vp8l.length) {
             desc += ' (Lossless)';
           }
         }
