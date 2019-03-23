@@ -884,11 +884,30 @@
       //console.log('color', color);
       return formatInfo('TIFF', color);
     };
+    var readVP8ColorFormat = function(binary, offset) {
+      offset += 3;
+      // check start code '9D 01 2A'
+      if (binary.length < offset + 3 ||
+          binary.at(offset) !== 0x9D ||
+          binary.at(offset + 1) !== 0x01 ||
+          binary.at(offset + 2) !== 0x2A) {
+        return 'unknown';
+      }
+      offset += 7;
+      // check color space type bit
+      if (binary.length < offset + 1 ||
+          (binary.at(offset) & 0x80) !== 0) {
+        return 'unknown';
+      }
+      return 'YCbCr 8.8.8 (12bpp 4:2:0)';
+    };
     var detectWebP = function(binary) {
       var magic4 = binary.length < 16 ? 0 : binary.big32(12);
       var desc = 'WebP';
+      var color = undefined;
       if (magic4 === 0x56503820 /* 'VP8 ' */) {
         desc += ' (Lossy)';
+        color = readVP8ColorFormat(binary, 20);
       } else if (magic4 === 0x5650384C /* 'VP8L' */) {
         desc += ' (Lossless)';
       } else if (magic4 === 0x56503858 /* 'VP8X' */) {
@@ -898,12 +917,16 @@
           var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
           var lossy = 0, lossless = 0, unknown = 0;
           for (var i = 0, p; p = anmf[i]; i++) {
-            var f = binary.length < p + 32 ? 0 : binary.big32(p + 24);
+            p += 24;
+            var f = binary.length < p + 8 ? 0 : binary.big32(p);
             if (f === 0x414C5048 /* 'ALPH' */) {
-              p += 32 + ((binary.little32(p + 28) + 1) & 0xfffffffe);
+              p += 8 + ((binary.little32(p + 4) + 1) & 0xfffffffe);
               f = binary.length < p + 8 ? 0 : binary.big32(p);
             }
             if (f === 0x56503820 /* 'VP8 ' */) {
+              if (lossy === 0) {
+                color = readVP8ColorFormat(binary, p + 8);
+              }
               lossy += 1;
             } else if (f === 0x5650384C /* 'VP8L' */) {
               lossless += 1;
@@ -925,12 +948,13 @@
           var vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
           if (0 < vp8.length) {
             desc += ' (Lossy)';
+            color = readVP8ColorFormat(binary, vp8[0] + 8);
           } else if (0 < vp8l.length) {
             desc += ' (Lossless)';
           }
         }
       }
-      return formatInfo(desc);
+      return formatInfo(desc, color);
     };
     var detectSVG = function(binary, magic, magic2) {
       if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
