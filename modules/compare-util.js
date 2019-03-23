@@ -884,7 +884,7 @@
       //console.log('color', color);
       return formatInfo('TIFF', color);
     };
-    var readVP8ColorFormat = function(binary, offset) {
+    var readVP8ColorFormat = function(binary, offset, hasAlpha) {
       offset += 3;
       // check start code '9D 01 2A'
       if (binary.length < offset + 3 ||
@@ -899,7 +899,11 @@
           (binary.at(offset) & 0x80) !== 0) {
         return 'unknown';
       }
-      return 'YCbCr 8.8.8 (12bpp 4:2:0)';
+      if (hasAlpha) {
+        return 'YCbCr 8.8.8 (12bpp 4:2:0) + Alpha 8';
+      } else {
+        return 'YCbCr 8.8.8 (12bpp 4:2:0)';
+      }
     };
     var detectWebP = function(binary) {
       var magic4 = binary.length < 16 ? 0 : binary.big32(12);
@@ -907,7 +911,7 @@
       var color = undefined;
       if (magic4 === 0x56503820 /* 'VP8 ' */) {
         desc += ' (Lossy)';
-        color = readVP8ColorFormat(binary, 20);
+        color = readVP8ColorFormat(binary, 20, false);
       } else if (magic4 === 0x5650384C /* 'VP8L' */) {
         desc += ' (Lossless)';
       } else if (magic4 === 0x56503858 /* 'VP8X' */) {
@@ -920,12 +924,13 @@
             p += 24;
             var f = binary.length < p + 8 ? 0 : binary.big32(p);
             if (f === 0x414C5048 /* 'ALPH' */) {
+              var hasAlpha = true;
               p += 8 + ((binary.little32(p + 4) + 1) & 0xfffffffe);
               f = binary.length < p + 8 ? 0 : binary.big32(p);
             }
             if (f === 0x56503820 /* 'VP8 ' */) {
               if (lossy === 0) {
-                color = readVP8ColorFormat(binary, p + 8);
+                color = readVP8ColorFormat(binary, p + 8, hasAlpha);
               }
               lossy += 1;
             } else if (f === 0x5650384C /* 'VP8L' */) {
@@ -944,11 +949,13 @@
             desc += ' (Animated)';
           }
         } else {
+          var alpha = findWebPChunk(binary, 0x414C5048 /* 'ALPH' */);
           var vp8 = findWebPChunk(binary, 0x56503820 /* 'VP8 ' */);
           var vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
           if (0 < vp8.length) {
             desc += ' (Lossy)';
-            color = readVP8ColorFormat(binary, vp8[0] + 8);
+            var hasAlpha = 0 < alpha.length && alpha[0] < vp8[0];
+            color = readVP8ColorFormat(binary, vp8[0] + 8, hasAlpha);
           } else if (0 < vp8l.length) {
             desc += ' (Lossless)';
           }
