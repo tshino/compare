@@ -869,6 +869,13 @@
                   bitsPerSample[0] === bitsPerSample[1] &&
                   bitsPerSample[0] === bitsPerSample[2] &&
                   0 <= [8, 16].indexOf(bitsPerSample[0])) {
+                if (samplesPerPixel === 4 &&
+                    bitsPerSample[0] === bitsPerSample[3] &&
+                    extraSamples.length === 0) {
+                  // No ExtraSamples is illegal but may happen
+                  // https://github.com/tshino/compare/issues/85
+                  maskIndex = 0;
+                }
                 color = makeAlphaNotation('RGB', [0, 1, 2], 'RGBA');
               }
               break;
