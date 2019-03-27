@@ -4320,19 +4320,11 @@
     var colorSpace = $('#altViewColorSpace').val();
     var mapping = $('.altViewMapping').val();
     var component = null;
+    var alphaEnabled = $('#altViewEnableAlpha').prop('checked');
     var enableContour = false;
     var colorSpaces = {
       'rgb': {
         modeSwitch: '#altViewModeSwRGB',
-        components: [ 'R', 'G', 'B' ],
-        coef: [
-          [ 1, 0, 0, 0, 0 ],
-          [ 0, 1, 0, 0, 0 ],
-          [ 0, 0, 1, 0, 0 ]
-        ]
-      },
-      'rgba': {
-        modeSwitch: '#altViewModeSwRGBA',
         components: [ 'R', 'G', 'B', 'A' ],
         coef: [
           [ 1, 0, 0, 0, 0 ],
@@ -4343,20 +4335,22 @@
       },
       'ycbcr601': {
         modeSwitch: '#altViewModeSwYCbCr',
-        components: [ 'Y', 'Cb', 'Cr' ],
+        components: [ 'Y', 'Cb', 'Cr', 'A' ],
         coef: [
           [ 0.299, 0.587, 0.114, 0, 0 ],
           [ -0.1687, -0.3313, 0.5000, 0, 127.5 ],
-          [ 0.5000, -0.4187, -0.0813, 0, 127.5 ]
+          [ 0.5000, -0.4187, -0.0813, 0, 127.5 ],
+          [ 0, 0, 0, 1, 0 ]
         ]
       },
       'ycbcr709': {
         modeSwitch: '#altViewModeSwYCbCr',
-        components: [ 'Y', 'Cb', 'Cr' ],
+        components: [ 'Y', 'Cb', 'Cr', 'A' ],
         coef: [
           [ 0.2126, 0.7152, 0.0722, 0, 0 ],
           [ -0.1146, -0.3854, 0.5000, 0, 127.5 ],
-          [ 0.5000, -0.4542, -0.0458, 0, 127.5 ]
+          [ 0.5000, -0.4542, -0.0458, 0, 127.5 ],
+          [ 0, 0, 0, 1, 0 ]
         ]
       }
     };
@@ -4439,6 +4433,17 @@
       updateDOM();
       return false;
     });
+    $('#altViewEnableAlpha').on('click', function() {
+      alphaEnabled = $(this).prop('checked');
+      if (component !== null && component !== 0 &&
+          colorSpaces[colorSpace].components[component - 1] === 'A') {
+        component = 0;
+        updateModeIndicator();
+        updateDOM();
+      } else {
+        updateModeIndicator();
+      }
+    });
     var reset = function() {
       if (component !== null) {
         component = null;
@@ -4468,16 +4473,22 @@
       changeMode(/* reverse= */ true);
     };
     var enableAlpha = function() {
-      if (colorSpace === 'rgb') {
-        changeColorSpace('rgba');
+      if (!alphaEnabled) {
+        alphaEnabled = true;
+        $('#altViewEnableAlpha').prop('checked', true);
+        updateModeIndicator();
       }
     };
     var updateModeIndicator = function() {
       if (component !== null) {
         $('#altViewMode .mode-sw').css({ display: 'none' });
-        $(colorSpaces[colorSpace].modeSwitch).css({
-          display: ''
-        }).find('button').removeClass('current').eq(component).addClass('current');
+        var sw = $(colorSpaces[colorSpace].modeSwitch).css({ display: '' });
+        var buttons = sw.find('button').removeClass('current');
+        buttons.eq(component).addClass('current');
+        var alpha = colorSpaces[colorSpace].components.indexOf('A');
+        if (0 <= alpha) {
+          buttons.eq(alpha + 1).css({ display: alphaEnabled ? '' : 'none' });
+        }
         $('#altViewColorBar *').remove();
         if (!colorBars[mapping]) {
           colorBars[mapping] = makeColorBar(colorMaps[mapping]);

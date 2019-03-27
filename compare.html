@@ -160,23 +160,18 @@ var changeLang = function(lang) {
 				</div>
 				<div class="toolbarElement" style="vertical-align: bottom;">
 					<div id="altViewModeSwRGB" class="mode-sw">
-						<button>RGB</button>
-						<button>R</button>
-						<button>G</button>
-						<button>B</button>
-					</div>
-					<div id="altViewModeSwRGBA" class="mode-sw">
-						<button>RGBA</button>
+						<button>Full</button>
 						<button>R</button>
 						<button>G</button>
 						<button>B</button>
 						<button>A</button>
 					</div>
 					<div id="altViewModeSwYCbCr" class="mode-sw">
-						<button>YCbCr</button>
+						<button>Full</button>
 						<button>Y</button>
 						<button>Cb</button>
 						<button>Cr</button>
+						<button>A</button>
 					</div>
 				</div>
 				<div id="altViewColorBar" class="toolbarElement" style="vertical-align: bottom;">
@@ -186,7 +181,6 @@ var changeLang = function(lang) {
 					<span class="ja">色空間 :</span>
 					<select id="altViewColorSpace">
 						<option value="rgb">RGB</option>
-						<option value="rgba">RGBA</option>
 						<option value="ycbcr601">YCbCr (JPEG / BT.601)</option>
 						<option value="ycbcr709">YCbCr (BT.709 HD)</option>
 					</select>
@@ -203,6 +197,10 @@ var changeLang = function(lang) {
 						<option value="pseudocolor">疑似カラー</option>
 					</select>
 				</div>
+				<input type="checkbox" id="altViewEnableAlpha">
+					<span class="en">Alpha channel</span>
+					<span class="ja">アルファチャンネル</span>
+				</input>
 			</div>
 		</div>
 	</div>
