@@ -523,6 +523,7 @@ div.mode-sw, div.button-group
 {
     display     : inline-flex;
     padding     : 0px;
+    vertical-align: bottom;
 }
 div.mode-sw > button, div.button-group > button
 {
