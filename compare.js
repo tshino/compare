@@ -2214,6 +2214,7 @@
       updateAuxOption();
     });
     var waveformAuxType = makeModeSwitch('#waveformAuxType', 0, repaint);
+    var waveformColumnLayout = makeToggleSwitch('#waveformColumnLayout', true, repaint);
     var waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
     var updateAuxOption = function() {
       if (waveformType.current() === 0) {
@@ -2243,26 +2244,36 @@
         ++histN[x];
       }
       //
-      var fig = figureUtil.makeBlankFigure(histW, 256);
+      var figW = (type === 0 && waveformColumnLayout.current()) ? histW * 3 : histW;
+      var fig = figureUtil.makeBlankFigure(figW, 256);
       var context = fig.context;
-      var bits = context.createImageData(histW, 256);
-      var s = -4 * histW;
+      var bits = context.createImageData(figW, 256);
+      var s = -4 * figW;
+      for (var i = 0, n = figW * 256 * 4; i < n; i += 4) {
+        bits.data[i + 0] = 0;
+        bits.data[i + 1] = 0;
+        bits.data[i + 2] = 0;
+        bits.data[i + 3] = 255;
+      }
       for (var x = 0; x < histW; ++x) {
         var invMax = 1 / (histN[x] * h);
         if (type === 0) { // RGB
           var rOff = 256 * x;
           var gOff = 256 * (x + histW);
           var bOff = 256 * (x + 2 * histW);
-          var off = 4 * (255 * histW + x);
+          var off0 = 4 * (255 * figW + x);
+          var off1 = waveformColumnLayout.current() ? off0 + 4 * histW : off0;
+          var off2 = waveformColumnLayout.current() ? off1 + 4 * histW : off0;
           for (var y = 0; y < 256; ++y) {
             var cR = Math.round(255 * (1 - Math.pow(1 - hist[rOff + y] * invMax, 200.0)));
             var cG = Math.round(255 * (1 - Math.pow(1 - hist[gOff + y] * invMax, 200.0)));
             var cB = Math.round(255 * (1 - Math.pow(1 - hist[bOff + y] * invMax, 200.0)));
-            bits.data[off + 0] = cR;
-            bits.data[off + 1] = cG;
-            bits.data[off + 2] = cB;
-            bits.data[off + 3] = 255;
-            off += s;
+            bits.data[off0 + 0] = cR;
+            bits.data[off1 + 1] = cG;
+            bits.data[off2 + 2] = cB;
+            off0 += s;
+            off1 += s;
+            off2 += s;
           }
         } else { // Luminance
           var cOff = x * 256;
@@ -2272,7 +2283,6 @@
             bits.data[off + 0] = c;
             bits.data[off + 1] = c;
             bits.data[off + 2] = c;
-            bits.data[off + 3] = 255;
             off += s;
           }
         }

@@ -521,7 +521,7 @@ h3 img
 }
 div.mode-sw, div.button-group
 {
-    display     : flex;
+    display     : inline-flex;
     padding     : 0px;
 }
 div.mode-sw > button, div.button-group > button
