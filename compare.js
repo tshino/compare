@@ -4473,6 +4473,9 @@
     };
     var changeMode = function(reverse) {
       var numOptions = colorSpaces[colorSpace].components.length + 1;
+      if (!alphaEnabled && colorSpaces[colorSpace].components[numOptions - 2] === 'A') {
+        numOptions -= 1;
+      }
       component =
         component === null ? 0 :
         (reverse ? component + numOptions - 1 : component + 1) % numOptions;
