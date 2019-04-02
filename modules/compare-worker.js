@@ -769,15 +769,13 @@ function calcOpticalFlow( a, b, options ) {
   };
 }
 
-function calcDiff( a, b, options ) {
-  var ignoreAE = options.ignoreAE;
-
-  var makeDiff = function(a, b, out, summary) {
-    var histogram = summary.histogram;
-    var d0 = a.data, d1 = b.data, o = out.data;
-    var w = a.width, h = a.height;
-    var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
-    for (var y = 0; y < h; y++) {
+var makeDiffImage = function(a, b, ignoreAE, summary) {
+  var w = a.width, h = a.height;
+  var out = compareImageUtil.makeImage(w, h);
+  var histogram = summary.histogram;
+  var d0 = a.data, d1 = b.data, o = out.data;
+  var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
+  for (var y = 0; y < h; y++) {
       for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
         var r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
         var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
@@ -799,25 +797,28 @@ function calcDiff( a, b, options ) {
       i += (a.pitch - w) * 4;
       j += (b.pitch - w) * 4;
       k += (out.pitch - w) * 4;
-    }
-    var unmatch = 0;
-    var maxAE = 0;
-    var countIgnoreAE = 0;
-    for (var ae = 0; ae < 256; ae++) {
-      if (0 < histogram[ae]) {
-        maxAE = ae;
-        if (ignoreAE < ae) {
-          unmatch += histogram[ae];
-        } else if (0 < ae) {
-          countIgnoreAE += histogram[ae];
-        }
+  }
+  var unmatch = 0;
+  var maxAE = 0;
+  var countIgnoreAE = 0;
+  for (var ae = 0; ae < 256; ae++) {
+    if (0 < histogram[ae]) {
+      maxAE = ae;
+      if (ignoreAE < ae) {
+        unmatch += histogram[ae];
+      } else if (0 < ae) {
+        countIgnoreAE += histogram[ae];
       }
     }
-    summary.unmatch += unmatch;
-    summary.maxAE = Math.max(summary.maxAE, maxAE);
-    summary.countIgnoreAE += countIgnoreAE;
-    summary.total += w * h;
-  };
+  }
+  summary.unmatch += unmatch;
+  summary.maxAE = Math.max(summary.maxAE, maxAE);
+  summary.countIgnoreAE += countIgnoreAE;
+  summary.total += w * h;
+  return out;
+};
+
+function calcDiff( a, b, options ) {
   if (options.orientationA && options.orientationA !== 1) {
     a = compareImageUtil.applyOrientation(a, options.orientationA);
   }
@@ -867,7 +868,6 @@ function calcDiff( a, b, options ) {
                              regionW,
                              regionH);
   }
-  var diff = compareImageUtil.makeImage(regionW, regionH);
   var summary = {
     total: 0,
     countIgnoreAE: 0,
@@ -875,10 +875,11 @@ function calcDiff( a, b, options ) {
     maxAE: 0,
     histogram: new Uint32Array(256)
   };
-  makeDiff(a, b, diff, summary);
+  var ignoreAE = options.ignoreAE;
+  var image = makeDiffImage(a, b, ignoreAE, summary);
   summary.match = summary.total - summary.unmatch;
   return {
-    image:      diff,
+    image: image,
     summary:    summary
   };
 }
