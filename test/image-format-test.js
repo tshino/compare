@@ -39,6 +39,7 @@
     [ 'data/grayscale/perfect/grayscale_rgb888.bmp', 'BMP', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgb888.png', 'PNG', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgb888.tif', 'TIFF', 'RGB 8.8.8 (24bpp)' ],
+    [ 'data/grayscale/perfect/grayscale_rgb888.webp', 'WebP (Lossless)', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgb161616.png', 'PNG', 'RGB 16.16.16 (48bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgb161616.tif', 'TIFF', 'RGB 16.16.16 (48bpp)' ],
     [ 'data/grayscale/perfect/grayscale_rgbx8888.bmp', 'BMP', 'RGB 8.8.8 (32bpp)' ],
@@ -78,6 +79,7 @@
     [ 'data/grayscale/reduced/grayscale_y4.tif', 'TIFF', 'Grayscale 4 (4bpp)' ],
     [ 'data/grayscale/reduced/grayscale_rgb555.bmp', 'BMP', 'RGB 5.5.5 (16bpp)' ],
     [ 'data/grayscale/reduced/grayscale_rgba5551.bmp', 'BMP', 'RGBA 5.5.5.1 (16bpp)' ],
+    [ 'data/grayscale/reduced/grayscale_ycbcr888.webp', 'WebP (Lossy)', 'YCbCr 8.8.8 (12bpp 4:2:0)' ],
   ];
   TEST( 'compareUtil detectImageFormat grayscale perfect', { timeout: 5000 }, function test(done) {
     imageFormatDetectionTest(done, grayscalePerfectSamples);
@@ -89,6 +91,7 @@
     [ 'data/fullcolor/perfect/fullcolor_rgb888.bmp', 'BMP', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgb888.png', 'PNG', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgb888.tif', 'TIFF', 'RGB 8.8.8 (24bpp)' ],
+    [ 'data/fullcolor/perfect/fullcolor_rgb888.webp', 'WebP (Lossless)', 'RGB 8.8.8 (24bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgb161616.png', 'PNG', 'RGB 16.16.16 (48bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgb161616.tif', 'TIFF', 'RGB 16.16.16 (48bpp)' ],
     [ 'data/fullcolor/perfect/fullcolor_rgbx8888.bmp', 'BMP', 'RGB 8.8.8 (32bpp)' ],
@@ -124,6 +127,7 @@
     [ 'data/fullcolor/reduced/fullcolor_rgb565.bmp', 'BMP', 'RGB 5.6.5 (16bpp)' ],
     [ 'data/fullcolor/reduced/fullcolor_rgba5551.bmp', 'BMP', 'RGBA 5.5.5.1 (16bpp)' ],
     [ 'data/fullcolor/reduced/fullcolor_ycbcr888.jpg', 'JPEG', 'YCbCr 8.8.8 (24bpp 4:4:4)' ],
+    [ 'data/fullcolor/reduced/fullcolor_ycbcr888.webp', 'WebP (Lossy)', 'YCbCr 8.8.8 (12bpp 4:2:0)' ],
   ];
   TEST( 'compareUtil detectImageFormat fullcolor perfect', { timeout: 5000 }, function test(done) {
     imageFormatDetectionTest(done, fullcolorPerfectSamples);
