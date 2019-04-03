@@ -769,21 +769,22 @@ function calcOpticalFlow( a, b, options ) {
   };
 }
 
-var makeDiffImage = function(a, b, ignoreAE, summary) {
+var makeDiffImage = function(a, b, ignoreAE, type, summary) {
   var w = a.width, h = a.height;
   var out = compareImageUtil.makeImage(w, h);
   var histogram = summary.histogram;
   var d0 = a.data, d1 = b.data, o = out.data;
   var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
   for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
-        var r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
-        var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
+    for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
+      var r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
+      var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
+      var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
+      histogram[ae] += 1;
+      if (type === 0) { // 0:Red-Blue
         var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.30 / 255));
-        var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
-        histogram[ae] += 1;
         if (ae === 0) {
           o[k    ] = mean;
           o[k + 2] = mean;
@@ -793,10 +794,16 @@ var makeDiffImage = function(a, b, ignoreAE, summary) {
         }
         o[k + 1] = mean;
         o[k + 3] = 255;
+      } else { // 1:Grayscale
+        o[k    ] = ae;
+        o[k + 1] = ae;
+        o[k + 2] = ae;
+        o[k + 3] = 255;
       }
-      i += (a.pitch - w) * 4;
-      j += (b.pitch - w) * 4;
-      k += (out.pitch - w) * 4;
+    }
+    i += (a.pitch - w) * 4;
+    j += (b.pitch - w) * 4;
+    k += (out.pitch - w) * 4;
   }
   var unmatch = 0;
   var maxAE = 0;
@@ -876,7 +883,8 @@ function calcDiff( a, b, options ) {
     histogram: new Uint32Array(256)
   };
   var ignoreAE = options.ignoreAE;
-  var image = makeDiffImage(a, b, ignoreAE, summary);
+  var type = options.type || 0;
+  var image = makeDiffImage(a, b, ignoreAE, type, summary);
   summary.match = summary.total - summary.unmatch;
   return {
     image: image,

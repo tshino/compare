@@ -902,6 +902,30 @@
           done();
         };
         taskQueue.addTask(task);
+      },
+      function(done) {
+        task.options.type = 1;  // Grayscale
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcDiff', data.cmd );
+          EXPECT_EQ( 1, data.options.type );
+          EXPECT_EQ( 3, data.result.image.width );
+          EXPECT_EQ( 2, data.result.image.height );
+          EXPECT_EQ( 3 * 2 * 4, data.result.image.data.length );
+          EXPECT_EQ( 0, data.result.image.data[0] );
+          EXPECT_EQ( 0, data.result.image.data[1] );
+          EXPECT_EQ( 0, data.result.image.data[2] );
+          EXPECT_EQ( 255, data.result.image.data[3] );
+          EXPECT_EQ( 5, data.result.image.data[4] );
+          EXPECT_EQ( 5, data.result.image.data[5] );
+          EXPECT_EQ( 5, data.result.image.data[6] );
+          EXPECT_EQ( 255, data.result.image.data[7] );
+          EXPECT_EQ( 10, data.result.image.data[8] );
+          EXPECT_EQ( 5, data.result.image.data[12] );
+          EXPECT_EQ( 10, data.result.image.data[16] );
+          EXPECT_EQ( 0, data.result.image.data[20] );
+          done();
+        };
+        taskQueue.addTask(task);
       }
     ])(done);
   });
