@@ -769,7 +769,7 @@ function calcOpticalFlow( a, b, options ) {
   };
 }
 
-var makeDiffImage = function(a, b, ignoreAE, type, summary) {
+var makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
   var w = a.width, h = a.height;
   var out = compareImageUtil.makeImage(w, h);
   var histogram = summary.histogram;
@@ -781,7 +781,7 @@ var makeDiffImage = function(a, b, ignoreAE, type, summary) {
       var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
       var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
       histogram[ae] += 1;
-      if (type === 0) { // 0:Red-Blue
+      if (imageType === 0) { // 0:Red-Blue
         var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
         var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
         var mean = Math.round((y0 * a0 + y1 * a1) * (0.30 / 255));
@@ -883,8 +883,8 @@ function calcDiff( a, b, options ) {
     histogram: new Uint32Array(256)
   };
   var ignoreAE = options.ignoreAE;
-  var type = options.type || 0;
-  var image = makeDiffImage(a, b, ignoreAE, type, summary);
+  var imageType = options.imageType || 0;
+  var image = makeDiffImage(a, b, ignoreAE, imageType, summary);
   summary.match = summary.total - summary.unmatch;
   return {
     image: image,

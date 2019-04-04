@@ -4037,6 +4037,7 @@
     var diffResult = {};
     var diffOptions = {
       ignoreAE: 0,
+      imageType: 0,
       resizeToLarger: true,
       resizeMethod: 'lanczos3',
       ignoreRemainder: false,
@@ -4049,6 +4050,21 @@
       updateTable();
       return false;
     });
+    var diffImageType = makeModeSwitch('#diffImageType', 0, function(type) {
+      diffOptions.imageType = type;
+      updateImageTypeFootnote();
+      updateTable();
+    });
+    var updateImageTypeFootnote = function() {
+      if (diffOptions.imageType === 0) {
+        $('#diffImageType0Footnote').show();
+        $('#diffImageType1Footnote').hide();
+      } else {
+        $('#diffImageType0Footnote').hide();
+        $('#diffImageType1Footnote').show();
+      }
+    };
+    updateImageTypeFootnote();
     $('.diffDimensionOption').on('change', function(e) {
       var o = this.options[this.selectedIndex].value;
       diffOptions.resizeToLarger = o === 'resize';
@@ -4112,6 +4128,7 @@
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
+      diffResult.imageType = diffOptions.imageType;
       diffResult.ignoreRemainder = diffOptions.ignoreRemainder;
       diffResult.resizeToLarger = diffOptions.resizeToLarger;
       diffResult.resizeMethod = diffOptions.resizeMethod;
@@ -4124,7 +4141,8 @@
           cmd:      'calcDiff',
           index:    [baseImageIndex, targetImageIndex],
           options:  {
-            ignoreAE:   diffOptions.ignoreAE,
+            ignoreAE: diffOptions.ignoreAE,
+            imageType: diffOptions.imageType,
             ignoreRemainder: diffOptions.ignoreRemainder,
             resizeToLarger: diffOptions.resizeToLarger,
             resizeMethod: diffOptions.resizeMethod,
@@ -4263,6 +4281,7 @@
       }
       if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
           diffResult.ignoreAE !== diffOptions.ignoreAE ||
+          diffResult.imageType !== diffOptions.imageType ||
           diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
           diffResult.resizeToLarger !== diffOptions.resizeToLarger ||
           diffResult.resizeMethod !== diffOptions.resizeMethod ||
@@ -4304,6 +4323,7 @@
     var updateFigure = function(baseIndex, targetIndex, options, result) {
       if (diffResult.base === baseIndex && diffResult.target === targetIndex &&
           diffResult.ignoreAE === options.ignoreAE &&
+          diffResult.imageType === options.imageType &&
           diffResult.ignoreRemainder === options.ignoreRemainder &&
           diffResult.resizeToLarger === options.resizeToLarger &&
           diffResult.resizeMethod === options.resizeMethod &&

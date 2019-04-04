@@ -795,6 +795,7 @@
       cmd: 'calcDiff', imageData: [image1, image2],
       options: {
         ignoreAE: 0,
+        imageType: 0,
         ignoreRemainder: false,
         resizeToLarger: true,
         resizeMethod: 'lanczos3',
@@ -824,6 +825,7 @@
           EXPECT_EQ( 0, data.result.summary.histogram[255] );
           EXPECT_EQ( 10, data.result.summary.maxAE );
           EXPECT_EQ( task.options.ignoreAE, data.options.ignoreAE );
+          EXPECT_EQ( task.options.imageType, data.options.imageType );
           EXPECT_EQ( task.options.ignoreRemainder, data.options.ignoreRemainder );
           EXPECT_EQ( task.options.resizeToLarger, data.options.resizeToLarger );
           EXPECT_EQ( task.options.resizeMethod, data.options.resizeMethod );
@@ -904,10 +906,10 @@
         taskQueue.addTask(task);
       },
       function(done) {
-        task.options.type = 1;  // Grayscale
+        task.options.imageType = 1;  // Grayscale
         taskCallback = function(data) {
           EXPECT_EQ( 'calcDiff', data.cmd );
-          EXPECT_EQ( 1, data.options.type );
+          EXPECT_EQ( 1, data.options.imageType );
           EXPECT_EQ( 3, data.result.image.width );
           EXPECT_EQ( 2, data.result.image.height );
           EXPECT_EQ( 3 * 2 * 4, data.result.image.data.length );
