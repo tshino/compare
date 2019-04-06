@@ -795,6 +795,7 @@ var makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
         o[k + 1] = mean;
         o[k + 3] = 255;
       } else { // 1:Grayscale
+        ae = ae > ignoreAE ? ae : 0;
         o[k    ] = ae;
         o[k + 1] = ae;
         o[k + 2] = ae;
