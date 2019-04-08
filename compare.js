@@ -2228,9 +2228,11 @@
     var waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
     var updateAuxOption = function() {
       if (waveformType.current() === 0) {
+        $('#waveformColumnLayout').show();
         $('#waveformAuxType').show();
         $('#waveformAuxType2').hide();
       } else {
+        $('#waveformColumnLayout').hide();
         $('#waveformAuxType').hide();
         $('#waveformAuxType2').show();
       }
