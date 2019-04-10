@@ -2160,11 +2160,11 @@
           context.stroke();
         }
       };
-      var drawHistogram = function(color, offset) {
+      var drawHistogram = function(color, offset, y, h) {
         context.fillStyle = color;
         for (var i = 0; i < 256; ++i) {
-          var h = 512 * Math.pow(hist[i + offset] / max, 0.5);
-          context.fillRect(i*3, 512-h, 3, h);
+          var v = h * Math.pow(hist[i + offset] / max, 0.5);
+          context.fillRect(i * 3, y - v, 3, v);
         }
       };
       context.fillStyle = '#222';
@@ -2172,11 +2172,11 @@
       drawGrid();
       if (type === 0) { // RGB
         context.globalCompositeOperation = 'lighter';
-        drawHistogram('#f00', 0);
-        drawHistogram('#0f0', 256);
-        drawHistogram('#00f', 512);
+        drawHistogram('#f00', 0, 512, 512);
+        drawHistogram('#0f0', 256, 512, 512);
+        drawHistogram('#00f', 512, 512, 512);
       } else { // Luminance
-        drawHistogram('#fff', 0);
+        drawHistogram('#fff', 0, 512, 512);
       }
       var axes = [
         { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
