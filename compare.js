@@ -2125,12 +2125,15 @@
       repaint();
       updateAuxOption();
     });
+    var histogramRowLayout = makeToggleSwitch('#histogramRowLayout', true, repaint);
     var histogramAuxType2 = makeModeSwitch('#histogramAuxType2', 0, repaint);
     var updateAuxOption = function() {
-      if (histogramType.current() === 1) {
-        $('#histogramAuxType2').show();
-      } else {
+      if (histogramType.current() === 0) {
+        $('#histogramRowLayout').show();
         $('#histogramAuxType2').hide();
+      } else {
+        $('#histogramRowLayout').hide();
+        $('#histogramAuxType2').show();
       }
     };
     updateAuxOption();
@@ -2172,9 +2175,15 @@
       drawGrid();
       if (type === 0) { // RGB
         context.globalCompositeOperation = 'lighter';
-        drawHistogram('#f00', 0, 512, 512);
-        drawHistogram('#0f0', 256, 512, 512);
-        drawHistogram('#00f', 512, 512, 512);
+        if (histogramRowLayout.current()) {
+          drawHistogram('#f00', 0, 170, 170);
+          drawHistogram('#0f0', 256, 341, 170);
+          drawHistogram('#00f', 512, 512, 170);
+        } else {
+          drawHistogram('#f00', 0, 512, 512);
+          drawHistogram('#0f0', 256, 512, 512);
+          drawHistogram('#00f', 512, 512, 512);
+        }
       } else { // Luminance
         drawHistogram('#fff', 0, 512, 512);
       }
