@@ -2315,7 +2315,7 @@
       context.beginPath();
       for (var k = 32; k < 255; k += 32) {
         context.moveTo(0, k + 0.5);
-        context.lineTo(histW, k + 0.5);
+        context.lineTo(figW, k + 0.5);
       }
       context.stroke();
       return fig.canvas;
