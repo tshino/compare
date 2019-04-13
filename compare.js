@@ -1948,6 +1948,13 @@
       }
       return grad;
     };
+    var drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
+      context.fillStyle = color;
+      for (var i = 0; i < n; ++i) {
+        var v = h * Math.pow(hist[i + offset] / max, 0.5);
+        context.fillRect((x + i) * 3, y - v, 3, v);
+      }
+    };
     var drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
       var dLen = Math.sqrt(dx * dx + dy * dy);
       var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
@@ -1975,6 +1982,7 @@
       copyImageBits: copyImageBits,
       copyGrayscaleBits: copyGrayscaleBits,
       makeLinearGradient: makeLinearGradient,
+      drawHistogram: drawHistogram,
       drawAxes: drawAxes
     };
   })();
@@ -2163,29 +2171,22 @@
           context.stroke();
         }
       };
-      var drawHistogram = function(color, offset, y, h) {
-        context.fillStyle = color;
-        for (var i = 0; i < 256; ++i) {
-          var v = h * Math.pow(hist[i + offset] / max, 0.5);
-          context.fillRect(i * 3, y - v, 3, v);
-        }
-      };
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
       drawGrid();
       if (type === 0) { // RGB
         context.globalCompositeOperation = 'lighter';
         if (histogramRowLayout.current()) {
-          drawHistogram('#f00', 0, 170, 170);
-          drawHistogram('#0f0', 256, 341, 170);
-          drawHistogram('#00f', 512, 512, 170);
+          figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
+          figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
+          figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
         } else {
-          drawHistogram('#f00', 0, 512, 512);
-          drawHistogram('#0f0', 256, 512, 512);
-          drawHistogram('#00f', 512, 512, 512);
+          figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
+          figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
+          figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
         }
       } else { // Luminance
-        drawHistogram('#fff', 0, 512, 512);
+        figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
       }
       var axes = [
         { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
@@ -4166,6 +4167,7 @@
       }
     };
     var makeHistogramFigure = function(hist, ignoreAE) {
+      ignoreAE = compareUtil.clamp(ignoreAE, 0, 255);
       var fig = figureUtil.makeBlankFigure(256 * 3, 320);
       var context = fig.context;
       context.fillStyle = '#222';
@@ -4176,14 +4178,8 @@
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
-      var drawHistogram = function(color1, color2, offset) {
-        for (var i = 0; i < 256; ++i) {
-          context.fillStyle = i <= ignoreAE ? color1 : color2;
-          var h = 300 * Math.pow(hist[i + offset] / max, 0.5);
-          context.fillRect(i*3, 320-h, 3, h);
-        }
-      };
-      drawHistogram('#ccc', '#fff', 0);
+      figureUtil.drawHistogram(context, '#ccc', hist, max, 0, ignoreAE + 1, 0, 320, 300);
+      figureUtil.drawHistogram(context, '#fff', hist, max, ignoreAE + 1, 255 - ignoreAE, ignoreAE + 1, 320, 300);
       return fig.canvas;
     };
     var updateReport = function(styles) {
