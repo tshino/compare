@@ -4058,9 +4058,11 @@
     };
     $('#diffGridBtn').click(grid.toggle);
     $('#diffIgnoreAE').on('change', function(e) {
-      diffOptions.ignoreAE = +this.value;
-      updateTable();
-      return false;
+      if (this.validity.valid) {
+        diffOptions.ignoreAE = +this.value;
+        updateTable();
+        return false;
+      }
     });
     var diffImageType = makeModeSwitch('#diffImageType', 0, function(type) {
       diffOptions.imageType = type;
