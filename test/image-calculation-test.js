@@ -907,6 +907,7 @@
       },
       function(done) {
         task.options.imageType = 1;  // Grayscale
+        task.options.ignoreAE = 0;
         taskCallback = function(data) {
           EXPECT_EQ( 'calcDiff', data.cmd );
           EXPECT_EQ( 1, data.options.imageType );
