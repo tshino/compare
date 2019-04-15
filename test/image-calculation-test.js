@@ -83,6 +83,49 @@
         };
         taskQueue.addTask(task);
       },
+      function(done) {
+        var task = {
+          cmd: 'calcHistogram',
+          type: 2, // YCbCr
+          auxTypes: [0], // bt601
+          imageData: [{
+            width: 4,
+            height: 4,
+            data: [
+              // #000000 -> (Y,Cb,Cr)=(0,128,128)
+              // #808080 -> (Y,Cb,Cr)=(128,128,128)
+              0, 0, 0, 255,  0, 0, 0, 255,  128, 128, 128, 255,  128, 128, 128, 255,
+              0, 0, 0, 255,  0, 0, 0, 255,  128, 128, 128, 255,  128, 128, 128, 255,
+              // #ff0000 -> (Y,Cb,Cr)=(76,84,255)
+              255, 0, 0, 255,  255, 0, 0, 255,  255, 0, 0, 255,  255, 0, 0, 255,
+              // #0000ff -> (Y,Cb,Cr)=(29,255,107)
+              // #ffff00 -> (Y,Cb,Cr)=(226,0,148)
+              0, 0, 255, 255,  0, 0, 255, 255,  0, 0, 255, 255,  255, 255, 0, 255,
+            ]
+          }]
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcHistogram', data.cmd );
+          EXPECT_EQ( 256 * 3, data.result.length );
+          EXPECT_EQ( 4, data.result[0] );
+          EXPECT_EQ( 0, data.result[1] );
+          EXPECT_EQ( 3, data.result[29] );
+          EXPECT_EQ( 4, data.result[76] );
+          EXPECT_EQ( 4, data.result[128] );
+          EXPECT_EQ( 1, data.result[226] );
+          EXPECT_EQ( 1, data.result[256] );
+          EXPECT_EQ( 4, data.result[256 + 84] );
+          EXPECT_EQ( 8, data.result[256 + 128] );
+          EXPECT_EQ( 3, data.result[256 + 255] );
+          EXPECT_EQ( 0, data.result[512] );
+          EXPECT_EQ( 3, data.result[512 + 107] );
+          EXPECT_EQ( 8, data.result[512 + 128] );
+          EXPECT_EQ( 1, data.result[512 + 148] );
+          EXPECT_EQ( 4, data.result[512 + 255] );
+          done();
+        };
+        taskQueue.addTask(task);
+      },
     ])(done);
   });
   TEST( 'compare-worker.js calc3DWaveform', function test(done) {

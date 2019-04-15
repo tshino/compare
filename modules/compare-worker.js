@@ -74,14 +74,15 @@ function calcHistogram( imageData, type, auxTypes )
 {
   var w = imageData.width;
   var h = imageData.height;
-  var hist = new Uint32Array(256 * (type === 0 ? 3 : 1));
+  var channels = (type === 0 || type === 2) ? 3 : 1;
+  var hist = new Uint32Array(256 * channels);
   if (type === 0) { // RGB
     for (var i = 0, n = 4 * w * h; i < n; i += 4) {
       hist[imageData.data[i + 0]] += 1;
       hist[imageData.data[i + 1] + 256] += 1;
       hist[imageData.data[i + 2] + 512] += 1;
     }
-  } else { // Luminance
+  } else if (type === 1) { // Luminance
     if (auxTypes[0] === 0) { // 0: bt601
       var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
     } else { // 1: bt709
@@ -93,6 +94,27 @@ function calcHistogram( imageData, type, auxTypes )
       var b = imageData.data[i + 2];
       var y = Math.round(m0 * r + m1 * g + m2 * b);
       hist[y] += 1;
+    }
+  } else { // YCbCr
+    if (auxTypes[0] === 0) { // 0: bt601
+      var m0 =  0.2990, m1 =  0.5870, m2 =  0.1140;
+      var m3 = -0.1687, m4 = -0.3313, m5 =  0.5000;
+      var m6 =  0.5000, m7 = -0.4187, m8 = -0.0813;
+    } else { // 1: bt709
+      var m0 =  0.2126, m1 =  0.7152, m2 =  0.0722;
+      var m3 = -0.1146, m4 = -0.3854, m5 =  0.5000;
+      var m6 =  0.5000, m7 = -0.4542, m8 = -0.0458;
+    }
+    for (var i = 0, n = 4 * w * h; i < n; i += 4) {
+      var r = imageData.data[i + 0];
+      var g = imageData.data[i + 1];
+      var b = imageData.data[i + 2];
+      var y = Math.round(m0 * r + m1 * g + m2 * b);
+      var cb = Math.round(m3 * r + m4 * g + m5 * b + 127.5);
+      var cr = Math.round(m6 * r + m7 * g + m8 * b + 127.5);
+      hist[y] += 1;
+      hist[cb + 256] += 1;
+      hist[cr + 512] += 1;
     }
   }
   return hist;
