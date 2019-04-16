@@ -2139,8 +2139,11 @@
       if (histogramType.current() === 0) {
         $('#histogramRowLayout').show();
         $('#histogramAuxType2').hide();
-      } else {
+      } else if (histogramType.current() === 1) {
         $('#histogramRowLayout').hide();
+        $('#histogramAuxType2').show();
+      } else {
+        $('#histogramRowLayout').show();
         $('#histogramAuxType2').show();
       }
     };
@@ -2175,18 +2178,29 @@
       context.fillRect(0,0,768,512);
       drawGrid();
       if (type === 0) { // RGB
-        context.globalCompositeOperation = 'lighter';
         if (histogramRowLayout.current()) {
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
         } else {
+          context.globalCompositeOperation = 'lighter';
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
         }
-      } else { // Luminance
+      } else if (type === 1) { // Luminance
         figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
+      } else { // YCbCr
+        if (histogramRowLayout.current()) {
+          figureUtil.drawHistogram(context, '#ddd', hist, max, 0, 256, 0, 170, 170);
+          figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 341, 170);
+          figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 170);
+        } else {
+          context.globalCompositeOperation = 'lighter';
+          figureUtil.drawHistogram(context, '#aaa', hist, max, 0, 256, 0, 512, 512);
+          figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 512, 512);
+          figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 512);
+        }
       }
       var axes = [
         { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
