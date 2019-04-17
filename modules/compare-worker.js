@@ -110,8 +110,8 @@ function calcHistogram( imageData, type, auxTypes )
       var g = imageData.data[i + 1];
       var b = imageData.data[i + 2];
       var y = Math.round(m0 * r + m1 * g + m2 * b);
-      var cb = Math.round(m3 * r + m4 * g + m5 * b + 127.5);
-      var cr = Math.round(m6 * r + m7 * g + m8 * b + 127.5);
+      var cb = Math.round(m3 * r + m4 * g + m5 * b + 127.50001); // 0.00001 for stable rounding
+      var cr = Math.round(m6 * r + m7 * g + m8 * b + 127.50001);
       hist[y] += 1;
       hist[cb + 256] += 1;
       hist[cr + 512] += 1;
