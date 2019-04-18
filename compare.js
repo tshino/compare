@@ -2157,8 +2157,8 @@
       }, attachImageDataToTask);
     };
     var makeFigure = function(type, auxType2, hist) {
-      var margin = 32;
-      var fig = figureUtil.makeBlankFigure(768, 512 + margin);
+      var right_margin = 40, bottom_margin = 32;
+      var fig = figureUtil.makeBlankFigure(768 + right_margin, 512 + bottom_margin);
       var context = fig.context;
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
@@ -2176,30 +2176,37 @@
       };
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
+      context.fillStyle = '#000';
+      context.fillRect(768,0,right_margin,512);
       drawGrid();
       if (type === 0) { // RGB
         if (histogramRowLayout.current()) {
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
+          var comp = [ '#f22', 168, 'R', '#2f2', 339, 'G', '#22f', 510, 'B' ];
         } else {
           context.globalCompositeOperation = 'lighter';
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
+          var comp = [ '#f22', 446, 'R', '#2f2', 478, 'G', '#22f', 510, 'B' ];
         }
       } else if (type === 1) { // Luminance
         figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
+        var comp = [ '#fff', 510, 'Y' ];
       } else { // YCbCr
         if (histogramRowLayout.current()) {
           figureUtil.drawHistogram(context, '#ddd', hist, max, 0, 256, 0, 170, 170);
-          figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 341, 170);
-          figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 170);
+          figureUtil.drawHistogram(context, '#22f', hist, max, 256, 256, 0, 341, 170);
+          figureUtil.drawHistogram(context, '#f22', hist, max, 512, 256, 0, 512, 170);
+          var comp = [ '#ddd', 168, 'Y', '#44f', 339, 'Cb', '#f44', 510, 'Cr' ];
         } else {
           context.globalCompositeOperation = 'lighter';
           figureUtil.drawHistogram(context, '#aaa', hist, max, 0, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 512);
+          var comp = [ '#ddd', 446, 'Y', '#44f', 478, 'Cb', '#f44', 510, 'Cr' ];
         }
       }
       var axes = [
@@ -2212,6 +2219,15 @@
         });
       }
       figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
+      var drawAxesLabels = function(context, comp) {
+        context.font = '30px sans-serif';
+        context.textAlign = 'left';
+        for (var i = 0; i < comp.length; i += 3) {
+          context.fillStyle = comp[i];
+          context.fillText(comp[i + 2], 768 + 2, comp[i + 1]);
+        }
+      };
+      drawAxesLabels(context, comp);
       return fig.canvas;
     };
     var updateFigure = function(type, auxTypes, img, hist) {
