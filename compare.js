@@ -1932,15 +1932,6 @@
         dest.data[i] = src.data[i];
       }
     };
-    var copyGrayscaleBits = function(src, dest) {
-      for (var i = 0, j = 0, n = src.width * src.height; i < n; ++i, j += 4) {
-        var y = src.data[i];
-        dest.data[j + 0] = y;
-        dest.data[j + 1] = y;
-        dest.data[j + 2] = y;
-        dest.data[j + 3] = 255;
-      }
-    };
     var makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
       var grad = ctx.createLinearGradient(x0,y0,x1,y1);
       for (var i = 0; i < stops.length; i++) {
@@ -1980,7 +1971,6 @@
       makeBlankFigure: makeBlankFigure,
       canvasFromImage: canvasFromImage,
       copyImageBits: copyImageBits,
-      copyGrayscaleBits: copyGrayscaleBits,
       makeLinearGradient: makeLinearGradient,
       drawHistogram: drawHistogram,
       drawAxes: drawAxes
