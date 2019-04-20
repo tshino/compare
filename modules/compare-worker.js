@@ -123,20 +123,23 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
 {
   var w = transposed ? imageData.height : imageData.width;
   var h = transposed ? imageData.width : imageData.height;
-  var hist = new Uint32Array(256 * histW * (type === 0 ? 3 : 1));
-  var histOff = new Uint32Array(w);
-  for (var i = 0; i < w; ++i) {
-    var x = Math.round((i + 0.5) / w * histW - 0.5);
-    histOff[flipped ? w - 1 - i : i] = x * 256;
+  var channels = type === 0 ? 3 : 1;
+  var hist = new Uint32Array(256 * histW * channels);
+  var sx = transposed ? h * 4 : 4;
+  var sy = transposed ? 4 : w * 4;
+  if (type === 1) { // Luminance
+    if (auxTypes[1] === 0) { // 0: bt601
+      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+    } else { // 1: bt709
+      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    }
   }
-  if (type === 0) { // RGB
-    var sx = transposed ? h * 4 : 4;
-    var sy = transposed ? 4 : w * 4;
-    for (var x = 0; x < w; ++x) {
-      var i = x * sx;
-      var rOff = histOff[x];
-      var gOff = histOff[x] + 256 * histW;
-      var bOff = histOff[x] + 512 * histW;
+  for (var x = 0; x < w; ++x) {
+    var i = x * sx;
+    var off0 = 256 * Math.round(((flipped ? w - 1 - x : x) + 0.5) / w * histW - 0.5);
+    if (type === 0) { // RGB
+      var off1 = off0 + 256 * histW;
+      var off2 = off0 + 512 * histW;
       for (var y = 0; y < h; ++y, i += sy) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
@@ -146,28 +149,17 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
           g = Math.round(srgb255ToLinear255[g]);
           b = Math.round(srgb255ToLinear255[b]);
         }
-        hist[rOff + r] += 1;
-        hist[gOff + g] += 1;
-        hist[bOff + b] += 1;
+        hist[off0 + r] += 1;
+        hist[off1 + g] += 1;
+        hist[off2 + b] += 1;
       }
-    }
-  } else { // Luminance
-    var sx = transposed ? h * 4 : 4;
-    var sy = transposed ? 4 : w * 4;
-    if (auxTypes[1] === 0) { // 0: bt601
-      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
-    } else { // 1: bt709
-      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
-    }
-    for (var x = 0; x < w; ++x) {
-      var i = x * sx;
-      var off = histOff[x];
+    } else { // Luminance
       for (var y = 0; y < h; ++y, i += sy) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
         var my = Math.round(m0 * r + m1 * g + m2 * b);
-        hist[off + my] += 1;
+        hist[off0 + my] += 1;
       }
     }
   }
