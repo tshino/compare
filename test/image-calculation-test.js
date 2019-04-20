@@ -162,6 +162,15 @@
         taskQueue.addTask(task);
       };
     };
+    var makeWaveform = function(w, list) {
+      var waveform = new Uint32Array(256 * w);
+      for (var i = 0; i < list.length; i++) {
+        for (var j = 0; j < list[i].length; j++) {
+          waveform[i * 256 + list[i][j][0]] = list[i][j][1];
+        }
+      }
+      return waveform;
+    };
     var tests = [];
     var imageData1 = [{
       width: 4,
@@ -173,31 +182,41 @@
         0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
       ]
     }];
-    var expected1 = new Uint32Array(256 * 3 * 4);
-    expected1[0*256 + 0] = 4; // R
-    expected1[1*256 + 0] = 4;
-    expected1[2*256 + 0] = 4;
-    expected1[3*256 + 0] = 4;
-    expected1[4*256 + 0] = 2; // G
-    expected1[4*256 + 1] = 2;
-    expected1[5*256 + 0] = 2;
-    expected1[5*256 + 1] = 2;
-    expected1[6*256 + 0] = 2;
-    expected1[6*256 + 1] = 2;
-    expected1[7*256 + 0] = 2;
-    expected1[7*256 + 1] = 2;
-    expected1[8*256 + 0] = 4; // B
-    expected1[9*256 + 64] = 4;
-    expected1[10*256 + 128] = 4;
-    expected1[11*256 + 192] = 4;
-    tests.push(makeAsyncTest('test1', {
+    tests.push(makeAsyncTest('rgb test1', {
       type: 0, // RGB
       auxTypes: [0, 0],
       histW: 4,
       transposed: false,
       flipped: false,
       imageData: imageData1
-    }, expected1));
+    }, makeWaveform(3 * 4, [
+      [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+      [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], // G
+      [[0,4]], [[64,4]], [[128,4]], [[192,4]] // B
+    ])));
+    tests.push(makeAsyncTest('rgb test2', {
+      type: 0, // RGB
+      auxTypes: [0, 0],
+      histW: 4,
+      transposed: true, // transposed!
+      flipped: false,
+      imageData: imageData1
+    }, makeWaveform(3 * 4, [
+      [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+      [[0,4]], [[0,4]], [[1,4]], [[1,4]], // G
+      [[0,1],[64,1],[128,1],[192,1]], [[0,1],[64,1],[128,1],[192,1]], // B
+      [[0,1],[64,1],[128,1],[192,1]], [[0,1],[64,1],[128,1],[192,1]],
+    ])));
+    tests.push(makeAsyncTest('luminance test1', {
+      type: 1, // Luminance
+      auxTypes: [0, 0],
+      histW: 4,
+      transposed: false,
+      flipped: false,
+      imageData: imageData1
+    }, makeWaveform(4, [
+      [[0,2],[1,2]], [[7,2],[8,2]], [[15,4]], [[22,4]]
+    ])));
     jsTestUtil.makeSequentialTest(tests)(done);
   });
   TEST( 'compare-worker.js calc3DWaveform', function test(done) {
