@@ -128,6 +128,78 @@
       },
     ])(done);
   });
+  TEST( 'compare-worker.js calcWaveform', function test(done) {
+    var makeAsyncTest = function(label, input, expected) {
+      label = ' in case ' + label;
+      return function(done) {
+        var task = {
+          cmd: 'calcWaveform',
+          type: input.type,
+          auxTypes: input.auxTypes,
+          histW: input.histW,
+          transposed: input.transposed,
+          flipped: input.flipped,
+          imageData: input.imageData
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcWaveform', data.cmd, 'cmd' + label );
+          EXPECT_EQ( expected.length, data.result.length, 'result.length' + label );
+          if (expected.length === data.result.length) {
+            var errorCount = 0;
+            for (var i = 0; i < expected.length; i++) {
+              if (expected[i] !== data.result[i]) {
+                errorCount += 1;
+                if (3 < errorCount) {
+                  ERROR('...Too many errors' + label);
+                  break;
+                }
+                EXPECT_EQ( expected[i], data.result[i], 'result[' + i + ']' + label );
+              }
+            }
+          }
+          done();
+        };
+        taskQueue.addTask(task);
+      };
+    };
+    var tests = [];
+    var imageData1 = [{
+      width: 4,
+      height: 4,
+      data: [
+        0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+        0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+        0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+        0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+      ]
+    }];
+    var expected1 = new Uint32Array(256 * 3 * 4);
+    expected1[0*256 + 0] = 4; // R
+    expected1[1*256 + 0] = 4;
+    expected1[2*256 + 0] = 4;
+    expected1[3*256 + 0] = 4;
+    expected1[4*256 + 0] = 2; // G
+    expected1[4*256 + 1] = 2;
+    expected1[5*256 + 0] = 2;
+    expected1[5*256 + 1] = 2;
+    expected1[6*256 + 0] = 2;
+    expected1[6*256 + 1] = 2;
+    expected1[7*256 + 0] = 2;
+    expected1[7*256 + 1] = 2;
+    expected1[8*256 + 0] = 4; // B
+    expected1[9*256 + 64] = 4;
+    expected1[10*256 + 128] = 4;
+    expected1[11*256 + 192] = 4;
+    tests.push(makeAsyncTest('test1', {
+      type: 0, // RGB
+      auxTypes: [0, 0],
+      histW: 4,
+      transposed: false,
+      flipped: false,
+      imageData: imageData1
+    }, expected1));
+    jsTestUtil.makeSequentialTest(tests)(done);
+  });
   TEST( 'compare-worker.js calc3DWaveform', function test(done) {
     var makeAsyncTest = function(label, input, expected) {
       label = ' in case ' + label;
