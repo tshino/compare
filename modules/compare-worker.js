@@ -123,7 +123,7 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
 {
   var w = transposed ? imageData.height : imageData.width;
   var h = transposed ? imageData.width : imageData.height;
-  var channels = type === 0 ? 3 : 1;
+  var channels = (type === 0 || type === 2) ? 3 : 1;
   var hist = new Uint32Array(256 * histW * channels);
   var sx = transposed ? h * 4 : 4;
   var sy = transposed ? 4 : w * 4;
@@ -132,6 +132,16 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
       var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
     } else { // 1: bt709
       var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    }
+  } else if (type === 2) { // YCbCr
+    if (auxTypes[1] === 0) { // 0: bt601
+      var m0 =  0.2990, m1 =  0.5870, m2 =  0.1140;
+      var m3 = -0.1687, m4 = -0.3313, m5 =  0.5000;
+      var m6 =  0.5000, m7 = -0.4187, m8 = -0.0813;
+    } else { // 1: bt709
+      var m0 =  0.2126, m1 =  0.7152, m2 =  0.0722;
+      var m3 = -0.1146, m4 = -0.3854, m5 =  0.5000;
+      var m6 =  0.5000, m7 = -0.4542, m8 = -0.0458;
     }
   }
   for (var x = 0; x < w; ++x) {
@@ -153,13 +163,27 @@ function calcWaveform( imageData, histW, transposed, flipped, type, auxTypes )
         hist[off1 + g] += 1;
         hist[off2 + b] += 1;
       }
-    } else { // Luminance
+    } else if (type === 1) { // Luminance
       for (var y = 0; y < h; ++y, i += sy) {
         var r = imageData.data[i + 0];
         var g = imageData.data[i + 1];
         var b = imageData.data[i + 2];
         var my = Math.round(m0 * r + m1 * g + m2 * b);
         hist[off0 + my] += 1;
+      }
+    } else { // YCbCr
+      var off1 = off0 + 256 * histW;
+      var off2 = off0 + 512 * histW;
+      for (var y = 0; y < h; ++y, i += sy) {
+        var r = imageData.data[i + 0];
+        var g = imageData.data[i + 1];
+        var b = imageData.data[i + 2];
+        var my = Math.round(m0 * r + m1 * g + m2 * b);
+        var cb = Math.round(m3 * r + m4 * g + m5 * b + 127.50001); // 0.00001 for stable rounding
+        var cr = Math.round(m6 * r + m7 * g + m8 * b + 127.50001);
+        hist[off0 + my] += 1;
+        hist[off1 + cb] += 1;
+        hist[off2 + cr] += 1;
       }
     }
   }
