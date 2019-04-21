@@ -2261,8 +2261,12 @@
         $('#waveformColumnLayout').show();
         $('#waveformAuxType').show();
         $('#waveformAuxType2').hide();
-      } else {
+      } else if (waveformType.current() === 1) {
         $('#waveformColumnLayout').hide();
+        $('#waveformAuxType').hide();
+        $('#waveformAuxType2').show();
+      } else {
+        $('#waveformColumnLayout').show();
         $('#waveformAuxType').hide();
         $('#waveformAuxType2').show();
       }
@@ -2286,7 +2290,8 @@
         ++histN[x];
       }
       //
-      var figW = (type === 0 && waveformColumnLayout.current()) ? histW * 3 : histW;
+      var columnLayout = (type === 0 || type === 2) && waveformColumnLayout.current();
+      var figW = columnLayout ? histW * 3 : histW;
       var fig = figureUtil.makeBlankFigure(figW, 256);
       var context = fig.context;
       var bits = context.createImageData(figW, 256);
@@ -2299,33 +2304,47 @@
       }
       for (var x = 0; x < histW; ++x) {
         var invMax = 1 / (histN[x] * h);
+        var off0 = 4 * (255 * figW + x);
+        var h0 = 256 * x;
         if (type === 0) { // RGB
-          var rOff = 256 * x;
-          var gOff = 256 * (x + histW);
-          var bOff = 256 * (x + 2 * histW);
-          var off0 = 4 * (255 * figW + x);
-          var off1 = waveformColumnLayout.current() ? off0 + 4 * histW : off0;
-          var off2 = waveformColumnLayout.current() ? off1 + 4 * histW : off0;
+          var h1 = h0 + 256 * histW;
+          var h2 = h0 + 512 * histW;
+          var off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
+          var off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
           for (var y = 0; y < 256; ++y) {
-            var cR = Math.round(255 * (1 - Math.pow(1 - hist[rOff + y] * invMax, 200.0)));
-            var cG = Math.round(255 * (1 - Math.pow(1 - hist[gOff + y] * invMax, 200.0)));
-            var cB = Math.round(255 * (1 - Math.pow(1 - hist[bOff + y] * invMax, 200.0)));
-            bits.data[off0 + 0] = cR;
-            bits.data[off1 + 1] = cG;
-            bits.data[off2 + 2] = cB;
+            var cR = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
+            var cG = Math.round(255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0)));
+            var cB = Math.round(255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0)));
+            bits.data[off0] = cR;
+            bits.data[off1] = cG;
+            bits.data[off2] = cB;
             off0 += s;
             off1 += s;
             off2 += s;
           }
-        } else { // Luminance
-          var cOff = x * 256;
-          var off = 4 * (255 * histW + x);
+        } else if (type === 1) { // Luminance
           for (var y = 0; y < 256; ++y) {
-            var c = Math.round(255 * (1 - Math.pow(1 - hist[cOff + y] * invMax, 200.0)));
-            bits.data[off + 0] = c;
-            bits.data[off + 1] = c;
-            bits.data[off + 2] = c;
-            off += s;
+            var c = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
+            bits.data[off0 + 0] = c;
+            bits.data[off0 + 1] = c;
+            bits.data[off0 + 2] = c;
+            off0 += s;
+          }
+        } else { // YCbCr
+          var h1 = h0 + 256 * histW;
+          var h2 = h0 + 512 * histW;
+          var off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
+          var off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
+          for (var y = 0; y < 256; ++y) {
+            var cR = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
+            var cG = Math.round(255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0)));
+            var cB = Math.round(255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0)));
+            bits.data[off0] = cR;
+            bits.data[off1] = cG;
+            bits.data[off2] = cB;
+            off0 += s;
+            off1 += s;
+            off2 += s;
           }
         }
       }
