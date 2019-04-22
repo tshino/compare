@@ -2336,12 +2336,20 @@
           var off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
           var off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
           for (var y = 0; y < 256; ++y) {
-            var cR = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
-            var cG = Math.round(255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0)));
-            var cB = Math.round(255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0)));
-            bits.data[off0] = cR;
-            bits.data[off1] = cG;
-            bits.data[off2] = cB;
+            var my = 255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0));
+            var cb = 255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0));
+            var cr = 255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0));
+            if (columnLayout) {
+              bits.data[off0] = Math.round(my);
+              bits.data[off0 + 1] = Math.round(my);
+              bits.data[off0 + 2] = Math.round(my);
+              bits.data[off1 + 1] = Math.round(cb);
+              bits.data[off2 - 2] = Math.round(cr);
+            } else {
+              bits.data[off0] = Math.round(cr * 0.3 + my * 0.7);
+              bits.data[off1] = Math.round(my * 0.7);
+              bits.data[off2] = Math.round(cb * 0.3 + my * 0.7);
+            }
             off0 += s;
             off1 += s;
             off2 += s;
