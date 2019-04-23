@@ -2346,9 +2346,9 @@
               bits.data[off1 + 1] = Math.round(cb);
               bits.data[off2 - 2] = Math.round(cr);
             } else {
-              bits.data[off0] = Math.round(cr * 0.3 + my * 0.7);
-              bits.data[off1] = Math.round(my * 0.7);
-              bits.data[off2] = Math.round(cb * 0.3 + my * 0.7);
+              bits.data[off0] = Math.round(compareUtil.clamp(cr + my * 0.85, 0, 255));
+              bits.data[off1] = Math.round(my * 0.85);
+              bits.data[off2] = Math.round(compareUtil.clamp(cb + my * 0.85, 0, 255));
             }
             off0 += s;
             off1 += s;
