@@ -2242,6 +2242,7 @@
   })();
   // Waveform
   var waveformDialog = (function() {
+    var figH = 256 + 20;
     var repaint = function() {
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
@@ -2292,7 +2293,7 @@
       //
       var columnLayout = (type === 0 || type === 2) && waveformColumnLayout.current();
       var figW = columnLayout ? histW * 3 : histW;
-      var fig = figureUtil.makeBlankFigure(figW, 256);
+      var fig = figureUtil.makeBlankFigure(figW, figH);
       var context = fig.context;
       var bits = context.createImageData(figW, 256);
       var s = -4 * figW;
@@ -2366,6 +2367,34 @@
         context.lineTo(figW, k + 0.5);
       }
       context.stroke();
+      context.globalAlpha = 1.0;
+      context.fillStyle = '#222';
+      context.fillRect(0,256,figW,figH - 256);
+      if (type === 0) { // RGB
+        if (columnLayout) {
+          var comp = [ '#f22', 0, 'R', '#2f2', 100, 'G', '#22f', 200, 'B' ];
+        } else {
+          var comp = [ '#f22', 0, 'R', '#2f2', 18, 'G', '#22f', 36, 'B' ];
+        }
+      } else if (type === 1) { // Luminance
+        var comp = [ '#fff', 0, 'Y' ];
+      } else { // YCbCr
+        if (columnLayout) {
+          var comp = [ '#ddd', 0, 'Y', '#44f', 100, 'Cb', '#f44', 200, 'Cr' ];
+        } else {
+          var comp = [ '#ddd', 0, 'Y', '#44f', 16, 'Cb', '#f44', 44, 'Cr' ];
+        }
+      }
+      var drawAxesLabels = function(context, comp) {
+        context.font = '18px sans-serif';
+        context.scale(figW / 300, 1);
+        context.textAlign = 'left';
+        for (var i = 0; i < comp.length; i += 3) {
+          context.fillStyle = comp[i];
+          context.fillText(comp[i + 2], comp[i + 1], figH - 2);
+        }
+      };
+      drawAxesLabels(context, comp);
       return fig.canvas;
     };
     var updateFigure = function(type, auxTypes, img, histW, hist) {
@@ -2379,13 +2408,13 @@
       }
     };
     var updateTable = function(transformOnly) {
-      var w = 320, h = 256, margin = 10;
+      var w = 320, h = figH, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
       updateFigureTable('#waveTable', 'waveform', updateAsync, styles, transformOnly);
     };
     var toggle = dialogUtil.defineDialog($('#waveform'), updateTable, toggleAnalysis, {
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
-      getBaseSize: function() { return { w: 320, h: 256 }; }
+      getBaseSize: function() { return { w: 320, h: figH }; }
     });
     return {
       updateFigure: updateFigure,
