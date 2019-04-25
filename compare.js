@@ -2242,7 +2242,7 @@
   })();
   // Waveform
   var waveformDialog = (function() {
-    var figH = 256 + 20;
+    var figH = 256 + 18;
     var repaint = function() {
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
@@ -2386,7 +2386,7 @@
         }
       }
       var drawAxesLabels = function(context, comp) {
-        context.font = '18px sans-serif';
+        context.font = '16px sans-serif';
         context.scale(figW / 300, 1);
         context.textAlign = 'left';
         for (var i = 0; i < comp.length; i += 3) {
