@@ -4133,7 +4133,8 @@
       offsetY: 0
     };
     $('#diffGridBtn').click(grid.toggle);
-    var diffImageBrightness = +$('#diffImageBrightness').val();
+    var diffImageBrightness = 8;
+    $('#diffImageBrightness').val(diffImageBrightness);
     var applyBrightness = function() {
       $('#diffResult .figMain').css('filter', 'brightness(' + diffImageBrightness + ')');
     };
