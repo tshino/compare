@@ -4133,6 +4133,16 @@
       offsetY: 0
     };
     $('#diffGridBtn').click(grid.toggle);
+    var diffImageBrightness = +$('#diffImageBrightness').val();
+    var applyBrightness = function() {
+      $('#diffResult .figMain').css('filter', 'brightness(' + diffImageBrightness + ')');
+    };
+    $('#diffImageBrightness').on('change', function(e) {
+      if (this.validity.valid) {
+        diffImageBrightness = +this.value;
+        applyBrightness();
+      }
+    });
     $('#diffIgnoreAE').on('change', function(e) {
       if (this.validity.valid) {
         diffOptions.ignoreAE = +this.value;
@@ -4286,6 +4296,9 @@
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       var figMain = $(fig.canvas).css(styles.style).addClass('figMain');
       $('#diffResult').css(styles.cellStyle).append(figMain);
+      if (diffOptions.imageType === 1) {
+        applyBrightness();
+      }
       diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
       if (diffResult.grid) {
         $('#diffResult').append(diffResult.grid);
