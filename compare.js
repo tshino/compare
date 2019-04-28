@@ -838,15 +838,16 @@
       }
       return desc;
     };
-    var makeGrid = function(w, h) {
+    var makeGrid = function(w, h, color) {
       var size = { w: w, h: h };
       var vbox = '0 0 ' + w + ' ' + h;
+      color = color || 'white';
       var mainGrid = makePathDesc(size, mainGridInterval);
       var auxGrid = makePathDesc(size, auxGridInterval, mainGridInterval);
       return $(
         '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
-          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + mainGrid + '"></path>' +
-          '<path stroke="white" fill="none" stroke-width="0.5" opacity="0.6" d="' + auxGrid + '"></path>' +
+          '<path stroke="' + color + '" fill="none" stroke-width="0.5" opacity="0.6" d="' + mainGrid + '"></path>' +
+          '<path stroke="' + color + '" fill="none" stroke-width="0.5" opacity="0.6" d="' + auxGrid + '"></path>' +
         '</svg>'
       ).width(w).height(h);
     };
@@ -4300,7 +4301,8 @@
       if (diffOptions.imageType === 1) {
         applyBrightness();
       }
-      diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
+      var gridColor = diffOptions.imageType === 0 ? 'white' : '#f0f';
+      diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h, gridColor).css(styles.style) : null;
       if (diffResult.grid) {
         $('#diffResult').append(diffResult.grid);
         updateGridStyle();
