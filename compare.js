@@ -2359,16 +2359,30 @@
         }
       }
       context.putImageData(bits, 0, 0);
-      context.globalAlpha = 0.2;
-      context.strokeStyle = '#fff';
-      context.lineWidth = 0.5;
-      context.beginPath();
-      for (var k = 32; k < 255; k += 32) {
-        context.moveTo(0, k + 0.5);
-        context.lineTo(figW, k + 0.5);
+      var drawGrid = function(x, w, color, alpha) {
+        context.strokeStyle = color;
+        context.globalAlpha = alpha;
+        context.lineWidth = 0.5;
+        context.beginPath();
+        for (var k = 32; k < 255; k += 32) {
+          context.moveTo(x, k + 0.5);
+          context.lineTo(x + w, k + 0.5);
+        }
+        context.stroke();
+        context.globalAlpha = 1.0;
+      };
+      if (type === 0) {
+        drawGrid(0, figW, '#fff', 0.4);
+      } else if (type === 1) {
+        drawGrid(0, figW, '#f0f', 0.6);
+      } else {
+        if (columnLayout) {
+          drawGrid(0, histW, '#f0f', 0.6);
+          drawGrid(histW, 2*histW, '#0f0', 0.6);
+        } else {
+          drawGrid(0, figW, '#0f0', 0.6);
+        }
       }
-      context.stroke();
-      context.globalAlpha = 1.0;
       context.fillStyle = '#222';
       context.fillRect(0,256,figW,figH - 256);
       if (type === 0) { // RGB
