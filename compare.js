@@ -1736,29 +1736,6 @@
       toggle: toggle
     };
   })();
-  // Clipboard
-  var clipboardReceiver = (function() {
-    $('#pasteArea').on('paste', function(e) {
-      //console.log(e);
-      var data = e.originalEvent.clipboardData || window.clipboardData;
-      //console.log(data.types);
-      //console.log(data.items);
-      if (data.files && 0 < data.files.length) {
-        //console.log(data.files);
-        addFiles(data.files);
-      }
-      return false;
-    });
-    var toggle = dialogUtil.defineDialog(
-      $('#clipboardReceiver'),
-      null,
-      null,
-      { initialFocus: $('#pasteArea') }
-    );
-    return {
-      toggle: toggle
-    };
-  })();
   // Image Information
   var infoDialog = (function() {
     var makeAspectRatioInfo = function(w, h) {
