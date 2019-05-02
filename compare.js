@@ -976,6 +976,17 @@
         }
       }
     };
+    var getROIRect = function(ent) {
+      var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
+      var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
+      var center = viewZoom.getCenter();
+      return [
+          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
+          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
+          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
+      ];
+    };
     var makePathDesc = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var desc = '';
@@ -986,7 +997,8 @@
       return desc;
     };
     var makeLabelAttr = function(img, x, y) {
-      var attr = makeLabelAttrOnTransform(img, x, y);
+      var roi = getROIRect(img);
+      var attr = makeLabelAttrOnTransform(img, roi, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
       if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
         attr[0]['dy'] = '40%';
@@ -997,17 +1009,8 @@
       }
       return attr;
     };
-    var makeLabelAttrOnTransform = function(ent, x, y) {
+    var makeLabelAttrOnTransform = function(ent, roi, x, y) {
       var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
-      var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
-      var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
-      var center = viewZoom.getCenter();
-      var roi = [
-          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1)
-          //ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
-          //ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
-      ];
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
       var pos = ent.interpretXY2(x, y);
@@ -1159,7 +1162,8 @@
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
         var pos = positions[ent.index];
-        var attr = makeLabelAttrOnTransform(ent, pos.x, pos.y);
+        var roi = getROIRect(ent);
+        var attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
         $(ent.cursor).find('g.labels text').each(function(i) {
           $(this).attr(attr[i]);
         });
