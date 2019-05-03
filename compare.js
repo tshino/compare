@@ -2107,6 +2107,8 @@
   };
   // Histogram
   var histogramDialog = (function() {
+    var figW = 768 + 40;
+    var figH = 512 + 32;
     var repaint = function() {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
@@ -2142,8 +2144,7 @@
       }, attachImageDataToTask);
     };
     var makeFigure = function(type, auxType2, hist) {
-      var right_margin = 40, bottom_margin = 32;
-      var fig = figureUtil.makeBlankFigure(768 + right_margin, 512 + bottom_margin);
+      var fig = figureUtil.makeBlankFigure(figW, figH);
       var context = fig.context;
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
@@ -2162,7 +2163,7 @@
       context.fillStyle = '#222';
       context.fillRect(0,0,768,512);
       context.fillStyle = '#000';
-      context.fillRect(768,0,right_margin,512);
+      context.fillRect(768,0,figW - 768,512);
       drawGrid();
       if (type === 0) { // RGB
         if (histogramRowLayout.current()) {
@@ -2222,7 +2223,7 @@
       }
     };
     var updateTable = function(transformOnly) {
-      var w = 384, h = 272, margin = 8;
+      var w = figW / 2, h = figH / 2, margin = 8;
       var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
       updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
     };
