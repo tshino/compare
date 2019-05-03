@@ -264,9 +264,11 @@
   crossCursor.addObserver(
     null,
     function(pointChanged) {
-      if (pointChanged) {
-        var pos = crossCursor.getNormalizedPosition();
+      var pos = crossCursor.getNormalizedPosition();
+      if (pos.isInView) {
         viewZoom.setZoomOrigin(pos);
+      } else {
+        viewZoom.resetZoomOrigin();
       }
     },
     function() {
@@ -955,7 +957,8 @@
     var getNormalizedPosition = function() {
       return {
         x: (0.5 + positions[primaryIndex].x) / entries[primaryIndex].width,
-        y: (0.5 + positions[primaryIndex].y) / entries[primaryIndex].height
+        y: (0.5 + positions[primaryIndex].y) / entries[primaryIndex].height,
+        isInView: positions[primaryIndex].isInView
       };
     };
     var isFixed = function() {
@@ -996,8 +999,7 @@
       desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
       return desc;
     };
-    var makeLabelAttr = function(img, x, y) {
-      var roi = getROIRect(img);
+    var makeLabelAttr = function(img, roi, x, y) {
       var attr = makeLabelAttrOnTransform(img, roi, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
       if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
@@ -1058,7 +1060,13 @@
       y = compareUtil.clamp(y, 0, img.height - 1);
       positions[img.index] = { x: x, y: y, fixed: fixedPosition };
       var desc = makePathDesc(img, x, y);
-      var labelsAttr = makeLabelAttr(img, x, y);
+      var roi = getROIRect(img);
+      var isInView = (
+        roi[0] <= x && x <= roi[2] &&
+        roi[1] <= y && y <= roi[3]
+      );
+      positions[img.index].isInView = isInView;
+      var labelsAttr = makeLabelAttr(img, roi, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
       } else {
@@ -1163,6 +1171,11 @@
         });
         var pos = positions[ent.index];
         var roi = getROIRect(ent);
+        var isInView = (
+          roi[0] <= pos.x && pos.x <= roi[2] &&
+          roi[1] <= pos.y && pos.y <= roi[3]
+        );
+        positions[ent.index].isInView = isInView;
         var attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
         $(ent.cursor).find('g.labels text').each(function(i) {
           $(this).attr(attr[i]);
