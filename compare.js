@@ -762,14 +762,12 @@
       $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     };
     var updateMap = function(img) {
-      var roiW = img.boxW / (img.baseWidth * viewZoom.scale);
-      var roiH = img.boxH / (img.baseHeight * viewZoom.scale);
-      var center = viewZoom.getCenter();
+      var roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
       $('#mapROI').attr({
-        x : 100 * (0.5 + center.x - 0.5 * roiW) + '%',
-        y : 100 * (0.5 + center.y - 0.5 * roiH) + '%',
-        width : (100 * roiW)+'%',
-        height : (100 * roiH)+'%'
+        x : 100 * roi[0] + '%',
+        y : 100 * roi[1] + '%',
+        width : 100 * (roi[2] - roi[0]) + '%',
+        height : 100 * (roi[3] - roi[1]) + '%'
       });
       var s = 120 / Math.max(img.width, img.height);
       var w = img.width * s;
