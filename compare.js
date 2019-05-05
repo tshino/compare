@@ -537,6 +537,21 @@
         var rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
         img.baseWidth = rect.width;
         img.baseHeight = rect.height;
+        img.calcNormalizedROI = function(zoomScale, zoomCenter) {
+          var roiW = img.boxW / (img.baseWidth * zoomScale);
+          var roiH = img.boxH / (img.baseHeight * zoomScale);
+          return [
+            compareUtil.clamp(0.5 + zoomCenter.x - 0.5 * roiW, 0, 1),
+            compareUtil.clamp(0.5 + zoomCenter.y - 0.5 * roiH, 0, 1),
+            compareUtil.clamp(0.5 + zoomCenter.x + 0.5 * roiW, 0, 1),
+            compareUtil.clamp(0.5 + zoomCenter.y + 0.5 * roiH, 0, 1)
+          ];
+        };
+        img.calcROI = function(zoomScale, zoomCenter) {
+          var nROI = img.calcNormalizedROI(zoomScale, zoomCenter);
+          var w = img.width, h = img.height;
+          return [ nROI[0] * w, nROI[1] * h, nROI[2] * w, nROI[3] * h ];
+        };
         var w = img.transposed ? rect.height : rect.width;
         var h = img.transposed ? rect.width : rect.height;
         $(img.element).css({ width: w+'px', height: h+'px' });
@@ -979,17 +994,6 @@
         }
       }
     };
-    var getROIRect = function(ent) {
-      var roiW = ent.boxW / (ent.baseWidth * viewZoom.scale);
-      var roiH = ent.boxH / (ent.baseHeight * viewZoom.scale);
-      var center = viewZoom.getCenter();
-      return [
-          ent.width * compareUtil.clamp(0.5 + center.x - 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y - 0.5 * roiH, 0, 1),
-          ent.width * compareUtil.clamp(0.5 + center.x + 0.5 * roiW, 0, 1),
-          ent.height * compareUtil.clamp(0.5 + center.y + 0.5 * roiH, 0, 1)
-      ];
-    };
     var makePathDesc = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var desc = '';
@@ -1060,7 +1064,7 @@
       y = compareUtil.clamp(y, 0, img.height - 1);
       positions[img.index] = { x: x, y: y, fixed: fixedPosition };
       var desc = makePathDesc(img, x, y);
-      var roi = getROIRect(img);
+      var roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
       var isInView = (
         roi[0] <= x && x <= roi[2] &&
         roi[1] <= y && y <= roi[3]
@@ -1170,7 +1174,7 @@
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
         var pos = positions[ent.index];
-        var roi = getROIRect(ent);
+        var roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
         var isInView = (
           roi[0] <= pos.x && pos.x <= roi[2] &&
           roi[1] <= pos.y && pos.y <= roi[3]
