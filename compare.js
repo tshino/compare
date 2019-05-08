@@ -977,7 +977,7 @@
     var isFixed = function() {
       return fixedPosition;
     };
-    var isInView = function(roi, x, y) {
+    var isInsideROI = function(roi, x, y) {
       return (
         roi[0] <= x && x <= roi[2] &&
         roi[1] <= y && y <= roi[3]
@@ -1069,7 +1069,7 @@
       positions[img.index] = { x: x, y: y, fixed: fixedPosition };
       var desc = makePathDesc(img, x, y);
       var roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-      positions[img.index].isInView = isInView(roi, x, y);
+      positions[img.index].isInView = isInsideROI(roi, x, y);
       var labelsAttr = makeLabelAttr(img, roi, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
@@ -1175,7 +1175,7 @@
         });
         var pos = positions[ent.index];
         var roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
-        positions[ent.index].isInView = isInView(roi, pos.x, pos.y);
+        positions[ent.index].isInView = isInsideROI(roi, pos.x, pos.y);
         var attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
         $(ent.cursor).find('g.labels text').each(function(i) {
           $(this).attr(attr[i]);
