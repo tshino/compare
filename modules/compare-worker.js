@@ -474,6 +474,7 @@ function calcMetrics( a, b, options )
     // error
     return result;
   }
+  var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
   var w = a.width;
   var h = a.height;
   var sum12 = function(data) {
@@ -482,7 +483,7 @@ function calcMetrics( a, b, options )
       var lineSum1 = 0, lineSum2 = 0, lineSumY1 = 0, lineSumY2 = 0;
       for (var x = 0; x < w; ++x, i += 4) {
         var r = data[i + 0], g = data[i + 1], b = data[i + 2];
-        var y0 = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        var y0 = Math.round(m0 * r + m1 * g + m2 * b);
         lineSum1 += r + g + b;
         lineSum2 += r * r + g * g + b * b;
         lineSumY1 += y0;
@@ -511,8 +512,8 @@ function calcMetrics( a, b, options )
         var r0 = dataA[i + 0], r1 = dataB[i + 0];
         var g0 = dataA[i + 1], g1 = dataB[i + 1];
         var b0 = dataA[i + 2], b1 = dataB[i + 2];
-        var y0 = Math.round(0.299 * r0 + 0.587 * g0 + 0.114 * b0);
-        var y1 = Math.round(0.299 * r1 + 0.587 * g1 + 0.114 * b1);
+        var y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
+        var y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
         lineSum += r0 * r1 + g0 * g1 + b0 * b1;
         lineSumY += y0 * y1;
       }
@@ -556,8 +557,8 @@ function calcMetrics( a, b, options )
         var r0 = dataA[i + 0], r1 = dataB[i + 0];
         var g0 = dataA[i + 1], g1 = dataB[i + 1];
         var b0 = dataA[i + 2], b1 = dataB[i + 2];
-        var y0 = Math.round(0.299 * r0 + 0.587 * g0 + 0.114 * b0);
-        var y1 = Math.round(0.299 * r1 + 0.587 * g1 + 0.114 * b1);
+        var y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
+        var y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
         var r = r0 - r1, g = g0 - g1, b = b0 - b1, dy = y0 - y1;
         lineAE += Math.abs(r) + Math.abs(g) + Math.abs(b);
         lineSE += r * r + g * g + b * b;
