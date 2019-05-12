@@ -42,7 +42,8 @@ self.addEventListener('message', function(e) {
     result.result = calcReducedColorTable(data.imageData[0]);
     break;
   case 'calcMetrics':
-    result.result = calcMetrics(data.imageData[0], data.imageData[1], data.options);
+    result.auxTypes = data.auxTypes;
+    result.result = calcMetrics(data.imageData[0], data.imageData[1], data.options, data.auxTypes);
     break;
   case 'calcToneCurve':
     result.type   = data.type;
@@ -455,9 +456,10 @@ function calcReducedColorTable( imageData )
   };
 }
 
-function calcMetrics( a, b, options )
+function calcMetrics( a, b, options, auxTypes )
 {
   options = options || {};
+  auxTypes = auxTypes || [0];
   if (options.orientationA && options.orientationA !== 1) {
     a = compareImageUtil.applyOrientation(a, options.orientationA);
   }
@@ -474,7 +476,11 @@ function calcMetrics( a, b, options )
     // error
     return result;
   }
-  var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+  if (auxTypes[0] === 0) { // 0: bt601
+    var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+  } else { // 1: bt709
+    var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+  }
   var w = a.width;
   var h = a.height;
   var sum12 = function(data) {
