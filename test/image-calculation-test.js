@@ -507,10 +507,12 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [colorImage1, colorImage1]
+          imageData: [colorImage1, colorImage1],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( 0, data.auxTypes[0] );
           EXPECT_EQ( Infinity, data.result.psnr );
           EXPECT_EQ( 0, data.result.sad );
           EXPECT_EQ( 0, data.result.ssd );
@@ -534,7 +536,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [colorImage1, colorImage2]
+          imageData: [colorImage1, colorImage2],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -560,7 +563,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [redImage, greenImage]
+          imageData: [redImage, greenImage],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -588,7 +592,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [blackImage, blackImage]
+          imageData: [blackImage, blackImage],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -615,7 +620,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [transparent, transparent]
+          imageData: [transparent, transparent],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -642,7 +648,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [blackImage, whiteImage]
+          imageData: [blackImage, whiteImage],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -669,7 +676,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [blackImage, redImage]
+          imageData: [blackImage, redImage],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -696,7 +704,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [blackImage, transparent]
+          imageData: [blackImage, transparent],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
@@ -723,7 +732,8 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
-          imageData: [blackImage, colorImage1]
+          imageData: [blackImage, colorImage1],
+          auxTypes: [0]
         };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
