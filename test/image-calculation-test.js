@@ -563,6 +563,24 @@
       function(done) {
         var task = {
           cmd: 'calcMetrics',
+          imageData: [colorImage1, colorImage2],
+          auxTypes: [1] // *** bt709
+        };
+        taskCallback = function(data) {
+          EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT( 1e-14 > Math.abs(10 * Math.log10((255*255*16) / (6*6*12+7*7*4)) - data.result.y.psnr) );
+          EXPECT_EQ( 6*12+7*4, data.result.y.sad );
+          EXPECT_EQ( 6*6*12+7*7*4, data.result.y.ssd );
+          EXPECT_EQ( 6.25, data.result.y.mae );
+          EXPECT_EQ( 6*6*0.75+7*7*0.25, data.result.y.mse );
+          //EXPECT_EQ( ????, data.result.y.ncc ); // non-trivial answer
+          done();
+        };
+        taskQueue.addTask(task);
+      },
+      function(done) {
+        var task = {
+          cmd: 'calcMetrics',
           imageData: [redImage, greenImage],
           auxTypes: [0]
         };
