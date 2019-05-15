@@ -2050,9 +2050,7 @@
       colorFreqDialog.updateFigure(entries[data.index[0]]);
       break;
     case 'calcMetrics':
-      entries[data.index[0]].metrics[data.index[1]] = data.result;
-      entries[data.index[1]].metrics[data.index[0]] = data.result;
-      metricsDialog.updateTable();
+      metricsDialog.updateFigure(data.index[0], data.index[1], data.auxTypes, data.result);
       break;
     case 'calcToneCurve':
       toneCurveDialog.updateFigure(data.type, data.auxTypes, data.index[0], data.index[1], data.result);
@@ -3552,7 +3550,23 @@
   var metricsDialog = (function() {
     var metricsMode = makeModeSwitch('#metricsMode', 0, function(type) {
       updateTable();
+      updateAuxOption();
     });
+    var metricsAuxType2 = makeModeSwitch('#metricsAuxType2', 0, function() {
+      discardTasksOfCommand('calcMetrics');
+      for (var i = 0, img; img = images[i]; i++) {
+        img.metrics = [];
+      }
+      updateTable();
+    });
+    var updateAuxOption = function() {
+      if (metricsMode.current() === 0) {
+        $('#metricsAuxType2').hide();
+      } else {
+        $('#metricsAuxType2').show();
+      }
+    };
+    updateAuxOption();
     var metricsToString = function(metrics, imgA) {
       if (typeof metrics === 'string') {
         return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
@@ -3637,7 +3651,8 @@
           options:  {
             orientationA: entries[a.index].orientation,
             orientationB: entries[b.index].orientation
-          }
+          },
+          auxTypes: [metricsAuxType2.current()],
         }, attachImageDataToTask);
       }
       $('#metricsTargetName').append(
@@ -3660,9 +3675,17 @@
       $('#nccValue').append($('<td>').text(compareUtil.hyphenToMinus(values.ncc)));
       $('#aeValue').append($('<td>').text(values.ae));
     };
+    var updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
+      if (auxTypes[0] === metricsAuxType2.current()) {
+        entries[baseIndex].metrics[targetIndex] = result;
+        entries[targetIndex].metrics[baseIndex] = result;
+      }
+      updateTable();
+    };
     var toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
     return {
       updateTable: updateTable,
+      updateFigure: updateFigure,
       toggle: toggle
     };
   })();
