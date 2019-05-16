@@ -577,6 +577,7 @@
         // 0, 1, 192 --> 15  30, 1, 192 --> 21    (+6)
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
+          EXPECT_EQ( 1, data.auxTypes[0] );
           EXPECT( 1e-14 > Math.abs(10 * Math.log10((255*255*16) / (6*6*12+7*7*4)) - data.result.y.psnr) );
           EXPECT_EQ( 6*12+7*4, data.result.y.sad );
           EXPECT_EQ( 6*6*12+7*7*4, data.result.y.ssd );
