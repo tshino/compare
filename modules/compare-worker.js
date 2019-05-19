@@ -528,8 +528,8 @@ function calcMetrics( a, b, options, auxTypes )
     }
     var den = Math.sqrt(sdsumA[0] * sdsumB[0]);
     var denY = Math.sqrt(sdsumA[1] * sdsumB[1]);
-    var ncc = den === 0 ? 0 : (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
-    var y_ncc = denY === 0 ? 0 : (sumY * (w * h) - sum12A[2] * sum12B[2]) / denY;
+    var ncc = den === 0 ? NaN : (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
+    var y_ncc = denY === 0 ? NaN : (sumY * (w * h) - sum12A[2] * sum12B[2]) / denY;
     return { ncc: ncc, y_ncc: y_ncc };
   };
   var ncc = calcNCC(a.data, b.data);
