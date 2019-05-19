@@ -3634,13 +3634,8 @@
       var a = entries[baseImageIndex];
       var b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
-        var invalid = {
-          psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN,
-          y: { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN },
-          ae: NaN, aeRgb: NaN, aeAlpha: NaN
-        };
-        a.metrics[b.index] = invalid;
-        b.metrics[a.index] = invalid;
+        a.metrics[b.index] = '‐ (different size)';
+        b.metrics[a.index] = '‐ (different size)';
       }
       if (!a.metrics[b.index]) {
         a.metrics[b.index] = 'calculating...';
