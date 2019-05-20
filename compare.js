@@ -3593,7 +3593,7 @@
             isNaN(m.sad) ? '‐' :
             compareUtil.addComma(m.sad),
         ncc:
-            isNaN(m.ncc) ? '‐' :
+            isNaN(m.ncc) ? '‐ (zero variance)' :
             m.ncc.toFixed(6),
         ae:
             isNaN(metrics.ae) ? '‐' :
