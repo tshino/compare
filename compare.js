@@ -3661,14 +3661,18 @@
         )
       );
       var values = metricsToString(a.metrics[b.index], a);
-      $('#psnrValue').append($('<td>').text(compareUtil.hyphenToMinus(values.psnr)));
-      $('#rmseValue').append($('<td>').text(values.rmse));
-      $('#mseValue').append($('<td>').text(values.mse));
-      $('#maeValue').append($('<td>').text(values.mae));
-      $('#ssdValue').append($('<td>').text(values.ssd));
-      $('#sadValue').append($('<td>').text(values.sad));
-      $('#nccValue').append($('<td>').text(compareUtil.hyphenToMinus(values.ncc)));
-      $('#aeValue').append($('<td>').text(values.ae));
+      var setMetricsValue = function(row, value, signed) {
+        var val = signed ? compareUtil.hyphenToMinus(value) : value;
+        row.append($('<td>').text(val));
+      };
+      setMetricsValue($('#psnrValue'), values.psnr, true);
+      setMetricsValue($('#rmseValue'), values.rmse, false);
+      setMetricsValue($('#mseValue'), values.mse, false);
+      setMetricsValue($('#maeValue'), values.mae, false);
+      setMetricsValue($('#ssdValue'), values.ssd, false);
+      setMetricsValue($('#sadValue'), values.sad, false);
+      setMetricsValue($('#nccValue'), values.ncc, true);
+      setMetricsValue($('#aeValue'), values.ae, false);
     };
     var updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
       if (auxTypes[0] === metricsAuxType2.current()) {
