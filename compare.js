@@ -3576,7 +3576,7 @@
         psnr:
             isNaN(m.psnr) ? '‐' :
             m.psnr === Infinity ? '∞ dB' :
-            m.psnr.toFixed(2) + ' dB',
+            compareUtil.hyphenToMinus(m.psnr.toFixed(2) + ' dB'),
         rmse:
             isNaN(m.mse) ? '‐' :
             Math.sqrt(m.mse).toPrecision(6),
@@ -3594,7 +3594,7 @@
             compareUtil.addComma(m.sad),
         ncc:
             isNaN(m.ncc) ? { en: '‐ (zero variance)', ja: '‐ (分散がゼロ)' } :
-            m.ncc.toFixed(6),
+            compareUtil.hyphenToMinus(m.ncc.toFixed(6)),
         ae:
             isNaN(metrics.ae) ? '‐' :
             compareUtil.addComma(metrics.ae) +
@@ -3663,22 +3663,21 @@
         )
       );
       var values = metricsToString(a.metrics[b.index], a);
-      var setMetricsValue = function(row, value, signed) {
+      var setMetricsValue = function(row, value) {
         if (typeof value === 'string') {
-          var val = signed ? compareUtil.hyphenToMinus(value) : value;
-          row.append($('<td>').text(val));
+          row.append($('<td>').text(value));
         } else {
           row.append(textUtil.setText($('<td>'), value));
         }
       };
-      setMetricsValue($('#psnrValue'), values.psnr, true);
-      setMetricsValue($('#rmseValue'), values.rmse, false);
-      setMetricsValue($('#mseValue'), values.mse, false);
-      setMetricsValue($('#maeValue'), values.mae, false);
-      setMetricsValue($('#ssdValue'), values.ssd, false);
-      setMetricsValue($('#sadValue'), values.sad, false);
-      setMetricsValue($('#nccValue'), values.ncc, true);
-      setMetricsValue($('#aeValue'), values.ae, false);
+      setMetricsValue($('#psnrValue'), values.psnr);
+      setMetricsValue($('#rmseValue'), values.rmse);
+      setMetricsValue($('#mseValue'), values.mse);
+      setMetricsValue($('#maeValue'), values.mae);
+      setMetricsValue($('#ssdValue'), values.ssd);
+      setMetricsValue($('#sadValue'), values.sad);
+      setMetricsValue($('#nccValue'), values.ncc);
+      setMetricsValue($('#aeValue'), values.ae);
     };
     var updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
       if (auxTypes[0] === metricsAuxType2.current()) {
