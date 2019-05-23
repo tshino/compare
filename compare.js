@@ -3593,7 +3593,7 @@
             isNaN(m.sad) ? '‐' :
             compareUtil.addComma(m.sad),
         ncc:
-            isNaN(m.ncc) ? '‐ (zero variance)' :
+            isNaN(m.ncc) ? { en: '‐ (zero variance)', ja: '‐ (分散がゼロ)' } :
             m.ncc.toFixed(6),
         ae:
             isNaN(metrics.ae) ? '‐' :
@@ -3662,8 +3662,12 @@
       );
       var values = metricsToString(a.metrics[b.index], a);
       var setMetricsValue = function(row, value, signed) {
-        var val = signed ? compareUtil.hyphenToMinus(value) : value;
-        row.append($('<td>').text(val));
+        if (typeof value === 'string') {
+          var val = signed ? compareUtil.hyphenToMinus(value) : value;
+          row.append($('<td>').text(val));
+        } else {
+          row.append(textUtil.setText($('<td>'), value));
+        }
       };
       setMetricsValue($('#psnrValue'), values.psnr, true);
       setMetricsValue($('#rmseValue'), values.rmse, false);
