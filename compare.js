@@ -3568,7 +3568,7 @@
     };
     updateAuxOption();
     var metricsToString = function(metrics, imgA) {
-      if (typeof metrics === 'string') {
+      if (typeof metrics === 'string' || metrics.en !== undefined) {
         return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
       }
       var m = metricsMode.current() === 0 ? metrics : metrics.y;
@@ -3634,12 +3634,14 @@
       var a = entries[baseImageIndex];
       var b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
-        a.metrics[b.index] = '‐ (different size)';
-        b.metrics[a.index] = '‐ (different size)';
+        var message = { en: '‐ (different size)', ja: '‐ (サイズが不一致)' };
+        a.metrics[b.index] = message;
+        b.metrics[a.index] = message;
       }
       if (!a.metrics[b.index]) {
-        a.metrics[b.index] = 'calculating...';
-        b.metrics[a.index] = 'calculating...';
+        var message = { en: 'calculating...', ja: '計算中...' };
+        a.metrics[b.index] = message;
+        b.metrics[a.index] = message;
         taskQueue.addTask({
           cmd:      'calcMetrics',
           index:    [a.index, b.index],
