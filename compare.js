@@ -1976,25 +1976,28 @@
       $(target).find('td.fig > *').css(styles.style);
       return;
     }
-    $(target).find('td').remove();
+    var labelRow = $(target).find('tr.label');
+    var figureRow = $(target).find('tr.figure');
+    labelRow.find('td').remove();
+    figureRow.find('td').remove();
     for (var k = 0, img; img = images[k]; k++) {
       if (!img[propName]) {
         img[propName] = figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
       var label = makeImageNameWithIndex('<td>', img);
-      $(target).find('tr').eq(0).append(label);
+      labelRow.append(label);
       var figMain = $(img[propName]).css(styles.style).addClass('figMain');
       var fig = $('<td class="fig">').css(styles.cellStyle).append(figMain);
       var axes = img[propName + 'Axes'];
       if (axes) {
         fig.append($(axes).css(styles.style));
       }
-      $(target).find('tr').eq(1).append(fig);
+      figureRow.append(fig);
     }
     if (k === 0) {
       var cell = $('<td rowspan="2">').text('no data');
-      $(target).find('tr').eq(0).append(cell);
+      labelRow.append(cell);
     }
   };
   var makeFigureStyles = function(w, h, margin, background, zoomController) {
