@@ -3741,22 +3741,22 @@
         toneCurveResult.result = null;
       }
     };
-    var updateAsync = function() {
-      toneCurveResult.base   = baseImageIndex;
-      toneCurveResult.target = targetImageIndex;
+    var updateAsync = function(baseImage, targetImage) {
+      toneCurveResult.base   = baseImage.index;
+      toneCurveResult.target = targetImage.index;
       toneCurveResult.type   = toneCurveType.current();
       toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
       toneCurveResult.result = null;
       discardTasksOfCommand('calcToneCurve');
-      if (baseImageIndex !== targetImageIndex) {
+      if (baseImage.index !== targetImage.index) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
           type:     toneCurveType.current(),
           auxTypes: [toneCurveAuxType2.current()],
-          index:    [baseImageIndex, targetImageIndex],
+          index:    [baseImage.index, targetImage.index],
           options:  {
-            orientationA: entries[baseImageIndex].orientation,
-            orientationB: entries[targetImageIndex].orientation
+            orientationA: baseImage.orientation,
+            orientationB: targetImage.orientation
           }
         }, attachImageDataToTask);
       }
@@ -3832,13 +3832,11 @@
       if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateTable)) {
         return;
       }
-      var a = entries[baseImageIndex];
-      var b = entries[targetImageIndex];
       if (toneCurveResult.base !== baseImageIndex ||
           toneCurveResult.target !== targetImageIndex ||
           toneCurveResult.type !== toneCurveType.current() ||
           toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
-        updateAsync();
+        updateAsync(entries[baseImageIndex], entries[targetImageIndex]);
       }
       var figW = 320, figH = 320, figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
