@@ -3750,7 +3750,6 @@
       toneCurveResult.type   = toneCurveType.current();
       toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
       toneCurveResult.result = null;
-      discardTasksOfCommand('calcToneCurve');
       if (baseImage.index !== targetImage.index) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
@@ -3832,7 +3831,7 @@
     };
     var updateTableDOM = function() {
       $('#toneCurveResult *').remove();
-      if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', updateTable)) {
+      if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', repaint)) {
         return;
       }
       if (toneCurveResult.base !== baseImageIndex ||
