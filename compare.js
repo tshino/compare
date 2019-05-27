@@ -3852,7 +3852,7 @@
     var updateTable = function(transformOnly) {
       if (transformOnly) {
         if (toneCurveResult.result !== null) {
-          $('#toneCurveResult > *').css({
+          $('#toneCurveTable td.fig > *').css({
             transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
           });
         }
