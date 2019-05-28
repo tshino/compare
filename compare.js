@@ -3829,7 +3829,7 @@
         css(styles.style);
       $('#toneCurveResult').append(dist).append(curve).append(axes).css(styles.cellStyle);
     };
-    var updateTableDOM = function() {
+    var updateTableDOM = function(styles) {
       $('#toneCurveResult *').remove();
       if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', repaint)) {
         return;
@@ -3840,8 +3840,6 @@
           toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
         updateAsync(entries[baseImageIndex], entries[targetImageIndex]);
       }
-      var figW = 320, figH = 320, figMargin = 8;
-      var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
       if (toneCurveResult.result === null) {
         $('#toneCurveResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
       } else {
@@ -3849,14 +3847,12 @@
       }
     };
     var updateTable = function(transformOnly) {
+      var figW = 320, figH = 320, figMargin = 8;
+      var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
       if (transformOnly) {
-        if (toneCurveResult.result !== null) {
-          $('#toneCurveTable td.fig > *').css({
-            transform: 'translate(-50%,0%) ' + figureZoom.makeTransform()
-          });
-        }
+        $('#toneCurveTable td.fig > *').css(styles.style);
       } else {
-        updateTableDOM();
+        updateTableDOM(styles);
       }
     };
     var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
