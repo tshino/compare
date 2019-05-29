@@ -3745,11 +3745,6 @@
       }
     };
     var updateAsync = function(baseImage, targetImage) {
-      toneCurveResult.base   = baseImage.index;
-      toneCurveResult.target = targetImage.index;
-      toneCurveResult.type   = toneCurveType.current();
-      toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
-      toneCurveResult.result = null;
       if (baseImage.index !== targetImage.index) {
         taskQueue.addTask({
           cmd:      'calcToneCurve',
@@ -3838,6 +3833,11 @@
           toneCurveResult.target !== targetImageIndex ||
           toneCurveResult.type !== toneCurveType.current() ||
           toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
+        toneCurveResult.base   = baseImageIndex;
+        toneCurveResult.target = targetImageIndex;
+        toneCurveResult.type   = toneCurveType.current();
+        toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
+        toneCurveResult.result = null;
         updateAsync(entries[baseImageIndex], entries[targetImageIndex]);
       }
       if (toneCurveResult.result === null) {
