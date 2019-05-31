@@ -1987,13 +1987,13 @@
       }
       var label = makeImageNameWithIndex('<td>', img);
       labelRow.append(label);
-      var figMain = $(img[propName]).css(styles.style).addClass('figMain');
-      var fig = $('<td class="fig">').css(styles.cellStyle).append(figMain);
+      var figCell = $('<td class="fig">').css(styles.cellStyle);
+      figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
       var axes = img[propName + 'Axes'];
       if (axes) {
-        fig.append($(axes).css(styles.style));
+        figCell.append($(axes).css(styles.style));
       }
-      figureRow.append(fig);
+      figureRow.append(figCell);
     }
     if (k === 0) {
       var cell = $('<td rowspan="2">').text('no data');
@@ -3806,23 +3806,22 @@
         scaleDesc += 'M 32,' + y + ' l 256,0 ';
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
-      var axes = $(
+      var fig = makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type);
+      var curve = (
+        '<svg viewBox="' + vbox + '">' +
+          curvePaths.join() +
+        '</svg>');
+      var axes = (
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
             '<path stroke-width="0.5" d="' + axesDesc + '"></path>' +
           '</g>' +
-        '</svg>').
-        css(styles.style);
-      var dist = $(
-          makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type).canvas
-        ).css(styles.style).addClass('figMain');
-      var curve = $(
-        '<svg viewBox="' + vbox + '">' +
-          curvePaths.join() +
-        '</svg>').
-        css(styles.style);
-      $('#toneCurveResult').append(dist).append(curve).append(axes).css(styles.cellStyle);
+        '</svg>');
+      fig.axes = $(curve + axes);
+      var figCell = $('#toneCurveResult').css(styles.cellStyle);
+      figCell.append($(fig.canvas).css(styles.style).addClass('figMain'));
+      figCell.append($(fig.axes).css(styles.style));
     };
     var updateTableDOM = function(styles) {
       $('#toneCurveResult *').remove();
