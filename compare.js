@@ -3768,9 +3768,9 @@
       fig.context.putImageData(bits, 32, 32);
       return fig;
     };
-    var makeFigure = function(styles) {
-      var numComponents = toneCurveResult.type === 0 ? 3 : 1;
-      var components = toneCurveResult.result.components;
+    var makeFigure = function(type, toneCurve, styles) {
+      var numComponents = type === 0 ? 3 : 1;
+      var components = toneCurve.components;
       var vbox = '0 0 ' + 320 + ' ' + 320;
       var curvePaths = [];
       var pointToCoord = function(p) {
@@ -3786,7 +3786,7 @@
       };
       for (var c = 0; c < numComponents; ++c) {
         var result = components[c];
-        var color = toneCurveResult.type === 0 ? ['#f00', '#0f0', '#00f'][c] : '#fff';
+        var color = type === 0 ? ['#f00', '#0f0', '#00f'][c] : '#fff';
         curvePaths[c] = '<g stroke="' + color + '" ' +
             'style="mix-blend-mode: lighten" ' +
             'fill="none" stroke-width="1">';
@@ -3806,7 +3806,7 @@
         scaleDesc += 'M 32,' + y + ' l 256,0 ';
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
-      var fig = makeToneMapFigure(toneCurveResult.result.toneMap, toneCurveResult.type);
+      var fig = makeToneMapFigure(toneCurve.toneMap, type);
       var curve = (
         '<svg viewBox="' + vbox + '">' +
           curvePaths.join() +
@@ -3844,7 +3844,7 @@
         var figCell = $('<td class="fig" colspan="3">').css(styles.cellStyle);
         figCell.append(figureUtil.makeBlankFigure(8,8).canvas);
       } else {
-        var figCell = makeFigure(styles);
+        var figCell = makeFigure(toneCurveResult.type, toneCurveResult.result, styles);
       }
       $('#toneCurveTable tr.figure').append(figCell);
     };
