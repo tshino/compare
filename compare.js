@@ -3819,10 +3819,7 @@
           '</g>' +
         '</svg>');
       fig.axes = $(curve + axes);
-      var figCell = $('<td class="fig" colspan="3">').css(styles.cellStyle);
-      figCell.append($(fig.canvas).css(styles.style).addClass('figMain'));
-      figCell.append($(fig.axes).css(styles.style));
-      return figCell;
+      return fig;
     };
     var updateTableDOM = function(styles) {
       $('#toneCurveTable tr.figure td').remove();
@@ -3840,11 +3837,13 @@
         toneCurveResult.result = null;
         updateAsync(entries[baseImageIndex], entries[targetImageIndex]);
       }
+      var figCell = $('<td class="fig" colspan="3">').css(styles.cellStyle);
       if (toneCurveResult.result === null) {
-        var figCell = $('<td class="fig" colspan="3">').css(styles.cellStyle);
         figCell.append(figureUtil.makeBlankFigure(8,8).canvas);
       } else {
-        var figCell = makeFigure(toneCurveResult.type, toneCurveResult.result, styles);
+        var figData = makeFigure(toneCurveResult.type, toneCurveResult.result, styles);
+        figCell.append($(figData.canvas).css(styles.style).addClass('figMain'));
+        figCell.append($(figData.axes).css(styles.style));
       }
       $('#toneCurveTable tr.figure').append(figCell);
     };
