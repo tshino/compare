@@ -686,6 +686,8 @@
       ent.waveform3DFig = null;
       ent.waveform3DFigAxes = null;
       ent.reducedColorTable = null;
+      ent.toneCurve = null;
+      ent.toneCurveAxes = null;
       discardTasksOfEntryByIndex(index);
       viewManagement.resetLayoutState();
       updateDOM();
@@ -3723,7 +3725,14 @@
     var toneCurveResult = {};
     var repaint = function() {
       discardTasksOfCommand('calcToneCurve');
+      for (var i = 0, img; img = images[i]; i++) {
+        img.toneCurve = null;
+        img.toneCurveAxes = null;
+      }
       toneCurveResult = {};
+      toneCurveResult.base = baseImageIndex;
+      toneCurveResult.type = toneCurveType.current();
+      toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
       updateTable();
     };
     var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
@@ -3739,10 +3748,11 @@
       }
     };
     var onRemoveEntry = function(index) {
-      if (toneCurveResult.base === index || toneCurveResult.target === index) {
-        $('#toneCurveTable tr.figure td').remove();
-        toneCurveResult.result = null;
+      for (var i = 0, img; img = images[i]; i++) {
+        img.toneCurve = null;
+        img.toneCurveAxes = null;
       }
+      $('#toneCurveTable tr.figure td').remove();
     };
     var updateAsync = function(baseImage, targetImage) {
       if (baseImage.index !== targetImage.index) {
@@ -3768,7 +3778,7 @@
       fig.context.putImageData(bits, 32, 32);
       return fig;
     };
-    var makeFigure = function(type, toneCurve, styles) {
+    var makeFigure = function(type, toneCurve) {
       var numComponents = type === 0 ? 3 : 1;
       var components = toneCurve.components;
       var vbox = '0 0 ' + 320 + ' ' + 320;
@@ -3822,30 +3832,44 @@
       return fig;
     };
     var updateTableDOM = function(styles) {
+      $('#toneCurveBaseName').children().remove();
+      $('#toneCurveTable tr.label td:not(.prop)').remove();
       $('#toneCurveTable tr.figure td').remove();
-      if (false === setupBaseAndTargetSelector('#toneCurveBaseName', '#toneCurveTargetName', repaint)) {
+      if (images.length < 2) {
+        $('#toneCurveTable tr.label').append($('<td>').text('no data'));
         return;
       }
+      setBaseAndTargetImage(null, null);
+      $('#toneCurveBaseName').append(
+        makeImageNameSelector(baseImageIndex, function(index) {
+          changeBaseImage(index);
+          repaint();
+        })
+      );
       if (toneCurveResult.base !== baseImageIndex ||
-          toneCurveResult.target !== targetImageIndex ||
           toneCurveResult.type !== toneCurveType.current() ||
           toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
-        toneCurveResult.base   = baseImageIndex;
-        toneCurveResult.target = targetImageIndex;
-        toneCurveResult.type   = toneCurveType.current();
-        toneCurveResult.auxTypes = [toneCurveAuxType2.current()];
-        toneCurveResult.result = null;
-        updateAsync(entries[baseImageIndex], entries[targetImageIndex]);
+        return repaint();
       }
-      var figCell = $('<td class="fig" colspan="3">').css(styles.cellStyle);
-      if (toneCurveResult.result === null) {
-        figCell.append(figureUtil.makeBlankFigure(8,8).canvas);
-      } else {
-        var figData = makeFigure(toneCurveResult.type, toneCurveResult.result, styles);
-        figCell.append($(figData.canvas).css(styles.style).addClass('figMain'));
-        figCell.append($(figData.axes).css(styles.style));
+      for (var k = 0, img; img = images[k]; k++) {
+        if (img.index === baseImageIndex) {
+          continue;
+        }
+        $('#toneCurveTable tr.label').append(
+          $('<td>').append(makeImageNameWithIndex('<span>', img))
+        );
+        if (!img.toneCurve) {
+          img.toneCurve = figureUtil.makeBlankFigure(8,8).canvas;
+          updateAsync(entries[baseImageIndex], img);
+        }
+        var figCell = $('<td class="fig">').css(styles.cellStyle);
+        figCell.append($(img.toneCurve).css(styles.style).addClass('figMain'));
+        var axes = img.toneCurveAxes;
+        if (axes) {
+          figCell.append($(axes).css(styles.style));
+        }
+        $('#toneCurveTable tr.figure').append(figCell);
       }
-      $('#toneCurveTable tr.figure').append(figCell);
     };
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
@@ -3859,11 +3883,12 @@
     var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveType.current() &&
           auxTypes[0] === toneCurveAuxType2.current() &&
-          baseIndex === toneCurveResult.base &&
-          targetIndex === toneCurveResult.target) {
+          baseIndex === toneCurveResult.base) {
         toneCurveResult.type = type;
         toneCurveResult.auxTypes = auxTypes;
-        toneCurveResult.result = result;
+        var figData = makeFigure(type, result);
+        entries[targetIndex].toneCurve = figData.canvas;
+        entries[targetIndex].toneCurveAxes = figData.axes;
       }
       updateTable();
     };
@@ -5091,6 +5116,7 @@
             waveform3DFig : null,
             reducedColorTable: null,
             metrics     : [],
+            toneCurve   : null,
             loading     : true,
             progress    : 0,
             error       : null,
