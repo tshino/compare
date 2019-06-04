@@ -3837,7 +3837,10 @@
       $('#toneCurveTable tr.figure td').remove();
       if (images.length < 2) {
         $('#toneCurveTable tr.label').append($('<td>').text('no data'));
-        return;
+        if (images.length === 0) {
+          $('#toneCurveBaseName').append($('<span>').text('no data'));
+          return;
+        }
       }
       setBaseAndTargetImage(null, null);
       $('#toneCurveBaseName').append(
