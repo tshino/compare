@@ -3752,7 +3752,7 @@
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
-      $('#toneCurveTable tr.figure td').remove();
+      $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
     var updateAsync = function(baseImage, targetImage) {
       if (baseImage.index !== targetImage.index) {
@@ -3834,9 +3834,9 @@
     var updateTableDOM = function(styles) {
       $('#toneCurveBaseName').children().remove();
       $('#toneCurveTable tr.label td:not(.prop)').remove();
-      $('#toneCurveTable tr.figure td').remove();
+      $('#toneCurveTable tr.figure td:not(.prop)').remove();
       if (images.length < 2) {
-        $('#toneCurveTable tr.label').append($('<td>').text('no data'));
+        $('#toneCurveTable tr.label').append($('<td rowspan="2">').text('no data'));
         if (images.length === 0) {
           $('#toneCurveBaseName').append($('<span>').text('no data'));
           return;
