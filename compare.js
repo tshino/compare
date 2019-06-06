@@ -3831,12 +3831,16 @@
       fig.axes = $(curve + axes);
       return fig;
     };
-    var updateTableDOM = function(styles) {
+    var updateFigureTable2 = function(target, styles, transformOnly) {
+      if (transformOnly) {
+        $(target).find('td.fig > *').css(styles.style);
+        return;
+      }
       $('#toneCurveBaseName').children().remove();
-      $('#toneCurveTable tr.label td:not(.prop)').remove();
-      $('#toneCurveTable tr.figure td:not(.prop)').remove();
+      $(target).find('tr.label td:not(.prop)').remove();
+      $(target).find('tr.figure td:not(.prop)').remove();
       if (images.length < 2) {
-        $('#toneCurveTable tr.label').append($('<td rowspan="2">').text('no data'));
+        $(target).find('tr.label').append($('<td rowspan="2">').text('no data'));
         if (images.length === 0) {
           $('#toneCurveBaseName').append($('<span>').text('no data'));
           return;
@@ -3858,7 +3862,7 @@
         if (img.index === baseImageIndex) {
           continue;
         }
-        $('#toneCurveTable tr.label').append(
+        $(target).find('tr.label').append(
           $('<td>').append(makeImageNameWithIndex('<span>', img))
         );
         if (!img.toneCurve) {
@@ -3871,17 +3875,13 @@
         if (axes) {
           figCell.append($(axes).css(styles.style));
         }
-        $('#toneCurveTable tr.figure').append(figCell);
+        $(target).find('tr.figure').append(figCell);
       }
     };
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
-      if (transformOnly) {
-        $('#toneCurveTable td.fig > *').css(styles.style);
-      } else {
-        updateTableDOM(styles);
-      }
+      updateFigureTable2('#toneCurveTable', styles, transformOnly);
     };
     var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveType.current() &&
