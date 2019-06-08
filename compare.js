@@ -3837,10 +3837,12 @@
         return;
       }
       $('#toneCurveBaseName').children().remove();
-      $(target).find('tr.label td:not(.prop)').remove();
-      $(target).find('tr.figure td:not(.prop)').remove();
+      var labelRow = $(target).find('tr.label');
+      var figureRow = $(target).find('tr.figure');
+      labelRow.find('td:not(.prop)').remove();
+      figureRow.find('td:not(.prop)').remove();
       if (images.length < 2) {
-        $(target).find('tr.label').append($('<td rowspan="2">').text('no data'));
+        labelRow.append($('<td rowspan="2">').text('no data'));
         if (images.length === 0) {
           $('#toneCurveBaseName').append($('<span>').text('no data'));
           return;
@@ -3862,7 +3864,7 @@
         if (img.index === baseImageIndex) {
           continue;
         }
-        $(target).find('tr.label').append(
+        labelRow.append(
           $('<td>').append(makeImageNameWithIndex('<span>', img))
         );
         if (!img.toneCurve) {
@@ -3875,7 +3877,7 @@
         if (axes) {
           figCell.append($(axes).css(styles.style));
         }
-        $(target).find('tr.figure').append(figCell);
+        figureRow.append(figCell);
       }
     };
     var updateTable = function(transformOnly) {
