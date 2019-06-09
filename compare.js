@@ -3844,7 +3844,7 @@
       if (images.length < 2) {
         labelRow.append($('<td rowspan="2">').text('no data'));
         if (images.length === 0) {
-          $('#toneCurveBaseName').append($('<span>').text('no data'));
+          $('#toneCurveBaseName').append($('<span>').text('no data')).attr('colspan', 1);
           return;
         }
       }
@@ -3860,10 +3860,11 @@
           toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
         return repaint();
       }
-      for (var k = 0, img; img = images[k]; k++) {
+      for (var k = 0, count = 0, img; img = images[k]; k++) {
         if (img.index === baseImageIndex) {
           continue;
         }
+        count += 1;
         labelRow.append(
           $('<td>').append(makeImageNameWithIndex('<span>', img))
         );
@@ -3879,6 +3880,7 @@
         }
         figureRow.append(figCell);
       }
+      $('#toneCurveBaseName').attr('colspan', Math.max(1, count));
     };
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
