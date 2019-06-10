@@ -3836,9 +3836,10 @@
         $(target).find('td.fig > *').css(styles.style);
         return;
       }
-      $('#toneCurveBaseName').children().remove();
+      var baseRow = $(target).find('tr.basename');
       var labelRow = $(target).find('tr.label');
       var figureRow = $(target).find('tr.figure');
+      baseRow.find('td:not(.prop) > *').remove();
       labelRow.find('td:not(.prop)').remove();
       figureRow.find('td:not(.prop)').remove();
       if (images.length < 2) {
