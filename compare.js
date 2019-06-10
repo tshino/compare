@@ -3836,21 +3836,21 @@
         $(target).find('td.fig > *').css(styles.style);
         return;
       }
-      var baseRow = $(target).find('tr.basename');
+      var baseCell = $(target).find('tr.basename td:not(.prop)');
       var labelRow = $(target).find('tr.label');
       var figureRow = $(target).find('tr.figure');
-      baseRow.find('td:not(.prop) > *').remove();
+      baseCell.children().remove();
       labelRow.find('td:not(.prop)').remove();
       figureRow.find('td:not(.prop)').remove();
       if (images.length < 2) {
         labelRow.append($('<td rowspan="2">').text('no data'));
         if (images.length === 0) {
-          $('#toneCurveBaseName').append($('<span>').text('no data')).attr('colspan', 1);
+          baseCell.append($('<span>').text('no data')).attr('colspan', 1);
           return;
         }
       }
       setBaseAndTargetImage(null, null);
-      $('#toneCurveBaseName').append(
+      baseCell.append(
         makeImageNameSelector(baseImageIndex, function(index) {
           changeBaseImage(index);
           repaint();
@@ -3881,7 +3881,7 @@
         }
         figureRow.append(figCell);
       }
-      $('#toneCurveBaseName').attr('colspan', Math.max(1, count));
+      baseCell.attr('colspan', Math.max(1, count));
     };
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
