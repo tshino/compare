@@ -3755,8 +3755,7 @@
       $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
     var updateAsync = function(baseImage, targetImage) {
-      if (baseImage.index !== targetImage.index) {
-        taskQueue.addTask({
+      taskQueue.addTask({
           cmd:      'calcToneCurve',
           type:     toneCurveType.current(),
           auxTypes: [toneCurveAuxType2.current()],
@@ -3765,8 +3764,7 @@
             orientationA: baseImage.orientation,
             orientationB: targetImage.orientation
           }
-        }, attachImageDataToTask);
-      }
+      }, attachImageDataToTask);
     };
     var makeToneMapFigure = function(toneMapData, type) {
       var fig = figureUtil.makeBlankFigure(320, 320);
@@ -3905,7 +3903,6 @@
     });
     return {
       onRemoveEntry: onRemoveEntry,
-      updateTable: updateTable,
       updateFigure: updateFigure,
       toggle: toggle
     };
