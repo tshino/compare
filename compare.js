@@ -3835,42 +3835,38 @@
         return;
       }
       var baseCell = $(target).find('tr.basename td:not(.prop)');
-      var labelRow = $(target).find('tr.label');
-      var figureRow = $(target).find('tr.figure');
       baseCell.children().remove();
-      labelRow.find('td:not(.prop)').remove();
-      figureRow.find('td:not(.prop)').remove();
-      if (images.length < 2) {
-        labelRow.append($('<td rowspan="2">').text('no data'));
-        if (images.length === 0) {
-          baseCell.append($('<span>').text('no data')).attr('colspan', 1);
-          return;
+      if (images.length === 0) {
+        baseCell.append($('<span>').text('no data')).attr('colspan', 1);
+      } else {
+        setBaseAndTargetImage(null, null);
+        baseCell.append(
+          makeImageNameSelector(baseImageIndex, function(index) {
+            changeBaseImage(index);
+            repaint();
+          })
+        );
+        if (toneCurveResult.base !== baseImageIndex ||
+            toneCurveResult.type !== toneCurveType.current() ||
+            toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
+          return repaint();
         }
       }
-      setBaseAndTargetImage(null, null);
-      baseCell.append(
-        makeImageNameSelector(baseImageIndex, function(index) {
-          changeBaseImage(index);
-          repaint();
-        })
-      );
-      if (toneCurveResult.base !== baseImageIndex ||
-          toneCurveResult.type !== toneCurveType.current() ||
-          toneCurveResult.auxTypes[0] !== toneCurveAuxType2.current()) {
-        return repaint();
-      }
+      var labelRow = $(target).find('tr.label');
+      var figureRow = $(target).find('tr.figure');
+      labelRow.find('td:not(.prop)').remove();
+      figureRow.find('td:not(.prop)').remove();
       for (var k = 0, count = 0, img; img = images[k]; k++) {
         if (img.index === baseImageIndex) {
           continue;
         }
         count += 1;
-        labelRow.append(
-          $('<td>').append(makeImageNameWithIndex('<span>', img))
-        );
         if (!img.toneCurve) {
           img.toneCurve = figureUtil.makeBlankFigure(8,8).canvas;
           updateAsync(entries[baseImageIndex], img);
         }
+        var label = makeImageNameWithIndex('<span>', img);
+        labelRow.append($('<td>').append(label));
         var figCell = $('<td class="fig">').css(styles.cellStyle);
         figCell.append($(img.toneCurve).css(styles.style).addClass('figMain'));
         var axes = img.toneCurveAxes;
@@ -3880,6 +3876,9 @@
         figureRow.append(figCell);
       }
       baseCell.attr('colspan', Math.max(1, count));
+      if (count == 0) {
+        labelRow.append($('<td rowspan="2">').text('no data'));
+      }
     };
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
