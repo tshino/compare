@@ -3829,7 +3829,7 @@
       fig.axes = $(curve + axes);
       return fig;
     };
-    var updateFigureTable2 = function(target, styles, transformOnly) {
+    var updateFigureTable2 = function(target, updateAsync, repaint, styles, transformOnly) {
       if (transformOnly) {
         $(target).find('td.fig > *').css(styles.style);
         return;
@@ -3883,14 +3883,12 @@
     var updateTable = function(transformOnly) {
       var figW = 320, figH = 320, figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
-      updateFigureTable2('#toneCurveTable', styles, transformOnly);
+      updateFigureTable2('#toneCurveTable', updateAsync, repaint, styles, transformOnly);
     };
     var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
-      if (type === toneCurveType.current() &&
-          auxTypes[0] === toneCurveAuxType2.current() &&
+      if (type === toneCurveResult.type &&
+          auxTypes[0] === toneCurveResult.auxTypes[0] &&
           baseIndex === toneCurveResult.base) {
-        toneCurveResult.type = type;
-        toneCurveResult.auxTypes = auxTypes;
         var figData = makeFigure(type, result);
         entries[targetIndex].toneCurve = figData.canvas;
         entries[targetIndex].toneCurveAxes = figData.axes;
