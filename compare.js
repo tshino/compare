@@ -3836,7 +3836,7 @@
       var baseCell = $(target).find('tr.basename td:not(.prop)');
       baseCell.children().remove();
       if (images.length === 0) {
-        baseCell.append($('<span>').text('no data')).attr('colspan', 1);
+        baseCell.append($('<span>').text('no data'));
       } else {
         baseCell.append(
           makeImageNameSelector(baseImageIndex, function(index) {
