@@ -3828,14 +3828,10 @@
       fig.axes = $(curve + axes);
       return fig;
     };
-    var updateFigureTable2 = function(target, updateAsync, repaint, styles, transformOnly) {
-      if (transformOnly) {
-        $(target).find('td.fig > *').css(styles.style);
-        return;
-      }
+    var updateBaseImageSelector = function(target, baseImageIndex) {
       var baseCell = $(target).find('tr.basename td:not(.prop)');
       baseCell.children().remove();
-      if (images.length === 0) {
+      if (baseImageIndex === null || images.length === 0) {
         baseCell.append($('<span>').text('no data'));
       } else {
         baseCell.append(
@@ -3845,6 +3841,14 @@
           })
         );
       }
+    };
+    var updateFigureTable2 = function(target, updateAsync, repaint, styles, transformOnly) {
+      if (transformOnly) {
+        $(target).find('td.fig > *').css(styles.style);
+        return;
+      }
+      updateBaseImageSelector('#toneCurveTable', baseImageIndex);
+      var baseCell = $(target).find('tr.basename td:not(.prop)');
       var labelRow = $(target).find('tr.label');
       var figureRow = $(target).find('tr.figure');
       labelRow.find('td:not(.prop)').remove();
