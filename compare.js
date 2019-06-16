@@ -3729,9 +3729,9 @@
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
-      toneCurveParam.base = baseImageIndex;
       toneCurveParam.type = toneCurveType.current();
       toneCurveParam.auxTypes = [toneCurveAuxType2.current()];
+      toneCurveParam.base = baseImageIndex;
       updateTable();
     };
     var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
@@ -3847,7 +3847,7 @@
         $(target).find('td.fig > *').css(styles.style);
         return;
       }
-      updateBaseImageSelector('#toneCurveTable', baseImageIndex);
+      updateBaseImageSelector(target, baseImageIndex);
       var baseCell = $(target).find('tr.basename td:not(.prop)');
       var labelRow = $(target).find('tr.label');
       var figureRow = $(target).find('tr.figure');
@@ -3878,11 +3878,11 @@
       }
     };
     var updateTable = function(transformOnly) {
-      if (images.length !== 0) {
+      if (images.length !== 0 && !transformOnly) {
         setBaseAndTargetImage(null, null);
-        if (toneCurveParam.base !== baseImageIndex ||
-            toneCurveParam.type !== toneCurveType.current() ||
-            toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current()) {
+        if (toneCurveParam.type !== toneCurveType.current() ||
+            toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
+            toneCurveParam.base !== baseImageIndex) {
           return repaint();
         }
       }
