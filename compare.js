@@ -3720,6 +3720,55 @@
       })
     );
   };
+  var updateBaseImageSelector = function(target, baseImageIndex, repaint) {
+    var baseCell = $(target).find('tr.basename td:not(.prop)');
+    baseCell.children().remove();
+    if (baseImageIndex === null || images.length === 0) {
+      baseCell.append($('<span>').text('no data'));
+    } else {
+      baseCell.append(
+        makeImageNameSelector(baseImageIndex, function(index) {
+          changeBaseImage(index);
+          repaint();
+        })
+      );
+    }
+  };
+  var updatePairwiseFigureTable = function(target, propName, update, repaint, styles, transformOnly) {
+    if (transformOnly) {
+      $(target).find('td.fig > *').css(styles.style);
+      return;
+    }
+    updateBaseImageSelector(target, baseImageIndex, repaint);
+    var baseCell = $(target).find('tr.basename td:not(.prop)');
+    var labelRow = $(target).find('tr.label');
+    var figureRow = $(target).find('tr.figure');
+    labelRow.find('td:not(.prop)').remove();
+    figureRow.find('td:not(.prop)').remove();
+    for (var k = 0, count = 0, img; img = images[k]; k++) {
+      if (img.index === baseImageIndex) {
+        continue;
+      }
+      count += 1;
+      if (!img[propName]) {
+        img[propName] = figureUtil.makeBlankFigure(8,8).canvas;
+        update(entries[baseImageIndex], img);
+      }
+      var label = makeImageNameWithIndex('<span>', img);
+      labelRow.append($('<td>').append(label));
+      var figCell = $('<td class="fig">').css(styles.cellStyle);
+      figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
+      var axes = img[propName + 'Axes'];
+      if (axes) {
+        figCell.append($(axes).css(styles.style));
+      }
+      figureRow.append(figCell);
+    }
+    baseCell.attr('colspan', Math.max(1, count));
+    if (count == 0) {
+      labelRow.append($('<td rowspan="2">').text('no data'));
+    }
+  };
   // Tone Curve Estimation
   var toneCurveDialog = (function() {
     var toneCurveParam = {};
@@ -3828,55 +3877,6 @@
       fig.axes = $(curve + axes);
       return fig;
     };
-    var updateBaseImageSelector = function(target, baseImageIndex, repaint) {
-      var baseCell = $(target).find('tr.basename td:not(.prop)');
-      baseCell.children().remove();
-      if (baseImageIndex === null || images.length === 0) {
-        baseCell.append($('<span>').text('no data'));
-      } else {
-        baseCell.append(
-          makeImageNameSelector(baseImageIndex, function(index) {
-            changeBaseImage(index);
-            repaint();
-          })
-        );
-      }
-    };
-    var updateFigureTable2 = function(target, propName, updateAsync, repaint, styles, transformOnly) {
-      if (transformOnly) {
-        $(target).find('td.fig > *').css(styles.style);
-        return;
-      }
-      updateBaseImageSelector(target, baseImageIndex, repaint);
-      var baseCell = $(target).find('tr.basename td:not(.prop)');
-      var labelRow = $(target).find('tr.label');
-      var figureRow = $(target).find('tr.figure');
-      labelRow.find('td:not(.prop)').remove();
-      figureRow.find('td:not(.prop)').remove();
-      for (var k = 0, count = 0, img; img = images[k]; k++) {
-        if (img.index === baseImageIndex) {
-          continue;
-        }
-        count += 1;
-        if (!img[propName]) {
-          img[propName] = figureUtil.makeBlankFigure(8,8).canvas;
-          updateAsync(entries[baseImageIndex], img);
-        }
-        var label = makeImageNameWithIndex('<span>', img);
-        labelRow.append($('<td>').append(label));
-        var figCell = $('<td class="fig">').css(styles.cellStyle);
-        figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
-        var axes = img[propName + 'Axes'];
-        if (axes) {
-          figCell.append($(axes).css(styles.style));
-        }
-        figureRow.append(figCell);
-      }
-      baseCell.attr('colspan', Math.max(1, count));
-      if (count == 0) {
-        labelRow.append($('<td rowspan="2">').text('no data'));
-      }
-    };
     var updateTable = function(transformOnly) {
       if (images.length !== 0 && !transformOnly) {
         setBaseAndTargetImage(null, null);
@@ -3888,7 +3888,7 @@
       }
       var figW = 320, figH = 320, figMargin = 8;
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
-      updateFigureTable2('#toneCurveTable', 'toneCurve', updateAsync, repaint, styles, transformOnly);
+      updatePairwiseFigureTable('#toneCurveTable', 'toneCurve', updateAsync, repaint, styles, transformOnly);
     };
     var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveParam.type &&
