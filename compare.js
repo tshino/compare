@@ -3765,7 +3765,7 @@
       figureRow.append(figCell);
     }
     baseCell.attr('colspan', Math.max(1, count));
-    if (count == 0) {
+    if (count === 0) {
       labelRow.append($('<td rowspan="2">').text('no data'));
     }
   };
