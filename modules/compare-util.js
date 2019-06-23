@@ -508,10 +508,11 @@
   };
 
   var formatReader = (function() {
-     var formatInfo = function(desc, color) {
+     var formatInfo = function(desc, color, anim) {
        return {
          toString: function() { return desc; },
-         color: color
+         color: color,
+         anim: anim
        };
      };
     var detectPNG = function(binary) {
@@ -933,6 +934,7 @@
       var magic4 = binary.length < 16 ? 0 : binary.big32(12);
       var desc = 'WebP';
       var color = undefined;
+      var anim = undefined;
       if (magic4 === 0x56503820 /* 'VP8 ' */) {
         desc += ' (Lossy)';
         color = readVP8ColorFormat(binary, 20, false);
@@ -977,6 +979,7 @@
           } else {
             desc += ' (Animated)';
           }
+          anim = { frameCount: lossy + lossless };
         } else {
           var alpha = findWebPChunk(binary, 0x414C5048 /* 'ALPH' */);
           var vp8 = findWebPChunk(binary, 0x56503820 /* 'VP8 ' */);
@@ -991,7 +994,7 @@
           }
         }
       }
-      return formatInfo(desc, color);
+      return formatInfo(desc, color, anim);
     };
     var detectSVG = function(binary, magic, magic2) {
       if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
