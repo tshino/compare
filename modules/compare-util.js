@@ -572,6 +572,7 @@
     var detectGIF = function(binary, magic, magic2) {
       var desc = 'GIF';
       var color = null;
+      var anim = undefined;
       if (13 <= binary.length) {
         //console.log('GIF sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
         var size = [binary.little16(6), binary.little16(8)];
@@ -585,6 +586,7 @@
         //console.log('bg', bgIndex);
         var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
+        var frames = 0;
         while (block + 3 <= binary.length) {
           var initial = binary.at(block);
           if (initial === 0x21) {
@@ -626,17 +628,31 @@
             var lctLength = localFlags & 0x07;
             //console.log('rect', rect.join(' '));
             //console.log('lct', lctFlag, lctLength);
-            var bpp = lctFlag ? (lctLength + 1) : (gctLength + 1);
-            color = 'Indexed RGB 8.8.8 (' + bpp + 'bpp)';
-            if (transparent && transparentIndex < Math.pow(2, bpp)) {
-              color += ' + Transparent';
+            if (frames === 0) {
+              var bpp = lctFlag ? (lctLength + 1) : (gctLength + 1);
+              color = 'Indexed RGB 8.8.8 (' + bpp + 'bpp)';
+              if (transparent && transparentIndex < Math.pow(2, bpp)) {
+                color += ' + Transparent';
+              }
             }
+            var off = 10 + (lctFlag ? Math.pow(2, lcgLength + 1) : 0) + 1;
+            for (; block + off < binary.length; ) {
+              var size = binary.at(block + off);
+              if (size === 0 /* Block Terminator */) {
+                block += off + 1;
+                break;
+              }
+              off += 1 + size;
+            }
+            frames += 1;
+          } else {
+            break;
           }
-          break;
         }
+        anim = { frameCount: frames };
       }
       color = color || 'unknown';
-      return formatInfo(desc, color);
+      return formatInfo(desc, color, anim);
     };
     var detectBMP = function(binary, magic, magic2) {
       // BMP
