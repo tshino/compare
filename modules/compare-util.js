@@ -517,11 +517,17 @@
      };
     var detectPNG = function(binary) {
       var desc = 'PNG';
-      if (detectPNGChunk(
-                binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */)) {
-        desc += ' (APNG)';
-      }
       var color = null;
+      var anim = undefined;
+      var actl = detectPNGChunk(
+                binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */);
+      if (actl && actl + 16 <= binary.length) {
+        var frameCount = binary.big32(actl + 8);
+        if (1 <= frameCount) {
+          desc += ' (APNG)';
+          anim = { frameCount: frameCount };
+        }
+      }
       var hasTRNS = detectPNGChunk(
                 binary, 0x74524e53 /* tRNS */, 0x49444154 /* IDAT */);
       var depth = binary.at(24);
@@ -567,7 +573,7 @@
           color = 'unknown';
           break;
       }
-      return formatInfo(desc, color);
+      return formatInfo(desc, color, anim);
     };
     var detectGIF = function(binary, magic, magic2) {
       var desc = 'GIF';
