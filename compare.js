@@ -1776,6 +1776,7 @@
       $('#infoHeight'),
       $('#infoAspect'),
       $('#infoOrientation'),
+      $('#infoNumFrames'),
       $('#infoFileSize'),
       $('#infoLastModified') ];
     var unknown = [null, '‐'];
@@ -1796,6 +1797,7 @@
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
         [orientation, orientationExpr],
+        !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
@@ -1814,10 +1816,18 @@
     };
     var updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
-      var val = [];
+      var val = [], animated = 0;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
         updateTableCell(val, i);
+        if (img.numFrames) {
+          animated += 1;
+        }
+      }
+      if (animated === 0) {
+        $('#infoNumFrames').hide();
+      } else {
+        $('#infoNumFrames').show();
       }
       if (i === 0) {
         rows[0].append(
@@ -5062,6 +5072,7 @@
         0 <= entry.color.indexOf('Transparent')) {
       altView.enableAlpha();
     }
+    entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
     if (isJPEG) {
       entry.orientation = compareUtil.detectExifOrientation(binary);
     }
