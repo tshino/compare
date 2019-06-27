@@ -1825,9 +1825,9 @@
         }
       }
       if (animated === 0) {
-        $('#infoNumFrames').hide();
+        $('#infoNumFrames').css('color', '#888');
       } else {
-        $('#infoNumFrames').show();
+        $('#infoNumFrames').css('color', '');
       }
       if (i === 0) {
         rows[0].append(
