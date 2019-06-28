@@ -1778,7 +1778,8 @@
       $('#infoOrientation'),
       $('#infoNumFrames'),
       $('#infoFileSize'),
-      $('#infoLastModified') ];
+      $('#infoLastModified')
+    ];
     var unknown = [null, '‐'];
     var makeTableValue = function(img) {
       var orientation = compareUtil.orientationUtil.toString(img.orientation);
