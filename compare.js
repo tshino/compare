@@ -1817,19 +1817,15 @@
     };
     var updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
-      var val = [], animated = 0;
+      var val = [], hasAnimated = false;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
         updateTableCell(val, i);
         if (img.numFrames) {
-          animated += 1;
+          hasAnimated = true;
         }
       }
-      if (animated === 0) {
-        $('#infoNumFrames').css('color', '#888');
-      } else {
-        $('#infoNumFrames').css('color', '');
-      }
+      $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
       if (i === 0) {
         rows[0].append(
           $('<td>').attr('rowspan', rows.length).text('no data')
