@@ -1817,14 +1817,18 @@
     };
     var updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
-      var val = [], hasAnimated = false;
+      var val = [], hasAnimated = false, hasOrientation = false;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
         updateTableCell(val, i);
         if (img.numFrames) {
           hasAnimated = true;
         }
+        if (img.orientation) {
+          hasOrientation = true;
+        }
       }
+      $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
       if (i === 0) {
         rows[0].append(
