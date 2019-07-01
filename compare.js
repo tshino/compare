@@ -1797,7 +1797,7 @@
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
-        [orientation, orientationExpr],
+        [img.orientation ? orientation : null, orientationExpr],
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
@@ -1807,7 +1807,7 @@
       for (var j = 0, v; v = val[i][j]; ++j) {
         var expr = val[i][j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
-        if (0 < i && val[i][j][0]) {
+        if (0 < i && val[0][j][0] && val[i][j][0]) {
           e.addClass(
               val[0][j][0] < val[i][j][0] ? 'sign lt' :
               val[0][j][0] > val[i][j][0] ? 'sign gt' : 'sign eq');
