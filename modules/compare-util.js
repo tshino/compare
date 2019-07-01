@@ -592,7 +592,7 @@
         //console.log('bg', bgIndex);
         var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
-        var frames = 0;
+        var frames = 0, animated = false;
         while (block + 3 <= binary.length) {
           var initial = binary.at(block);
           if (initial === 0x21) {
@@ -610,6 +610,7 @@
               //console.log(app0.toString(16), app1.toString(16));
               if (app0 === 0x4e455453 && app1 === 0x43415045 /* NETS CAPE */) {
                 desc += ' (Animated)';
+                animated = true;
               }
             }
             for (var off = 2; block + off < binary.length; ) {
@@ -655,7 +656,9 @@
             break;
           }
         }
-        anim = { frameCount: frames };
+        if (animated) {
+          anim = { frameCount: frames };
+        }
       }
       color = color || 'unknown';
       return formatInfo(desc, color, anim);
