@@ -2243,7 +2243,7 @@
     };
     var toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
-      getBaseSize: function() { return { w: 384, h: 272 }; }
+      getBaseSize: function() { return { w: figW / 2, h: figH / 2 }; }
     });
     return {
       updateFigure: updateFigure,
