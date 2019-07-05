@@ -1987,12 +1987,13 @@
   var updateFigureTable = function(target, propName, update, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
-      return;
+      return null;
     }
     var labelRow = $(target).find('tr.label');
     var figureRow = $(target).find('tr.figure');
     labelRow.find('td').remove();
     figureRow.find('td').remove();
+    var figIndices = [];
     for (var k = 0, img; img = images[k]; k++) {
       if (!img[propName]) {
         img[propName] = figureUtil.makeBlankFigure(8, 8).canvas;
@@ -2007,11 +2008,13 @@
         figCell.append($(axes).css(styles.style));
       }
       figureRow.append(figCell);
+      figIndices[k] = img.index;
     }
     if (k === 0) {
       var cell = $('<td rowspan="2">').text('no data');
       labelRow.append(cell);
     }
+    return figIndices;
   };
   var makeFigureStyles = function(w, h, margin, background, zoomController) {
     var styles = { figW: w, figH: h, figMargin: margin, baseW: w, baseH: h };
