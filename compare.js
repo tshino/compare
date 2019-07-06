@@ -2126,6 +2126,28 @@
   var histogramDialog = (function() {
     var figW = 768 + 40;
     var figH = 512 + 32;
+    var figIndices = [];
+    $('#histogram').on('mousemove', 'td.fig > *', function(e) {
+      var point = figureZoom.positionFromMouseEvent(e, this, null);
+      onFigurePointed(point);
+    });
+    var onFigurePointed = function(point) {
+      var x = Math.floor(point.x * figW * 256 / 768);
+      if (0 <= x && x <= 255 && histogramType.current() === 0) {
+        var infoRow = $('#histoTable tr.info');
+        infoRow.children().remove();
+        for (var k = 0; k < figIndices.length; k++) {
+          var index = figIndices[k];
+          var hist = entries[index].histogramData;
+          var info = (
+            'R ' + String(x) + '(' + compareUtil.addComma(hist[x]) + ')  ' +
+            'G ' + String(x) + '(' + compareUtil.addComma(hist[x + 256]) + ')  ' +
+            'B ' + String(x) + '(' + compareUtil.addComma(hist[x + 512]) + ')'
+          );
+          infoRow.append($('<td>').css('font-size','14px').text(info));
+        }
+      }
+    };
     var repaint = function() {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
@@ -2235,6 +2257,7 @@
     };
     var updateFigure = function(type, auxTypes, img, hist) {
       if (type === histogramType.current() && auxTypes[0] === histogramAuxType2.current()) {
+        img.histogramData = hist;
         img.histogram = makeFigure(type, auxTypes[0], hist);
         updateTable();
       }
@@ -2242,7 +2265,11 @@
     var updateTable = function(transformOnly) {
       var w = figW / 2, h = figH / 2, margin = 8;
       var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
-      updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
+      var indices = updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
+      if (indices) {
+        figIndices = indices;
+        $('#histoTable tr.info > *').remove();
+      }
     };
     var toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
