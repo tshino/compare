@@ -2139,12 +2139,24 @@
         for (var k = 0; k < figIndices.length; k++) {
           var index = figIndices[k];
           var hist = entries[index].histogramData;
-          var info = (
-            'R ' + String(x) + '(' + compareUtil.addComma(hist[x]) + ')  ' +
-            'G ' + String(x) + '(' + compareUtil.addComma(hist[x + 256]) + ')  ' +
-            'B ' + String(x) + '(' + compareUtil.addComma(hist[x + 512]) + ')'
-          );
-          infoRow.append($('<td>').css('font-size','14px').text(info));
+          var td = $('<td>').css('font-size','14px');
+          var addInfo = function(label, color, offset) {
+            var value = hist[offset + x];
+            var info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
+            var span = $('<span>').text(info).css({
+              'color': color,
+              'display': 'inline-block',
+              'width': '120px'
+            });
+            if (value === 0) {
+              span.css('opacity', '0.3');
+            }
+            td.append(span);
+          }
+          addInfo('R', '#800', 0);
+          addInfo('G', '#080', 256);
+          addInfo('B', '#008', 512);
+          infoRow.append(td);
         }
       }
     };
