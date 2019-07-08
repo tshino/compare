@@ -2133,10 +2133,7 @@
     });
     var onFigurePointed = function(point) {
       var x = Math.floor(point.x * figW * 256 / 768);
-      if (0 <= x && x <= 255 && (
-          histogramType.current() === 0 ||
-          histogramType.current() === 1
-      )) {
+      if (0 <= x && x <= 255) {
         var infoRow = $('#histoTable tr.info');
         infoRow.children().remove();
         for (var k = 0; k < figIndices.length; k++) {
@@ -2160,8 +2157,12 @@
             addInfo('R', '#800', 0);
             addInfo('G', '#080', 256);
             addInfo('B', '#008', 512);
+          } else if (histogramType.current() === 1) {
+            addInfo('Y', '#444', 0);
           } else {
             addInfo('Y', '#444', 0);
+            addInfo('Cb', '#008', 256);
+            addInfo('Cr', '#800', 512);
           }
           infoRow.append(td);
         }
