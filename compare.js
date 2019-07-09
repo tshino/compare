@@ -2136,33 +2136,33 @@
       if (0 <= x && x <= 255) {
         var infoRow = $('#histoTable tr.info');
         infoRow.children().remove();
+        var addInfo = function(target, label, color, hist, offset) {
+          var value = hist[offset + x];
+          var info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
+          var span = $('<span>').text(info).css({
+            'color': color,
+            'display': 'inline-block',
+            'width': '120px'
+          });
+          if (value === 0) {
+            span.css('opacity', '0.3');
+          }
+          target.append(span);
+        };
         for (var k = 0; k < figIndices.length; k++) {
           var index = figIndices[k];
           var hist = entries[index].histogramData;
           var td = $('<td>').css('font-size','14px');
-          var addInfo = function(label, color, offset) {
-            var value = hist[offset + x];
-            var info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
-            var span = $('<span>').text(info).css({
-              'color': color,
-              'display': 'inline-block',
-              'width': '120px'
-            });
-            if (value === 0) {
-              span.css('opacity', '0.3');
-            }
-            td.append(span);
-          }
           if (histogramType.current() === 0) {
-            addInfo('R', '#800', 0);
-            addInfo('G', '#080', 256);
-            addInfo('B', '#008', 512);
+            addInfo(td, 'R', '#800', hist, 0);
+            addInfo(td, 'G', '#080', hist, 256);
+            addInfo(td, 'B', '#008', hist, 512);
           } else if (histogramType.current() === 1) {
-            addInfo('Y', '#444', 0);
+            addInfo(td, 'Y', '#444', hist, 0);
           } else {
-            addInfo('Y', '#444', 0);
-            addInfo('Cb', '#008', 256);
-            addInfo('Cr', '#800', 512);
+            addInfo(td, 'Y', '#444', hist, 0);
+            addInfo(td, 'Cb', '#008', hist, 256);
+            addInfo(td, 'Cr', '#800', hist, 512);
           }
           infoRow.append(td);
         }
