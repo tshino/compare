@@ -2288,7 +2288,11 @@
       var indices = updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
       if (indices) {
         figIndices = indices;
-        $('#histoTable tr.info > *').remove();
+        var infoRow = $('#histoTable tr.info');
+        infoRow.children().remove();
+        for (var i = 0; i < indices.length; i++) {
+          infoRow.append($('<td>&nbsp;</td>').css('font-size','14px'));
+        }
       }
     };
     var toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
