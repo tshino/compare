@@ -297,7 +297,9 @@
     return crossCursor.processMouseMove(e, selector, this);
   });
   figureZoom.setPointCallback(function(e) {
-    if ($('#opticalFlow').is(':visible')) {
+    if ($('#histogram').is(':visible')) {
+      histogramDialog.processClick(e);
+    } else if ($('#opticalFlow').is(':visible')) {
       opticalFlowDialog.processClick(e);
     }
   });
@@ -2168,6 +2170,9 @@
         }
       }
     };
+    var processClick = function(point) {
+      onFigurePointed(point);
+    };
     var repaint = function() {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
@@ -2300,6 +2305,7 @@
       getBaseSize: function() { return { w: figW / 2, h: figH / 2 }; }
     });
     return {
+      processClick: processClick,
       updateFigure: updateFigure,
       toggle: toggle
     };
