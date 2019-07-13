@@ -4126,6 +4126,7 @@
       var bits = fig.context.createImageData(w, h);
       figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
       var vectorPaths = [];
+      var circles = [];
       fig.context.putImageData(bits, 0, 0);
       var pointToCoord = function(x, y) {
         return x.toFixed(2) + ',' + y.toFixed(2);
@@ -4135,8 +4136,13 @@
           'M ' + pointToCoord(p.x0 + 0.5, p.y0 + 0.5) +
           ' L ' + pointToCoord(p.x1 + 0.5, p.y1 + 0.5)
         );
+        circles.push(
+          '<circle cx="' + (p.x0 + 0.5).toFixed(2) + '" cy="' + (p.y0 + 0.5).toFixed(2) + '" r="3">' +
+          '</circle>'
+        );
       }
       var vectors =
+          '<g stroke="#ff4" stroke-width="0.3" fill="none">' + circles + '</g>' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.6" d="' + vectorPaths.join(' ') + '"></path>' +
           '</g>';
