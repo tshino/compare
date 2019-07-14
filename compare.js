@@ -4141,7 +4141,7 @@
           '</circle>'
         );
       }
-      var vectors =
+      var strokes =
           '<g stroke="#ff4" stroke-width="0.3" fill="none">' + circles + '</g>' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.6" d="' + vectorPaths.join(' ') + '"></path>' +
@@ -4151,7 +4151,7 @@
       opticalFlowResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
       var picture = $(fig.canvas).css(styles.style).addClass('figMain');
-      var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + vectors + '</svg>').css(styles.style);
+      var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + strokes + '</svg>').css(styles.style);
       opticalFlowResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
       var popup = $('<div>').append($('<span>')).css(styles.style);
       $('#opticalFlowResult').append(picture);
