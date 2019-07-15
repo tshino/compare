@@ -4014,13 +4014,17 @@
       }
     };
     var arrowMarkDesc = [
-      'M9,9L1,1 m0,3v-3h3',
-      'M1,9L9,1 m-3,0h3v3',
-      'M1,1L9,9 m0,-3v3h-3',
-      'M9,1L1,9 m0,-3v3h3'
+      'M9,7L1,3 m1,3l-1,-3l3,-1',
+      'M7,9L3,1 m-1,3l1,-3l3,1',
+      'M1,7L9,3 m-3,-1l3,1l-1,3',
+      'M3,9L7,1 m-3,1l3,-1l1,3',
+      'M9,3L1,7 m1,-3l-1,3l3,1',
+      'M7,1L3,9 m-1,-3l1,3l3,-1',
+      'M1,3L9,7 m-1,-3l1,3l-3,1',
+      'M3,1L7,9 m1,-3l-1,3l-3,-1',
     ];
     var makeArrowMark = function(dx, dy) {
-      var arrowType = dy < 0 ? (dx < 0 ? 0 : 1) : (dx < 0 ? 3 : 2);
+      var arrowType = (dy < 0 ? 0 : 4) + (dx < 0 ? 0 : 2) + (Math.abs(dy) < Math.abs(dx) ? 0 : 1);
       var desc = arrowMarkDesc[arrowType];
       return $('<svg viewBox="0 0 10 10"><path fill="none" stroke="white" stroke-width="0.8" d="' + desc + '"></path></svg>').css({
         display: 'inline-block',
