@@ -399,15 +399,22 @@
     };
   };
 
-  var detectPNGChunk = function(binary, target, before) {
+  var findPNGChunk = function(binary, callback) {
     for (var p = 8; p + 8 <= binary.length; ) {
       var len = binary.big32(p);
       var chunk = binary.big32(p + 4);
-      if (chunk === target) { return p; }
-      if (chunk === before) { break; }
+      var res = callback(p, chunk);
+      if (res !== undefined) { return res; }
       p += len + 12;
     }
     return null;
+  };
+
+  var detectPNGChunk = function(binary, target, before) {
+    return findPNGChunk(binary, function(p, chunk) {
+      if (chunk === target) { return p; }
+      if (chunk === before) { return null; }
+    });
   };
 
   var findJPEGSegment = function(binary, callback) {
