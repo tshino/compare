@@ -531,8 +531,29 @@
       if (actl && actl + 16 <= binary.length) {
         var frameCount = binary.big32(actl + 8);
         if (1 <= frameCount) {
+          var durationNum = 0, durationDen = 1, commonDelay;
+          findPNGChunk(binary, function(p, chunk) {
+            if (chunk === 0x6663544c /* fcTL */ && p + 34 <= binary.length) {
+              var num = binary.big16(p + 28);
+              var den = binary.big16(p + 30);
+              if (den === 0) { den = 100; }
+              if (commonDelay === undefined) { commonDelay = [num, den]; }
+              if (commonDelay && (commonDelay[0] !== num || commonDelay[1] !== den)) { commonDelay = null; }
+              durationNum = durationNum * den + num * durationDen;
+              durationDen = durationDen * den;
+              var gcd = calcGCD(durationNum, durationDen);
+              durationNum /= gcd;
+              durationDen /= gcd;
+            }
+          });
           desc += ' (APNG)';
-          anim = { frameCount: frameCount };
+          anim = {
+            frameCount: frameCount,
+            durationNum: durationNum,
+            durationDen: durationDen,
+            fpsNum: commonDelay ? commonDelay[1] : null,
+            fpsDen: commonDelay ? commonDelay[0] : null
+          };
         }
       }
       var hasTRNS = detectPNGChunk(
