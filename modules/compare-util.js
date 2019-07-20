@@ -599,7 +599,7 @@
         //console.log('bg', bgIndex);
         var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
-        var frames = 0, durationMsec = 0, animated = false;
+        var frames = 0, commonDelay, duration = 0, animated = false;
         while (block + 3 <= binary.length) {
           var initial = binary.at(block);
           if (initial === 0x21) {
@@ -608,7 +608,10 @@
             if (label === 0xf9 /* Graphic Control Extension */ &&
                 block + 8 <= binary.length) {
               transparent = binary.at(block + 3) & 0x01;
-              durationMsec += 10 * binary.little16(block + 4);
+              var delay = binary.little16(block + 4);
+              if (commonDelay === undefined) { commonDelay = delay; }
+              if (commonDelay !== delay) { commonDelay = null; }
+              duration += delay; /* x10 msec */
               transparentIndex = binary.at(block + 6);
               //console.log('transparent', transparent, transparentIndex);
             } else if (label === 0xff /* Application Extension */ &&
@@ -667,7 +670,10 @@
         if (animated) {
           anim = {
             frameCount: frames,
-            durationMsec: durationMsec
+            durationNum: duration,
+            durationDen: 100,
+            fpsNum: commonDelay ? 100 : null,
+            fpsDen: commonDelay ? commonDelay : null
           };
         }
       }
