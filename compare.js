@@ -1770,6 +1770,16 @@
         return [exact.ratio, exactLabel];
       }
     };
+    var makeDurationInfo = function(formatInfo) {
+      if (formatInfo && formatInfo.anim) {
+        var num = formatInfo.anim.durationNum;
+        var den = formatInfo.anim.durationDen;
+        var value = num / den;
+        var desc = (num / den).toFixed(3);
+        return [value, desc];
+      }
+      return [null, '‐'];
+    };
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
@@ -1779,6 +1789,7 @@
       $('#infoAspect'),
       $('#infoOrientation'),
       $('#infoNumFrames'),
+      $('#infoDuration'),
       $('#infoFileSize'),
       $('#infoLastModified')
     ];
@@ -1801,6 +1812,7 @@
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
         [img.orientation ? orientation : null, orientationExpr],
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
+        makeDurationInfo(img.formatInfo),
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
@@ -1832,6 +1844,7 @@
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
+      $('#infoDuration').css('color', hasAnimated ? '' : '#888');
       if (i === 0) {
         rows[0].append(
           $('<td>').attr('rowspan', rows.length).text('no data')
