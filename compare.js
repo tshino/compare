@@ -1776,6 +1776,9 @@
         var den = formatInfo.anim.durationDen;
         var value = num / den;
         var desc = (num / den).toFixed(3);
+        if (0 !== num * 1000 % den) {
+          desc = 'approx. ' + desc;
+        }
         return [value, desc];
       }
       return [null, '‐'];
