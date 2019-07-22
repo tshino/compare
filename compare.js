@@ -1762,13 +1762,15 @@
     var makeAspectRatioInfo = function(w, h) {
       var exact = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
       var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(exact);
-      var exactLabel = compareUtil.aspectRatioUtil.toString(exact);
+      var desc = compareUtil.aspectRatioUtil.toString(exact);
       if (approx) {
         var approxLabel = compareUtil.aspectRatioUtil.toString(approx);
-        return [exact.ratio, exactLabel + '\n(approx. ' + approxLabel + ')'];
-      } else {
-        return [exact.ratio, exactLabel];
+        desc = textUtil.setText($('<span>'), {
+          en: desc + '\n(approx. ' + approxLabel + ')',
+          ja: desc + '\n(約 ' + approxLabel + ')'
+        });
       }
+      return [exact.ratio, desc];
     };
     var makeDurationInfo = function(formatInfo) {
       if (formatInfo && formatInfo.anim) {
@@ -1786,7 +1788,10 @@
             num *= formatInfo.anim.fpsNum / den;
             den = formatInfo.anim.fpsNum;
           }
-          desc = num + '/' + den + ' (approx. ' + desc + ')';
+          desc = textUtil.setText($('<span>'), {
+            en: num + '/' + den + '\n(approx. ' + desc + ')',
+            ja: num + '/' + den + '\n(約 ' + desc + ')'
+          });
         }
         return [value, desc];
       }
