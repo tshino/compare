@@ -12,10 +12,15 @@
 TEST( 'compareUtil calcGCD', function test() {
   EXPECT( compareUtil.calcGCD(1, 1) === 1 );
   EXPECT( compareUtil.calcGCD(1, 10) === 1 );
-  EXPECT( compareUtil.calcGCD(1, 10) === 1 );
+  EXPECT( compareUtil.calcGCD(10, 1) === 1 );
+  EXPECT( compareUtil.calcGCD(2, 3) === 1 );
   EXPECT( compareUtil.calcGCD(10, 8) === 2 );
+  EXPECT( compareUtil.calcGCD(3, 15) === 3 );
   EXPECT( compareUtil.calcGCD(60, 75) === 15 );
   EXPECT( compareUtil.calcGCD(1920, 1080) === 120 );
+  EXPECT( compareUtil.calcGCD(0, 0) === 0 );
+  EXPECT( compareUtil.calcGCD(0, 3) === 3 );
+  EXPECT( compareUtil.calcGCD(2, 0) === 2 );
 });
 
 TEST( 'compareUtil addComma', function test() {
