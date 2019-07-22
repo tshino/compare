@@ -1777,7 +1777,16 @@
         var value = num / den;
         var desc = (num / den).toFixed(3);
         if (0 !== num * 1000 % den) {
-          desc = 'approx. ' + desc;
+          var gcd = compareUtil.calcGCD(num, den);
+          num /= gcd;
+          den /= gcd;
+          if (formatInfo.anim.fpsNum !== null &&
+              formatInfo.anim.fpsDen === 1 &&
+              formatInfo.anim.fpsNum % den === 0) {
+            num *= formatInfo.anim.fpsNum / den;
+            den = formatInfo.anim.fpsNum;
+          }
+          desc = num + '/' + den + ' (approx. ' + desc + ')';
         }
         return [value, desc];
       }
