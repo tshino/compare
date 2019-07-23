@@ -1797,6 +1797,35 @@
       }
       return [null, '‐'];
     };
+    var makeFPSInfo = function(formatInfo) {
+      if (formatInfo && formatInfo.anim) {
+        var num = formatInfo.anim.fpsNum;
+        var den = formatInfo.anim.fpsDen;
+        if (num !== null && den !== null) {
+          var value = num / den;
+          if (0 === num % den) {
+            var desc = num / den;
+          } else {
+            var desc = (num / den).toFixed(2);
+          }
+          if (0 !== num * 100 % den) {
+            var gcd = compareUtil.calcGCD(num, den);
+            num /= gcd;
+            den /= gcd;
+            desc = textUtil.setText($('<span>'), {
+              en: num + '/' + den + '\n(approx. ' + desc + ')',
+              ja: num + '/' + den + '\n(約 ' + desc + ')'
+            });
+          }
+          return [value, desc];
+        }
+        return [null, textUtil.setText($('<span>'), {
+          en: '(non uniform)',
+          ja: '(一定でない)',
+        })];
+      }
+      return [null, '‐'];
+    };
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
@@ -1807,6 +1836,7 @@
       $('#infoOrientation'),
       $('#infoNumFrames'),
       $('#infoDuration'),
+      $('#infoFPS'),
       $('#infoFileSize'),
       $('#infoLastModified')
     ];
@@ -1830,6 +1860,7 @@
         [img.orientation ? orientation : null, orientationExpr],
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         makeDurationInfo(img.formatInfo),
+        makeFPSInfo(img.formatInfo),
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
@@ -1862,6 +1893,7 @@
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
       $('#infoDuration').css('color', hasAnimated ? '' : '#888');
+      $('#infoFPS').css('color', hasAnimated ? '' : '#888');
       if (i === 0) {
         rows[0].append(
           $('<td>').attr('rowspan', rows.length).text('no data')
