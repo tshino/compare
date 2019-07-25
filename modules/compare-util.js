@@ -515,13 +515,13 @@
   };
 
   var formatReader = (function() {
-     var formatInfo = function(desc, color, anim) {
-       return {
-         toString: function() { return desc; },
-         color: color,
-         anim: anim
-       };
-     };
+    var formatInfo = function(desc, color, anim) {
+      return {
+        toString: function() { return desc; },
+        color: color,
+        anim: anim
+      };
+    };
     var detectPNG = function(binary) {
       var desc = 'PNG';
       var color = null;
