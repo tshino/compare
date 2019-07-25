@@ -297,6 +297,18 @@ TEST( 'compareUtil binaryFromDataURI', function test() {
   EXPECT( binary.little32(2) === 0x2c6f6c6c /* ,oll */ );
 });
 
+TEST( 'compareUtil findNearlyConstantValue', function test() {
+  var findNearlyConstantValue = compareUtil.findNearlyConstantValue;
+  EXPECT_EQ( null, findNearlyConstantValue([], 0.01) );
+  EXPECT_EQ( null, findNearlyConstantValue([0.5], 0.01) );
+  EXPECT_EQ( 0.5, findNearlyConstantValue([0.5, 0.5], 0.01) );
+  EXPECT_EQ( 0.625, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75], 0.2) );
+  EXPECT_EQ( null, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75], 0.1) );
+  EXPECT_EQ( null, findNearlyConstantValue([0, 1, 2, 3, 4], 1) );
+  EXPECT_EQ( 2, findNearlyConstantValue([0, 1, 2, 3, 4], 2) );
+  EXPECT_EQ( null, findNearlyConstantValue([0, 3, 4, 3, 4, 3, 4, 3, 4], 2) );
+});
+
 TEST( 'compareUtil orientationUtil toString', function test() {
   var toString = compareUtil.orientationUtil.toString;
   EXPECT_EQ( 'TopLeft', toString(1) );

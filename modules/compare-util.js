@@ -514,6 +514,24 @@
     return offsets;
   };
 
+  var findNearlyConstantValue = function(list, tolerance) {
+    if (list.length <= 1) {
+      return null;
+    }
+    var min = list[0], max = min, sum = min;
+    for (var i = 1; i < list.length; i++) {
+      var x = list[i];
+      sum += x;
+      if (min > x) { min = x; }
+      if (max < x) { max = x; }
+    }
+    var mean = sum / list.length;
+    if (mean - tolerance <= min && max <= mean + tolerance) {
+      return mean;
+    }
+    return null;
+  };
+
   var formatReader = (function() {
     var formatInfo = function(desc, color, anim) {
       return {
@@ -1767,6 +1785,7 @@
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
+    findNearlyConstantValue:   findNearlyConstantValue,
     detectImageFormat:      detectImageFormat,
     orientationUtil:        orientationUtil,
     aspectRatioUtil:        aspectRatioUtil,
