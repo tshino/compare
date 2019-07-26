@@ -531,6 +531,13 @@
     }
     return null;
   };
+  var findApproxUniformFPS = function(delayList) {
+    var uniformDelay = findNearlyConstantValue(delayList, 0.010);
+    if (uniformDelay !== null && 0 < uniformDelay) {
+       return Math.round(10 / uniformDelay) / 10;
+    }
+    return null;
+  };
 
   var formatReader = (function() {
     var formatInfo = function(desc, color, anim) {
@@ -550,6 +557,7 @@
         var frameCount = binary.big32(actl + 8);
         if (1 <= frameCount) {
           var durationNum = 0, durationDen = 1, commonDelay;
+          var delayList = [];
           findPNGChunk(binary, function(p, chunk) {
             if (chunk === 0x6663544c /* fcTL */ && p + 34 <= binary.length) {
               var num = binary.big16(p + 28);
@@ -557,6 +565,7 @@
               if (den === 0) { den = 100; }
               if (commonDelay === undefined) { commonDelay = [num, den]; }
               if (commonDelay && (commonDelay[0] !== num || commonDelay[1] !== den)) { commonDelay = null; }
+              delayList.push(num / den);
               durationNum = durationNum * den + num * durationDen;
               durationDen = durationDen * den;
               var gcd = calcGCD(durationNum, durationDen);
@@ -570,7 +579,8 @@
             durationNum: durationNum,
             durationDen: durationDen,
             fpsNum: commonDelay ? commonDelay[1] : null,
-            fpsDen: commonDelay ? commonDelay[0] : null
+            fpsDen: commonDelay ? commonDelay[0] : null,
+            approxFPS: findApproxUniformFPS(delayList)
           };
         }
       }
@@ -638,7 +648,7 @@
         //console.log('bg', bgIndex);
         var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
-        var frames = 0, commonDelay, duration = 0, animated = false;
+        var frames = 0, commonDelay, delayList = [], duration = 0, animated = false;
         while (block + 3 <= binary.length) {
           var initial = binary.at(block);
           if (initial === 0x21) {
@@ -650,6 +660,7 @@
               var delay = binary.little16(block + 4);
               if (commonDelay === undefined) { commonDelay = delay; }
               if (commonDelay !== delay) { commonDelay = null; }
+              delayList.push(delay * 0.01);
               duration += delay; /* x10 msec */
               transparentIndex = binary.at(block + 6);
               //console.log('transparent', transparent, transparentIndex);
@@ -712,7 +723,8 @@
             durationNum: duration,
             durationDen: 100,
             fpsNum: commonDelay ? 100 : null,
-            fpsDen: commonDelay ? commonDelay : null
+            fpsDen: commonDelay ? commonDelay : null,
+            approxFPS: findApproxUniformFPS(delayList)
           };
         }
       }
@@ -1029,11 +1041,12 @@
         if (animated) {
           var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
           var lossy = 0, lossless = 0, unknown = 0;
-          var duration = 0, commonDelay;
+          var duration = 0, commonDelay, delayList = [];
           for (var i = 0, p; p = anmf[i]; i++) {
             var delay = binary.length < p + 24 ? 0 : (binary.little32(p + 20) & 0xffffff);
             if (commonDelay === undefined) { commonDelay = delay; }
             if (commonDelay !== delay) { commonDelay = null; }
+            delayList.push(delay * 0.001);
             duration += delay;
             p += 24;
             var f = binary.length < p + 8 ? 0 : binary.big32(p);
@@ -1070,7 +1083,8 @@
             durationNum: duration,
             durationDen: 1000,
             fpsNum: commonDelay ? 1000 : null,
-            fpsDen: commonDelay ? commonDelay : null
+            fpsDen: commonDelay ? commonDelay : null,
+            approxFPS: findApproxUniformFPS(delayList)
           };
         } else {
           var alpha = findWebPChunk(binary, 0x414C5048 /* 'ALPH' */);
