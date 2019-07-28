@@ -1822,13 +1822,13 @@
         if (formatInfo.anim.approxFPS !== null) {
           desc = formatInfo.anim.approxFPS.toFixed(1);
           return [null, textUtil.setText($('<span>'), {
-            en: 'non uniform\n(approx. ' + desc + ')',
-            ja: '一定でない\n(約 ' + desc + ')'
+            en: 'non-uniform\n(approx. ' + desc + ')',
+            ja: '一様でない\n(約 ' + desc + ')'
           })]
         } else {
           return [null, textUtil.setText($('<span>'), {
-            en: 'non uniform',
-            ja: '一定でない',
+            en: 'non-uniform',
+            ja: '一様でない',
           })];
         }
       }
