@@ -1820,17 +1820,18 @@
           return [value, desc];
         }
         if (formatInfo.anim.approxFPS !== null) {
-          desc = formatInfo.anim.approxFPS.toFixed(1);
-          return [null, textUtil.setText($('<span>'), {
+          var desc = formatInfo.anim.approxFPS.toFixed(1);
+          desc = textUtil.setText($('<span>'), {
             en: 'non-uniform\n(approx. ' + desc + ')',
             ja: '一様でない\n(約 ' + desc + ')'
-          })]
+          });
         } else {
-          return [null, textUtil.setText($('<span>'), {
+          var desc = textUtil.setText($('<span>'), {
             en: 'non-uniform',
             ja: '一様でない',
-          })];
+          });
         }
+        return [null, desc];
       }
       return [null, '‐'];
     };
