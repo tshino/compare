@@ -1874,14 +1874,14 @@
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(val, i) {
-      for (var j = 0, v; v = val[i][j]; ++j) {
-        var expr = val[i][j][1];
+    var updateTableCell = function(val, base, isBase) {
+      for (var j = 0, v; v = val[j]; ++j) {
+        var expr = val[j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
-        if (0 < i && val[0][j][0] && val[i][j][0]) {
+        if (!isBase && base[j][0] && val[j][0]) {
           e.addClass(
-              val[0][j][0] < val[i][j][0] ? 'sign lt' :
-              val[0][j][0] > val[i][j][0] ? 'sign gt' : 'sign eq');
+              base[j][0] < val[j][0] ? 'sign lt' :
+              base[j][0] > val[j][0] ? 'sign gt' : 'sign eq');
         }
         rows[j].append(e);
       }
@@ -1889,15 +1889,18 @@
     var updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
       var val = [], hasAnimated = false, hasOrientation = false;
+      var baseIndex = 0;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
-        updateTableCell(val, i);
         if (img.numFrames) {
           hasAnimated = true;
         }
         if (img.orientation) {
           hasOrientation = true;
         }
+      }
+      for (var i = 0, img; img = images[i]; i++) {
+        updateTableCell(val[i], val[baseIndex], i === baseIndex);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
