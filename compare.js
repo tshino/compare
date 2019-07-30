@@ -1890,8 +1890,12 @@
       $('#infoTable td:not(.prop)').remove();
       var val = [], hasAnimated = false, hasOrientation = false;
       var baseIndex = 0;
+      var baseVal = null;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
+        if (img.index === baseIndex) {
+          baseVal = val[i];
+        }
         if (img.numFrames) {
           hasAnimated = true;
         }
@@ -1899,8 +1903,12 @@
           hasOrientation = true;
         }
       }
+      if (baseVal === null && val[0]) {
+        baseVal = val[0];
+        baseIndex = images[0].index;
+      }
       for (var i = 0, img; img = images[i]; i++) {
-        updateTableCell(val[i], val[baseIndex], i === baseIndex);
+        updateTableCell(val[i], baseVal, img.index === baseIndex);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
