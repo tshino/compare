@@ -1874,14 +1874,20 @@
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(val, base, isBase) {
+    var updateTableCell = function(val, base, isBase, enableComparison) {
       for (var j = 0, v; v = val[j]; ++j) {
         var expr = val[j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
-        if (!isBase && base[j][0] && val[j][0]) {
+        if (enableComparison && !isBase && base[j][0] && val[j][0]) {
           e.addClass(
               base[j][0] < val[j][0] ? 'sign lt' :
               base[j][0] > val[j][0] ? 'sign gt' : 'sign eq');
+        }
+        if (enableComparison && isBase && j === 0 /* Name */) {
+          e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+            en: ' (base image)',
+            ja: ' (基準画像)',
+          }));
         }
         rows[j].append(e);
       }
@@ -1907,8 +1913,9 @@
         baseVal = val[0];
         baseIndex = images[0].index;
       }
+      var enableComparison = 2 <= val.length;
       for (var i = 0, img; img = images[i]; i++) {
-        updateTableCell(val[i], baseVal, img.index === baseIndex);
+        updateTableCell(val[i], baseVal, img.index === baseIndex, enableComparison);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
