@@ -1860,7 +1860,12 @@
         $('<span>').text('(' + orientation + ')')
       ) : orientation;
       return [
-        [null, makeImageNameWithIndex('<span>', img) ],
+        [null, makeImageNameWithIndex('<span>', img).click(
+          { index: img.index }, function(e) {
+            changeBaseImage(e.data.index);
+            updateTable();
+          }
+        )],
         [null, img.format !== '' ? img.format : '-'],
         [null, img.color !== '' ? img.color : '-'],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1894,8 +1899,11 @@
     };
     var updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
+      if (images.length !== 0) {
+        setBaseAndTargetImage(null, null);
+      }
       var val = [], hasAnimated = false, hasOrientation = false;
-      var baseIndex = 0;
+      var baseIndex = baseImageIndex;
       var baseVal = null;
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
