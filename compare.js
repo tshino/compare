@@ -1878,22 +1878,26 @@
       for (var j = 0, v; v = val[j]; ++j) {
         var expr = val[j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
-        if (enableComparison && !isBase && base[j][0] && val[j][0]) {
-          e.addClass(
-              base[j][0] < val[j][0] ? 'sign lt' :
-              base[j][0] > val[j][0] ? 'sign gt' : 'sign eq');
-        }
-        if (enableComparison && j === 0 /* Name */) {
+        if (enableComparison) {
           if (isBase) {
-            e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
-              en: ' (base image)',
-              ja: ' (基準画像)',
-            }));
+            if (j === 0 /* Name */) {
+              e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+                en: ' (base image)',
+                ja: ' (基準画像)',
+              }));
+            }
           } else {
-            e.children().last().addClass('imageName').click(function(e) {
-              changeBaseImage(index);
-              updateTable();
-            });
+            if (j === 0 /* Name */) {
+              e.children().last().addClass('imageName').click(function(e) {
+                changeBaseImage(index);
+                updateTable();
+              });
+            } else if (base[j][0] && val[j][0]) {
+              e.addClass(
+                base[j][0] < val[j][0] ? 'sign lt' :
+                base[j][0] > val[j][0] ? 'sign gt' : 'sign eq'
+              );
+            }
           }
         }
         rows[j].append(e);
