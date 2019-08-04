@@ -158,13 +158,16 @@ button.close
     color           : #fff;
     text-shadow     : -1px 0px 2px #000, 0px -1px 2px #000, 1px 0px 2px #000, 0px 1px 2px #000;
     opacity         : 0.7;
+}
+.imageName
+{
     cursor          : pointer;
 }
 #view .error .imageName
 {
     color           : red;
 }
-#view .imageName:hover
+#view .imageName:hover, .imageName:hover
 {
     color           : #69f;
 }

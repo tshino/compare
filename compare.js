@@ -1860,12 +1860,7 @@
         $('<span>').text('(' + orientation + ')')
       ) : orientation;
       return [
-        [null, makeImageNameWithIndex('<span>', img).click(
-          { index: img.index }, function(e) {
-            changeBaseImage(e.data.index);
-            updateTable();
-          }
-        )],
+        [null, makeImageNameWithIndex('<span>', img)],
         [null, img.format !== '' ? img.format : '-'],
         [null, img.color !== '' ? img.color : '-'],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1879,7 +1874,7 @@
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(val, base, isBase, enableComparison) {
+    var updateTableCell = function(index, val, base, isBase, enableComparison) {
       for (var j = 0, v; v = val[j]; ++j) {
         var expr = val[j][1];
         var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
@@ -1888,11 +1883,18 @@
               base[j][0] < val[j][0] ? 'sign lt' :
               base[j][0] > val[j][0] ? 'sign gt' : 'sign eq');
         }
-        if (enableComparison && isBase && j === 0 /* Name */) {
-          e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
-            en: ' (base image)',
-            ja: ' (基準画像)',
-          }));
+        if (enableComparison && j === 0 /* Name */) {
+          if (isBase) {
+            e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+              en: ' (base image)',
+              ja: ' (基準画像)',
+            }));
+          } else {
+            e.children().last().addClass('imageName').click(function(e) {
+              changeBaseImage(index);
+              updateTable();
+            });
+          }
         }
         rows[j].append(e);
       }
@@ -1923,7 +1925,7 @@
       }
       var enableComparison = 2 <= val.length;
       for (var i = 0, img; img = images[i]; i++) {
-        updateTableCell(val[i], baseVal, img.index === baseIndex, enableComparison);
+        updateTableCell(img.index, val[i], baseVal, img.index === baseIndex, enableComparison);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
