@@ -1772,6 +1772,17 @@
       }
       return [exact.ratio, desc];
     };
+    var makeOrientationInfo = function(img) {
+      var orientation = compareUtil.orientationUtil.toString(img.orientation);
+      var orientationExpr = img.orientation ? $('<span>').append(
+        $('<img src="res/orientation.svg" width="30">').css({
+          verticalAlign: '-8px',
+          transform: img.orientationAsCSS
+        }),
+        $('<span>').text('(' + orientation + ')')
+      ) : orientation;
+      return [img.orientation ? orientation : null, orientationExpr];
+    };
     var makeDurationInfo = function(formatInfo) {
       if (formatInfo && formatInfo.anim) {
         var num = formatInfo.anim.durationNum;
@@ -1851,14 +1862,6 @@
     ];
     var unknown = [null, '‐'];
     var makeTableValue = function(img) {
-      var orientation = compareUtil.orientationUtil.toString(img.orientation);
-      var orientationExpr = img.orientation ? $('<span>').append(
-        $('<img src="res/orientation.svg" width="30">').css({
-          verticalAlign: '-8px',
-          transform: img.orientationAsCSS
-        }),
-        $('<span>').text('(' + orientation + ')')
-      ) : orientation;
       return [
         [null, makeImageNameWithIndex('<span>', img)],
         [null, img.format !== '' ? img.format : '-'],
@@ -1866,7 +1869,7 @@
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
         img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
-        [img.orientation ? orientation : null, orientationExpr],
+        makeOrientationInfo(img),
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         makeDurationInfo(img.formatInfo),
         makeFPSInfo(img.formatInfo),
