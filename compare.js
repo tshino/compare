@@ -1774,14 +1774,14 @@
     };
     var makeOrientationInfo = function(img) {
       var orientation = compareUtil.orientationUtil.toString(img.orientation);
-      var orientationExpr = img.orientation ? $('<span>').append(
+      var desc = img.orientation ? $('<span>').append(
         $('<img src="res/orientation.svg" width="30">').css({
           verticalAlign: '-8px',
           transform: img.orientationAsCSS
         }),
         $('<span>').text('(' + orientation + ')')
       ) : orientation;
-      return [img.orientation ? orientation : null, orientationExpr];
+      return [img.orientation ? orientation : null, desc];
     };
     var makeDurationInfo = function(formatInfo) {
       if (formatInfo && formatInfo.anim) {
@@ -1879,8 +1879,8 @@
     };
     var updateTableCell = function(index, val, base, isBase, enableComparison) {
       for (var j = 0, v; v = val[j]; ++j) {
-        var expr = val[j][1];
-        var e = (typeof expr === 'string' ? $('<td>').text(expr) : $('<td>').append(expr));
+        var desc = val[j][1];
+        var e = (typeof desc === 'string' ? $('<td>').text(desc) : $('<td>').append(desc));
         if (enableComparison) {
           if (isBase) {
             if (j === 0 /* Name */) {
