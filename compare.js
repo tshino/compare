@@ -1878,32 +1878,33 @@
       ];
     };
     var updateTableCell = function(index, val, base, isBase, enableComparison) {
+      var elems = [];
       for (var j = 0, v; v = val[j]; ++j) {
-        var desc = val[j][1];
+        var desc = v[1];
         var e = (typeof desc === 'string' ? $('<td>').text(desc) : $('<td>').append(desc));
-        if (enableComparison) {
-          if (isBase) {
-            if (j === 0 /* Name */) {
-              e.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
-                en: ' (base image)',
-                ja: ' (基準画像)',
-              }));
-            }
-          } else {
-            if (j === 0 /* Name */) {
-              e.children().last().addClass('imageName').click(function(e) {
-                changeBaseImage(index);
-                updateTable();
-              });
-            } else if (base[j][0] && val[j][0]) {
-              e.addClass(
-                base[j][0] < val[j][0] ? 'sign lt' :
-                base[j][0] > val[j][0] ? 'sign gt' : 'sign eq'
-              );
-            }
-          }
+        if (enableComparison && !isBase && base[j][0] && v[0]) {
+          e.addClass(
+              base[j][0] < v[0] ? 'sign lt' :
+              base[j][0] > v[0] ? 'sign gt' : 'sign eq'
+          );
         }
-        rows[j].append(e);
+        elems.push(e);
+      }
+      if (enableComparison) {
+        if (isBase) {
+          elems[0].append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+            en: ' (base image)',
+            ja: ' (基準画像)',
+          }));
+        } else {
+          elems[0].children().last().addClass('imageName').click(function(e) {
+            changeBaseImage(index);
+            updateTable();
+          });
+        }
+      }
+      for (var j = 0; j < elems.length; ++j) {
+        rows[j].append(elems[j]);
       }
     };
     var updateTable = function() {
