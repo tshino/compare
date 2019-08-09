@@ -1939,7 +1939,7 @@
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
       $('#infoDuration').css('color', hasAnimated ? '' : '#888');
       $('#infoFPS').css('color', hasAnimated ? '' : '#888');
-      if (i === 0) {
+      if (val.length === 0) {
         rows[0].append(
           $('<td>').attr('rowspan', rows.length).text('no data')
         );
