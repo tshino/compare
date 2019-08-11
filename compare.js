@@ -1913,13 +1913,10 @@
         setBaseAndTargetImage(null, null);
       }
       var val = [], hasAnimated = false, hasOrientation = false;
-      var baseIndex = baseImageIndex;
-      var baseVal = null;
+      var indices = [];
       for (var i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
-        if (img.index === baseIndex) {
-          baseVal = val[i];
-        }
+        indices[i] = img.index;
         if (img.numFrames) {
           hasAnimated = true;
         }
@@ -1927,13 +1924,11 @@
           hasOrientation = true;
         }
       }
-      if (baseVal === null && val[0]) {
-        baseVal = val[0];
-        baseIndex = images[0].index;
-      }
+      var basePos = Math.max(0, indices.indexOf(baseImageIndex));
+      var baseVal = val[basePos] || null;
       var enableComparison = 2 <= val.length;
       for (var i = 0, img; img = images[i]; i++) {
-        updateTableCell(img.index, val[i], baseVal, img.index === baseIndex, enableComparison);
+        updateTableCell(img.index, val[i], baseVal, i == basePos, enableComparison);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
