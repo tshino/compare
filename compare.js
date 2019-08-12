@@ -1927,8 +1927,8 @@
       var basePos = Math.max(0, indices.indexOf(baseImageIndex));
       var baseVal = val[basePos] || null;
       var enableComparison = 2 <= val.length;
-      for (var i = 0, img; img = images[i]; i++) {
-        updateTableCell(img.index, val[i], baseVal, i == basePos, enableComparison);
+      for (var i = 0; i < val.length; i++) {
+        updateTableCell(indices[i], val[i], baseVal, i == basePos, enableComparison);
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
