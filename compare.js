@@ -1877,20 +1877,13 @@
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(val, base, isBase, enableComparison) {
+    var updateTableCell = function(val) {
       for (var j = 0, v; v = val[j]; ++j) {
-        var desc = v[1];
-        var e = (typeof desc === 'string' ? $('<td>').text(desc) : $('<td>').append(desc));
-        if (enableComparison && !isBase && base[j][0] && v[0]) {
-          e.addClass(
-              base[j][0] < v[0] ? 'sign lt' :
-              base[j][0] > v[0] ? 'sign gt' : 'sign eq'
-          );
-        }
-        rows[j].append(e);
+        var desc = v[1], e = $('<td>');
+        rows[j].append(typeof desc === 'string' ? e.text(desc) : e.append(desc));
       }
     };
-    var updateTableCellForComparison = function(index, isBase) {
+    var updateTableCellForComparison = function(index, val, base, isBase) {
       var name = rows[0].children().last();
       if (isBase) {
         name.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
@@ -1902,6 +1895,14 @@
           changeBaseImage(index);
           updateTable();
         });
+        for (var j = 0, v; v = val[j]; ++j) {
+          if (base[j][0] && v[0]) {
+            rows[j].children().last().addClass(
+              base[j][0] < v[0] ? 'sign lt' :
+              base[j][0] > v[0] ? 'sign gt' : 'sign eq'
+            );
+          }
+        }
       }
     };
     var updateTable = function() {
@@ -1925,9 +1926,9 @@
       var baseVal = val[basePos] || null;
       var enableComparison = 2 <= val.length;
       for (var i = 0; i < val.length; i++) {
-        updateTableCell(val[i], baseVal, i == basePos, enableComparison);
+        updateTableCell(val[i]);
         if (enableComparison) {
-          updateTableCellForComparison(indices[i], i === basePos);
+          updateTableCellForComparison(indices[i], val[i], baseVal, i === basePos);
         }
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
