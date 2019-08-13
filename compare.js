@@ -1877,8 +1877,7 @@
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(index, val, base, isBase, enableComparison) {
-      var elems = [];
+    var updateTableCell = function(val, base, isBase, enableComparison) {
       for (var j = 0, v; v = val[j]; ++j) {
         var desc = v[1];
         var e = (typeof desc === 'string' ? $('<td>').text(desc) : $('<td>').append(desc));
@@ -1888,23 +1887,21 @@
               base[j][0] > v[0] ? 'sign gt' : 'sign eq'
           );
         }
-        elems.push(e);
+        rows[j].append(e);
       }
-      if (enableComparison) {
-        if (isBase) {
-          elems[0].append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
-            en: ' (base image)',
-            ja: ' (基準画像)',
-          }));
-        } else {
-          elems[0].children().last().addClass('imageName').click(function(e) {
-            changeBaseImage(index);
-            updateTable();
-          });
-        }
-      }
-      for (var j = 0; j < elems.length; ++j) {
-        rows[j].append(elems[j]);
+    };
+    var updateTableCellForComparison = function(index, isBase) {
+      var name = rows[0].children().last();
+      if (isBase) {
+        name.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+          en: ' (base image)',
+          ja: ' (基準画像)',
+        }));
+      } else {
+        name.children().last().addClass('imageName').click(function(e) {
+          changeBaseImage(index);
+          updateTable();
+        });
       }
     };
     var updateTable = function() {
@@ -1928,7 +1925,10 @@
       var baseVal = val[basePos] || null;
       var enableComparison = 2 <= val.length;
       for (var i = 0; i < val.length; i++) {
-        updateTableCell(indices[i], val[i], baseVal, i == basePos, enableComparison);
+        updateTableCell(val[i], baseVal, i == basePos, enableComparison);
+        if (enableComparison) {
+          updateTableCellForComparison(indices[i], i === basePos);
+        }
       }
       $('#infoOrientation').css('color', hasOrientation ? '' : '#888');
       $('#infoNumFrames').css('color', hasAnimated ? '' : '#888');
