@@ -1886,7 +1886,7 @@
     var updateTableCellForComparison = function(index, val, base, isBase) {
       var name = rows[0].children().last();
       if (isBase) {
-        name.append(textUtil.setText($('<span>').css('font-size', '0.8em'), {
+        name.append($('<br>'), textUtil.setText($('<span>').css('font-size', '0.8em'), {
           en: ' (base image)',
           ja: ' (基準画像)',
         }));
@@ -1936,9 +1936,8 @@
       $('#infoDuration').css('color', hasAnimated ? '' : '#888');
       $('#infoFPS').css('color', hasAnimated ? '' : '#888');
       if (val.length === 0) {
-        rows[0].append(
-          $('<td>').attr('rowspan', rows.length).text('no data')
-        );
+        rows[0].append($('<td>').text('no data'));
+        rows[1].append($('<td>').attr('rowspan', rows.length - 1).text('no data'));
       }
     };
     var toggle = dialogUtil.defineDialog($('#info'), updateTable, toggleAnalysis);
