@@ -1879,7 +1879,7 @@
     };
     var updateTableCell = function(val) {
       for (var j = 0, v; v = val[j]; ++j) {
-        var desc = v[1], e = $('<td>');
+        var desc = v[1], e = $('<td>').css('max-width', '300px');
         rows[j].append(typeof desc === 'string' ? e.text(desc) : e.append(desc));
       }
     };
