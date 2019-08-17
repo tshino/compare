@@ -297,6 +297,19 @@ TEST( 'compareUtil binaryFromDataURI', function test() {
   EXPECT( binary.little32(2) === 0x2c6f6c6c /* ,oll */ );
 });
 
+TEST( 'compareUtil calcMinMaxMean', function test() {
+  var m, calcMinMaxMean = compareUtil.calcMinMaxMean;
+  EXPECT_EQ( null, calcMinMaxMean([]) );
+  m = calcMinMaxMean([0, 0, 0]);
+  EXPECT( m.min === 0 && m.max === 0 && m.mean === 0 );
+  m = calcMinMaxMean([-1, 0, 1]);
+  EXPECT( m.min === -1 && m.max === 1 && m.mean === 0 );
+  m = calcMinMaxMean([-1, -2, -3]);
+  EXPECT( m.min === -3 && m.max === -1 && m.mean === -2 );
+  m = calcMinMaxMean([10, 20, 90]);
+  EXPECT( m.min === 10 && m.max === 90 && m.mean === 40 );
+});
+
 TEST( 'compareUtil findNearlyConstantValue', function test() {
   var findNearlyConstantValue = compareUtil.findNearlyConstantValue;
   EXPECT_EQ( null, findNearlyConstantValue([], 0.01) );

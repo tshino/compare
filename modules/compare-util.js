@@ -514,8 +514,8 @@
     return offsets;
   };
 
-  var findNearlyConstantValue = function(list, tolerance) {
-    if (list.length <= 1) {
+  var calcMinMaxMean = function(list) {
+    if (list.length == 0) {
       return null;
     }
     var min = list[0], max = min, sum = min;
@@ -526,8 +526,15 @@
       if (max < x) { max = x; }
     }
     var mean = sum / list.length;
-    if (mean - tolerance <= min && max <= mean + tolerance) {
-      return mean;
+    return { min: min, max: max, mean: mean };
+  };
+  var findNearlyConstantValue = function(list, tolerance) {
+    if (list.length <= 1) {
+      return null;
+    }
+    var m = calcMinMaxMean(list);
+    if (m.mean - tolerance <= m.min && m.max <= m.mean + tolerance) {
+      return m.mean;
     }
     return null;
   };
@@ -1799,6 +1806,7 @@
     detectPNGChunk:         detectPNGChunk,
     detectMPFIdentifier:    detectMPFIdentifier,
     detectExifOrientation:  detectExifOrientation,
+    calcMinMaxMean:         calcMinMaxMean,
     findNearlyConstantValue:   findNearlyConstantValue,
     detectImageFormat:      detectImageFormat,
     orientationUtil:        orientationUtil,
