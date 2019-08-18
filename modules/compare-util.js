@@ -533,13 +533,38 @@
       return null;
     }
     var m = calcMinMaxMean(list);
-    if (m.mean - tolerance <= m.min && m.max <= m.mean + tolerance) {
+    if (m.min < m.mean - tolerance || m.mean + tolerance < m.max) {
+      return null;
+    }
+    if (m.min === m.max) {
       return m.mean;
     }
-    return null;
+    var sum = 0, maxPeriod = Math.max(60, list.length >> 1);
+    for (var i = 1; i <= maxPeriod; i++) {
+      sum += list[i - 1];
+      if (list[i] === list[0]) {
+        var period = i;
+        for (var j = i + 1; j < list.length; j++) {
+          if (list[j] === list[j % period]) {
+            continue;
+          }
+          // allow exception only at the final frame
+          var error = Math.abs(list[j] - list[j % period]);
+          if (j === list.length - 1 && error <= tolerance) {
+            continue;
+          }
+          period = 0;
+          break;
+        }
+        if (0 < period) {
+          return sum / period;
+        }
+      }
+    }
+    return m.mean;
   };
   var findApproxUniformFPS = function(delayList) {
-    var uniformDelay = findNearlyConstantValue(delayList, 0.010);
+    var uniformDelay = findNearlyConstantValue(delayList, 0.010 + 1e-7);
     if (uniformDelay !== null && 0 < uniformDelay) {
        return Math.round(10 / uniformDelay) / 10;
     }

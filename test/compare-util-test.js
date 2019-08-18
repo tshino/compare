@@ -315,8 +315,26 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
   EXPECT_EQ( null, findNearlyConstantValue([], 0.01) );
   EXPECT_EQ( null, findNearlyConstantValue([0.5], 0.01) );
   EXPECT_EQ( 0.5, findNearlyConstantValue([0.5, 0.5], 0.01) );
-  EXPECT_EQ( 0.625, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75], 0.2) );
+  EXPECT_EQ( 0.5, findNearlyConstantValue([0.5, 0.5, 0.5, 0.5, 0.5, 0.5], 0.01) );
+
   EXPECT_EQ( null, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75], 0.1) );
+  EXPECT_EQ( 0.625, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75], 0.2) );
+  EXPECT_EQ( 0.625, findNearlyConstantValue([0.5, 0.75, 0.5, 0.75, 0.5], 0.2) );
+
+  EXPECT_EQ( 2.5, findNearlyConstantValue([2, 3, 2, 3, 2, 3], 1) );
+  EXPECT_EQ( 2.5, findNearlyConstantValue([2, 3, 2, 3, 2, 3, 2], 1) );
+
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3, 2, 2, 3], 1) );
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3, 2, 2], 1) );
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3, 2], 1) );
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3], 1) );
+
+  EXPECT_EQ( 1/24, findNearlyConstantValue([
+    0.04, 0.04, 0.05, 0.04, 0.04, 0.04,
+    0.04, 0.04, 0.05, 0.04, 0.04, 0.04,
+    0.04, 0.04, 0.05, 0.04, 0.04, 0.04,
+    0.04, 0.04, 0.05, 0.05], 0.01 + 1e-7) );
+
   EXPECT_EQ( null, findNearlyConstantValue([0, 1, 2, 3, 4], 1) );
   EXPECT_EQ( 2, findNearlyConstantValue([0, 1, 2, 3, 4], 2) );
   EXPECT_EQ( null, findNearlyConstantValue([0, 3, 4, 3, 4, 3, 4, 3, 4], 2) );
