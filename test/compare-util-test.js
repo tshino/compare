@@ -328,6 +328,10 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
   EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3, 2, 2], 1) );
   EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3, 2], 1) );
   EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2, 3], 1) );
+  EXPECT_EQ( null, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 1], 1) );
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2], 1) );
+  EXPECT_EQ( 12/5, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 3], 1) );
+  EXPECT_EQ( null, findNearlyConstantValue([2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 4], 1) );
 
   EXPECT_EQ( 1/24, findNearlyConstantValue([
     0.04, 0.04, 0.05, 0.04, 0.04, 0.04,
