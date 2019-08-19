@@ -539,7 +539,7 @@
     if (m.min === m.max) {
       return m.mean;
     }
-    var sum = 0, maxPeriod = Math.max(60, list.length >> 1);
+    var sum = 0, maxPeriod = Math.min(60, list.length >> 1);
     for (var i = 1; i <= maxPeriod; i++) {
       sum += list[i - 1];
       if (list[i] === list[0]) {
