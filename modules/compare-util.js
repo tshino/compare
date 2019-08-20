@@ -528,17 +528,7 @@
     var mean = sum / list.length;
     return { min: min, max: max, mean: mean };
   };
-  var findNearlyConstantValue = function(list, tolerance) {
-    if (list.length <= 1) {
-      return null;
-    }
-    var m = calcMinMaxMean(list);
-    if (m.min < m.mean - tolerance || m.mean + tolerance < m.max) {
-      return null;
-    }
-    if (m.min === m.max) {
-      return m.mean;
-    }
+  var findMeanByCadenceDetection = function(list, tolerance) {
     var sum = 0, maxPeriod = Math.min(60, list.length >> 1);
     for (var i = 1; i <= maxPeriod; i++) {
       sum += list[i - 1];
@@ -560,6 +550,23 @@
           return sum / period;
         }
       }
+    }
+    return null;
+  };
+  var findNearlyConstantValue = function(list, tolerance) {
+    if (list.length <= 1) {
+      return null;
+    }
+    var m = calcMinMaxMean(list);
+    if (m.min < m.mean - tolerance || m.mean + tolerance < m.max) {
+      return null;
+    }
+    if (m.min === m.max) {
+      return m.mean;
+    }
+    var m2 = findMeanByCadenceDetection(list, tolerance);
+    if (m2 !== null) {
+      return m2;
     }
     return m.mean;
   };
