@@ -1759,16 +1759,19 @@
   })();
   // Image Information
   var infoDialog = (function() {
+    var makeDescriptionWithApprox = function(exact, approx) {
+      return textUtil.setText($('<span>'), {
+        en: exact + '\n(approx. ' + approx + ')',
+        ja: exact + '\n(約 ' + approx + ')'
+      });
+    };
     var makeAspectRatioInfo = function(w, h) {
       var exact = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
       var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(exact);
       var desc = compareUtil.aspectRatioUtil.toString(exact);
       if (approx) {
         var approxLabel = compareUtil.aspectRatioUtil.toString(approx);
-        desc = textUtil.setText($('<span>'), {
-          en: desc + '\n(approx. ' + approxLabel + ')',
-          ja: desc + '\n(約 ' + approxLabel + ')'
-        });
+        desc = makeDescriptionWithApprox(desc, approxLabel);
       }
       return [exact.ratio, desc];
     };
@@ -1799,10 +1802,7 @@
             num *= formatInfo.anim.fpsNum / den;
             den = formatInfo.anim.fpsNum;
           }
-          desc = textUtil.setText($('<span>'), {
-            en: num + '/' + den + '\n(approx. ' + desc + ')',
-            ja: num + '/' + den + '\n(約 ' + desc + ')'
-          });
+          desc = makeDescriptionWithApprox(num + '/' + den, desc);
         }
         return [value, desc];
       }
@@ -1823,10 +1823,7 @@
             var gcd = compareUtil.calcGCD(num, den);
             num /= gcd;
             den /= gcd;
-            desc = textUtil.setText($('<span>'), {
-              en: num + '/' + den + '\n(approx. ' + desc + ')',
-              ja: num + '/' + den + '\n(約 ' + desc + ')'
-            });
+            desc = makeDescriptionWithApprox(num + '/' + den, desc);
           }
           return [value, desc];
         }
