@@ -1760,10 +1760,17 @@
   // Image Information
   var infoDialog = (function() {
     var makeDescriptionWithApprox = function(exact, approx) {
-      return textUtil.setText($('<span>'), {
-        en: exact + '\n(approx. ' + approx + ')',
-        ja: exact + '\n(約 ' + approx + ')'
-      });
+      if (typeof exact === 'string') {
+        exact = { en: exact, ja: exact };
+      }
+      if (approx !== undefined) {
+        return textUtil.setText($('<span>'), {
+          en: exact.en + '\n(approx. ' + approx + ')',
+          ja: exact.ja + '\n(約 ' + approx + ')'
+        });
+      } else {
+        return textUtil.setText($('<span>'), exact);
+      }
     };
     var makeAspectRatioInfo = function(w, h) {
       var exact = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
@@ -1808,6 +1815,7 @@
       }
       return [null, '‐'];
     };
+    var nonUniform = { en: 'non-uniform', ja: '一様でない' };
     var makeFPSInfo = function(formatInfo) {
       if (formatInfo && formatInfo.anim) {
         var num = formatInfo.anim.fpsNum;
@@ -1829,15 +1837,9 @@
         }
         if (formatInfo.anim.approxFPS !== null) {
           var desc = formatInfo.anim.approxFPS.toFixed(1);
-          desc = textUtil.setText($('<span>'), {
-            en: 'non-uniform\n(approx. ' + desc + ')',
-            ja: '一様でない\n(約 ' + desc + ')'
-          });
+          desc = makeDescriptionWithApprox(nonUniform, desc);
         } else {
-          var desc = textUtil.setText($('<span>'), {
-            en: 'non-uniform',
-            ja: '一様でない',
-          });
+          var desc = makeDescriptionWithApprox(nonUniform);
         }
         return [null, desc];
       }
