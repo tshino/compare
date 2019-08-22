@@ -1763,13 +1763,19 @@
       if (typeof exact === 'string') {
         exact = { en: exact, ja: exact };
       }
+      return textUtil.setText($('<span>'), {
+        en: exact.en + '\n(approx. ' + approx + ')',
+        ja: exact.ja + '\n(約 ' + approx + ')'
+      });
+    };
+    var makeCellValue = function(data) {
+      var value = data[0], desc = data[1], approx = data[2];
       if (approx !== undefined) {
-        return textUtil.setText($('<span>'), {
-          en: exact.en + '\n(approx. ' + approx + ')',
-          ja: exact.ja + '\n(約 ' + approx + ')'
-        });
+        return [value, makeDescriptionWithApprox(desc, approx)];
+      } else if (typeof desc === 'string') {
+        return [value, desc];
       } else {
-        return textUtil.setText($('<span>'), exact);
+        return [value, textUtil.setText($('<span>'), desc)];
       }
     };
     var makeAspectRatioInfo = function(w, h) {
@@ -1777,10 +1783,10 @@
       var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(exact);
       var desc = compareUtil.aspectRatioUtil.toString(exact);
       if (approx) {
-        var approxLabel = compareUtil.aspectRatioUtil.toString(approx);
-        desc = makeDescriptionWithApprox(desc, approxLabel);
+        return [exact.ratio, desc, compareUtil.aspectRatioUtil.toString(approx)];
+      } else {
+        return [exact.ratio, desc];
       }
-      return [exact.ratio, desc];
     };
     var makeOrientationInfo = function(img) {
       var orientation = compareUtil.orientationUtil.toString(img.orientation);
@@ -1809,7 +1815,7 @@
             num *= formatInfo.anim.fpsNum / den;
             den = formatInfo.anim.fpsNum;
           }
-          desc = makeDescriptionWithApprox(num + '/' + den, desc);
+          return [value, num + '/' + den, desc];
         }
         return [value, desc];
       }
@@ -1823,7 +1829,7 @@
         if (num !== null && den !== null) {
           var value = num / den;
           if (0 === num % den) {
-            var desc = num / den;
+            var desc = String(num / den);
           } else {
             var desc = (num / den).toFixed(2);
           }
@@ -1831,17 +1837,15 @@
             var gcd = compareUtil.calcGCD(num, den);
             num /= gcd;
             den /= gcd;
-            desc = makeDescriptionWithApprox(num + '/' + den, desc);
+            return [value, num + '/' + den, desc];
           }
           return [value, desc];
         }
         if (formatInfo.anim.approxFPS !== null) {
-          var desc = formatInfo.anim.approxFPS.toFixed(1);
-          desc = makeDescriptionWithApprox(nonUniform, desc);
+          return [null, nonUniform, formatInfo.anim.approxFPS.toFixed(1)];
         } else {
-          var desc = makeDescriptionWithApprox(nonUniform);
+          return [null, nonUniform];
         }
-        return [null, desc];
       }
       return [null, '‐'];
     };
@@ -1867,11 +1871,11 @@
         img.color === '' ? unknown : [img.color, img.color],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
-        img.sizeUnknown ? unknown : makeAspectRatioInfo(img.width, img.height),
+        img.sizeUnknown ? unknown : makeCellValue(makeAspectRatioInfo(img.width, img.height)),
         makeOrientationInfo(img),
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
-        makeDurationInfo(img.formatInfo),
-        makeFPSInfo(img.formatInfo),
+        makeCellValue(makeDurationInfo(img.formatInfo)),
+        makeCellValue(makeFPSInfo(img.formatInfo)),
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
