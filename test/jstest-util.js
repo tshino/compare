@@ -1,6 +1,11 @@
 ﻿var jsTestUtil = (function() {
   var expectEqualArray = function(a, b, label) {
     label = label !== undefined ? ' (' + label + ')' : '';
+    EXPECT( 'object' === typeof a && a !== null );
+    EXPECT( 'object' === typeof b && b !== null );
+    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+      return;
+    }
     EXPECT( undefined !== a.length );
     EXPECT( undefined !== b.length );
     EXPECT_EQ( a.length, b.length, 'the lengths of the arrays' + label + ' are different');
@@ -94,6 +99,16 @@
       result = true; expectEqualArray({}, {});
       backup.eq( false, result );
       result = true; expectEqualArray(1, 1);
+      backup.eq( false, result );
+      result = true; expectEqualArray(0, 0);
+      backup.eq( false, result );
+      result = true; expectEqualArray(undefined, undefined);
+      backup.eq( false, result );
+      result = true; expectEqualArray(null, null);
+      backup.eq( false, result );
+      result = true; expectEqualArray([1, 2], null);
+      backup.eq( false, result );
+      result = true; expectEqualArray(null, [3, 4]);
       backup.eq( false, result );
 
       EXPECT = backup.e;
@@ -221,5 +236,7 @@
     makeFileBasedTestRunner: makeFileBasedTestRunner
   };
 })();
+
+EXPECT_EQ_ARRAY = jsTestUtil.expectEqualArray;
 
 TEST( 'jsTestUtil self test', jsTestUtil.makeSelfTest() );

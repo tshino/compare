@@ -492,7 +492,7 @@ TEST( 'compareImageUtil copy', function test() {
 
   EXPECT_EQ( 2, image2.width );
   EXPECT_EQ( 2, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     0, 1, 2, 3,  4, 5, 6, 7,
     16, 17, 18, 19,  20, 21, 22, 23
   ], image2.data );
@@ -509,7 +509,7 @@ TEST( 'compareImageUtil rotateCW', function test() {
 
   EXPECT_EQ( 5, image2.width );
   EXPECT_EQ( 3, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     48,49,50,51, 36,37,38,39, 24,25,26,27, 12,13,14,15, 0,1,2,3,
     52,53,54,55, 40,41,42,43, 28,29,30,31, 16,17,18,19, 4,5,6,7,
     56,57,58,59, 44,45,46,47, 32,33,34,35, 20,21,22,23, 8,9,10,11
@@ -527,7 +527,7 @@ TEST( 'compareImageUtil rotateCCW', function test() {
 
   EXPECT_EQ( 5, image2.width );
   EXPECT_EQ( 3, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     8,9,10,11,20,21,22,23, 32,33,34,35, 44,45,46,47, 56,57,58,59,
     4,5,6,7,  16,17,18,19, 28,29,30,31, 40,41,42,43, 52,53,54,55,
     0,1,2,3,  12,13,14,15, 24,25,26,27, 36,37,38,39, 48,49,50,51
@@ -545,7 +545,7 @@ TEST( 'compareImageUtil flipH', function test() {
 
   EXPECT_EQ( 3, image2.width );
   EXPECT_EQ( 5, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     8,9,10,11, 4,5,6,7, 0,1,2,3,
     20,21,22,23, 16,17,18,19, 12,13,14,15,
     32,33,34,35, 28,29,30,31, 24,25,26,27,
@@ -565,7 +565,7 @@ TEST( 'compareImageUtil flipV', function test() {
 
   EXPECT_EQ( 3, image2.width );
   EXPECT_EQ( 5, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     48,49,50,51, 52,53,54,55, 56,57,58,59,
     36,37,38,39, 40,41,42,43, 44,45,46,47,
     24,25,26,27, 28,29,30,31, 32,33,34,35,
@@ -583,7 +583,7 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   var result1 = compareImageUtil.applyOrientation(src, 1);
   EXPECT_EQ( 2, result1.width );
   EXPECT_EQ( 3, result1.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     0,1,2,3,     4,5,6,7,
     8,9,10,11,   12,13,14,15,
     16,17,18,19, 20,21,22,23
@@ -591,7 +591,7 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   var result2 = compareImageUtil.applyOrientation(src, 2);
   EXPECT_EQ( 2, result2.width );
   EXPECT_EQ( 3, result2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     4,5,6,7,     0,1,2,3,
     12,13,14,15, 8,9,10,11,
     20,21,22,23, 16,17,18,19
@@ -599,7 +599,7 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   var result3 = compareImageUtil.applyOrientation(src, 3);
   EXPECT_EQ( 2, result3.width );
   EXPECT_EQ( 3, result3.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     20,21,22,23, 16,17,18,19,
     12,13,14,15, 8,9,10,11,
     4,5,6,7,     0,1,2,3
@@ -607,7 +607,7 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   var result4 = compareImageUtil.applyOrientation(src, 4);
   EXPECT_EQ( 2, result4.width );
   EXPECT_EQ( 3, result4.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     16,17,18,19, 20,21,22,23,
     8,9,10,11,   12,13,14,15,
     0,1,2,3,     4,5,6,7
@@ -615,28 +615,28 @@ TEST( 'compareImageUtil applyOrientation', function test() {
   var result5 = compareImageUtil.applyOrientation(src, 5);
   EXPECT_EQ( 3, result5.width );
   EXPECT_EQ( 2, result5.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     0,1,2,3, 8,9,10,11,   16,17,18,19,
     4,5,6,7, 12,13,14,15, 20,21,22,23
   ], result5.data );
   var result6 = compareImageUtil.applyOrientation(src, 6);
   EXPECT_EQ( 3, result6.width );
   EXPECT_EQ( 2, result6.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     16,17,18,19, 8,9,10,11,   0,1,2,3,
     20,21,22,23, 12,13,14,15, 4,5,6,7
   ], result6.data );
   var result7 = compareImageUtil.applyOrientation(src, 7);
   EXPECT_EQ( 3, result7.width );
   EXPECT_EQ( 2, result7.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     20,21,22,23, 12,13,14,15, 4,5,6,7,
     16,17,18,19, 8,9,10,11,   0,1,2,3
   ], result7.data );
   var result8 = compareImageUtil.applyOrientation(src, 8);
   EXPECT_EQ( 3, result8.width );
   EXPECT_EQ( 2, result8.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     4,5,6,7, 12,13,14,15, 20,21,22,23,
     0,1,2,3, 8,9,10,11,   16,17,18,19
   ], result8.data );
@@ -651,17 +651,17 @@ TEST( 'compareImageUtil applyOrientation F32', function test() {
   EXPECT_EQ( 2, result1.width );
   EXPECT_EQ( 3, result1.height );
   EXPECT_EQ( 1, result1.channels );
-  jsTestUtil.expectEqualArray( [ 0, 1, 2, 3, 4, 5 ], result1.data );
+  EXPECT_EQ_ARRAY( [ 0, 1, 2, 3, 4, 5 ], result1.data );
   var result2 = compareImageUtil.applyOrientation(src, 2);
   EXPECT_EQ( 2, result2.width );
   EXPECT_EQ( 3, result2.height );
   EXPECT_EQ( 1, result2.channels );
-  jsTestUtil.expectEqualArray( [ 1, 0, 3, 2, 5, 4 ], result2.data );
+  EXPECT_EQ_ARRAY( [ 1, 0, 3, 2, 5, 4 ], result2.data );
   var result3 = compareImageUtil.applyOrientation(src, 3);
   EXPECT_EQ( 2, result3.width );
   EXPECT_EQ( 3, result3.height );
   EXPECT_EQ( 1, result3.channels );
-  jsTestUtil.expectEqualArray( [ 5, 4, 3, 2, 1, 0 ], result3.data );
+  EXPECT_EQ_ARRAY( [ 5, 4, 3, 2, 1, 0 ], result3.data );
 });
 
 TEST( 'compareImageUtil copy F32', function test() {
@@ -674,7 +674,7 @@ TEST( 'compareImageUtil copy F32', function test() {
 
   EXPECT_EQ( 2, image2.width );
   EXPECT_EQ( 2, image2.height );
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     0, 1,
     4, 5
   ], image2.data );
@@ -838,7 +838,7 @@ TEST( 'compareImageUtil resizeNN', function test() {
   compareImageUtil.fill(image1, 10, 20, 30, 40);
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeNN(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
@@ -851,7 +851,7 @@ TEST( 'compareImageUtil resizeNN', function test() {
   image1.data[3] = 255;
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeNN(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     255, 255, 255, 255,  255, 255, 255, 255,  10, 20, 30, 40,  10, 20, 30, 40,
     255, 255, 255, 255,  255, 255, 255, 255,  10, 20, 30, 40,  10, 20, 30, 40,
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
@@ -866,7 +866,7 @@ TEST( 'compareImageUtil resizeNN F32', function test() {
   compareImageUtil.fill(image1, 10);
   compareImageUtil.fill(image2, 0);
   compareImageUtil.resizeNN(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     10, 10, 10, 10,
     10, 10, 10, 10,
     10, 10, 10, 10,
@@ -876,7 +876,7 @@ TEST( 'compareImageUtil resizeNN F32', function test() {
   image1.data[0] = 255;
   compareImageUtil.fill(image2, 0);
   compareImageUtil.resizeNN(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     255, 255, 10, 10,
     255, 255, 10, 10,
     10,  10,  10, 10,
@@ -891,7 +891,7 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   compareImageUtil.fill(image1, 10, 20, 30, 40);
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeBilinear(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
     10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,  10, 20, 30, 40,
@@ -904,7 +904,7 @@ TEST( 'compareImageUtil resizeBilinear', function test() {
   image1.data[3] = 255;
   compareImageUtil.fill(image2, 0, 0, 0, 0);
   compareImageUtil.resizeBilinear(image2, image1);
-  jsTestUtil.expectEqualArray( [
+  EXPECT_EQ_ARRAY( [
     255, 255, 255, 255,  194, 196, 199, 201,  71, 79, 86, 94,  10, 20, 30, 40,
     194, 196, 199, 201,  148, 152, 157, 161,  56, 64, 72, 80,  10, 20, 30, 40,
     71, 79, 86, 94,  56, 64, 72, 80,  25, 35, 44, 53,  10, 20, 30, 40,
