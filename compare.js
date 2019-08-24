@@ -1778,16 +1778,6 @@
         return [value, textUtil.setText($('<span>'), desc)];
       }
     };
-    var makeAspectRatioInfo = function(w, h) {
-      var exact = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
-      var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(exact);
-      var desc = compareUtil.aspectRatioUtil.toString(exact);
-      if (approx) {
-        return [exact.ratio, desc, compareUtil.aspectRatioUtil.toString(approx)];
-      } else {
-        return [exact.ratio, desc];
-      }
-    };
     var makeOrientationInfo = function(img) {
       var orientation = compareUtil.orientationUtil.toString(img.orientation);
       var desc = img.orientation ? $('<span>').append(
@@ -1871,7 +1861,7 @@
         img.color === '' ? unknown : [img.color, img.color],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
         img.sizeUnknown ? unknown : [img.height, compareUtil.addComma(img.height) ],
-        img.sizeUnknown ? unknown : makeCellValue(makeAspectRatioInfo(img.width, img.height)),
+        img.sizeUnknown ? unknown : makeCellValue(compareUtil.aspectRatioUtil.makeInfo(img.width, img.height)),
         makeOrientationInfo(img),
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         makeCellValue(makeDurationInfo(img.formatInfo)),

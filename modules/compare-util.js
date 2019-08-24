@@ -1273,10 +1273,21 @@
     var toString = function(ratio) {
       return addComma(ratio.w) + ':' + addComma(ratio.h);
     };
+    var makeInfo = function(w, h) {
+      var exact = calcAspectRatio(w, h);
+      var approx = findApproxAspectRatio(exact);
+      var desc = toString(exact);
+      if (approx) {
+        return [exact.ratio, desc, toString(approx)];
+      } else {
+        return [exact.ratio, desc];
+      }
+    };
     return {
       calcAspectRatio: calcAspectRatio,
       findApproxAspectRatio: findApproxAspectRatio,
-      toString: toString
+      toString: toString,
+      makeInfo: makeInfo
     };
   })();
   var cursorKeyCodeToXY = function(keyCode, step) {

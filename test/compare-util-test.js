@@ -475,6 +475,22 @@ TEST( 'compareUtil orientationUtil interpretXY2', function test() {
     EXPECT_EQ( '2:1', findApprox(15578, 7783) );
     EXPECT_EQ( '2:1', findApprox(1001, 500) );
   });
+  TEST( 'compareUtil aspectRatioUtil makeInfo', function test() {
+    makeInfo = compareUtil.aspectRatioUtil.makeInfo;
+    EXPECT_EQ_ARRAY( [1, '1:1'], makeInfo(1, 1) );
+    EXPECT_EQ_ARRAY( [1, '1:1'], makeInfo(100, 100) );
+    EXPECT_EQ_ARRAY( [0.5, '1:2'], makeInfo(100, 200) );
+    EXPECT_EQ_ARRAY( [16/9, '16:9'], makeInfo(1920, 1080) );
+    EXPECT_EQ_ARRAY( [8/5, '8:5'], makeInfo(1920, 1200) );
+    EXPECT_EQ_ARRAY( [960/544, '30:17'], makeInfo(960, 544) );
+    EXPECT_EQ_ARRAY( [2432/3648, '2:3'], makeInfo(2432, 3648) );
+    EXPECT_EQ_ARRAY( [2028/1521, '4:3'], makeInfo(2028, 1521) );
+    EXPECT_EQ_ARRAY( [2592/1944, '4:3'], makeInfo(2592, 1944) );
+    EXPECT_EQ_ARRAY( [400/301, '400:301', '4:3'], makeInfo(400, 301) );
+    EXPECT_EQ_ARRAY( [2056/3648, '257:456', '9:16'], makeInfo(2056, 3648) );
+    EXPECT_EQ_ARRAY( [3648/2056, '456:257', '16:9'], makeInfo(3648, 2056) );
+    EXPECT_EQ_ARRAY( [15578/7783, '15,578:7,783', '2:1'], makeInfo(15578, 7783) );
+  });
 })();
 
 TEST( 'compareUtil cursorKeyCodeToXY', function test() {
