@@ -480,6 +480,8 @@ TEST( 'compareUtil orientationUtil interpretXY2', function test() {
     EXPECT_EQ_ARRAY( [1, '1:1'], makeInfo(1, 1) );
     EXPECT_EQ_ARRAY( [1, '1:1'], makeInfo(100, 100) );
     EXPECT_EQ_ARRAY( [0.5, '1:2'], makeInfo(100, 200) );
+    EXPECT_EQ_ARRAY( [1/10, '1:10'], makeInfo(1, 10) );
+    EXPECT_EQ_ARRAY( [10, '10:1'], makeInfo(10, 1) );
     EXPECT_EQ_ARRAY( [16/9, '16:9'], makeInfo(1920, 1080) );
     EXPECT_EQ_ARRAY( [8/5, '8:5'], makeInfo(1920, 1200) );
     EXPECT_EQ_ARRAY( [960/544, '30:17'], makeInfo(960, 544) );
