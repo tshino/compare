@@ -495,6 +495,19 @@ TEST( 'compareUtil orientationUtil interpretXY2', function test() {
   });
 })();
 
+TEST( 'compareUtil makeDurationInfo', function test() {
+  var make = compareUtil.makeDurationInfo;
+  EXPECT_EQ_ARRAY( [null, '‐'], make() );
+  EXPECT_EQ_ARRAY( [null, '‐'], make(null) );
+  EXPECT_EQ_ARRAY( [null, '‐'], make({}) );
+  EXPECT_EQ_ARRAY( [3, '3.000'], make({ anim: { durationNum: 3, durationDen: 1 } }) );
+  EXPECT_EQ_ARRAY( [7/4, '1.750'], make({ anim: { durationNum: 14, durationDen: 8 } }) );
+  EXPECT_EQ_ARRAY( [4/3, '4/3', '1.333'], make({ anim: { durationNum: 4, durationDen: 3 } }) );
+  EXPECT_EQ_ARRAY( [4/3, '4/3', '1.333'], make({ anim: { durationNum: 20, durationDen: 15 } }) );
+  EXPECT_EQ_ARRAY( [4/3, '40/30', '1.333'],
+                   make({ anim: { durationNum: 20, durationDen: 15, fpsNum: 30, fpsDen: 1 } }) );
+});
+
 TEST( 'compareUtil cursorKeyCodeToXY', function test() {
   var cursorKeyCodeToXY = compareUtil.cursorKeyCodeToXY;
   EXPECT( cursorKeyCodeToXY(99).x === 0 );

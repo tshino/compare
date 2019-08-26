@@ -1290,6 +1290,28 @@
       makeInfo: makeInfo
     };
   })();
+  var makeDurationInfo = function(formatInfo) {
+    if (formatInfo && formatInfo.anim) {
+      var num = formatInfo.anim.durationNum;
+      var den = formatInfo.anim.durationDen;
+      var value = num / den;
+      var desc = (num / den).toFixed(3);
+      if (0 !== num * 1000 % den) {
+        var gcd = calcGCD(num, den);
+        num /= gcd;
+        den /= gcd;
+        if (formatInfo.anim.fpsNum !== null &&
+            formatInfo.anim.fpsDen === 1 &&
+            formatInfo.anim.fpsNum % den === 0) {
+          num *= formatInfo.anim.fpsNum / den;
+          den = formatInfo.anim.fpsNum;
+        }
+        return [value, num + '/' + den, desc];
+      }
+      return [value, desc];
+    }
+    return [null, '‐'];
+  };
   var cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
     var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
@@ -1854,6 +1876,7 @@
     detectImageFormat:      detectImageFormat,
     orientationUtil:        orientationUtil,
     aspectRatioUtil:        aspectRatioUtil,
+    makeDurationInfo:       makeDurationInfo,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
     calcInscribedRect:      calcInscribedRect,
     processKeyDownEvent:    processKeyDownEvent,
