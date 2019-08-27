@@ -602,6 +602,9 @@
               var num = binary.big16(p + 28);
               var den = binary.big16(p + 30);
               if (den === 0) { den = 100; }
+              var gcd = calcGCD(num, den);
+              num /= gcd;
+              den /= gcd;
               if (commonDelay === undefined) { commonDelay = [num, den]; }
               if (commonDelay && (commonDelay[0] !== num || commonDelay[1] !== den)) { commonDelay = null; }
               delayList.push(num / den);
