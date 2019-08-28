@@ -1315,6 +1315,33 @@
     }
     return [null, '‐'];
   };
+  var makeFPSInfo = function(formatInfo, nonUniform) {
+    if (formatInfo && formatInfo.anim) {
+      var num = formatInfo.anim.fpsNum;
+      var den = formatInfo.anim.fpsDen;
+      if (num !== null && den !== null) {
+        var value = num / den;
+        if (0 === num % den) {
+          var desc = String(num / den);
+        } else {
+          var desc = (num / den).toFixed(2);
+        }
+        if (0 !== num * 100 % den) {
+          var gcd = compareUtil.calcGCD(num, den);
+          num /= gcd;
+          den /= gcd;
+          return [value, num + '/' + den, desc];
+        }
+        return [value, desc];
+      }
+      if (formatInfo.anim.approxFPS !== null) {
+        return [null, nonUniform, formatInfo.anim.approxFPS.toFixed(1)];
+      } else {
+        return [null, nonUniform];
+      }
+    }
+    return [null, '‐'];
+  };
   var cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
     var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
@@ -1880,6 +1907,7 @@
     orientationUtil:        orientationUtil,
     aspectRatioUtil:        aspectRatioUtil,
     makeDurationInfo:       makeDurationInfo,
+    makeFPSInfo:            makeFPSInfo,
     cursorKeyCodeToXY:      cursorKeyCodeToXY,
     calcInscribedRect:      calcInscribedRect,
     processKeyDownEvent:    processKeyDownEvent,

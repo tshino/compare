@@ -1790,33 +1790,6 @@
       return [img.orientation ? orientation : null, desc];
     };
     var nonUniform = { en: 'non-uniform', ja: '一様でない' };
-    var makeFPSInfo = function(formatInfo) {
-      if (formatInfo && formatInfo.anim) {
-        var num = formatInfo.anim.fpsNum;
-        var den = formatInfo.anim.fpsDen;
-        if (num !== null && den !== null) {
-          var value = num / den;
-          if (0 === num % den) {
-            var desc = String(num / den);
-          } else {
-            var desc = (num / den).toFixed(2);
-          }
-          if (0 !== num * 100 % den) {
-            var gcd = compareUtil.calcGCD(num, den);
-            num /= gcd;
-            den /= gcd;
-            return [value, num + '/' + den, desc];
-          }
-          return [value, desc];
-        }
-        if (formatInfo.anim.approxFPS !== null) {
-          return [null, nonUniform, formatInfo.anim.approxFPS.toFixed(1)];
-        } else {
-          return [null, nonUniform];
-        }
-      }
-      return [null, '‐'];
-    };
     var rows = [
       $('#infoName'),
       $('#infoFormat'),
@@ -1843,7 +1816,7 @@
         makeOrientationInfo(img),
         !img.numFrames ? unknown : [img.numFrames, String(img.numFrames)],
         makeCellValue(compareUtil.makeDurationInfo(img.formatInfo)),
-        makeCellValue(makeFPSInfo(img.formatInfo)),
+        makeCellValue(compareUtil.makeFPSInfo(img.formatInfo, nonUniform)),
         [img.size, img.size ? compareUtil.addComma(img.size) : '-'],
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];

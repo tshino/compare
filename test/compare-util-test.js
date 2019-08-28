@@ -510,6 +510,20 @@ TEST( 'compareUtil makeDurationInfo', function test() {
   EXPECT_EQ_ARRAY( [34/24, '34/24', '1.417'], make({ anim: { durationNum: 34, durationDen: 24, fpsNum: 24, fpsDen: 1 } }) );
 });
 
+TEST( 'compareUtil makeFPSInfo', function test() {
+  var make = compareUtil.makeFPSInfo;
+  var nu = { en: 'non-uniform' };
+  EXPECT_EQ_ARRAY( [null, '‐'], make() );
+  EXPECT_EQ_ARRAY( [null, '‐'], make(null, nu) );
+  EXPECT_EQ_ARRAY( [null, '‐'], make({}, nu) );
+  EXPECT_EQ_ARRAY( [25, '25'], make({ anim: { fpsNum: 1000, fpsDen: 40, approxFPS: null } }, nu) );
+  EXPECT_EQ_ARRAY( [1000/32, '31.25'], make({ anim: { fpsNum: 1000, fpsDen: 32, approxFPS: null } }, nu) );
+  EXPECT_EQ_ARRAY( [100/3, '100/3', '33.33'], make({ anim: { fpsNum: 1000, fpsDen: 30, approxFPS: null } }, nu) );
+  EXPECT_EQ_ARRAY( [24, '24'], make({ anim: { fpsNum: 24, fpsDen: 1, approxFPS: null } }, nu) );
+  EXPECT_EQ_ARRAY( [null, nu, '24.0'], make({ anim: { fpsNum: null, fpsDen: null, approxFPS: 24 } }, nu) );
+  EXPECT_EQ_ARRAY( [null, nu], make({ anim: { fpsNum: null, fpsDen: null, approxFPS: null } }, nu) );
+});
+
 TEST( 'compareUtil cursorKeyCodeToXY', function test() {
   var cursorKeyCodeToXY = compareUtil.cursorKeyCodeToXY;
   EXPECT( cursorKeyCodeToXY(99).x === 0 );
