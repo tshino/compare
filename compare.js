@@ -1866,9 +1866,11 @@
           hasOrientation = true;
         }
       }
-      var basePos = Math.max(0, indices.indexOf(baseImageIndex));
-      var baseVal = val[basePos] || null;
       var enableComparison = 2 <= val.length;
+      if (enableComparison) {
+        var basePos = Math.max(0, indices.indexOf(baseImageIndex));
+        var baseVal = val[basePos] || null;
+      }
       for (var i = 0; i < val.length; i++) {
         updateTableCell(val[i]);
         if (enableComparison) {
