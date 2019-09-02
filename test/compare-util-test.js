@@ -346,6 +346,30 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
   EXPECT_EQ( null, findNearlyConstantValue([0, 3, 4, 3, 4, 3, 4, 3, 4], 2) );
 });
 
+TEST( 'compareUtil detectImageFormat', function test() {
+  var detect = function(array) {
+    var content = new Uint8Array(array);
+    var datauri = jsTestUtil.dataURIFromArrayBuffer(content);
+    var binary = compareUtil.binaryFromDataURI(datauri);
+    var format = compareUtil.detectImageFormat(binary);
+    return format;
+  };
+  EXPECT_EQ( null, detect([]) );
+  EXPECT_EQ( null, detect([0, 1, 2, 3]) );
+
+  var f = detect([0x89, 0x50, 0x4e, 0x47]);
+  EXPECT_EQ( 'PNG', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0x47, 0x49, 0x46, 0x38]);
+  EXPECT_EQ( 'GIF', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0x42, 0x4d, 0, 0]);
+  EXPECT_EQ( 'BMP', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
+});
+
 TEST( 'compareUtil orientationUtil toString', function test() {
   var toString = compareUtil.orientationUtil.toString;
   EXPECT_EQ( 'TopLeft', toString(1) );

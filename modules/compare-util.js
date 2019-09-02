@@ -854,6 +854,7 @@
             break;
         }
       }
+      color = color || 'unknown';
       return formatInfo('BMP', color);
     };
     var detectJPEG = function(binary, magic, magic2) {
