@@ -368,6 +368,10 @@ TEST( 'compareUtil detectImageFormat', function test() {
   var f = detect([0x42, 0x4d, 0, 0]);
   EXPECT_EQ( 'BMP', f.toString() );
   EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0xff, 0xd8, 0xff, 0xe0]);
+  EXPECT_EQ( 'JPEG', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
 });
 
 TEST( 'compareUtil orientationUtil toString', function test() {

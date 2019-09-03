@@ -888,21 +888,23 @@
           return s;
         }
       };
-      switch (sof.sampling) {
-        case 0x111111: color += ' (24bpp ' + sampling('4:4:4') + ')'; break;
-        case 0x211111: color += ' (16bpp ' + sampling('4:2:2') + ')'; break;
-        case 0x121111: color += ' (16bpp ' + sampling('4:4:0') + ')'; break;
-        case 0x221111: color += ' (12bpp ' + sampling('4:2:0') + ')'; break;
-        case 0x411111: color += ' (12bpp ' + sampling('4:1:1') + ')'; break;
-        case 0x311111: color += ' (40/3 bpp ' + sampling('3:1:1') + ')'; break;
-        case 0x421111: color += ' (10bpp ' + sampling('4:1:0') + ')'; break;
-        default:
-         if (nf === 1) {
-           color += ' (8bpp)';
-         } else if (nf === 3) {
-           color += ' (uncommon sampling ' + samplingPattern(['Y', 'Cb', 'Cr']) + ')';
-         }
-         break;
+      if (sof) {
+        switch (sof.sampling) {
+          case 0x111111: color += ' (24bpp ' + sampling('4:4:4') + ')'; break;
+          case 0x211111: color += ' (16bpp ' + sampling('4:2:2') + ')'; break;
+          case 0x121111: color += ' (16bpp ' + sampling('4:4:0') + ')'; break;
+          case 0x221111: color += ' (12bpp ' + sampling('4:2:0') + ')'; break;
+          case 0x411111: color += ' (12bpp ' + sampling('4:1:1') + ')'; break;
+          case 0x311111: color += ' (40/3 bpp ' + sampling('3:1:1') + ')'; break;
+          case 0x421111: color += ' (10bpp ' + sampling('4:1:0') + ')'; break;
+          default:
+            if (nf === 1) {
+              color += ' (8bpp)';
+            } else if (nf === 3) {
+              color += ' (uncommon sampling ' + samplingPattern(['Y', 'Cb', 'Cr']) + ')';
+            }
+            break;
+        }
       }
       //console.log(hasJFIF);
       //console.log(hasAdobe);
