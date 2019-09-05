@@ -1146,6 +1146,7 @@
           }
         }
       }
+      color = color || 'unknown';
       return formatInfo(desc, color, anim);
     };
     var detectSVG = function(binary, magic, magic2) {

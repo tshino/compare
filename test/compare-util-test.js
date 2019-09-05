@@ -380,6 +380,10 @@ TEST( 'compareUtil detectImageFormat', function test() {
   var f = detect([0x49, 0x49, 0x2a, 0x00]);
   EXPECT_EQ( 'TIFF', f.toString() );
   EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50]);
+  EXPECT_EQ( 'WebP', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
 });
 
 TEST( 'compareUtil orientationUtil toString', function test() {
