@@ -1028,6 +1028,7 @@
         }
       }
       //console.log('color', color);
+      color = color || 'unknown';
       return formatInfo('TIFF', color);
     };
     var readVP8ColorFormat = function(binary, offset, hasAlpha) {

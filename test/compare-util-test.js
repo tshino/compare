@@ -372,6 +372,14 @@ TEST( 'compareUtil detectImageFormat', function test() {
   var f = detect([0xff, 0xd8, 0xff, 0xe0]);
   EXPECT_EQ( 'JPEG', f.toString() );
   EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0x4d, 0x4d, 0x00, 0x2a]);
+  EXPECT_EQ( 'TIFF', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect([0x49, 0x49, 0x2a, 0x00]);
+  EXPECT_EQ( 'TIFF', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
 });
 
 TEST( 'compareUtil orientationUtil toString', function test() {
