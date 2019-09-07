@@ -392,6 +392,11 @@ TEST( 'compareUtil detectImageFormat', function test() {
   var f = detect('<?xml ?><svg');
   EXPECT_EQ( 'SVG', f && f.toString() );
   EXPECT_EQ( undefined, f && f.color );
+
+  var BOM = '\ufeff';
+  var f = detect(BOM + '<?xml ?><svg');
+  EXPECT_EQ( 'SVG', f && f.toString() );
+  EXPECT_EQ( undefined, f && f.color );
 });
 
 TEST( 'compareUtil orientationUtil toString', function test() {
