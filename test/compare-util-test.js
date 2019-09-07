@@ -347,9 +347,13 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
 });
 
 TEST( 'compareUtil detectImageFormat', function test() {
-  var detect = function(array) {
-    var content = new Uint8Array(array);
-    var datauri = jsTestUtil.dataURIFromArrayBuffer(content);
+  var detect = function(content) {
+    if (typeof content === 'string') {
+      var u8array = (new TextEncoder).encode(content);
+    } else {
+      var u8array = new Uint8Array(content);
+    }
+    var datauri = jsTestUtil.dataURIFromArrayBuffer(u8array);
     var binary = compareUtil.binaryFromDataURI(datauri);
     var format = compareUtil.detectImageFormat(binary);
     return format;
@@ -384,6 +388,10 @@ TEST( 'compareUtil detectImageFormat', function test() {
   var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50]);
   EXPECT_EQ( 'WebP', f.toString() );
   EXPECT_EQ( 'unknown', f.color );
+
+  var f = detect('<?xml ?><svg');
+  EXPECT_EQ( 'SVG', f && f.toString() );
+  EXPECT_EQ( undefined, f && f.color );
 });
 
 TEST( 'compareUtil orientationUtil toString', function test() {
