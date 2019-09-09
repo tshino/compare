@@ -389,6 +389,10 @@ TEST( 'compareUtil detectImageFormat', function test() {
   EXPECT_EQ( 'WebP', f.toString() );
   EXPECT_EQ( 'unknown', f.color );
 
+  var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20]);
+  EXPECT_EQ( 'WebP (Lossy)', f.toString() );
+  EXPECT_EQ( 'unknown', f.color );
+
   var f = detect('<?xml ?><svg');
   EXPECT_EQ( 'SVG', f && f.toString() );
   EXPECT_EQ( undefined, f && f.color );
