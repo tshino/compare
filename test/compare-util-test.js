@@ -346,7 +346,7 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
   EXPECT_EQ( null, findNearlyConstantValue([0, 3, 4, 3, 4, 3, 4, 3, 4], 2) );
 });
 
-TEST( 'compareUtil detectImageFormat', function test() {
+(function(){
   var detect = function(content) {
     if (typeof content === 'string') {
       var u8array = (new TextEncoder).encode(content);
@@ -358,72 +358,88 @@ TEST( 'compareUtil detectImageFormat', function test() {
     var format = compareUtil.detectImageFormat(binary);
     return format;
   };
-  EXPECT_EQ( null, detect([]) );
-  EXPECT_EQ( null, detect([0, 1, 2, 3]) );
+  TEST( 'compareUtil detectImageFormat', function test() {
+    EXPECT_EQ( null, detect([]) );
+    EXPECT_EQ( null, detect([0, 1, 2, 3]) );
+  });
 
-  var f = detect([0x89, 0x50, 0x4e, 0x47]);
-  EXPECT_EQ( 'PNG', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat PNG', function test() {
+    var f = detect([0x89, 0x50, 0x4e, 0x47]);
+    EXPECT_EQ( 'PNG', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect([0x47, 0x49, 0x46, 0x38]);
-  EXPECT_EQ( 'GIF', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat GIF', function test() {
+    var f = detect([0x47, 0x49, 0x46, 0x38]);
+    EXPECT_EQ( 'GIF', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect([0x42, 0x4d, 0, 0]);
-  EXPECT_EQ( 'BMP', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat BMP', function test() {
+    var f = detect([0x42, 0x4d, 0, 0]);
+    EXPECT_EQ( 'BMP', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect([0xff, 0xd8, 0xff, 0xe0]);
-  EXPECT_EQ( 'JPEG', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat JPEG', function test() {
+    var f = detect([0xff, 0xd8, 0xff, 0xe0]);
+    EXPECT_EQ( 'JPEG', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect([0x4d, 0x4d, 0x00, 0x2a]);
-  EXPECT_EQ( 'TIFF', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat TIFF', function test() {
+    var f = detect([0x4d, 0x4d, 0x00, 0x2a]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
 
-  var f = detect([0x49, 0x49, 0x2a, 0x00]);
-  EXPECT_EQ( 'TIFF', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+    var f = detect([0x49, 0x49, 0x2a, 0x00]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50]);
-  EXPECT_EQ( 'WebP', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+  TEST( 'compareUtil detectImageFormat WebP', function test() {
+    var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50]);
+    EXPECT_EQ( 'WebP', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
 
-  var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20]); // 'VP8 '
-  EXPECT_EQ( 'WebP (Lossy)', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+    var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20]); // 'VP8 '
+    EXPECT_EQ( 'WebP (Lossy)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
 
-  var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x4C]); // 'VP8L'
-  EXPECT_EQ( 'WebP (Lossless)', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+    var f = detect([0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x4C]); // 'VP8L'
+    EXPECT_EQ( 'WebP (Lossless)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
 
-  var f = detect([
-    0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
-    0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
-    0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
-    0x56, 0x50, 0x38, 0x20, 0, 0, 0, 0 // 'VP8 '
-  ]);
-  EXPECT_EQ( 'WebP (Lossy)', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x20, 0, 0, 0, 0 // 'VP8 '
+    ]);
+    EXPECT_EQ( 'WebP (Lossy)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
 
-  var f = detect([
-    0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
-    0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
-    0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
-    0x56, 0x50, 0x38, 0x4C, 0, 0, 0, 0 // 'VP8L'
-  ]);
-  EXPECT_EQ( 'WebP (Lossless)', f.toString() );
-  EXPECT_EQ( 'unknown', f.color );
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x00, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x4C, 0, 0, 0, 0 // 'VP8L'
+    ]);
+    EXPECT_EQ( 'WebP (Lossless)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+  });
 
-  var f = detect('<?xml ?><svg');
-  EXPECT_EQ( 'SVG', f && f.toString() );
-  EXPECT_EQ( undefined, f && f.color );
+  TEST( 'compareUtil detectImageFormat SVG', function test() {
+    var f = detect('<?xml ?><svg');
+    EXPECT_EQ( 'SVG', f && f.toString() );
+    EXPECT_EQ( undefined, f && f.color );
 
-  var BOM = '\ufeff';
-  var f = detect(BOM + '<?xml ?><svg');
-  EXPECT_EQ( 'SVG', f && f.toString() );
-  EXPECT_EQ( undefined, f && f.color );
-});
+    var BOM = '\ufeff';
+    var f = detect(BOM + '<?xml ?><svg');
+    EXPECT_EQ( 'SVG', f && f.toString() );
+    EXPECT_EQ( undefined, f && f.color );
+  });
+})();
 
 TEST( 'compareUtil orientationUtil toString', function test() {
   var toString = compareUtil.orientationUtil.toString;
