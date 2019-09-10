@@ -384,6 +384,16 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     var f = detect([0x47, 0x49, 0x46, 0x38]);
     EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
+
+    var f = detect([
+      0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0,
+      0x21, 0xff, // Application Extension
+      10, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, // NETS CAPE
+      0, 0, 0,
+    ]);
+    EXPECT_EQ( 'GIF (Animated)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+    EXPECT_EQ( 0, f.anim && f.anim.frameCount );
   });
 
   TEST( 'compareUtil detectImageFormat BMP', function test() {
