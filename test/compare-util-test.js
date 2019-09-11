@@ -394,6 +394,7 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 'GIF (Animated)', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
     EXPECT_EQ( 0, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 0, f.anim && f.anim.durationNum );
   });
 
   TEST( 'compareUtil detectImageFormat BMP', function test() {
@@ -448,6 +449,16 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'WebP (Lossless)', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x02, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0
+    ]);
+    EXPECT_EQ( 'WebP (Animated)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+    EXPECT_EQ( 0, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 0, f.anim && f.anim.durationNum );
   });
 
   TEST( 'compareUtil detectImageFormat SVG', function test() {
