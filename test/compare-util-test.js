@@ -473,6 +473,20 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 1, f.anim && f.anim.frameCount );
     EXPECT_EQ( 40, f.anim && f.anim.durationNum );
     EXPECT_EQ( 1000, f.anim && f.anim.durationDen );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x02, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
+      0x41, 0x4E, 0x4D, 0x46, 0x18, 0, 0, 0, // 'ANMF'
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x4c, 0, 0, 0, 0, // 'VP8L'
+    ]);
+    EXPECT_EQ( 'WebP (Animated Lossless)', f.toString() );
+    EXPECT_EQ( 'unknown', f.color );
+    EXPECT_EQ( 1, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 40, f.anim && f.anim.durationNum );
+    EXPECT_EQ( 1000, f.anim && f.anim.durationDen );
   });
 
   TEST( 'compareUtil detectImageFormat SVG', function test() {
