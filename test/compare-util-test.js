@@ -374,10 +374,40 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0,
       0, 0, 0, 0x08, 0x61, 0x63, 0x54, 0x4C, // acTL
       0, 0, 0, 0x01, 0, 0, 0, 0
-      ]);
+    ]);
     EXPECT_EQ( 'PNG (APNG)', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
     EXPECT_EQ( 1, f.anim && f.anim.frameCount );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x00, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Grayscale 1 (1bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x02, 0x00, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Grayscale 2 (2bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x04, 0x00, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Grayscale 4 (4bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x08, 0x00, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Grayscale 8 (8bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x00, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Grayscale 16 (16bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat GIF', function test() {
