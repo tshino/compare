@@ -415,6 +415,25 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0, 0, 0, 0x00, 0x74, 0x52, 0x4e, 0x53, // tRNS
     ]);
     EXPECT_EQ( 'Grayscale 16 (16bpp) + Transparent', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x08, 0x02, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x02, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 16.16.16 (48bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x02, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0x00, 0x74, 0x52, 0x4e, 0x53, // tRNS
+    ]);
+    EXPECT_EQ( 'RGB 16.16.16 (48bpp) + Transparent', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat GIF', function test() {
