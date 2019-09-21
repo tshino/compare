@@ -477,6 +477,18 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x04, 0, 0, 0, 0, 0, 0, 0,
     ]);
     EXPECT_EQ( 'Grayscale+Alpha 16.16 (32bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x08, 0x06, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGBA 8.8.8.8 (32bpp)', f.color );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x10, 0x06, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGBA 16.16.16.16 (64bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat GIF', function test() {
