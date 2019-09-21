@@ -745,7 +745,8 @@
                 color += ' + Transparent';
               }
             }
-            var off = 10 + (lctFlag ? 3 * Math.pow(2, lctLength + 1) : 0) + 1;
+            block += 10 + (lctFlag ? 3 * Math.pow(2, lctLength + 1) : 0);
+            var off = 1;
             for (; block + off < binary.length; ) {
               var size = binary.at(block + off);
               if (size === 0 /* Block Terminator */) {

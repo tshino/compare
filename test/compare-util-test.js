@@ -506,6 +506,14 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 'unknown', f.color );
     EXPECT_EQ( 0, f.anim && f.anim.frameCount );
     EXPECT_EQ( 0, f.anim && f.anim.durationNum );
+
+    var f = detect([
+      0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x80, 0, 0, // GCT: 1bit
+      0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+      0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, // no LCT
+    ]);
+    EXPECT_EQ( 'GIF', f.toString() );
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (1bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat BMP', function test() {
