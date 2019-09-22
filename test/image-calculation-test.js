@@ -872,7 +872,7 @@
       // different orientation and resulting same image
       function(done) {
         var options = { orientationA: 1, orientationB: 5 };
-        var task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3], options };
+        var task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3], options: options };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcMetrics', data.cmd );
           EXPECT_EQ( Infinity, data.result.psnr );
@@ -939,7 +939,7 @@
       },
       function(done) {
         var options = { orientationA: 1, orientationB: 8 };
-        var task = { cmd: 'calcToneCurve', type: 0, auxTypes: [0], imageData: [image1, image3], options };
+        var task = { cmd: 'calcToneCurve', type: 0, auxTypes: [0], imageData: [image1, image3], options: options };
         taskCallback = function(data) {
           EXPECT_EQ( 'calcToneCurve', data.cmd );
           EXPECT_EQ( 0, data.type );
