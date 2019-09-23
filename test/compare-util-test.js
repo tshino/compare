@@ -626,7 +626,7 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
 
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0,
-      0x21, 0xf9, 5, 0x01, 4, 0, 255, 0, 0, // Graphic Control Extension
+      0x21, 0xf9, 4, 0x01, 4, 0, 255, 0, // Graphic Control Extension
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x87, // LCT: 8bit
     ]);
     EXPECT_EQ( 'GIF', f.toString() );

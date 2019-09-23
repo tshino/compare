@@ -679,15 +679,12 @@
       var anim = undefined;
       if (13 <= binary.length) {
         //console.log('GIF sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
-        var size = [binary.little16(6), binary.little16(8)];
+        //var size = [binary.little16(6), binary.little16(8)];
         var bitfield = binary.at(10);
         var gctFlag = bitfield >> 7;
-        var colorRes = (bitfield >> 4) & 0x07;
         var gctLength = bitfield & 0x07;
-        var bgIndex = binary.at(11);
         //console.log('size', size.join('x'));
-        //console.log('gct', gctFlag, colorRes, gctLength);
-        //console.log('bg', bgIndex);
+        //console.log('gct', gctFlag, gctLength);
         var transparent, transparentIndex;
         var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
         var frames = 0, commonDelay, delayList = [], duration = 0, animated = false;
