@@ -598,36 +598,39 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0xcc, 0xcc, 0xcc, 0xdd, 0xdd, 0xdd, 0xee, 0xee, 0xee, 0xff, 0xff, 0xff,
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, // no LCT
     ]);
-    EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (4bpp)', f.color );
 
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0, // no GCT
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x84, // LCT: 5bit
     ]);
-    EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (5bpp)', f.color );
 
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0, // no GCT
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x85, // LCT: 6bit
     ]);
-    EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (6bpp)', f.color );
 
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0, // no GCT
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x86, // LCT: 7bit
     ]);
-    EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (7bpp)', f.color );
 
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0, // no GCT
       0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x87, // LCT: 8bit
     ]);
-    EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (8bpp)', f.color );
+
+    var f = detect([
+      0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0,
+      0x21, 0xf9, 5, 0x01, 4, 0, 255, 0, 0, // Graphic Control Extension
+      0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x87, // LCT: 8bit
+    ]);
+    EXPECT_EQ( 'GIF', f.toString() );
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (8bpp) + Transparent', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat BMP', function test() {

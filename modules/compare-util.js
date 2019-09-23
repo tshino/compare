@@ -716,7 +716,8 @@
                 animated = true;
               }
             }
-            for (var off = 2; block + off < binary.length; ) {
+            block += 2;
+            for (var off = 0; block + off < binary.length; ) {
               var size = binary.at(block + off);
               if (size === 0 /* Block Terminator */) {
                 block += off + 1;
