@@ -640,6 +640,19 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
 
     var f = detect([
       0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x01, 0x00, // Windows style
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (1bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x01, 0x00, // OS/2 style
+    ]);
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (1bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x04, 0x00, // Windows style
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ]);
@@ -653,17 +666,55 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
 
     var f = detect([
       0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x01, 0x00, // Windows style
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    ]);
-    EXPECT_EQ( 'Indexed RGB 8.8.8 (1bpp)', f.color );
-
-    var f = detect([
-      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x08, 0x00, // Windows style
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ]);
     EXPECT_EQ( 'Indexed RGB 8.8.8 (8bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x08, 0x00, // OS/2 style
+    ]);
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (8bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // Windows style
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 5.5.5 (16bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // OS/2 style
+    ]);
+    EXPECT_EQ( 'RGB 5.5.5 (16bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x18, 0x00, // Windows style
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x18, 0x00, // OS/2 style
+    ]);
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x20, 0x00, // Windows style
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 8.8.8 (32bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x20, 0x00, // OS/2 style
+    ]);
+    EXPECT_EQ( 'RGB 8.8.8 (32bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat JPEG', function test() {
