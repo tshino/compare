@@ -691,6 +691,30 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 'RGB 5.5.5 (16bpp)', f.color );
 
     var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // Windows style, biSize=40
+      0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // compression=3
+      0x00, 0x7c, 0, 0, 0xe0, 0x03, 0, 0, 0x1f, 0x00, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 5.5.5 (16bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // Windows style, biSize=40
+      0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // compression=3
+      0x00, 0xf8, 0, 0, 0xe0, 0x07, 0, 0, 0x1f, 0x00, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 5.6.5 (16bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+      40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // Windows style, biSize=40
+      0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // compression=3
+      0x00, 0x0e, 0, 0, 0xe0, 0x01, 0, 0, 0x1f, 0x00, 0, 0,
+    ]);
+    EXPECT_EQ( 'RGB 3.4.5 (16bpp)', f.color );
+
+    var f = detect([
       0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x18, 0x00, // Windows style
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
