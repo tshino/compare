@@ -813,6 +813,16 @@
             ];
           }
         }
+        var makeRGBAMaskDesc = function(mask) {
+          var desc = '', bits = [], labels = ['R', 'G', 'B', 'A'];
+          for (var i = 0; i < mask.length; i++) {
+            if (0 < mask[i]) {
+              desc += labels[i];
+              bits.push(mask[i]);
+            }
+          }
+          return 0 < bits.length ? desc + ' ' + bits.join('.') : '';
+        };
         //console.log(biSize);
         //console.log(bitCount);
         //console.log(compression);
@@ -830,8 +840,8 @@
           case 16:
             switch (mask.length) {
               case 0: color = 'RGB 5.5.5'; break;
-              case 3: color = 'RGB ' + mask.join('.'); break;
-              case 4: color = 'RGBA ' + mask.join('.'); break;
+              case 3: color = makeRGBAMaskDesc(mask); break;
+              case 4: color = makeRGBAMaskDesc(mask); break;
               default: color = 'RGB'; break;
             }
             color += ' (16bpp)';
@@ -842,8 +852,8 @@
           case 32:
             switch (mask.length) {
               case 0: color = 'RGB 8.8.8'; break;
-              case 3: color = 'RGB ' + mask.join('.'); break;
-              case 4: color = 'RGBA ' + mask.join('.'); break;
+              case 3: color = makeRGBAMaskDesc(mask); break;
+              case 4: color = makeRGBAMaskDesc(mask); break;
               default: color = 'RGB'; break;
             }
             color += ' (32bpp)';
