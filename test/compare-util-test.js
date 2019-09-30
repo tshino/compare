@@ -755,6 +755,14 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 'RGBA 3.4.5.4 (16bpp)', f.color );
 
     var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+      56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x10, 0x00, // Windows style, biSize=56
+      0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // compression=3
+      0x00, 0xff, 0, 0, 0x00, 0x00, 0, 0, 0x00, 0x00, 0, 0, 0xff, 0x00, 0, 0,
+    ]);
+    EXPECT_EQ( 'RA 8.8 (16bpp)', f.color );
+
+    var f = detect([
       0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
       40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x18, 0x00, // Windows style
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
