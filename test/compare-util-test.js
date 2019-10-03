@@ -819,6 +819,14 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff,
     ]);
     EXPECT_EQ( 'RGBA 8.8.8.8 (32bpp)', f.color );
+
+    var f = detect([
+      0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+      56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0x20, 0x00, // Windows style, biSize=56
+      0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // compression=3
+      0xff, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0xff, 0x00,
+    ]);
+    EXPECT_EQ( 'RA 12.12 (32bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat JPEG', function test() {
