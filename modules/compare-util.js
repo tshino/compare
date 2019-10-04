@@ -909,7 +909,7 @@
           default:
             if (nf === 1) {
               color += ' (8bpp)';
-            } else if (nf === 3) {
+            } else if (nf === 3 && sof.samplingPattern !== undefined) {
               color += ' (uncommon sampling ' + samplingPattern(['Y', 'Cb', 'Cr']) + ')';
             }
             break;

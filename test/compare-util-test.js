@@ -840,6 +840,18 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'JPEG (MPF)', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 1,   // SOF0
+    ]);
+    EXPECT_EQ( 'Grayscale 8 (8bpp)', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
+    ]);
+    EXPECT_EQ( 'YCbCr 8.8.8', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat TIFF', function test() {
