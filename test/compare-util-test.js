@@ -863,6 +863,20 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     var f = detect([
       0xff, 0xd8, // SOI
       0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
+      0, 0x11, 0, 0, 0x11, 0, 0, 0x11, 0,   // sampling pattern
+    ]);
+    EXPECT_EQ( 'YCbCr 8.8.8 (24bpp 4:4:4)', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
+      0, 0x22, 0, 0, 0x22, 0, 0, 0x22, 0,   // sampling pattern (redundant notation)
+    ]);
+    EXPECT_EQ( 'YCbCr 8.8.8 (24bpp 4:4:4-variant Y=2x2 Cb=2x2 Cr=2x2)', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
       0, 0x22, 0, 0, 0x11, 0, 0, 0x11, 0,   // sampling pattern
     ]);
     EXPECT_EQ( 'YCbCr 8.8.8 (12bpp 4:2:0)', f.color );
