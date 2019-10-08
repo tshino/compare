@@ -901,6 +901,20 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0, 0x41, 0, 0, 0x11, 0, 0, 0x11, 0,   // sampling pattern
     ]);
     EXPECT_EQ( 'YCbCr 8.8.8 (12bpp 4:1:1)', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
+      0, 0x31, 0, 0, 0x11, 0, 0, 0x11, 0,   // sampling pattern
+    ]);
+    EXPECT_EQ( 'YCbCr 8.8.8 (40/3 bpp 3:1:1)', f.color );
+
+    var f = detect([
+      0xff, 0xd8, // SOI
+      0xff, 0xc0, 0, 0, 0, 0, 0, 0, 0, 3,   // SOF0
+      0, 0x42, 0, 0, 0x11, 0, 0, 0x11, 0,   // sampling pattern
+    ]);
+    EXPECT_EQ( 'YCbCr 8.8.8 (10bpp 4:1:0)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat TIFF', function test() {
