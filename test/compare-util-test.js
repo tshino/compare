@@ -925,6 +925,21 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     var f = detect([0x49, 0x49, 0x2a, 0x00]);
     EXPECT_EQ( 'TIFF', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 1,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 0
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 1 (1bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // BitsPerSample = [1]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 1 (1bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat WebP', function test() {
