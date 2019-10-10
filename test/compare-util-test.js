@@ -940,6 +940,38 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'TIFF', f.toString() );
     EXPECT_EQ( 'Grayscale 1 (1bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 2, 0, 0, // BitsPerSample = [2]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 2 (2bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 4, 0, 0, // BitsPerSample = [4]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 4 (4bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 8, 0, 0, // BitsPerSample = [8]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 8 (8bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 16, 0, 0, // BitsPerSample = [16]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale 16 (16bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat WebP', function test() {
