@@ -993,12 +993,12 @@
             //console.log('extraSamples', extraSamples);
             var baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
             var totalBaseBits = baseBits.reduce(function(a, b) { return a + b; }, 0);
-            if (0 <= alphaIndex && alphaIndex < bitsPerSample.length) {
-              var alphaBits = bitsPerSample[alphaIndex];
+            if (0 <= alphaIndex && baseIndices.length + alphaIndex < bitsPerSample.length) {
+              var alphaBits = bitsPerSample[baseIndices.length + alphaIndex];
               var name = withAlphaName + ' (pre-multiplied) ' + baseBits.join('.') + '.' + alphaBits;
               return name + ' (' + (totalBaseBits + alphaBits) +  'bpp)';
-            } else if (0 <= maskIndex && maskIndex < bitsPerSample.length) {
-              var maskBits = bitsPerSample[maskIndex];
+            } else if (0 <= maskIndex && baseIndices.length + maskIndex < bitsPerSample.length) {
+              var maskBits = bitsPerSample[baseIndices.length + maskIndex];
               var name = withAlphaName + ' ' + baseBits.join('.') + '.' + maskBits;
               return name + ' (' + (totalBaseBits + maskBits) +  'bpp)';
             } else {
