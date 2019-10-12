@@ -976,6 +976,15 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     var f = detect([
       0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 3,
       0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // PhotometricInterpretation = 1
+      0x01, 0x02, 0, 3, 0, 0, 0, 2, 0, 8, 0, 8, // BitsPerSample = [8, 8]
+      0x01, 0x52, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // ExtraSamples [1]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Grayscale+Alpha (pre-multiplied) 8.8 (16bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 3,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // PhotometricInterpretation = 1
       0x01, 0x02, 0, 3, 0, 0, 0, 2, 0, 8, 0, 4, // BitsPerSample = [8, 4]
       0x01, 0x52, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // ExtraSamples [1]
     ]);
