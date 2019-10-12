@@ -991,14 +991,15 @@
           var maskIndex = extraSamples.indexOf(2 /* Unassociated alpha data */);
           var makeAlphaNotation = function(baseName, baseIndices, withAlphaName) {
             //console.log('extraSamples', extraSamples);
+            var numBaseSamples = baseIndices.length;
             var baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
             var totalBaseBits = baseBits.reduce(function(a, b) { return a + b; }, 0);
-            if (0 <= alphaIndex && baseIndices.length + alphaIndex < bitsPerSample.length) {
-              var alphaBits = bitsPerSample[baseIndices.length + alphaIndex];
+            if (0 <= alphaIndex && numBaseSamples + alphaIndex < bitsPerSample.length) {
+              var alphaBits = bitsPerSample[numBaseSamples + alphaIndex];
               var name = withAlphaName + ' (pre-multiplied) ' + baseBits.join('.') + '.' + alphaBits;
               return name + ' (' + (totalBaseBits + alphaBits) +  'bpp)';
-            } else if (0 <= maskIndex && baseIndices.length + maskIndex < bitsPerSample.length) {
-              var maskBits = bitsPerSample[baseIndices.length + maskIndex];
+            } else if (0 <= maskIndex && numBaseSamples + maskIndex < bitsPerSample.length) {
+              var maskBits = bitsPerSample[numBaseSamples + maskIndex];
               var name = withAlphaName + ' ' + baseBits.join('.') + '.' + maskBits;
               return name + ' (' + (totalBaseBits + maskBits) +  'bpp)';
             } else {
