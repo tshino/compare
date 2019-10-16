@@ -1024,12 +1024,23 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
       0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 4,
       0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 2, 0, 0, // PhotometricInterpretation = 2
       0x01, 0x15, 0, 3, 0, 0, 0, 1, 0, 4, 0, 0, // SamplesPerPixel = 4
-      0x01, 0x02, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0x3a, // BitsPerSample = [8, 8, 8]
+      0x01, 0x02, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0x3a, // BitsPerSample = [8, 8, 8, 8]
       0x01, 0x52, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // ExtraSamples [1]
       0, 8, 0, 8, 0, 8, 0, 8
     ]);
     EXPECT_EQ( 'TIFF', f.toString() );
     EXPECT_EQ( 'RGBA (pre-multiplied) 8.8.8.8 (32bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 4,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 2, 0, 0, // PhotometricInterpretation = 2
+      0x01, 0x15, 0, 3, 0, 0, 0, 1, 0, 4, 0, 0, // SamplesPerPixel = 4
+      0x01, 0x02, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0x3a, // BitsPerSample = [16, 16, 16, 16]
+      0x01, 0x52, 0, 3, 0, 0, 0, 1, 0, 1, 0, 0, // ExtraSamples [1]
+      0, 16, 0, 16, 0, 16, 0, 16
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'RGBA (pre-multiplied) 16.16.16.16 (64bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat WebP', function test() {
