@@ -1108,6 +1108,22 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'TIFF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 16.16.16 (2bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 3, 0, 0, // PhotometricInterpretation = 3
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 4, 0, 0, // BitsPerSample = [4]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Indexed RGB 16.16.16 (4bpp)', f.color );
+
+    var f = detect([
+      0x4d, 0x4d, 0x00, 0x2a, 0, 0, 0, 8, 0, 2,
+      0x01, 0x06, 0, 3, 0, 0, 0, 1, 0, 3, 0, 0, // PhotometricInterpretation = 3
+      0x01, 0x02, 0, 3, 0, 0, 0, 1, 0, 8, 0, 0, // BitsPerSample = [8]
+    ]);
+    EXPECT_EQ( 'TIFF', f.toString() );
+    EXPECT_EQ( 'Indexed RGB 16.16.16 (8bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat WebP', function test() {
