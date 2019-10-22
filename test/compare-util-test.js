@@ -559,8 +559,7 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     var f = detect([
       0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x00, 0, 0,
       0x21, 0xff, // Application Extension
-      10, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, // NETS CAPE
-      0, 0, 0,
+      10, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0, 0, 0 // NETS CAPE
     ]);
     EXPECT_EQ( 'GIF (Animated)', f.toString() );
     EXPECT_EQ( 'unknown', f.color );
@@ -631,6 +630,25 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'GIF', f.toString() );
     EXPECT_EQ( 'Indexed RGB 8.8.8 (8bpp) + Transparent', f.color );
+
+    var f = detect([
+      0x47, 0x49, 0x46, 0x38, 0, 0, 0, 0, 0, 0, 0x81, 0, 0, // GCT: 2bit
+      0x00, 0x00, 0x00, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xff, 0xff, 0xff,
+      0x21, 0xff, // Application Extension
+      10, 0x4e, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0, 0, 0, // NETS CAPE
+      0x21, 0xf9, 4, 0x00, 7, 0, 255, 0, // Graphic Control Extension
+      0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, // no LCT
+      0x21, 0xf9, 4, 0x00, 7, 0, 255, 0, // Graphic Control Extension
+      0x2c, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, // no LCT
+    ]);
+    EXPECT_EQ( 'GIF (Animated)', f.toString() );
+    EXPECT_EQ( 'Indexed RGB 8.8.8 (2bpp)', f.color );
+    EXPECT_EQ( 2, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 14, f.anim && f.anim.durationNum );
+    EXPECT_EQ( 100, f.anim && f.anim.durationDen );
+    EXPECT_EQ( 100, f.anim && f.anim.fpsNum );
+    EXPECT_EQ( 7, f.anim && f.anim.fpsDen );
+    EXPECT( f.anim && f.anim.approxFPS && 0.05 >= Math.abs(100/7 - f.anim.approxFPS) );
   });
 
   TEST( 'compareUtil detectImageFormat BMP', function test() {
