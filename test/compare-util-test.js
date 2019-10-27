@@ -576,6 +576,34 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 100, f.anim && f.anim.fpsNum );
     EXPECT_EQ( 7, f.anim && f.anim.fpsDen );
     EXPECT( f.anim && f.anim.approxFPS && 0.05 >= Math.abs(100/7 - f.anim.approxFPS) );
+
+    var f = detect([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+      0, 0, 0, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR
+      0, 0, 0, 0, 0, 0, 0, 0, 0x08, 0x02, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0x08, 0x61, 0x63, 0x54, 0x4C, // acTL
+      0, 0, 0, 0x04, 0, 0, 0, 0, 99, 99, 99, 99,
+      0, 0, 0, 0x1a, 0x66, 0x63, 0x54, 0x4C, // fcTL
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x07, 0x00, 0x64, // d=7/100
+      0, 0, 99, 99, 99, 99,
+      0, 0, 0, 0x1a, 0x66, 0x63, 0x54, 0x4C, // fcTL
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x08, 0x00, 0x64, // d=8/100
+      0, 0, 99, 99, 99, 99,
+      0, 0, 0, 0x1a, 0x66, 0x63, 0x54, 0x4C, // fcTL
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x07, 0x00, 0x64, // d=7/100
+      0, 0, 99, 99, 99, 99,
+      0, 0, 0, 0x1a, 0x66, 0x63, 0x54, 0x4C, // fcTL
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x08, 0x00, 0x64, // d=8/100
+      0, 0, 99, 99, 99, 99
+    ]);
+    EXPECT_EQ( 'PNG (APNG)', f.toString() );
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+    EXPECT_EQ( 4, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 3, f.anim && f.anim.durationNum );
+    EXPECT_EQ( 10, f.anim && f.anim.durationDen );
+    EXPECT_EQ( null, f.anim && f.anim.fpsNum );
+    EXPECT_EQ( null, f.anim && f.anim.fpsDen );
+    EXPECT( f.anim && f.anim.approxFPS && 0.05 >= Math.abs(40/3 - f.anim.approxFPS) );
   });
 
   TEST( 'compareUtil detectImageFormat GIF', function test() {
