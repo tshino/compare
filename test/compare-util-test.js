@@ -1315,6 +1315,20 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'WebP (Lossy)', f.toString() );
     EXPECT_EQ( 'YCbCr 8.8.8 (12bpp 4:2:0)', f.color );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x4C, 0, 0, 0, 0, // 'VP8L'
+      0x2f, 0, 0, 0, 0x00,
+    ]);
+    EXPECT_EQ( 'WebP (Lossless)', f.toString() );
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x4C, 0, 0, 0, 0, // 'VP8L'
+      0x2f, 0, 0, 0, 0x10,
+    ]);
+    EXPECT_EQ( 'WebP (Lossless)', f.toString() );
+    EXPECT_EQ( 'RGBA 8.8.8.8 (32bpp)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat SVG', function test() {
