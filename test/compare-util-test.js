@@ -1308,6 +1308,13 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 2, f.anim && f.anim.frameCount );
     EXPECT_EQ( 80, f.anim && f.anim.durationNum );
     EXPECT_EQ( 1000, f.anim && f.anim.durationDen );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50, 0x56, 0x50, 0x38, 0x20, 0, 0, 0, 0, // 'VP8 '
+      0, 0, 0, 0x9d, 0x01, 0x2a, 0, 0, 0, 0, 0x00,
+    ]);
+    EXPECT_EQ( 'WebP (Lossy)', f.toString() );
+    EXPECT_EQ( 'YCbCr 8.8.8 (12bpp 4:2:0)', f.color );
   });
 
   TEST( 'compareUtil detectImageFormat SVG', function test() {
