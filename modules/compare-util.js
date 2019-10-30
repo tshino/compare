@@ -1064,7 +1064,7 @@
     };
     var readWebPLosslessColorFormat = function(binary, offset, hasAlpha) {
       // check signature
-      if (binary.length < offset + 5 || binary.at(offset) != 0x2F) {
+      if (binary.length < offset + 5 || binary.at(offset) !== 0x2F) {
         return 'unknown';
       }
       var flags = binary.at(offset + 4) & 0xf0;
