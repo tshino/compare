@@ -1370,6 +1370,44 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     ]);
     EXPECT_EQ( 'WebP (Lossless)', f.toString() );
     EXPECT_EQ( 'RGBA 8.8.8.8 (32bpp)', f.color );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x02, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
+      0x41, 0x4E, 0x4D, 0x46, 35, 0, 0, 0, // 'ANMF'
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x20, 11, 0, 0, 0, // 'VP8 '
+      0, 0, 0, 0x9d, 0x01, 0x2a, 0, 0, 0, 0, 0x00, 99,
+      0x41, 0x4E, 0x4D, 0x46, 35, 0, 0, 0, // 'ANMF'
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x20, 11, 0, 0, 0, // 'VP8 '
+      0, 0, 0, 0x9d, 0x01, 0x2a, 0, 0, 0, 0, 0x00, 99,
+    ]);
+    EXPECT_EQ( 'WebP (Animated Lossy)', f.toString() );
+    EXPECT_EQ( 'YCbCr 8.8.8 (12bpp 4:2:0)', f.color );
+    EXPECT_EQ( 2, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 140, f.anim && f.anim.durationNum );
+    EXPECT_EQ( 1000, f.anim && f.anim.durationDen );
+
+    var f = detect([
+      0x52, 0x49, 0x46, 0x46, 0,0,0,0, 0x57, 0x45, 0x42, 0x50,
+      0x56, 0x50, 0x38, 0x58, 0x0a, 0, 0, 0, // 'VP8X'
+      0x02, 0x00, 0x00, 0x00, 0, 0, 0, 0, 0, 0,
+      0x41, 0x4E, 0x4D, 0x46, 29, 0, 0, 0, // 'ANMF'
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x4c, 5, 0, 0, 0, // 'VP8L'
+      0x2f, 0, 0, 0, 0x00, 99,
+      0x41, 0x4E, 0x4D, 0x46, 29, 0, 0, 0, // 'ANMF'
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 0, 0, 0,
+      0x56, 0x50, 0x38, 0x4c, 5, 0, 0, 0, // 'VP8L'
+      0x2f, 0, 0, 0, 0x00, 99,
+    ]);
+    EXPECT_EQ( 'WebP (Animated Lossless)', f.toString() );
+    EXPECT_EQ( 'RGB 8.8.8 (24bpp)', f.color );
+    EXPECT_EQ( 2, f.anim && f.anim.frameCount );
+    EXPECT_EQ( 140, f.anim && f.anim.durationNum );
+    EXPECT_EQ( 1000, f.anim && f.anim.durationDen );
   });
 
   TEST( 'compareUtil detectImageFormat SVG', function test() {
