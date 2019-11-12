@@ -1098,6 +1098,7 @@
           var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
           var lossy = 0, lossless = 0, unknown = 0;
           var duration = 0, commonDelay, delayList = [];
+          var colorList = [];
           for (var i = 0, p; p = anmf[i]; i++) {
             var delay = binary.length < p + 24 ? 0 : (binary.little32(p + 20) & 0xffffff);
             if (commonDelay === undefined) { commonDelay = delay; }
@@ -1112,18 +1113,23 @@
               f = binary.length < p + 8 ? 0 : binary.big32(p);
             }
             if (f === 0x56503820 /* 'VP8 ' */) {
-              if (lossy === 0) {
-                color = readVP8ColorFormat(binary, p + 8, hasAlpha);
+              color = readVP8ColorFormat(binary, p + 8, hasAlpha);
+              if (0 > colorList.indexOf(color)) {
+                colorList.push(color);
               }
               lossy += 1;
             } else if (f === 0x5650384C /* 'VP8L' */) {
-              if (lossless === 0) {
-                color = readWebPLosslessColorFormat(binary, p + 8, hasAlpha);
+              color = readWebPLosslessColorFormat(binary, p + 8, hasAlpha);
+              if (0 > colorList.indexOf(color)) {
+                colorList.push(color);
               }
               lossless += 1;
             } else {
               unknown += 1;
             }
+          }
+          if (0 < colorList.length) {
+            color = colorList.sort().join(', ');
           }
           if (0 < lossy && 0 === lossless && unknown === 0) {
             desc += ' (Animated Lossy)';
