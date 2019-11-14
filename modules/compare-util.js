@@ -1107,13 +1107,14 @@
             duration += delay;
             p += 24;
             var f = binary.length < p + 8 ? 0 : binary.big32(p);
+            var hasALPH = false;
             if (f === 0x414C5048 /* 'ALPH' */) {
-              hasAlpha = true;
+              hasALPH = true;
               p += 8 + ((binary.little32(p + 4) + 1) & 0xfffffffe);
               f = binary.length < p + 8 ? 0 : binary.big32(p);
             }
             if (f === 0x56503820 /* 'VP8 ' */) {
-              color = readVP8ColorFormat(binary, p + 8, hasAlpha);
+              color = readVP8ColorFormat(binary, p + 8, hasAlpha || hasALPH);
               if (0 > colorList.indexOf(color)) {
                 colorList.push(color);
               }
