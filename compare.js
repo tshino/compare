@@ -2841,6 +2841,11 @@
       [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
       [0, 12], [1, 13], [4, 16], [5, 17]
     ];
+    var cubeFaces = [
+      [0, 1, 5, 4, 0], [12, 16, 17, 13, 12],
+      [0, 12, 13, 1, 0], [4, 5, 17, 16, 4],
+      [0, 4, 16, 12, 0], [1, 13, 17, 5, 1]
+    ];
     var make3DCylinder = function(r, sz) {
       var v = [], cz = sz / 2;
       for (var i = 0; i < 36; ++i) {
@@ -2863,6 +2868,7 @@
     return {
       makeCube: makeCube,
       cubeIndices: cubeIndices,
+      cubeFaces: cubeFaces,
       make3DCylinder: make3DCylinder,
       cylinderIndices: cylinderIndices
     };
@@ -2887,10 +2893,19 @@
         return pos3DTo2D(pos[0], pos[1], pos[2]);
       });
     };
+    var isFrontFace = function(v2d, face) {
+        var a = v2d[face[0]];
+        var b = v2d[face[1]];
+        var c = v2d[face[2]];
+        var abx = b[0] - a[0], aby = b[1] - a[1];
+        var acx = c[0] - a[0], acy = c[1] - a[1];
+        return abx * acy < aby * acx;
+    };
     return {
       xr: xr, yr: yr, xg: xg, yg: yg, yb: yb,
       pos3DTo2D: pos3DTo2D,
-      vertices3DTo2D: vertices3DTo2D
+      vertices3DTo2D: vertices3DTo2D,
+      isFrontFace: isFrontFace
     };
   };
   var makeAxesDesc = function(v, lines) {
@@ -2901,14 +2916,16 @@
       );
     }).join('');
   };
-  var makeAxesSVG = function(vbox, labels, axesDesc) {
+  var makeAxesSVG = function(vbox, labels, axesDesc, grayAxesDesc) {
     var labelsSVG = labels.map(function(label) {
       return '<text>' + label.text + '</text>';
     }).join('');
     return $(
     '<svg viewBox="' + vbox + '">' +
-      '<g stroke="white" fill="none">' +
-        '<path stroke-width="0.2" d="' + axesDesc + '"></path>' +
+      '<g fill="none" stroke-width="0.2">' +
+        (grayAxesDesc !== undefined ?
+          '<path stroke="gray" d="' + grayAxesDesc + '"></path>' : '') +
+        '<path stroke="white" d="' + axesDesc + '"></path>' +
       '</g>' +
       '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
     '</svg>');
@@ -3072,6 +3089,7 @@
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
     var vertexIndicesCube = vertexUtil.cubeIndices;
+    var cubeFaces = vertexUtil.cubeFaces;
     var makeVertices3DCylinder = (function(){
       var vertices = vertexUtil.make3DCylinder(128, 256);
       return function(rotation) {
@@ -3227,13 +3245,25 @@
           colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
         ) : vertices3DCIEXyy // 4:CIE xyY
       );
-      var axesDesc = makeAxesDesc(v,
-          colorDistType.current() === 0 ? vertexIndicesCube : // 0:RGB
+      if (colorDistType.current() === 0) {
+        var frontFaces = [], backFaces = [];
+        cubeFaces.map(function(face) {
+          if (rotation.isFrontFace(v, face)) {
+            frontFaces.push(face);
+          } else {
+            backFaces.push(face);
+          }
+        });
+      }
+      var lines = (
+          colorDistType.current() === 0 ? frontFaces : // 0:RGB
           colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
           colorDistType.current() === 2 ? vertexIndicesCylinder : // 2:HSL
           colorDistType.current() === 3 ? vertexIndicesYCbCr : // 3:YCbCr
           vertexIndicesCIEXyy // 4:CIE xyY
       );
+      var axesDesc = makeAxesDesc(v, lines);
+      var grayAxesDesc = backFaces !== undefined ? makeAxesDesc(v, backFaces) : undefined;
       if (colorDistType.current() === 0) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
@@ -3265,9 +3295,12 @@
         ];
       }
       if (!fig.axes) {
-        fig.axes = makeAxesSVG(vbox, labels, axesDesc);
+        fig.axes = makeAxesSVG(vbox, labels, axesDesc, grayAxesDesc);
       } else {
-        $(fig.axes).find('g path').attr('d', axesDesc);
+        $(fig.axes).find('g path[stroke=white]').attr('d', axesDesc);
+        if (grayAxesDesc !== undefined) {
+          $(fig.axes).find('g path[stroke=gray]').attr('d', grayAxesDesc);
+        }
       }
       updateAxesLabels(fig.axes, labels, rotation);
     };
