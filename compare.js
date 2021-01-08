@@ -2922,10 +2922,10 @@
     }).join('');
     return $(
     '<svg viewBox="' + vbox + '">' +
-      '<g fill="none" stroke-width="0.2">' +
+      '<g fill="none">' +
         (grayAxesDesc !== undefined ?
-          '<path stroke="gray" d="' + grayAxesDesc + '"></path>' : '') +
-        '<path stroke="white" d="' + axesDesc + '"></path>' +
+          '<path stroke-width="0.2" stroke="gray" d="' + grayAxesDesc + '"></path>' : '') +
+        '<path stroke-width="0.3" stroke="white" d="' + axesDesc + '"></path>' +
       '</g>' +
       '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
     '</svg>');
@@ -3130,12 +3130,14 @@
     };
     var vertices3DYCbCr601 = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
     var vertices3DYCbCr709 = makeVertices3DYCbCr(compareUtil.colorMatrixBT709);
-    var vertexIndicesYCbCr = vertexIndicesCube.concat([
-      [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
-      [18, 21, 19, 22, 20, 23, 18], // lower hexagon
-      [24, 27, 25, 28, 26, 29, 24], // upper hexagon
-      [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
+    var facesYCbCr = cubeFaces.concat([
+      [18, 23, 20, 22, 19, 21, 18], // lower hexagon
+      [24, 27, 25, 28, 26, 29, 24] // upper hexagon
     ]);
+    var darkLinesYCbCr = [
+      [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
+      [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
+    ];
     var vertices3DCIEXyy = vertices3DCube.concat([
       [163.2 - 128, 84.15 - 128, -128], // lower chromaticity points
       [76.5 - 128, 153 - 128, -128],
@@ -3245,25 +3247,33 @@
           colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
         ) : vertices3DCIEXyy // 4:CIE xyY
       );
-      if (colorDistType.current() === 0) {
-        var frontFaces = [], backFaces = [];
-        cubeFaces.map(function(face) {
+      var faces = (
+        colorDistType.current() === 0 ? cubeFaces : // 0:RGB
+        colorDistType.current() === 3 ? facesYCbCr : // 3:YCbCr
+        undefined
+      );
+      var darkLines = faces !== undefined ? [] : undefined;
+      if (colorDistType.current() === 3) {
+        darkLines = darkLines.concat(darkLinesYCbCr);
+      }
+      if (faces !== undefined) {
+        var whiteLines = [];
+        faces.forEach(function(face) {
           if (rotation.isFrontFace(v, face)) {
-            frontFaces.push(face);
+            whiteLines.push(face);
           } else {
-            backFaces.push(face);
+            darkLines.push(face);
           }
         });
       }
       var lines = (
-          colorDistType.current() === 0 ? frontFaces : // 0:RGB
+          whiteLines !== undefined ? whiteLines :
           colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
           colorDistType.current() === 2 ? vertexIndicesCylinder : // 2:HSL
-          colorDistType.current() === 3 ? vertexIndicesYCbCr : // 3:YCbCr
           vertexIndicesCIEXyy // 4:CIE xyY
       );
       var axesDesc = makeAxesDesc(v, lines);
-      var grayAxesDesc = backFaces !== undefined ? makeAxesDesc(v, backFaces) : undefined;
+      var grayAxesDesc = darkLines !== undefined ? makeAxesDesc(v, darkLines) : undefined;
       if (colorDistType.current() === 0) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
