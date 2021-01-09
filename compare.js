@@ -3152,11 +3152,13 @@
       [76.5 - 128, 153 - 128, 128],
       [38.25 - 128, 15.3 - 128, 128]
     ]);
-    var vertexIndicesCIEXyy = vertexIndicesCube.concat([
-      [4, 12], [5, 13],
-      [18, 19, 20, 18], [21, 22, 23, 21],
-      [18, 21], [19, 22], [20, 23]
+    var facesCIEXyy = cubeFaces.concat([
+      [18, 20, 19, 18], [21, 22, 23, 21]
     ]);
+    var darkLinesCIEXyy = [
+      [4, 12], [5, 13], // diagonal
+      [18, 21], [19, 22], [20, 23]
+    ];
     var makeFigure = function(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
@@ -3257,11 +3259,14 @@
       var faces = (
         currentType === TYPE_RGB ? cubeFaces :
         currentType === TYPE_YCbCr ? facesYCbCr :
+        currentType === TYPE_CIExyY ? facesCIEXyy :
         undefined
       );
       var darkLines = faces !== undefined ? [] : undefined;
       if (currentType === TYPE_YCbCr) {
         darkLines = darkLines.concat(darkLinesYCbCr);
+      } else if (currentType === TYPE_CIExyY) {
+        darkLines = darkLines.concat(darkLinesCIEXyy);
       }
       if (faces !== undefined) {
         var whiteLines = [];
@@ -3276,8 +3281,7 @@
       var lines = (
           whiteLines !== undefined ? whiteLines :
           currentType === TYPE_HSV ? vertexIndicesCylinder :
-          currentType === TYPE_HSL ? vertexIndicesCylinder :
-          vertexIndicesCIEXyy // TYPE_CIExyY
+          currentType === TYPE_HSL ? vertexIndicesCylinder : []
       );
       var axesDesc = makeAxesDesc(v, lines);
       var grayAxesDesc = darkLines !== undefined ? makeAxesDesc(v, darkLines) : undefined;
