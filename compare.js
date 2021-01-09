@@ -2857,25 +2857,38 @@
       }
       return v;
     };
-    var cylinderIndices = (function() {
-      var indices = [[], []];
+    var cylinderFaces = (function() {
+      var faces = [[], []];
       for (var i = 0; i <= 36; ++i) {
-        indices[0][i] = (i % 36) * 2;
-        indices[1][i] = (i % 36) * 2 + 1;
+        faces[0][i] = ((36 - i) % 36) * 2;
+        faces[1][i] = (i % 36) * 2 + 1;
       }
-      return indices;
+      return faces;
     })();
+    var makeCylinderSideFaces = function(rotation) {
+      var yaw = Math.ceil(rotation.yaw / 10);
+      yaw = 36 * Math.ceil(yaw / 36) - yaw;
+      var faces = [[], []];
+      for (var i = 0; i <= 19; ++i) {
+        faces[0][i] = ((i + 18 + yaw) % 36) * 2;
+        faces[1][i] = ((37 - i + yaw) % 36) * 2 + 1;
+      }
+      return faces;
+    };
     return {
       makeCube: makeCube,
       cubeIndices: cubeIndices,
       cubeFaces: cubeFaces,
       make3DCylinder: make3DCylinder,
-      cylinderIndices: cylinderIndices
+      cylinderFaces: cylinderFaces,
+      makeCylinderSideFaces: makeCylinderSideFaces
     };
   }());
   var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
-    var ax = Math.round(orientation.x) * (Math.PI / 180);
-    var ay = Math.round(orientation.y) * (Math.PI / 180);
+    var pitch = Math.round(orientation.x);
+    var yaw = Math.round(orientation.y);
+    var ax = pitch * (Math.PI / 180);
+    var ay = yaw * (Math.PI / 180);
     var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
     var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
     var scale = 0.707;
@@ -2902,6 +2915,7 @@
         return abx * acy < aby * acx;
     };
     return {
+      pitch: pitch, yaw: yaw,
       xr: xr, yr: yr, xg: xg, yg: yg, yb: yb,
       pos3DTo2D: pos3DTo2D,
       vertices3DTo2D: vertices3DTo2D,
@@ -3094,7 +3108,6 @@
       { x: 20, y: -60 }
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
-    var vertexIndicesCube = vertexUtil.cubeIndices;
     var cubeFaces = vertexUtil.cubeFaces;
     var makeVertices3DCylinder = (function(){
       var vertices = vertexUtil.make3DCylinder(128, 256);
@@ -3107,10 +3120,16 @@
         ]);
       };
     })();
-    var vertexIndicesCylinder = vertexUtil.cylinderIndices.concat([
-      [72, 73], [74, 75],
+    var makeCylinderFaces = function(rotation) {
+      var side = vertexUtil.makeCylinderSideFaces(rotation);
+      return vertexUtil.cylinderFaces.concat(side);
+    };
+    var darkLinesCylinder = [
       [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
-    ]);
+    ];
+    var cylinderContourLines = [
+      [72, 73], [74, 75]
+    ];
     var makeVertices3DYCbCr = function(mat) {
       var p3d = function(r, g, b, z) {
         return [
@@ -3258,33 +3277,27 @@
       );
       var faces = (
         currentType === TYPE_RGB ? cubeFaces :
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? makeCylinderFaces(rotation) :
         currentType === TYPE_YCbCr ? facesYCbCr :
-        currentType === TYPE_CIExyY ? facesCIEXyy :
-        undefined
+        currentType === TYPE_CIExyY ? facesCIEXyy : []
       );
-      var darkLines = faces !== undefined ? [] : undefined;
-      if (currentType === TYPE_YCbCr) {
-        darkLines = darkLines.concat(darkLinesYCbCr);
-      } else if (currentType === TYPE_CIExyY) {
-        darkLines = darkLines.concat(darkLinesCIEXyy);
-      }
-      if (faces !== undefined) {
-        var whiteLines = [];
-        faces.forEach(function(face) {
-          if (rotation.isFrontFace(v, face)) {
-            whiteLines.push(face);
-          } else {
-            darkLines.push(face);
-          }
-        });
-      }
-      var lines = (
-          whiteLines !== undefined ? whiteLines :
-          currentType === TYPE_HSV ? vertexIndicesCylinder :
-          currentType === TYPE_HSL ? vertexIndicesCylinder : []
+      var darkLines = [].concat(
+        currentType === TYPE_YCbCr ? darkLinesYCbCr :
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? darkLinesCylinder :
+        currentType === TYPE_CIExyY ? darkLinesCIEXyy : []
       );
-      var axesDesc = makeAxesDesc(v, lines);
-      var grayAxesDesc = darkLines !== undefined ? makeAxesDesc(v, darkLines) : undefined;
+      var whiteLines = [].concat(
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? cylinderContourLines : []
+      );
+      faces.forEach(function(face) {
+        if (rotation.isFrontFace(v, face)) {
+          whiteLines.push(face);
+        } else {
+          darkLines.push(face);
+        }
+      });
+      var axesDesc = makeAxesDesc(v, whiteLines);
+      var grayAxesDesc = makeAxesDesc(v, darkLines);
       if (currentType === TYPE_RGB) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
@@ -3319,9 +3332,7 @@
         fig.axes = makeAxesSVG(vbox, labels, axesDesc, grayAxesDesc);
       } else {
         $(fig.axes).find('g path[stroke=white]').attr('d', axesDesc);
-        if (grayAxesDesc !== undefined) {
-          $(fig.axes).find('g path[stroke=gray]').attr('d', grayAxesDesc);
-        }
+        $(fig.axes).find('g path[stroke=gray]').attr('d', grayAxesDesc);
       }
       updateAxesLabels(fig.axes, labels, rotation);
     };
