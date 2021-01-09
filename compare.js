@@ -3061,13 +3061,19 @@
     var colorDistAuxType2 = makeModeSwitch('#colorDistAuxType2', 0, function(type) {
       updateFigure();
     });
+    var TYPE_RGB = 0;
+    var TYPE_HSV = 1;
+    var TYPE_HSL = 2;
+    var TYPE_YCbCr = 3;
+    var TYPE_CIExyY = 4;
     var updateAuxOption = function() {
-      if (colorDistType.current() === 0 ||
-          colorDistType.current() === 1 ||
-          colorDistType.current() === 2) { // 0:RGB, 1:HSV, 2:HSL
+      var currentType = colorDistType.current();
+      if (currentType === TYPE_RGB ||
+          currentType === TYPE_HSV ||
+          currentType === TYPE_HSL) {
         $('#colorDistAuxType').show();
         $('#colorDistAuxType2').hide();
-      } else if (colorDistType.current() === 3) { // 3:YCbCr
+      } else if (currentType === TYPE_YCbCr) {
         $('#colorDistAuxType').hide();
         $('#colorDistAuxType2').show();
       } else {
@@ -3166,19 +3172,20 @@
       var yb = rotation.yb;
       var rgbColors = colors;
       var convertOption = null;
-      if (colorDistType.current() === 0) { // 0:RGB
+      var currentType = colorDistType.current();
+      if (currentType === TYPE_RGB) {
         convertOption = colorDistAuxType.current() === 0 ?
             null :
             ['linearColors', compareUtil.convertColorListRgbToLinear];
-      } else if (colorDistType.current() === 1) { // 1:HSV
+      } else if (currentType === TYPE_HSV) {
         convertOption = colorDistAuxType.current() === 0 ?
             ['hsvColors', compareUtil.convertColorListRgbToHsv] :
             ['hsvLinearColors', compareUtil.convertColorListRgbToHsvLinear];
-      } else if (colorDistType.current() === 2) { // 2:HSL
+      } else if (currentType === TYPE_HSL) {
         convertOption = colorDistAuxType.current() === 0 ?
             ['hslColors', compareUtil.convertColorListRgbToHsl] :
             ['hslLinearColors', compareUtil.convertColorListRgbToHslLinear];
-      } else if (colorDistType.current() === 4) { // 4:CIE xyY
+      } else if (currentType === TYPE_CIExyY) {
         convertOption = ['xyyColors', compareUtil.convertColorListRgbToXyy];
       }
       if (convertOption) {
@@ -3187,17 +3194,17 @@
         }
         colors = colorTable[convertOption[0]];
       }
-      if (colorDistType.current() === 0 ||
-          colorDistType.current() === 1 ||
-          colorDistType.current() === 2 ||
-          colorDistType.current() === 4) { // 0:RGB, 1:HSV, 2:HSL, 4:CIE xyY
+      if (currentType === TYPE_RGB ||
+          currentType === TYPE_HSV ||
+          currentType === TYPE_HSL ||
+          currentType === TYPE_CIExyY) {
         var coef_xr = xr;
         var coef_xg = xg;
         var coef_xb = 0;
         var coef_yr = yr;
         var coef_yg = yg;
         var coef_yb = yb;
-      } else { // 3:YCbCr
+      } else { // TYPE_YCbCr
         var mat = colorDistAuxType2.current() === 0 ?
             compareUtil.colorMatrixBT601 :
             compareUtil.colorMatrixBT709;
@@ -3240,20 +3247,20 @@
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(
-        colorDistType.current() === 0 ? vertices3DCube : // 0:RGB
-        (colorDistType.current() === 1 ||
-         colorDistType.current() === 2) ? makeVertices3DCylinder(rotation) : // 1:HSV, 2:HSL
-        colorDistType.current() === 3 ? ( // 3:YCbCr
+        currentType === TYPE_RGB ? vertices3DCube :
+        (currentType === TYPE_HSV ||
+         currentType === TYPE_HSL) ? makeVertices3DCylinder(rotation) :
+        currentType === TYPE_YCbCr ? (
           colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
-        ) : vertices3DCIEXyy // 4:CIE xyY
+        ) : vertices3DCIEXyy // TYPE_CIExyY
       );
       var faces = (
-        colorDistType.current() === 0 ? cubeFaces : // 0:RGB
-        colorDistType.current() === 3 ? facesYCbCr : // 3:YCbCr
+        currentType === TYPE_RGB ? cubeFaces :
+        currentType === TYPE_YCbCr ? facesYCbCr :
         undefined
       );
       var darkLines = faces !== undefined ? [] : undefined;
-      if (colorDistType.current() === 3) {
+      if (currentType === TYPE_YCbCr) {
         darkLines = darkLines.concat(darkLinesYCbCr);
       }
       if (faces !== undefined) {
@@ -3268,35 +3275,35 @@
       }
       var lines = (
           whiteLines !== undefined ? whiteLines :
-          colorDistType.current() === 1 ? vertexIndicesCylinder : // 1:HSV
-          colorDistType.current() === 2 ? vertexIndicesCylinder : // 2:HSL
-          vertexIndicesCIEXyy // 4:CIE xyY
+          currentType === TYPE_HSV ? vertexIndicesCylinder :
+          currentType === TYPE_HSL ? vertexIndicesCylinder :
+          vertexIndicesCIEXyy // TYPE_CIExyY
       );
       var axesDesc = makeAxesDesc(v, lines);
       var grayAxesDesc = darkLines !== undefined ? makeAxesDesc(v, darkLines) : undefined;
-      if (colorDistType.current() === 0) {
+      if (currentType === TYPE_RGB) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
           { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: (xr < 0 && yr < 0 && xg < 0) },
           { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
           { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
         ];
-      } else if (colorDistType.current() === 1 || colorDistType.current() === 2) {
+      } else if (currentType === TYPE_HSV || currentType === TYPE_HSL) {
         var labels = [
-          { pos: [0, 0, 140], text: (colorDistType.current() === 1 ? 'V' : 'L'), color: '#ccc', hidden: false },
+          { pos: [0, 0, 140], text: (currentType === TYPE_HSV ? 'V' : 'L'), color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
           { pos: [160, 0, -140], text: 'S H=0', color: '#f00', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
           { pos: [-80, 140, -140], text: 'H=120', color: '#0f0', hidden: (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg)) },
           { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg)) }
         ];
-      } else if (colorDistType.current() === 3) {
+      } else if (currentType === TYPE_YCbCr) {
         var labels = [
           { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
           { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
           { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
           { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
         ];
-      } else if (colorDistType.current() === 4) {
+      } else if (currentType === TYPE_CIExyY) {
         var labels = [
           { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
           { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
