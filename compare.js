@@ -2837,10 +2837,6 @@
       }
       return v;
     };
-    var cubeIndices = [
-      [0, 1, 5, 4, 0], [12, 13, 17, 16, 12],
-      [0, 12], [1, 13], [4, 16], [5, 17]
-    ];
     var cubeFaces = [
       [0, 1, 5, 4, 0], [12, 16, 17, 13, 12],
       [0, 12, 13, 1, 0], [4, 5, 17, 16, 4],
@@ -2896,7 +2892,6 @@
     };
     return {
       makeCube: makeCube,
-      cubeIndices: cubeIndices,
       cubeFaces: cubeFaces,
       make3DCylinder: make3DCylinder,
       makeCylinderFaces: makeCylinderFaces,
@@ -3436,7 +3431,6 @@
       function() { updateTable(/* transformOnly = */ true); },
       { x: 20, y: -110 }
     );
-    var vertexIndicesCube = vertexUtil.cubeIndices;
     var makeColorGradientStops = function(type) {
       var color2 =
           type === 0 ? '#fff' :
@@ -3553,7 +3547,9 @@
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
       drawVerticalColorBar(context, v, colorStopsForType[type]);
-      var axesDesc = makeAxesDesc(v, vertexIndicesCube);
+      var lines = rotationUtil.makeViewOfFaces(v, vertexUtil.cubeFaces);
+      var axesDesc = makeAxesDesc(v, lines.whiteLines);
+      var grayAxesDesc = makeAxesDesc(v, lines.darkLines);
       var s = 12 / scale;
       var labels = [
           { pos: [-h/2-s, -w/2-s, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
@@ -3572,9 +3568,10 @@
         labels[3].color = '#00f';
       }
       if (!fig.axes) {
-        fig.axes = makeAxesSVG(vbox, labels, axesDesc);
+        fig.axes = makeAxesSVG(vbox, labels, axesDesc, grayAxesDesc);
       } else {
-        $(fig.axes).find('g path').attr('d', axesDesc);
+        $(fig.axes).find('g path[stroke=white]').attr('d', axesDesc);
+        $(fig.axes).find('g path[stroke=gray]').attr('d', grayAxesDesc);
       }
       updateAxesLabels(fig.axes, labels, rotation);
     };
