@@ -1978,6 +1978,133 @@
       setDragStateCallback
     };
   };
+  var vertexUtil = (function() {
+    var makeCube = function(sx, sy, sz) {
+      var v = [];
+      var cx = sx / 2, cy = sy / 2, cz = sz / 2;
+      for (var i = 0; i < 18; ++i) {
+        var posX = (Math.floor(i / 6) % 3) * cx - cx;
+        var posY = (Math.floor(i / 2) % 3) * cy - cy;
+        var posZ = (i % 2) * sz - cz;
+        v[i] = [posX, posY, posZ];
+      }
+      return v;
+    };
+    var cubeFaces = [
+      [0, 1, 5, 4, 0], [12, 16, 17, 13, 12],
+      [0, 12, 13, 1, 0], [4, 5, 17, 16, 4],
+      [0, 4, 16, 12, 0], [1, 13, 17, 5, 1]
+    ];
+    var make3DCylinder = function(r, sz) {
+      var v = [], cz = sz / 2;
+      for (var i = 0; i < 36; ++i) {
+        var a = i / 18 * Math.PI;
+        var posX = r * Math.cos(a);
+        var posY = r * Math.sin(a);
+        v[i * 2] = [posX, posY, -cz];
+        v[i * 2 + 1] = [posX, posY, cz];
+      }
+      v = v.concat([[0, 0, -cz], [0, 0, cz]]);
+      return v;
+    };
+    var cylinderTopAndBottomFaces = (function() {
+      var faces = [[], []];
+      for (var i = 0; i <= 36; ++i) {
+        faces[0][i] = ((36 - i) % 36) * 2;
+        faces[1][i] = (i % 36) * 2 + 1;
+      }
+      return faces;
+    })();
+    var getRightMostVertexOfCylinder = function(rotation) {
+      var yaw = Math.round(rotation.yaw / 10);
+      var index = 36 * Math.ceil(yaw / 36) - yaw;
+      return index;
+    };
+    var makeCylinderSideFaces = function(rotation) {
+      var index = getRightMostVertexOfCylinder(rotation);
+      var faces = [[], []];
+      for (var i = 0; i <= 18; ++i) {
+        faces[0][i] = ((i + 18 + index) % 36) * 2;
+        faces[1][i] = ((36 - i + index) % 36) * 2 + 1;
+      }
+      return faces;
+    };
+    var makeCylinderFaces = function(rotation) {
+      var side = makeCylinderSideFaces(rotation);
+      return cylinderTopAndBottomFaces.concat(side);
+    };
+    var cylinderDarkLines = [
+      [72, 0, 1, 73, 25, 24, 72, 48, 49, 73, 72]
+    ];
+    var makeCylinderContour = function(rotation) {
+      var index = getRightMostVertexOfCylinder(rotation);
+      return [
+        [index * 2, index * 2 + 1],
+        [(index + 18) % 36 * 2, (index + 18) % 36 * 2 + 1]
+      ];
+    };
+    return {
+      makeCube,
+      cubeFaces,
+      make3DCylinder,
+      makeCylinderFaces,
+      cylinderDarkLines,
+      makeCylinderContour
+    };
+  })();
+  var rotationUtil = (function() {
+    var isFrontFace = function(v2d, face) {
+      var a = v2d[face[0]];
+      var b = v2d[face[1]];
+      var c = v2d[face[2]];
+      var abx = b[0] - a[0], aby = b[1] - a[1];
+      var acx = c[0] - a[0], acy = c[1] - a[1];
+      return abx * acy < aby * acx;
+    };
+    var makeViewOfFaces = function(vertices2D, faces) {
+      var whiteLines = [], darkLines = [];
+      faces.forEach(function(face) {
+        if (isFrontFace(vertices2D, face)) {
+          whiteLines.push(face);
+        } else {
+          darkLines.push(face);
+        }
+      });
+      return {whiteLines, darkLines};
+    };
+    return {
+      makeViewOfFaces
+    };
+  })();
+  var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
+    var pitch = Math.round(orientation.x);
+    var yaw = Math.round(orientation.y);
+    var ax = pitch * (Math.PI / 180);
+    var ay = yaw * (Math.PI / 180);
+    var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
+    var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
+    var scale = 0.707;
+    var sr = scale * (scale_r || 1);
+    var sg = scale * (scale_g || 1);
+    var sb = scale * (scale_b || 1);
+    var xr = sr * cos_ay, yr = -sr * sin_ay * sin_ax;
+    var xg = -sg * sin_ay, yg = -sg * cos_ay * sin_ax;
+    var yb = -sb * cos_ax;
+    var pos3DTo2D = function(x, y, z) {
+      return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
+    };
+    var vertices3DTo2D = function(v) {
+      return v.map(function(pos) {
+        return pos3DTo2D(pos[0], pos[1], pos[2]);
+      });
+    };
+    return {
+      pitch, yaw,
+      xr, yr, xg, yg, yb,
+      pos3DTo2D,
+      vertices3DTo2D
+    };
+  };
   var makeTaskQueue = function(workerPath, processResult) {
     var worker = newWorker(workerPath);
     var taskCount = 0;
@@ -2054,6 +2181,9 @@
     makeZoomController:     makeZoomController,
     makeRotationController: makeRotationController,
     makeRotationInputFilter: makeRotationInputFilter,
+    vertexUtil:             vertexUtil,
+    rotationUtil:           rotationUtil,
+    makeRotationCoefs:      makeRotationCoefs,
     makeTaskQueue:          makeTaskQueue
   };
 })();
