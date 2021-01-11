@@ -2855,19 +2855,8 @@
         v[i * 2] = [posX, posY, -cz];
         v[i * 2 + 1] = [posX, posY, cz];
       }
+      v = v.concat([[0, 0, -cz], [0, 0, cz]]);
       return v;
-    };
-    var makeMakeCylinderVertices = function(radius, height) {
-      var vertices = make3DCylinder(radius, height);
-      var half = height / 2;
-      return function(rotation) {
-        var scale = radius / Math.sqrt(rotation.xg * rotation.xg + rotation.xr * rotation.xr);
-        var hx = rotation.xr * scale, hy = rotation.xg * scale;
-        return vertices.concat([
-            [-hx, -hy, -half], [-hx, -hy, half], [hx, hy, -half], [hx, hy, half],
-            [0, 0, -half], [0, 0, half]
-        ]);
-      };
     };
     var cylinderTopAndBottomFaces = (function() {
       var faces = [[], []];
@@ -2877,13 +2866,17 @@
       }
       return faces;
     })();
+    var getRightMostVertexOfCylinder = function(rotation) {
+      var yaw = Math.round(rotation.yaw / 10);
+      var index = 36 * Math.ceil(yaw / 36) - yaw;
+      return index;
+    };
     var makeCylinderSideFaces = function(rotation) {
-      var yaw = Math.ceil(rotation.yaw / 10);
-      yaw = 36 * Math.ceil(yaw / 36) - yaw;
+      var index = getRightMostVertexOfCylinder(rotation);
       var faces = [[], []];
-      for (var i = 0; i <= 19; ++i) {
-        faces[0][i] = ((i + 18 + yaw) % 36) * 2;
-        faces[1][i] = ((37 - i + yaw) % 36) * 2 + 1;
+      for (var i = 0; i <= 18; ++i) {
+        faces[0][i] = ((i + 18 + index) % 36) * 2;
+        faces[1][i] = ((36 - i + index) % 36) * 2 + 1;
       }
       return faces;
     };
@@ -2892,20 +2885,23 @@
       return cylinderTopAndBottomFaces.concat(side);
     };
     var cylinderDarkLines = [
-      [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
+      [72, 0, 1, 73, 25, 24, 72, 48, 49, 73, 72]
     ];
-    var cylinderContourLines = [
-      [72, 73], [74, 75]
-    ];
+    var makeCylinderContour = function(rotation) {
+      var index = getRightMostVertexOfCylinder(rotation);
+      return [
+        [index * 2, index * 2 + 1],
+        [(index + 18) % 36 * 2, (index + 18) % 36 * 2 + 1]
+      ];
+    };
     return {
       makeCube: makeCube,
       cubeIndices: cubeIndices,
       cubeFaces: cubeFaces,
       make3DCylinder: make3DCylinder,
-      makeMakeCylinderVertices: makeMakeCylinderVertices,
       makeCylinderFaces: makeCylinderFaces,
       cylinderDarkLines: cylinderDarkLines,
-      cylinderContourLines: cylinderContourLines
+      makeCylinderContour: makeCylinderContour
     };
   }());
   var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
@@ -3133,7 +3129,7 @@
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
     var cubeFaces = vertexUtil.cubeFaces;
-    var makeVertices3DCylinder = vertexUtil.makeMakeCylinderVertices(128, 256);
+    var verticesCylinder = vertexUtil.make3DCylinder(128, 256);
     var makeVertices3DYCbCr = function(mat) {
       var p3d = function(r, g, b, z) {
         return [
@@ -3273,8 +3269,7 @@
       var vbox = '0 0 320 320';
       var v3d = (
         currentType === TYPE_RGB ? vertices3DCube :
-        (currentType === TYPE_HSV ||
-         currentType === TYPE_HSL) ? makeVertices3DCylinder(rotation) :
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? verticesCylinder :
         currentType === TYPE_YCbCr ? (
           colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
         ) : vertices3DCIEXyy // TYPE_CIExyY
@@ -3292,7 +3287,7 @@
         currentType === TYPE_CIExyY ? darkLinesCIEXyy : []
       );
       var whiteLines = [].concat(
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? vertexUtil.cylinderContourLines : []
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? vertexUtil.makeCylinderContour(rotation) : []
       );
       faces.forEach(function(face) {
         if (rotation.isFrontFace(v, face)) {
