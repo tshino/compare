@@ -2857,7 +2857,19 @@
       }
       return v;
     };
-    var cylinderFaces = (function() {
+    var makeMakeCylinderVertices = function(radius, height) {
+      var vertices = make3DCylinder(radius, height);
+      var half = height / 2;
+      return function(rotation) {
+        var scale = radius / Math.sqrt(rotation.xg * rotation.xg + rotation.xr * rotation.xr);
+        var hx = rotation.xr * scale, hy = rotation.xg * scale;
+        return vertices.concat([
+            [-hx, -hy, -half], [-hx, -hy, half], [hx, hy, -half], [hx, hy, half],
+            [0, 0, -half], [0, 0, half]
+        ]);
+      };
+    };
+    var cylinderTopAndBottomFaces = (function() {
       var faces = [[], []];
       for (var i = 0; i <= 36; ++i) {
         faces[0][i] = ((36 - i) % 36) * 2;
@@ -2875,13 +2887,25 @@
       }
       return faces;
     };
+    var makeCylinderFaces = function(rotation) {
+      var side = makeCylinderSideFaces(rotation);
+      return cylinderTopAndBottomFaces.concat(side);
+    };
+    var cylinderDarkLines = [
+      [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
+    ];
+    var cylinderContourLines = [
+      [72, 73], [74, 75]
+    ];
     return {
       makeCube: makeCube,
       cubeIndices: cubeIndices,
       cubeFaces: cubeFaces,
       make3DCylinder: make3DCylinder,
-      cylinderFaces: cylinderFaces,
-      makeCylinderSideFaces: makeCylinderSideFaces
+      makeMakeCylinderVertices: makeMakeCylinderVertices,
+      makeCylinderFaces: makeCylinderFaces,
+      cylinderDarkLines: cylinderDarkLines,
+      cylinderContourLines: cylinderContourLines
     };
   }());
   var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
@@ -3109,27 +3133,7 @@
     );
     var vertices3DCube = vertexUtil.makeCube(256, 256, 256);
     var cubeFaces = vertexUtil.cubeFaces;
-    var makeVertices3DCylinder = (function(){
-      var vertices = vertexUtil.make3DCylinder(128, 256);
-      return function(rotation) {
-        var scale = 128 / Math.sqrt(rotation.xg * rotation.xg + rotation.xr * rotation.xr);
-        var hx = rotation.xr * scale, hy = rotation.xg * scale;
-        return vertices.concat([
-            [-hx, -hy, -128], [-hx, -hy, 128], [hx, hy, -128], [hx, hy, 128],
-            [0, 0, -128], [0, 0, 128]
-        ]);
-      };
-    })();
-    var makeCylinderFaces = function(rotation) {
-      var side = vertexUtil.makeCylinderSideFaces(rotation);
-      return vertexUtil.cylinderFaces.concat(side);
-    };
-    var darkLinesCylinder = [
-      [76, 0, 1, 77, 25, 24, 76, 48, 49, 77, 76]
-    ];
-    var cylinderContourLines = [
-      [72, 73], [74, 75]
-    ];
+    var makeVertices3DCylinder = vertexUtil.makeMakeCylinderVertices(128, 256);
     var makeVertices3DYCbCr = function(mat) {
       var p3d = function(r, g, b, z) {
         return [
@@ -3267,7 +3271,7 @@
       }
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
-      var v = rotation.vertices3DTo2D(
+      var v3d = (
         currentType === TYPE_RGB ? vertices3DCube :
         (currentType === TYPE_HSV ||
          currentType === TYPE_HSL) ? makeVertices3DCylinder(rotation) :
@@ -3275,19 +3279,20 @@
           colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
         ) : vertices3DCIEXyy // TYPE_CIExyY
       );
+      var v = rotation.vertices3DTo2D(v3d);
       var faces = (
         currentType === TYPE_RGB ? cubeFaces :
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? makeCylinderFaces(rotation) :
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? vertexUtil.makeCylinderFaces(rotation) :
         currentType === TYPE_YCbCr ? facesYCbCr :
         currentType === TYPE_CIExyY ? facesCIEXyy : []
       );
       var darkLines = [].concat(
         currentType === TYPE_YCbCr ? darkLinesYCbCr :
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? darkLinesCylinder :
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? vertexUtil.cylinderDarkLines :
         currentType === TYPE_CIExyY ? darkLinesCIEXyy : []
       );
       var whiteLines = [].concat(
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? cylinderContourLines : []
+        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? vertexUtil.cylinderContourLines : []
       );
       faces.forEach(function(face) {
         if (rotation.isFrontFace(v, face)) {
