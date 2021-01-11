@@ -2861,16 +2861,20 @@
   // 3D Color Distribution
   var colorDistDialog = (function() {
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
+      invalidateAssets();
       updateFigure();
       updateAuxOption();
     });
     var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
+      invalidateAssets();
       updateFigure();
     });
     var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
+      invalidateAssets();
       updateFigure();
     });
     var colorDistAuxType2 = makeModeSwitch('#colorDistAuxType2', 0, function(type) {
+      invalidateAssets();
       updateFigure();
     });
     var TYPE_RGB = 0;
@@ -2956,6 +2960,33 @@
       [4, 12], [5, 13], // diagonal
       [18, 21], [19, 22], [20, 23]
     ];
+    var assets = null;
+    var invalidateAssets = function() {
+      assets = null;
+    };
+    var updateAssets = function() {
+      if (assets === null) {
+        var currentType = colorDistType.current();
+        assets = {};
+        if (currentType === TYPE_RGB) {
+          assets.vertices3D = vertices3DCube;
+          assets.makeFaces = function() { return cubeFaces; };
+          assets.darkLines = [];
+        } else if (currentType === TYPE_HSV || currentType === TYPE_HSL) {
+          assets.vertices3D = verticesCylinder;
+          assets.makeFaces = compareUtil.vertexUtil.makeCylinderFaces;
+          assets.darkLines = compareUtil.vertexUtil.cylinderDarkLines;
+        } else if (currentType === TYPE_YCbCr) {
+          assets.vertices3D = colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 : vertices3DYCbCr709;
+          assets.makeFaces = function() { return facesYCbCr; };
+          assets.darkLines = darkLinesYCbCr;
+        } else { // TYPE_CIExyY
+          assets.vertices3D = vertices3DCIEXyy;
+          assets.makeFaces = function() { return facesCIEXyy; };
+          assets.darkLines = darkLinesCIEXyy;
+        }
+      }
+    };
     var makeFigure = function(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
@@ -3045,26 +3076,11 @@
       }
       context.putImageData(bits, 0, 0);
       var vbox = '0 0 320 320';
-      var v3d = (
-        currentType === TYPE_RGB ? vertices3DCube :
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? verticesCylinder :
-        currentType === TYPE_YCbCr ? (
-          colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 :vertices3DYCbCr709
-        ) : vertices3DCIEXyy // TYPE_CIExyY
-      );
-      var v = rotation.vertices3DTo2D(v3d);
-      var faces = (
-        currentType === TYPE_RGB ? cubeFaces :
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? compareUtil.vertexUtil.makeCylinderFaces(rotation) :
-        currentType === TYPE_YCbCr ? facesYCbCr :
-        currentType === TYPE_CIExyY ? facesCIEXyy : []
-      );
+      updateAssets();
+      var v = rotation.vertices3DTo2D(assets.vertices3D);
+      var faces = assets.makeFaces(rotation);
       var lines = compareUtil.rotationUtil.makeViewOfFaces(v, faces);
-      var darkLines = lines.darkLines.concat(
-        currentType === TYPE_YCbCr ? darkLinesYCbCr :
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? compareUtil.vertexUtil.cylinderDarkLines :
-        currentType === TYPE_CIExyY ? darkLinesCIEXyy : []
-      );
+      var darkLines = lines.darkLines.concat(assets.darkLines);
       var whiteLines = lines.whiteLines.concat(
         (currentType === TYPE_HSV || currentType === TYPE_HSL) ? compareUtil.vertexUtil.makeCylinderContour(rotation) : []
       );
