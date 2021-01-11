@@ -1895,6 +1895,89 @@
       zoom: zoom
     };
   };
+  var makeRotationInputFilter = function(controller) {
+    var processKeyDown = function(e) {
+      return processKeyDownEvent(e, {
+        zoomIn: function() { controller.zoom(0.25); return false; },
+        zoomOut: function() { controller.zoom(-0.25); return false; },
+        cursor: function() {
+          var step = e.shiftKey ? 10 : 1;
+          var d = cursorKeyCodeToXY(e.keyCode);
+          controller.rotate(d.x, d.y, step);
+          return false;
+        }
+      });
+    };
+    var dragState = null;
+    var dragStateCallback = null;
+    var setDragStateCallback = function(callback) {
+      dragStateCallback = callback;
+    };
+    var processMouseDown = function(e) {
+      if (e.which === 1) {
+        dragState = { x: e.clientX, y: e.clientY };
+        if (dragStateCallback) {
+          dragStateCallback(true, false);
+        }
+        return false;
+      }
+    };
+    var processMouseMove = function(e) {
+      if (dragState) {
+        if (e.buttons !== 1) {
+          dragState = null;
+          if (dragStateCallback) {
+            dragStateCallback(false, false);
+          }
+        } else {
+          var dx = e.clientX - dragState.x;
+          var dy = e.clientY - dragState.y;
+          dragState = { x: e.clientX, y: e.clientY };
+          controller.rotate(dx, dy, 0.5);
+          return false;
+        }
+      }
+    };
+    var processMouseUp = function(e) {
+      if (dragState) {
+        dragState = null;
+        if (dragStateCallback) {
+          dragStateCallback(false, false);
+        }
+      }
+    };
+    var processWheel = function(e) {
+      return processWheelEvent(e, {
+        zoom: function(steps) {
+          var ZOOM_STEP_WHEEL = 0.0625;
+          controller.zoom(-steps * ZOOM_STEP_WHEEL);
+        }
+      });
+    };
+    var touchFilter = makeTouchEventFilter();
+    var processTouchMove = function(e) {
+      return touchFilter.onTouchMove(e, {
+        move: function(dx, dy) { controller.rotate(dx, dy, 0.3); },
+        zoom: function(dx, dy, delta) { controller.zoom(delta); }
+      });
+    };
+    var processTouchEnd = function(e) {
+      touchFilter.resetState();
+    };
+    var enableMouseAndTouch = function(root, filter, deepFilter) {
+      $(root).on('mousedown', deepFilter, processMouseDown);
+      $(root).on('mousemove', filter, processMouseMove);
+      $(root).on('mouseup', filter, processMouseUp);
+      $(root).on('wheel', filter, processWheel);
+      $(root).on('touchmove', filter, processTouchMove);
+      $(root).on('touchend', filter, processTouchEnd);
+    };
+    return {
+      processKeyDown,
+      enableMouseAndTouch,
+      setDragStateCallback
+    };
+  };
   var makeTaskQueue = function(workerPath, processResult) {
     var worker = newWorker(workerPath);
     var taskCount = 0;
@@ -1970,6 +2053,7 @@
     makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,
     makeRotationController: makeRotationController,
+    makeRotationInputFilter: makeRotationInputFilter,
     makeTaskQueue:          makeTaskQueue
   };
 })();

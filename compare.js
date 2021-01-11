@@ -2985,78 +2985,6 @@
       });
     });
   };
-  var makeRotationInputFilter = function(target, controller) {
-    var processKeyDown = function(e) {
-      return compareUtil.processKeyDownEvent(e, {
-        zoomIn: function() { controller.zoom(0.25); return false; },
-        zoomOut: function() { controller.zoom(-0.25); return false; },
-        cursor: function() {
-          var step = e.shiftKey ? 10 : 1;
-          var d = compareUtil.cursorKeyCodeToXY(e.keyCode);
-          controller.rotate(d.x, d.y, step);
-          return false;
-        }
-      });
-    };
-    var dragState = null;
-    var processMouseDown = function(e) {
-      if (e.which === 1) {
-        dragState = { x: e.clientX, y: e.clientY };
-        setDragStateClass(target, true, false);
-        return false;
-      }
-    };
-    var processMouseMove = function(e) {
-      if (dragState) {
-        if (e.buttons !== 1) {
-          dragState = null;
-          setDragStateClass(target, false, false);
-        } else {
-          var dx = e.clientX - dragState.x;
-          var dy = e.clientY - dragState.y;
-          dragState = { x: e.clientX, y: e.clientY };
-          controller.rotate(dx, dy, 0.5);
-          return false;
-        }
-      }
-    };
-    var processMouseUp = function(e) {
-      if (dragState) {
-        dragState = null;
-        setDragStateClass(target, false, false);
-      }
-    };
-    var processWheelEvent = function(e) {
-      return compareUtil.processWheelEvent(e, {
-        zoom: function(steps) {
-          var ZOOM_STEP_WHEEL = 0.0625;
-          controller.zoom(-steps * ZOOM_STEP_WHEEL);
-        }
-      });
-    };
-    var touchFilter = compareUtil.makeTouchEventFilter();
-    var processTouchMove = function(e) {
-      return touchFilter.onTouchMove(e, {
-        move: function(dx, dy) { controller.rotate(dx, dy, 0.3); },
-        zoom: function(dx, dy, delta) { controller.zoom(delta); }
-      });
-    };
-    var processTouchEnd = function(e) {
-      touchFilter.resetState();
-    };
-    var enableMouseAndTouch = function(root, filter, deepFilter) {
-      $(root).on('mousedown', deepFilter, processMouseDown);
-      $(root).on('mousemove', filter, processMouseMove);
-      $(root).on('mouseup', filter, processMouseUp);
-      $(root).on('wheel', filter, processWheelEvent);
-      $(root).on('touchmove', filter, processTouchMove);
-      $(root).on('touchend', filter, processTouchEnd);
-    };
-    return {
-      processKeyDown: processKeyDown,
-      enableMouseAndTouch: enableMouseAndTouch
-    };
-  };
   // 3D Color Distribution
   var colorDistDialog = (function() {
     var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
@@ -3347,7 +3275,10 @@
     var toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
       onOpen: rotationController.resetZoom
     });
-    var rotationInputFilter = makeRotationInputFilter('#colorDist', rotationController);
+    var rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
+    rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
+      setDragStateClass('#colorDist', dragging, horizontal);
+    });
     var processKeyDown = function(e) {
       if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
@@ -3582,7 +3513,10 @@
     var toggle = dialogUtil.defineDialog($('#waveform3D'), updateTable, toggleAnalysis, {
       onOpen: rotationController.resetZoom
     });
-    var rotationInputFilter = makeRotationInputFilter('#waveform3D', rotationController);
+    var rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
+    rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
+      setDragStateClass('#waveform3D', dragging, horizontal);
+    });
     return {
       updateFigure: updateFigure,
       toggle: toggle,
