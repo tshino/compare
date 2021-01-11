@@ -1349,7 +1349,7 @@
           var desc = (num / den).toFixed(2);
         }
         if (0 !== num * 100 % den) {
-          var gcd = compareUtil.calcGCD(num, den);
+          var gcd = calcGCD(num, den);
           num /= gcd;
           den /= gcd;
           return [value, num + '/' + den, desc];
@@ -1862,6 +1862,39 @@
     o.makeTransform = makeTransform;
     return o;
   };
+  var makeRotationController = function(onrotate, onzoom, initialOrientation) {
+    initialOrientation = initialOrientation || { x: 30, y: -30 };
+    var orientation = {
+      x: initialOrientation.x,
+      y: initialOrientation.y
+    };
+    var zoomLevel = 0.12;
+    var resetZoom = function() {
+      zoomLevel = 0.12;
+    };
+    var getScale = function() {
+      return Math.round(Math.pow(2, zoomLevel) * 100) / 100;
+    };
+    var rotate = function(dx, dy, scale) {
+      orientation.x += dy * scale;
+      orientation.y += dx * scale;
+      orientation.x = clamp(orientation.x, -90, 90);
+      orientation.y -= Math.floor(orientation.y / 360) * 360;
+      onrotate();
+    };
+    var zoom = function(delta) {
+      var MAX_ZOOM_LEVEL = 6;
+      zoomLevel = clamp(zoomLevel + delta, 0, MAX_ZOOM_LEVEL);
+      onzoom();
+    };
+    return {
+      orientation: orientation,
+      getScale: getScale,
+      resetZoom: resetZoom,
+      rotate: rotate,
+      zoom: zoom
+    };
+  };
   var makeTaskQueue = function(workerPath, processResult) {
     var worker = newWorker(workerPath);
     var taskCount = 0;
@@ -1936,6 +1969,7 @@
     processWheelEvent:      processWheelEvent,
     makeTouchEventFilter:   makeTouchEventFilter,
     makeZoomController:     makeZoomController,
+    makeRotationController: makeRotationController,
     makeTaskQueue:          makeTaskQueue
   };
 })();
