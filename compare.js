@@ -2972,18 +2972,22 @@
           assets.vertices3D = vertices3DCube;
           assets.makeFaces = function() { return cubeFaces; };
           assets.darkLines = [];
+          assets.makeAdditionalWhiteLines = function() { return []; };
         } else if (currentType === TYPE_HSV || currentType === TYPE_HSL) {
           assets.vertices3D = verticesCylinder;
           assets.makeFaces = compareUtil.vertexUtil.makeCylinderFaces;
           assets.darkLines = compareUtil.vertexUtil.cylinderDarkLines;
+          assets.makeAdditionalWhiteLines = compareUtil.vertexUtil.makeCylinderContour;
         } else if (currentType === TYPE_YCbCr) {
           assets.vertices3D = colorDistAuxType2.current() === 0 ? vertices3DYCbCr601 : vertices3DYCbCr709;
           assets.makeFaces = function() { return facesYCbCr; };
           assets.darkLines = darkLinesYCbCr;
+          assets.makeAdditionalWhiteLines = function() { return []; };
         } else { // TYPE_CIExyY
           assets.vertices3D = vertices3DCIEXyy;
           assets.makeFaces = function() { return facesCIEXyy; };
           assets.darkLines = darkLinesCIEXyy;
+          assets.makeAdditionalWhiteLines = function() { return []; };
         }
       }
     };
@@ -3081,9 +3085,7 @@
       var faces = assets.makeFaces(rotation);
       var lines = compareUtil.rotationUtil.makeViewOfFaces(v, faces);
       var darkLines = lines.darkLines.concat(assets.darkLines);
-      var whiteLines = lines.whiteLines.concat(
-        (currentType === TYPE_HSV || currentType === TYPE_HSL) ? compareUtil.vertexUtil.makeCylinderContour(rotation) : []
-      );
+      var whiteLines = lines.whiteLines.concat(assets.makeAdditionalWhiteLines(rotation));
       var axesDesc = makeAxesDesc(v, whiteLines);
       var grayAxesDesc = makeAxesDesc(v, darkLines);
       if (currentType === TYPE_RGB) {
