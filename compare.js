@@ -2989,6 +2989,56 @@
           assets.darkLines = darkLinesCIEXyy;
           assets.makeAdditionalWhiteLines = function() { return []; };
         }
+        if (currentType === TYPE_RGB) {
+          assets.labels = [
+            { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: false },
+            { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: false },
+            { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: false },
+            { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: false }
+          ];
+          assets.updateLabelsVisibility = function(labels, rotation) {
+            labels[0].hidden = (rotation.xr < 0 && 0 < rotation.yr && 0 < rotation.xg);
+            labels[1].hidden = (rotation.xr < 0 && rotation.yr < 0 && rotation.xg < 0);
+            labels[2].hidden = (0 < rotation.xg && rotation.yg < 0 && 0 < rotation.yr);
+            labels[3].hidden = (rotation.xr < 0 && rotation.yr < 0 && 0 < rotation.xg);
+          };
+        } else if (currentType === TYPE_HSV || currentType === TYPE_HSL) {
+          assets.labels = [
+            { pos: [0, 0, 140], text: (currentType === TYPE_HSV ? 'V' : 'L'), color: '#ccc', hidden: false },
+            { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
+            { pos: [160, 0, -140], text: 'S H=0', color: '#f00', hidden: false },
+            { pos: [-80, 140, -140], text: 'H=120', color: '#0f0', hidden: false },
+            { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: false }
+          ];
+          assets.updateLabelsVisibility = function(labels, rotation) {
+            var xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
+            labels[2].hidden = (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg));
+            labels[3].hidden = (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg));
+            labels[4].hidden = (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg));
+          };
+        } else if (currentType === TYPE_YCbCr) {
+          assets.labels = [
+            { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
+            { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
+            { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: false },
+            { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: false }
+          ];
+          assets.updateLabelsVisibility = function(labels, rotation) {
+            var xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
+            labels[2].hidden = (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg));
+            labels[3].hidden = (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr));
+          };
+        } else if (currentType === TYPE_CIExyY) {
+          assets.labels = [
+            { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: false },
+            { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
+            { pos: [-140, 140, -140], text: 'y', color: '#08f', hidden: false },
+            { pos: [-140, -140, 140], text: 'Y', color: '#ccc', hidden: false }
+          ];
+          assets.updateLabelsVisibility = function(labels, rotation) {
+            labels[0].hidden = (rotation.xr < 0 && 0 < rotation.yr && 0 < rotation.xg);
+          };
+        }
       }
     };
     var makeFigure = function(fig, colorTable) {
@@ -3088,43 +3138,14 @@
       var whiteLines = lines.whiteLines.concat(assets.makeAdditionalWhiteLines(rotation));
       var axesDesc = makeAxesDesc(v, whiteLines);
       var grayAxesDesc = makeAxesDesc(v, darkLines);
-      if (currentType === TYPE_RGB) {
-        var labels = [
-          { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
-          { pos: [140, -140, -140], text: 'R', color: '#f00', hidden: (xr < 0 && yr < 0 && xg < 0) },
-          { pos: [-140, 140, -140], text: 'G', color: '#0f0', hidden: (0 < xg && yg < 0 && 0 < yr) },
-          { pos: [-140, -140, 140], text: 'B', color: '#00f', hidden: (xr < 0 && yr < 0 && 0 < xg) }
-        ];
-      } else if (currentType === TYPE_HSV || currentType === TYPE_HSL) {
-        var labels = [
-          { pos: [0, 0, 140], text: (currentType === TYPE_HSV ? 'V' : 'L'), color: '#ccc', hidden: false },
-          { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
-          { pos: [160, 0, -140], text: 'S H=0', color: '#f00', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
-          { pos: [-80, 140, -140], text: 'H=120', color: '#0f0', hidden: (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg)) },
-          { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg)) }
-        ];
-      } else if (currentType === TYPE_YCbCr) {
-        var labels = [
-          { pos: [0, 0, 140], text: 'Y', color: '#ccc', hidden: false },
-          { pos: [0, 0, -140], text: 'O', color: '#888', hidden: false },
-          { pos: [140, 0, -140], text: 'Cb', color: '#08f', hidden: (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg)) },
-          { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr)) }
-        ];
-      } else if (currentType === TYPE_CIExyY) {
-        var labels = [
-          { pos: [-140, -140, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
-          { pos: [140, -140, -140], text: 'x', color: '#08f', hidden: false },
-          { pos: [-140, 140, -140], text: 'y', color: '#08f', hidden: false },
-          { pos: [-140, -140, 140], text: 'Y', color: '#ccc', hidden: false }
-        ];
-      }
+      assets.updateLabelsVisibility(assets.labels, rotation);
       if (!fig.axes) {
-        fig.axes = makeAxesSVG(vbox, labels, axesDesc, grayAxesDesc);
+        fig.axes = makeAxesSVG(vbox, assets.labels, axesDesc, grayAxesDesc);
       } else {
         $(fig.axes).find('g path[stroke=white]').attr('d', axesDesc);
         $(fig.axes).find('g path[stroke=gray]').attr('d', grayAxesDesc);
       }
-      updateAxesLabels(fig.axes, labels, rotation);
+      updateAxesLabels(fig.axes, assets.labels, rotation);
     };
     var redrawFigureAll = function() {
       for (var i = 0, img; img = images[i]; i++) {
