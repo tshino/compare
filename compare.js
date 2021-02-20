@@ -1779,15 +1779,15 @@
       }
     };
     var makeOrientationInfo = function(img) {
-      var orientation = compareUtil.orientationUtil.toString(img.orientation);
-      var desc = img.orientation ? $('<span>').append(
+      var orientation = compareUtil.orientationUtil.toString(img.orientationExif);
+      var desc = img.orientationExif ? $('<span>').append(
         $('<img src="res/orientation.svg" width="30">').css({
           verticalAlign: '-8px',
-          transform: img.orientationAsCSS
+          transform: compareUtil.orientationUtil.getCSSTransform(img.orientationExif)
         }),
         $('<span>').text('(' + orientation + ')')
       ) : orientation;
-      return [img.orientation ? orientation : null, desc];
+      return [img.orientationExif ? orientation : null, desc];
     };
     var nonUniform = { en: 'non-uniform', ja: '一様でない' };
     var rows = [
@@ -1862,7 +1862,7 @@
         if (img.numFrames) {
           hasAnimated = true;
         }
-        if (img.orientation) {
+        if (img.orientationExif) {
           hasOrientation = true;
         }
       }
@@ -5077,7 +5077,8 @@
     }
     entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
     if (isJPEG) {
-      entry.orientation = compareUtil.detectExifOrientation(binary);
+      entry.orientationExif = compareUtil.detectExifOrientation(binary);
+      entry.orientation = entry.orientationExif;
     }
     var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     var img = new Image;
@@ -5121,6 +5122,7 @@
             height          : 0,
             canvasWidth     : 0,
             canvasHeight    : 0,
+            orientationExif : null,
             orientation     : null,
             transposed      : false,
             orientationAsCSS    : '',
