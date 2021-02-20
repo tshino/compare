@@ -37,6 +37,27 @@
     }
   };
 
+  var drawImageAwareOfOrientation = function() {
+    return new Promise(function(resolve, reject) {
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        canvas.width = 2;
+        canvas.height = 2;
+        var context = canvas.getContext('2d');
+        context.drawImage(img, 0, 0);
+        var imageData = context.getImageData(0, 0, 2, 2);
+        resolve(imageData.data[4] == 0);
+      };
+      img.onerror = reject;
+      // this jpeg is 2x1 with orientation=8 so it should rotate to 1x2
+      img.src = 'data:image/jpeg;base64,/9j/4QAeRXhpZgAASUkqAAgAAAABABIBAwABAAAACAAAAP/bAEMA' +
+                'AgEBAQEBAgEBAQICAgICBAMCAgICBQQEAwQGBQYGBgUGBgYHCQgGBwkHBgYICwgJCgoKCgoGCAs' +
+                'MCwoMCQoKCv/AAAsIAAEAAgEBEQD/xAAUAAEAAAAAAAAAAAAAAAAAAAAJ/8QAFBABAAAAAAAAAA' +
+                'AAAAAAAAAAAP/aAAgBAQAAPwB/H//Z';
+    });
+  };
+
   var blobFromDataURI = function(dataURI, type) {
     var parts = dataURI.split(',');
     type = type || parts[0].match(/:(.*?);/)[1];
@@ -2140,6 +2161,7 @@
   return {
     browserName:            browserName,
     storageAvailable:       storageAvailable,
+    drawImageAwareOfOrientation: drawImageAwareOfOrientation,
     blobFromDataURI:        blobFromDataURI,
     createObjectURL:        createObjectURL,
     revokeObjectURL:        revokeObjectURL,

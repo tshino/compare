@@ -344,6 +344,10 @@
       $(target).removeClass('horizontal-dragging');
     }
   };
+  var drawImageAwareOfOrientation = false;
+  compareUtil.drawImageAwareOfOrientation().then(
+    function(result) { drawImageAwareOfOrientation = result; }
+  );
 
   var textUtil = (function() {
     var toggleLang = function() {
@@ -5078,7 +5082,9 @@
     entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
     if (isJPEG) {
       entry.orientationExif = compareUtil.detectExifOrientation(binary);
-      entry.orientation = entry.orientationExif;
+      if (!drawImageAwareOfOrientation) {
+        entry.orientation = entry.orientationExif;
+      }
     }
     var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     var img = new Image;
