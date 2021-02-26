@@ -2681,8 +2681,8 @@
           var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
           var xyz = x + y + z;
           return {
-            x: 32 + (xyz === 0 ? 0 : x / xyz * 255),
-            y: 287 - (xyz === 0 ? 0 : y / xyz * 255)
+            x: 32 + (xyz === 0 ? 0 : x / xyz * 255 * 1.5),
+            y: 287 - (xyz === 0 ? 0 : y / xyz * 255 * 1.5)
           };
         } else if (type === 2) { // G-B
           return { x: 32 + g, y: 287 - b };
@@ -2716,7 +2716,9 @@
         { pos: { x: 159.5, y: 32    } , color: '',     types: [] },
         { pos: { x: 159.5, y: 287   } , color: '',     types: [] },
         { pos: { x: 32,    y: 159.5 } , color: '',     types: [] },
-        { pos: { x: 287,   y: 159.5 } , color: '',     types: [] }
+        { pos: { x: 287,   y: 159.5 } , color: '',     types: [] },
+        { pos: { x: 32,    y: -96   } , color: '',     types: [] },
+        { pos: { x: 416,   y: 287   } , color: '',     types: [] }
       ];
       var mainAxesColor = '#06c';
       var auxAxesColor = color ? '#555' : '#024';
@@ -2730,8 +2732,8 @@
         { indices: [1, 6, 6, 2, 2, 4, 4, 3, 3, 5, 5, 1], color: auxAxesColor, types: [0] },
         { indices: [4, 7, 5, 7, 6, 7], color: auxAxesColor, types: [2,3,4] },
         { indices: [1, 2, 2, 3, 3, 1], color: auxAxesColor, types: [1] },
-        { indices: [8, 9, 9, 10], color: mainAxesColor, types: [1] },
-        { indices: [8, 10], color: auxAxesColor, types: [1] },
+        { indices: [24, 9, 9, 25], color: mainAxesColor, types: [1] },
+        { indices: [24, 25], color: auxAxesColor, types: [1] },
         { indices: [8, 9, 9, 10, 10, 11, 11, 8], color: auxAxesColor, types: [0] }
       ];
       var labels = [
@@ -2800,7 +2802,7 @@
           makeFigure(type, auxTypes[1], color, fig, w, h, result);
           fig.context.globalAlpha = color ? 0.7 : 0.3;
           fig.context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
-          fig.context.drawImage(bg, 0, 0, 320, 320);
+          fig.context.drawImage(bg, -16, -144, 480, 480);
           notify();
         };
         bg.src = color ? 'res/xy-chromaticity-diagram-gray.png' : 'res/xy-chromaticity-diagram.png';

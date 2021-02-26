@@ -235,8 +235,8 @@ function calcVectorscope( imageData, type, colorMode, auxTypes )
       var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
       var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
       var xyz = capX + capY + capZ;
-      var x = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255);
-      var y = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255);
+      var x = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255 * 1.5);
+      var y = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255 * 1.5);
       var plotx = 32 + x;
       var ploty = 287 - y;
       var offset = ploty * 320 + plotx;
