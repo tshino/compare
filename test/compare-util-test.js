@@ -1887,3 +1887,12 @@ TEST( 'compareUtil calcInscribedRect', function test() {
   EXPECT( calcInscribedRect(100, 200, 25, 10).width === 100 );
   EXPECT( calcInscribedRect(100, 200, 25, 10).height === 40 );
 });
+
+TEST( 'compareUtil rotationUtil', function test() {
+  var isFrontFace = compareUtil.rotationUtil.isFrontFace;
+  var vertices2D = [[0, 0], [0, 1], [1, 0]];
+  var frontFace = [0, 1, 2];
+  var backFace = [0, 2, 1];
+  EXPECT( isFrontFace(vertices2D, frontFace) === true );
+  EXPECT( isFrontFace(vertices2D, backFace) === false );
+});

@@ -2094,6 +2094,7 @@
       return {whiteLines, darkLines};
     };
     return {
+      isFrontFace,
       makeViewOfFaces
     };
   })();
