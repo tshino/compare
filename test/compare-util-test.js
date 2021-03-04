@@ -1888,11 +1888,34 @@ TEST( 'compareUtil calcInscribedRect', function test() {
   EXPECT( calcInscribedRect(100, 200, 25, 10).height === 40 );
 });
 
-TEST( 'compareUtil rotationUtil', function test() {
+TEST( 'compareUtil rotationUtil isFrontFace', function test() {
   var isFrontFace = compareUtil.rotationUtil.isFrontFace;
   var vertices2D = [[0, 0], [0, 1], [1, 0]];
   var frontFace = [0, 1, 2];
   var backFace = [0, 2, 1];
   EXPECT( isFrontFace(vertices2D, frontFace) === true );
   EXPECT( isFrontFace(vertices2D, backFace) === false );
+});
+
+TEST( 'compareUtil rotationUtil makeViewOfFaces', function test() {
+  var makeViewOfFaces = compareUtil.rotationUtil.makeViewOfFaces;
+  var vertices2D = [
+    [0, 0], [0, 1], [1, 0],
+    [1, 1], [1, 3], [3, 3], [3, 1]
+  ];
+  var faces = [
+    [0, 1, 2],
+    [0, 2, 1],
+    [3, 4, 5, 6],
+    [6, 4, 1, 2]
+  ];
+  var result = makeViewOfFaces(vertices2D, faces);
+  var frontFaces = result.whiteLines;
+  var backFaces = result.darkLines;
+  EXPECT_EQ( 2, frontFaces.length );
+  EXPECT_EQ( 2, backFaces.length );
+  EXPECT_EQ_ARRAY( [0, 1, 2], frontFaces[0] );
+  EXPECT_EQ_ARRAY( [3, 4, 5, 6], frontFaces[1] );
+  EXPECT_EQ_ARRAY( [0, 2, 1], backFaces[0] );
+  EXPECT_EQ_ARRAY( [6, 4, 1, 2], backFaces[1] );
 });
