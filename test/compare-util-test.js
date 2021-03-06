@@ -1897,8 +1897,8 @@ TEST( 'compareUtil rotationUtil isFrontFace', function test() {
   EXPECT( isFrontFace(vertices2D, backFace) === false );
 });
 
-TEST( 'compareUtil rotationUtil makeViewOfFaces', function test() {
-  var makeViewOfFaces = compareUtil.rotationUtil.makeViewOfFaces;
+TEST( 'compareUtil rotationUtil splitIntoFrontAndBackFaces', function test() {
+  var splitIntoFrontAndBackFaces = compareUtil.rotationUtil.splitIntoFrontAndBackFaces;
   var vertices2D = [
     [0, 0], [0, 1], [1, 0],
     [1, 1], [1, 3], [3, 3], [3, 1]
@@ -1909,9 +1909,9 @@ TEST( 'compareUtil rotationUtil makeViewOfFaces', function test() {
     [3, 4, 5, 6],
     [6, 4, 1, 2]
   ];
-  var result = makeViewOfFaces(vertices2D, faces);
-  var frontFaces = result.whiteLines;
-  var backFaces = result.darkLines;
+  var result = splitIntoFrontAndBackFaces(vertices2D, faces);
+  var frontFaces = result.frontFaces;
+  var backFaces = result.backFaces;
   EXPECT_EQ( 2, frontFaces.length );
   EXPECT_EQ( 2, backFaces.length );
   EXPECT_EQ_ARRAY( [0, 1, 2], frontFaces[0] );

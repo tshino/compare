@@ -3139,9 +3139,9 @@
       updateAssets();
       var v = rotation.vertices3DTo2D(assets.vertices3D);
       var faces = assets.makeFaces(rotation);
-      var lines = compareUtil.rotationUtil.makeViewOfFaces(v, faces);
-      var darkLines = lines.darkLines.concat(assets.darkLines);
-      var whiteLines = lines.whiteLines.concat(assets.makeAdditionalWhiteLines(rotation));
+      var lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, faces);
+      var darkLines = lines.backFaces.concat(assets.darkLines);
+      var whiteLines = lines.frontFaces.concat(assets.makeAdditionalWhiteLines(rotation));
       var axesDesc = makeAxesDesc(v, whiteLines);
       var grayAxesDesc = makeAxesDesc(v, darkLines);
       assets.updateLabelsVisibility(assets.labels, rotation);
@@ -3363,9 +3363,9 @@
       var vbox = '0 0 320 320';
       var v = rotation.vertices3DTo2D(vertices3DCube);
       drawVerticalColorBar(context, v, colorStopsForType[type]);
-      var lines = compareUtil.rotationUtil.makeViewOfFaces(v, compareUtil.vertexUtil.cubeFaces);
-      var axesDesc = makeAxesDesc(v, lines.whiteLines);
-      var grayAxesDesc = makeAxesDesc(v, lines.darkLines);
+      var lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, compareUtil.vertexUtil.cubeFaces);
+      var axesDesc = makeAxesDesc(v, lines.frontFaces);
+      var grayAxesDesc = makeAxesDesc(v, lines.backFaces);
       var s = 12 / scale;
       var labels = [
           { pos: [-h/2-s, -w/2-s, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },

@@ -2082,20 +2082,20 @@
       var acx = c[0] - a[0], acy = c[1] - a[1];
       return abx * acy < aby * acx;
     };
-    var makeViewOfFaces = function(vertices2D, faces) {
-      var whiteLines = [], darkLines = [];
+    var splitIntoFrontAndBackFaces = function(vertices2D, faces) {
+      var frontFaces = [], backFaces = [];
       faces.forEach(function(face) {
         if (isFrontFace(vertices2D, face)) {
-          whiteLines.push(face);
+          frontFaces.push(face);
         } else {
-          darkLines.push(face);
+          backFaces.push(face);
         }
       });
-      return {whiteLines, darkLines};
+      return {frontFaces, backFaces};
     };
     return {
       isFrontFace,
-      makeViewOfFaces
+      splitIntoFrontAndBackFaces
     };
   })();
   var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
