@@ -2037,8 +2037,8 @@
       return faces;
     })();
     var getRightMostVertexOfCylinder = function(rotation) {
-      var yaw = Math.round(rotation.yaw / 10);
-      var index = 36 * Math.ceil(yaw / 36) - yaw;
+      var yaw10 = Math.round(rotation.yaw / 10);
+      var index = 36 * Math.ceil(yaw10 / 36) - yaw10;
       return index;
     };
     var makeCylinderSideFaces = function(rotation) {
