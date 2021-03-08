@@ -3337,6 +3337,8 @@
       var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
       var toLinear = compareUtil.srgb255ToLinear8;
       for (var y = 0, k = 0; y < h; y += 1) {
+        var plotx0 = orgx + xr * y;
+        var ploty0 = orgy + yr * y;
         for (var x = 0; x < w; x += 1, k += 1) {
           var r = waveform[k * 3];
           var g = waveform[k * 3 + 1];
@@ -3349,13 +3351,15 @@
               type === 4 ? toLinear[r] : // Linear R
               type === 5 ? toLinear[g] : // Linear G
               toLinear[b]; // Linear B
-          var plotx = Math.round(orgx + xr * y + xg * x);
-          var ploty = Math.round(orgy + yr * y + yg * x + yb * c);
+          var plotx = Math.round(plotx0);
+          var ploty = Math.round(ploty0 + yb * c);
           var offset = ploty * 320 + plotx;
           dist[offset] += 1;
           colorMap[offset] += r;
           colorMap[offset + 102400] += g;
           colorMap[offset + 204800] += b;
+          plotx0 += xg;
+          ploty0 += yg;
         }
       }
       var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
