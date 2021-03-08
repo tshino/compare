@@ -3333,12 +3333,11 @@
       var xr = rotation.xr, yr = rotation.yr;
       var xg = rotation.xg, yg = rotation.yg;
       var yb = rotation.yb;
-      var orgx = 159.5 - ((h - 1) / 2 * xr + (w - 1) / 2 * xg);
-      var orgy = 159.5 - ((h - 1) / 2 * yr + (w - 1) / 2 * yg + 127.5 * yb);
+      var org = rotation.pos3DTo2D(-0.5 * (h - 1), -0.5 * (w - 1), -127.5);
       var toLinear = compareUtil.srgb255ToLinear8;
       for (var y = 0, k = 0; y < h; y += 1) {
-        var plotx0 = orgx + xr * y;
-        var ploty0 = orgy + yr * y;
+        var plotx0 = org[0] - 0.5 + xr * y;
+        var ploty0 = org[1] - 0.5 + yr * y;
         for (var x = 0; x < w; x += 1, k += 1) {
           var r = waveform[k * 3];
           var g = waveform[k * 3 + 1];
