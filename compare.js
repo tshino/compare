@@ -3084,6 +3084,7 @@
         }
         colors = colorTable[convertOption[0]];
       }
+      var pos3Dto2D = rotation.pos3DTo2D;
       if (currentType === TYPE_RGB ||
           currentType === TYPE_HSV ||
           currentType === TYPE_HSL ||
@@ -3104,16 +3105,21 @@
         var coef_yr = mat[1][0] * yr + mat[2][0] * yg + mat[0][0] * yb;
         var coef_yg = mat[1][1] * yr + mat[2][1] * yg + mat[0][1] * yb;
         var coef_yb = mat[1][2] * yr + mat[2][2] * yg + mat[0][2] * yb;
+        pos3Dto2D = function(x, y, z) {
+          return [
+            160 + coef_xr * x + coef_xg * y + coef_xb * z,
+            160 + coef_yr * x + coef_yg * y + coef_yb * z
+          ];
+        };
       }
-      var orgx = 159.5 - 127.5 * (coef_xr + coef_xg + coef_xb);
-      var orgy = 159.5 - 127.5 * (coef_yr + coef_yg + coef_yb);
+      var org = pos3Dto2D(-127.5, -127.5, -127.5);
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
         var r = rgb >> 16;
         var g = (rgb >> 8) & 255;
         var b = rgb & 255;
-        var plotx = Math.round(orgx + coef_xr * r + coef_xg * g + coef_xb * b);
-        var ploty = Math.round(orgy + coef_yr * r + coef_yg * g + coef_yb * b);
+        var plotx = Math.round(org[0] - 0.5 + coef_xr * r + coef_xg * g + coef_xb * b);
+        var ploty = Math.round(org[1] - 0.5 + coef_yr * r + coef_yg * g + coef_yb * b);
         var offset = ploty * 320 + plotx;
         var count = counts[k];
         dist[offset] += count;
