@@ -3113,14 +3113,18 @@
         };
       }
       var org = pos3Dto2D(-127.5, -127.5, -127.5);
+      var colorToOffset = function(r, g, b) {
+        var plotx = Math.floor(org[0] + coef_xr * r + coef_xg * g + coef_xb * b);
+        var ploty = Math.floor(org[1] + coef_yr * r + coef_yg * g + coef_yb * b);
+        var offset = ploty * 320 + plotx;
+        return offset;
+      };
       for (var k = 0, n = colors.length; k < n; k += 1) {
         var rgb = colors[k];
         var r = rgb >> 16;
         var g = (rgb >> 8) & 255;
         var b = rgb & 255;
-        var plotx = Math.round(org[0] - 0.5 + coef_xr * r + coef_xg * g + coef_xb * b);
-        var ploty = Math.round(org[1] - 0.5 + coef_yr * r + coef_yg * g + coef_yb * b);
-        var offset = ploty * 320 + plotx;
+        var offset = colorToOffset(r, g, b);
         var count = counts[k];
         dist[offset] += count;
         if (colorMap) { // RGB with Color
