@@ -3099,12 +3099,12 @@
         var mat = colorDistAuxType2.current() === 0 ?
             compareUtil.colorMatrixBT601 :
             compareUtil.colorMatrixBT709;
-        var coef_xr = mat[1][0] * xr + mat[2][0] * xg;
-        var coef_xg = mat[1][1] * xr + mat[2][1] * xg;
-        var coef_xb = mat[1][2] * xr + mat[2][2] * xg;
-        var coef_yr = mat[1][0] * yr + mat[2][0] * yg + mat[0][0] * yb;
-        var coef_yg = mat[1][1] * yr + mat[2][1] * yg + mat[0][1] * yb;
-        var coef_yb = mat[1][2] * yr + mat[2][2] * yg + mat[0][2] * yb;
+        var coef_r = rotation.vec3DTo2D(mat[1][0], mat[2][0], mat[0][0]);
+        var coef_g = rotation.vec3DTo2D(mat[1][1], mat[2][1], mat[0][1]);
+        var coef_b = rotation.vec3DTo2D(mat[1][2], mat[2][2], mat[0][2]);
+        var coef_xr = coef_r[0], coef_yr = coef_r[1];
+        var coef_xg = coef_g[0], coef_yg = coef_g[1];
+        var coef_xb = coef_b[0], coef_yb = coef_b[1];
         pos3Dto2D = function(x, y, z) {
           return [
             160 + coef_xr * x + coef_xg * y + coef_xb * z,
@@ -3113,9 +3113,10 @@
         };
       }
       var org = pos3Dto2D(-127.5, -127.5, -127.5);
+      var org_x = org[0], org_y =org[1];
       var colorToOffset = function(r, g, b) {
-        var plotx = Math.floor(org[0] + coef_xr * r + coef_xg * g + coef_xb * b);
-        var ploty = Math.floor(org[1] + coef_yr * r + coef_yg * g + coef_yb * b);
+        var plotx = Math.floor(org_x + coef_xr * r + coef_xg * g + coef_xb * b);
+        var ploty = Math.floor(org_y + coef_yr * r + coef_yg * g + coef_yb * b);
         var offset = ploty * 320 + plotx;
         return offset;
       };

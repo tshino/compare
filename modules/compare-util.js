@@ -2115,6 +2115,9 @@
     var pos3DTo2D = function(x, y, z) {
       return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
     };
+    var vec3DTo2D = function(x, y, z) {
+      return [ xr * x + xg * y, yr * x + yg * y + yb * z ];
+    };
     var vertices3DTo2D = function(v) {
       return v.map(function(pos) {
         return pos3DTo2D(pos[0], pos[1], pos[2]);
@@ -2124,6 +2127,7 @@
       pitch, yaw,
       xr, yr, xg, yg, yb,
       pos3DTo2D,
+      vec3DTo2D,
       vertices3DTo2D
     };
   };
