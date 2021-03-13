@@ -3057,9 +3057,6 @@
       var colors = colorTable.colors;
       var counts = colorTable.counts;
       var rotation = compareUtil.makeRotationCoefs(rotationController.orientation);
-      var xr = rotation.xr, yr = rotation.yr;
-      var xg = rotation.xg, yg = rotation.yg;
-      var yb = rotation.yb;
       var rgbColors = colors;
       var convertOption = null;
       var currentType = colorDistType.current();
@@ -3088,11 +3085,9 @@
           currentType === TYPE_HSV ||
           currentType === TYPE_HSL ||
           currentType === TYPE_CIExyY) {
-        var coef_xr = xr, coef_yr = yr;
-        var coef_xg = xg, coef_yg = yg;
-        var coef_xb = 0, coef_yb = yb;
-        var org = rotation.pos3DTo2D(-127.5, -127.5, -127.5);
-        var org_x = org[0], org_y =org[1];
+        var coef_r = rotation.vec3DTo2D(1, 0, 0);
+        var coef_g = rotation.vec3DTo2D(0, 1, 0);
+        var coef_b = rotation.vec3DTo2D(0, 0, 1);
       } else { // TYPE_YCbCr
         var mat = colorDistAuxType2.current() === 0 ?
             compareUtil.colorMatrixBT601 :
@@ -3100,12 +3095,12 @@
         var coef_r = rotation.vec3DTo2D(mat[1][0], mat[2][0], mat[0][0]);
         var coef_g = rotation.vec3DTo2D(mat[1][1], mat[2][1], mat[0][1]);
         var coef_b = rotation.vec3DTo2D(mat[1][2], mat[2][2], mat[0][2]);
-        var coef_xr = coef_r[0], coef_yr = coef_r[1];
-        var coef_xg = coef_g[0], coef_yg = coef_g[1];
-        var coef_xb = coef_b[0], coef_yb = coef_b[1];
-        var org_x = 160 - 127.5 * (coef_xr + coef_xg + coef_xb);
-        var org_y = 160 - 127.5 * (coef_yr + coef_yg + coef_yb);
       }
+      var coef_xr = coef_r[0], coef_yr = coef_r[1];
+      var coef_xg = coef_g[0], coef_yg = coef_g[1];
+      var coef_xb = coef_b[0], coef_yb = coef_b[1];
+      var org_x = 160 - 127.5 * (coef_xr + coef_xg + coef_xb);
+      var org_y = 160 - 127.5 * (coef_yr + coef_yg + coef_yb);
       var colorToOffset = function(r, g, b) {
         var plotx = Math.floor(org_x + coef_xr * r + coef_xg * g + coef_xb * b);
         var ploty = Math.floor(org_y + coef_yr * r + coef_yg * g + coef_yb * b);
