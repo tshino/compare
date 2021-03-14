@@ -3334,8 +3334,8 @@
       var org = rotation.pos3DTo2D(-0.5 * (h - 1), -0.5 * (w - 1), -127.5);
       var toLinear = compareUtil.srgb255ToLinear8;
       for (var y = 0, k = 0; y < h; y += 1) {
-        var plotx0 = org[0] - 0.5 + xr * y;
-        var ploty0 = org[1] - 0.5 + yr * y;
+        var plotx0 = org[0] + xr * y;
+        var ploty0 = org[1] + yr * y;
         for (var x = 0; x < w; x += 1, k += 1) {
           var r = waveform[k * 3];
           var g = waveform[k * 3 + 1];
@@ -3348,8 +3348,8 @@
               type === 4 ? toLinear[r] : // Linear R
               type === 5 ? toLinear[g] : // Linear G
               toLinear[b]; // Linear B
-          var plotx = Math.round(plotx0);
-          var ploty = Math.round(ploty0 + yb * c);
+          var plotx = Math.floor(plotx0);
+          var ploty = Math.floor(ploty0 + yb * c);
           var offset = ploty * 320 + plotx;
           dist[offset] += 1;
           colorMap[offset] += r;
