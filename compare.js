@@ -3333,21 +3333,23 @@
       var yb = rotation.yb;
       var org = rotation.pos3DTo2D(-0.5 * (h - 1), -0.5 * (w - 1), -127.5);
       var toLinear = compareUtil.srgb255ToLinear8;
+      var r, g, b;
+      var getZValue =
+          type === 0 ? function(k) { return waveformY[k]; } :
+          type === 1 ? function() { return r; } :
+          type === 2 ? function() { return g; } :
+          type === 3 ? function() { return b; } :
+          type === 4 ? function() { return toLinear[r]; } :
+          type === 5 ? function() { return toLinear[g]; } :
+          function() { return toLinear[b]; };
       for (var y = 0, k = 0; y < h; y += 1) {
         var plotx0 = org[0] + xr * y;
         var ploty0 = org[1] + yr * y;
         for (var x = 0; x < w; x += 1, k += 1) {
-          var r = waveform[k * 3];
-          var g = waveform[k * 3 + 1];
-          var b = waveform[k * 3 + 2];
-          var c =
-              type === 0 ? waveformY[k] : // Y
-              type === 1 ? r : // R
-              type === 2 ? g : // G
-              type === 3 ? b : // B
-              type === 4 ? toLinear[r] : // Linear R
-              type === 5 ? toLinear[g] : // Linear G
-              toLinear[b]; // Linear B
+          r = waveform[k * 3];
+          g = waveform[k * 3 + 1];
+          b = waveform[k * 3 + 2];
+          var c = getZValue(k);
           var plotx = Math.floor(plotx0);
           var ploty = Math.floor(ploty0 + yb * c);
           var offset = ploty * 320 + plotx;
