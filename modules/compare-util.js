@@ -1187,6 +1187,28 @@
       color = color || 'unknown';
       return formatInfo(desc, color, anim);
     };
+    var detectAVIF = function(binary, magic) {
+      if (magic < 16) {
+        return null;
+      }
+      var major = binary.big32(8), minor = binary.big32(12);
+      var desc = null;
+      if (major === 0x61766966 /* 'avif' */) {
+        desc = 'AVIF';
+      } else if (major == 0x6d696631 /* 'mif1'*/) {
+        for (var i = 0, n = magic - 16; i + 4 <= n; i += 4) {
+          var compatible = binary.big32(16 + i);
+          if (compatible === 0x61766966 /* 'avif' */) {
+            desc = 'AVIF';
+            break;
+          }
+        }
+      }
+      if (desc) {
+        return formatInfo(desc);
+      }
+      return null;
+    };
     var detectSVG = function(binary, magic, magic2) {
       if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||
@@ -1214,6 +1236,7 @@
       detectJPEG: detectJPEG,
       detectTIFF: detectTIFF,
       detectWebP: detectWebP,
+      detectAVIF: detectAVIF,
       detectSVG: detectSVG
     };
   })();
@@ -1238,6 +1261,9 @@
     }
     if (magic === 0x52494646 /* RIFF */ && magic3 === 0x57454250) { // WebP
       return formatReader.detectWebP(binary);
+    }
+    if (magic2 === 0x66747970 /* ftyp */) { // AVIF
+      return formatReader.detectAVIF(binary, magic);
     }
     var svg = formatReader.detectSVG(binary, magic, magic2);
     if (svg !== null) {

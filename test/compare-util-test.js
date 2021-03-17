@@ -1630,6 +1630,26 @@ TEST( 'compareUtil findNearlyConstantValue', function test() {
     EXPECT_EQ( 'SVG', f && f.toString() );
     EXPECT_EQ( undefined, f && f.color );
   });
+
+  TEST( 'compareUtil detectImageFormat AVIF', function test() {
+    var f = detect([
+        0, 0, 0, 16,
+        0x66, 0x74, 0x79, 0x70, // 'ftyp'
+        0x61, 0x76, 0x69, 0x66, // 'avif'
+        0x00, 0x00, 0x00, 0x00
+    ]);
+    EXPECT_EQ( 'AVIF', f && f.toString() );
+    var f = detect([
+      0, 0, 0, 28,
+      0x66, 0x74, 0x79, 0x70, // 'ftyp'
+      0x6d, 0x69, 0x66, 0x31, // 'mif1'
+      0x00, 0x00, 0x00, 0x00,
+      0x6d, 0x69, 0x66, 0x31, // 'mif1'
+      0x61, 0x76, 0x69, 0x66, // 'avif'
+      0x6d, 0x69, 0x61, 0x66  // 'miaf'
+    ]);
+    EXPECT_EQ( 'AVIF', f && f.toString() );
+  });
 })();
 
 TEST( 'compareUtil orientationUtil toString', function test() {
