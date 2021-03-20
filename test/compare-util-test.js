@@ -170,15 +170,15 @@ TEST( 'compareUtil convertColorListRgbToXyy', function test() {
   ];
   var xyy = compareUtil.convertColorListRgbToXyy(rgb);
   EXPECT_EQ( rgb.length, xyy.length );
-  EXPECT_EQ( 0x505400, xyy[0] );    // x=79.74, y=83.90, Y = 0
-  EXPECT_EQ( 0x505437, xyy[1] );    // x=79.74, y=83.90, Y = 55.04
-  EXPECT_EQ( 0x5054ff, xyy[2] );    // x=79.74, y=83.90, Y = 255
-  EXPECT_EQ( 0xa35436, xyy[3] );    // x=163.20, y=84.15, Y = 54.23
-  EXPECT_EQ( 0x4d99b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
-  EXPECT_EQ( 0x260f12, xyy[5] );    // x=38.25, y=15.30, Y = 18.40
-  EXPECT_EQ( 0xa3540c, xyy[6] );    // x=163.20, y=84.15, Y = 11.71
-  EXPECT_EQ( 0x4d9927, xyy[7] );    // x=76.50, y=153.00, Y = 39.36
-  EXPECT_EQ( 0x260f04, xyy[8] );    // x=38.25, y=15.30, Y = 3.97
+  EXPECT_EQ( 0x787e00, xyy[0] );    // x=79.74, y=83.90, Y = 0
+  EXPECT_EQ( 0x787e37, xyy[1] );    // x=79.74, y=83.90, Y = 55.04
+  EXPECT_EQ( 0x787eff, xyy[2] );    // x=79.74, y=83.90, Y = 255
+  EXPECT_EQ( 0xf57e36, xyy[3] );    // x=163.20, y=84.15, Y = 54.23
+  EXPECT_EQ( 0x73e6b6, xyy[4] );    // x=76.50, y=153.00, Y = 182.36
+  EXPECT_EQ( 0x391712, xyy[5] );    // x=38.25, y=15.30, Y = 18.40
+  EXPECT_EQ( 0xf57e0c, xyy[6] );    // x=163.20, y=84.15, Y = 11.71
+  EXPECT_EQ( 0x73e627, xyy[7] );    // x=76.50, y=153.00, Y = 39.36
+  EXPECT_EQ( 0x391704, xyy[8] );    // x=38.25, y=15.30, Y = 3.97
 });
 
 TEST( 'compareUtil convertColorListRgbToHsv', function test() {
