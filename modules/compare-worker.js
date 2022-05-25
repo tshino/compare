@@ -1,4 +1,5 @@
-﻿var workerLocation = workerLocation || location.href;
+﻿'use strict';
+var workerLocation = workerLocation || location.href;
 var importScript = function(relativePath) {
   var baseURL = workerLocation.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
   var path = baseURL + relativePath;

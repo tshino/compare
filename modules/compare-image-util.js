@@ -1,4 +1,5 @@
-﻿var compareImageUtil = (function() {
+﻿'use strict';
+var compareImageUtil = (function() {
 
   var FORMAT_U8x4  = 0x0104;
   var FORMAT_F32x1 = 0x0401;

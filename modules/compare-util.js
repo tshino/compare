@@ -1,4 +1,5 @@
-﻿var compareUtil = (function() {
+﻿'use strict';
+var compareUtil = (function() {
 
   var browserName = (function() {
     var ua = window.navigator.userAgent.toLowerCase();
