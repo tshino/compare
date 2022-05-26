@@ -1,5 +1,5 @@
 ﻿'use strict';
-var compareUtil = (function() {
+var CompareUtil = function() {
 
   var browserName = (function() {
     var ua = window.navigator.userAgent.toLowerCase();
@@ -2240,4 +2240,4 @@ var compareUtil = (function() {
     makeRotationCoefs:      makeRotationCoefs,
     makeTaskQueue:          makeTaskQueue
   };
-})();
+};

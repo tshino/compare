@@ -1,4 +1,6 @@
-﻿TEST( 'compareUtil clamp', function test() {
+﻿const compareUtil = CompareUtil();
+
+TEST( 'compareUtil clamp', function test() {
   EXPECT( compareUtil.clamp(0, 0, 0) === 0 );
   EXPECT( compareUtil.clamp(0, -1, 1) === 0 );
   EXPECT( compareUtil.clamp(5, 1, 2) === 2 );
