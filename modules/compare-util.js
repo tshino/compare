@@ -1,5 +1,5 @@
 ﻿'use strict';
-var CompareUtil = function() {
+const CompareUtil = function(window) {
 
   var browserName = (function() {
     var ua = window.navigator.userAgent.toLowerCase();

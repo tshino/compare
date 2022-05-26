@@ -1,4 +1,4 @@
-﻿const compareUtil = CompareUtil();
+﻿const compareUtil = CompareUtil(window);
 
 TEST( 'compareUtil clamp', function test() {
   EXPECT( compareUtil.clamp(0, 0, 0) === 0 );

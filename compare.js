@@ -1,4 +1,4 @@
-﻿const compareUtil = CompareUtil();
+﻿const compareUtil = CompareUtil(window);
 
 $( function() {
   // Check for the various File API support.
