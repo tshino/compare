@@ -2241,3 +2241,7 @@ const CompareUtil = function(window) {
     makeTaskQueue:          makeTaskQueue
   };
 };
+
+if (typeof module !== 'undefined') {
+    module.exports = CompareUtil;
+}
