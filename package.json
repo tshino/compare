@@ -1,8 +1,17 @@
 {
     "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
         "test": "mocha test/*.test.js"
     },
     "devDependencies": {
+        "eslint": "^8.16.0",
         "mocha": "^10.0.0"
+    },
+    "eslintConfig": {
+        "root": true,
+        "parserOptions": {
+            "ecmaVersion": "latest"
+        }
     }
 }
