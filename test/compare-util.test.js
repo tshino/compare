@@ -1723,4 +1723,84 @@ describe('CompareUtil', () => {
             assert.notStrictEqual(f && f.toString(), 'AVIF');  // HEIC
         });
     });
+
+    describe('orientationUtil', () => {
+        describe('toString', () => {
+            const toString = compareUtil.orientationUtil.toString;
+            it('should return string representation of given orientation value', () => {
+                assert.strictEqual(toString(1), 'TopLeft');
+                assert.strictEqual(toString(2), 'TopRight');
+                assert.strictEqual(toString(3), 'BottomRight');
+                assert.strictEqual(toString(4), 'BottomLeft');
+                assert.strictEqual(toString(5), 'LeftTop');
+                assert.strictEqual(toString(6), 'RightTop');
+                assert.strictEqual(toString(7), 'RightBottom');
+                assert.strictEqual(toString(8), 'LeftBottom');
+                assert.strictEqual(toString(9), 'Invalid');
+                assert.strictEqual(toString(0), 'Invalid');
+                assert.strictEqual(toString(null), '‐');
+            });
+        });
+
+        describe('isTransposed', () => {
+            const isTransposed = compareUtil.orientationUtil.isTransposed;
+            it('should return true if given orientation is transposed', () => {
+                assert.strictEqual(isTransposed(1), false);
+                assert.strictEqual(isTransposed(2), false);
+                assert.strictEqual(isTransposed(3), false);
+                assert.strictEqual(isTransposed(4), false);
+                assert.strictEqual(isTransposed(5), true);
+                assert.strictEqual(isTransposed(6), true);
+                assert.strictEqual(isTransposed(7), true);
+                assert.strictEqual(isTransposed(8), true);
+                assert.strictEqual(isTransposed(9), false);
+                assert.strictEqual(isTransposed(0), false);
+                assert.strictEqual(isTransposed(null), false);
+            });
+        });
+
+        describe('getCSSTransform', () => {
+            const getCSSTransform = compareUtil.orientationUtil.getCSSTransform;
+            it('should make a piece of CSS transform parameter for given orientation', () => {
+                assert.strictEqual(getCSSTransform(1), '');
+                assert.strictEqual(getCSSTransform(2), ' scale(-1,1)');
+                assert.strictEqual(getCSSTransform(3), ' rotate(180deg)');
+                assert.strictEqual(getCSSTransform(4), ' scale(-1,1) rotate(180deg)');
+                assert.strictEqual(getCSSTransform(5), ' scale(-1,1) rotate(90deg)');
+                assert.strictEqual(getCSSTransform(6), ' rotate(90deg)');
+                assert.strictEqual(getCSSTransform(7), ' scale(-1,1) rotate(-90deg)');
+                assert.strictEqual(getCSSTransform(8), ' rotate(-90deg)');
+                assert.strictEqual(getCSSTransform(9), '');
+                assert.strictEqual(getCSSTransform(0), '');
+                assert.strictEqual(getCSSTransform(null), '');
+            });
+        });
+
+        describe('interpretXY', () => {
+            const interpretXY = compareUtil.orientationUtil.interpretXY;
+            it('should interpret XY coordinate (pixel centered)', () => {
+                assert.deepStrictEqual(interpretXY(1, 40, 30, 10, 5), {x: 10, y: 5});
+                assert.deepStrictEqual(interpretXY(2, 40, 30, 10, 5), {x: 29, y: 5});
+                assert.deepStrictEqual(interpretXY(3, 40, 30, 10, 5), {x: 29, y: 24});
+                assert.deepStrictEqual(interpretXY(4, 40, 30, 10, 5), {x: 10, y: 24});
+                assert.deepStrictEqual(interpretXY(5, 30, 40, 10, 5), {x: 5, y: 10});
+                assert.deepStrictEqual(interpretXY(6, 30, 40, 10, 5), {x: 5, y: 29});
+                assert.deepStrictEqual(interpretXY(7, 30, 40, 10, 5), {x: 24, y: 29});
+                assert.deepStrictEqual(interpretXY(8, 30, 40, 10, 5), {x: 24, y: 10});
+                assert.deepStrictEqual(interpretXY(9, 40, 30, 10, 5), {x: 10, y: 5});
+                assert.deepStrictEqual(interpretXY(0, 40, 30, 10, 5), {x: 10, y: 5});
+                assert.deepStrictEqual(interpretXY(null, 40, 30, 10, 5), {x: 10, y: 5});
+            });
+        });
+
+        describe('interpretXY2', () => {
+            const interpretXY2 = compareUtil.orientationUtil.interpretXY2;
+            it('should interpret XY coordinate (geometric)', () => {
+                assert.deepStrictEqual(interpretXY2(1, 40, 30, 10, 5), {x: 10, y: 5});
+                assert.deepStrictEqual(interpretXY2(3, 40, 30, 10, 5), {x: 30, y: 25});
+                assert.deepStrictEqual(interpretXY2(5, 30, 40, 10, 5), {x: 5, y: 10});
+                assert.deepStrictEqual(interpretXY2(7, 30, 40, 10, 5), {x: 25, y: 30});
+            });
+        });
+    });
 });
