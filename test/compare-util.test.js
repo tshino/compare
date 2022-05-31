@@ -1840,39 +1840,43 @@ describe('CompareUtil', () => {
                 assert.strictEqual(toString({ w: 15578, h: 7783 }), '15,578:7,783');
             });
         });
-    //     describe('aspectRatioUtil findApproxAspectRatio', () => {
-    //         var findApprox = function (w, h) {
-    //             var a = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
-    //             var approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(a);
-    //             return approx ? compareUtil.aspectRatioUtil.toString(approx) : null;
-    //         };
-    //         assert.strictEqual(null, findApprox(1, 1));
-    //         assert.strictEqual(null, findApprox(100, 100));
-    //         assert.strictEqual(null, findApprox(100, 200));
-    //         assert.strictEqual(null, findApprox(1920, 1080));
-    //         assert.strictEqual('16:9', findApprox(3648, 2056));
-    //         assert.strictEqual('9:16', findApprox(2056, 3648));
-    //         assert.strictEqual('16:9', findApprox(960, 541));
-    //         assert.strictEqual('2:1', findApprox(15578, 7783));
-    //         assert.strictEqual('2:1', findApprox(1001, 500));
-    //     });
-    //     describe('aspectRatioUtil makeInfo', () => {
-    //         makeInfo = compareUtil.aspectRatioUtil.makeInfo;
-    //         assert.strictEqual_ARRAY([1, '1:1'], makeInfo(1, 1));
-    //         assert.strictEqual_ARRAY([1, '1:1'], makeInfo(100, 100));
-    //         assert.strictEqual_ARRAY([0.5, '1:2'], makeInfo(100, 200));
-    //         assert.strictEqual_ARRAY([1 / 10, '1:10'], makeInfo(1, 10));
-    //         assert.strictEqual_ARRAY([10, '10:1'], makeInfo(10, 1));
-    //         assert.strictEqual_ARRAY([16 / 9, '16:9'], makeInfo(1920, 1080));
-    //         assert.strictEqual_ARRAY([8 / 5, '8:5'], makeInfo(1920, 1200));
-    //         assert.strictEqual_ARRAY([960 / 544, '30:17'], makeInfo(960, 544));
-    //         assert.strictEqual_ARRAY([2432 / 3648, '2:3'], makeInfo(2432, 3648));
-    //         assert.strictEqual_ARRAY([2028 / 1521, '4:3'], makeInfo(2028, 1521));
-    //         assert.strictEqual_ARRAY([2592 / 1944, '4:3'], makeInfo(2592, 1944));
-    //         assert.strictEqual_ARRAY([400 / 301, '400:301', '4:3'], makeInfo(400, 301));
-    //         assert.strictEqual_ARRAY([2056 / 3648, '257:456', '9:16'], makeInfo(2056, 3648));
-    //         assert.strictEqual_ARRAY([3648 / 2056, '456:257', '16:9'], makeInfo(3648, 2056));
-    //         assert.strictEqual_ARRAY([15578 / 7783, '15,578:7,783', '2:1'], makeInfo(15578, 7783));
-    //     });
+        describe('findApproxAspectRatio', () => {
+            const findApprox = function (w, h) {
+                const a = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
+                const approx = compareUtil.aspectRatioUtil.findApproxAspectRatio(a);
+                return approx ? compareUtil.aspectRatioUtil.toString(approx) : null;
+            };
+            it('should make a reasonable approximation of given aspect ratio', () => {
+                assert.strictEqual(findApprox(1, 1), null);
+                assert.strictEqual(findApprox(100, 100), null);
+                assert.strictEqual(findApprox(100, 200), null);
+                assert.strictEqual(findApprox(1920, 1080), null);
+                assert.strictEqual(findApprox(3648, 2056), '16:9');
+                assert.strictEqual(findApprox(2056, 3648), '9:16');
+                assert.strictEqual(findApprox(960, 541), '16:9');
+                assert.strictEqual(findApprox(15578, 7783), '2:1');
+                assert.strictEqual(findApprox(1001, 500), '2:1');
+            });
+        });
+        describe('makeInfo', () => {
+            const makeInfo = compareUtil.aspectRatioUtil.makeInfo;
+            it('should make a summary of given aspect ratio', () => {
+                assert.deepStrictEqual(makeInfo(1, 1), [1, '1:1']);
+                assert.deepStrictEqual(makeInfo(100, 100), [1, '1:1']);
+                assert.deepStrictEqual(makeInfo(100, 200), [0.5, '1:2']);
+                assert.deepStrictEqual(makeInfo(1, 10), [1 / 10, '1:10']);
+                assert.deepStrictEqual(makeInfo(10, 1), [10, '10:1']);
+                assert.deepStrictEqual(makeInfo(1920, 1080), [16 / 9, '16:9']);
+                assert.deepStrictEqual(makeInfo(1920, 1200), [8 / 5, '8:5']);
+                assert.deepStrictEqual(makeInfo(960, 544), [960 / 544, '30:17']);
+                assert.deepStrictEqual(makeInfo(2432, 3648), [2432 / 3648, '2:3']);
+                assert.deepStrictEqual(makeInfo(2028, 1521), [2028 / 1521, '4:3']);
+                assert.deepStrictEqual(makeInfo(2592, 1944), [2592 / 1944, '4:3']);
+                assert.deepStrictEqual(makeInfo(400, 301), [400 / 301, '400:301', '4:3']);
+                assert.deepStrictEqual(makeInfo(2056, 3648), [2056 / 3648, '257:456', '9:16']);
+                assert.deepStrictEqual(makeInfo(3648, 2056), [3648 / 2056, '456:257', '16:9']);
+                assert.deepStrictEqual(makeInfo(15578, 7783), [15578 / 7783, '15,578:7,783', '2:1']);
+            });
+        });
     });
 });
