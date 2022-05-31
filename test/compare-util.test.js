@@ -1819,6 +1819,7 @@ describe('CompareUtil', () => {
             { inW: 3648, inH: 2056, expectW: 456, expectH: 257 },
             { inW: 15578, inH: 7783, expectW: 15578, expectH: 7783 },
         ];
+
         describe('calcAspectRatio', () => {
             it('should make a reduced fraction for given aspect ratio', () => {
                 for (const t of testCases) {
@@ -1828,6 +1829,7 @@ describe('CompareUtil', () => {
                 }
             });
         });
+
         describe('toString', () => {
             it('should make string representation of given aspect ratio', () => {
                 const toString = compareUtil.aspectRatioUtil.toString;
@@ -1840,6 +1842,7 @@ describe('CompareUtil', () => {
                 assert.strictEqual(toString({ w: 15578, h: 7783 }), '15,578:7,783');
             });
         });
+
         describe('findApproxAspectRatio', () => {
             const findApprox = function (w, h) {
                 const a = compareUtil.aspectRatioUtil.calcAspectRatio(w, h);
@@ -1858,6 +1861,7 @@ describe('CompareUtil', () => {
                 assert.strictEqual(findApprox(1001, 500), '2:1');
             });
         });
+
         describe('makeInfo', () => {
             const makeInfo = compareUtil.aspectRatioUtil.makeInfo;
             it('should make a summary of given aspect ratio', () => {
@@ -1877,6 +1881,42 @@ describe('CompareUtil', () => {
                 assert.deepStrictEqual(makeInfo(3648, 2056), [3648 / 2056, '456:257', '16:9']);
                 assert.deepStrictEqual(makeInfo(15578, 7783), [15578 / 7783, '15,578:7,783', '2:1']);
             });
+        });
+    });
+
+    describe('makeDurationInfo', () => {
+        const make = compareUtil.makeDurationInfo;
+        it('should make a summary of given animation duration info', () => {
+            assert.deepStrictEqual(make(), [null, '‐']);
+            assert.deepStrictEqual(make(null), [null, '‐']);
+            assert.deepStrictEqual(make({}), [null, '‐']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 3, durationDen: 1 } }), [3, '3.000']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 14, durationDen: 8 } }), [7 / 4, '1.750']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 40, durationDen: 25, fpsNum: 25, fpsDen: 1 } }), [8 / 5, '1.600']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 4, durationDen: 3 } }), [4 / 3, '4/3', '1.333']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 20, durationDen: 15 } }), [4 / 3, '4/3', '1.333']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 20, durationDen: 15, fpsNum: 30, fpsDen: 1 } }), [4 / 3, '40/30', '1.333']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 34, durationDen: 24, fpsNum: null, fpsDen: null } }), [34 / 24, '17/12', '1.417']);
+            assert.deepStrictEqual(make({ anim: { durationNum: 34, durationDen: 24, fpsNum: 24, fpsDen: 1 } }), [34 / 24, '34/24', '1.417']);
+        })
+    });
+
+    describe('makeFPSInfo', () => {
+        const make = compareUtil.makeFPSInfo;
+        const nu = { en: 'non-uniform' };
+        it('should make a summary of given animation Frames Per Second info', () => {
+            assert.deepStrictEqual(make(), [null, '‐']);
+            assert.deepStrictEqual(make(null, nu), [null, '‐']);
+            assert.deepStrictEqual(make({}, nu), [null, '‐']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 1, fpsDen: 1, approxFPS: null } }, nu), [1, '1']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 100, fpsDen: 100, approxFPS: null } }, nu), [1, '1']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 1000, fpsDen: 1000, approxFPS: null } }, nu), [1, '1']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 1000, fpsDen: 40, approxFPS: null } }, nu), [25, '25']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 1000, fpsDen: 32, approxFPS: null } }, nu), [1000 / 32, '31.25']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 1000, fpsDen: 30, approxFPS: null } }, nu), [100 / 3, '100/3', '33.33']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: 24, fpsDen: 1, approxFPS: null } }, nu), [24, '24']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: null, fpsDen: null, approxFPS: 24 } }, nu), [null, nu, '24.0']);
+            assert.deepStrictEqual(make({ anim: { fpsNum: null, fpsDen: null, approxFPS: null } }, nu), [null, nu]);
         });
     });
 });
