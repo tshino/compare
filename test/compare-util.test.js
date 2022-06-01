@@ -1919,4 +1919,23 @@ describe('CompareUtil', () => {
             assert.deepStrictEqual(make({ anim: { fpsNum: null, fpsDen: null, approxFPS: null } }, nu), [null, nu]);
         });
     });
+
+    describe('cursorKeyCodeToXY', () => {
+        const cursorKeyCodeToXY = compareUtil.cursorKeyCodeToXY;
+        it('should interpret cursor key code to XY coordinate', () => {
+            assert.deepStrictEqual(cursorKeyCodeToXY(99), {x: 0, y: 0});
+
+            assert.deepStrictEqual(cursorKeyCodeToXY(37), {x: -1, y: 0});
+            assert.deepStrictEqual(cursorKeyCodeToXY(38), {x: 0, y: -1});
+            assert.deepStrictEqual(cursorKeyCodeToXY(39), {x: 1, y: 0});
+            assert.deepStrictEqual(cursorKeyCodeToXY(40), {x: 0, y: 1});
+
+            assert.deepStrictEqual(cursorKeyCodeToXY(99, 10), {x: 0, y: 0});
+
+            assert.deepStrictEqual(cursorKeyCodeToXY(37, 10), {x: -10, y: 0});
+            assert.deepStrictEqual(cursorKeyCodeToXY(38, 10), {x: 0, y: -10});
+            assert.deepStrictEqual(cursorKeyCodeToXY(39, 10), {x: 10, y: 0});
+            assert.deepStrictEqual(cursorKeyCodeToXY(40, 10), {x: 0, y: 10});
+        });
+    });
 });
