@@ -1938,4 +1938,77 @@ describe('CompareUtil', () => {
             assert.deepStrictEqual(cursorKeyCodeToXY(40, 10), {x: 0, y: 10});
         });
     });
+
+    describe('calcInscribedRect', () => {
+        const calcInscribedRect = compareUtil.calcInscribedRect;
+        it('should calculate size of inscribed rectangular', () => {
+            //assert.strictEqual( calcInscribedRect(0, 0, 0, 0).width === 0 );
+
+            assert.deepStrictEqual(calcInscribedRect(1, 1, 1, 1), {width: 1, height: 1});
+            assert.deepStrictEqual(calcInscribedRect(1, 1, 10, 10), {width: 1, height: 1});
+            assert.deepStrictEqual(calcInscribedRect(100, 100, 1, 1), {width: 100, height: 100});
+
+            assert.deepStrictEqual(calcInscribedRect(100, 100, 10, 10), {width: 100, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(100, 100, 20, 10), {width: 100, height: 50});
+            assert.deepStrictEqual(calcInscribedRect(100, 100, 10, 20), {width: 50, height: 100});
+
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 10, 10), {width: 100, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 15, 10), {width: 150, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 20, 10), {width: 200, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 25, 10), {width: 200, height: 80});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 40, 10), {width: 200, height: 50});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 10, 20), {width: 50, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(200, 100, 10, 25), {width: 40, height: 100});
+
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 10, 10), {width: 100, height: 100});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 10, 15), {width: 100, height: 150});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 10, 20), {width: 100, height: 200});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 10, 25), {width: 80, height: 200});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 10, 40), {width: 50, height: 200});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 20, 10), {width: 100, height: 50});
+            assert.deepStrictEqual(calcInscribedRect(100, 200, 25, 10), {width: 100, height: 40});
+        });
+    });
+
+    describe('rotationUtil', () => {
+        describe('isFrontFace', () => {
+            const isFrontFace = compareUtil.rotationUtil.isFrontFace;
+            it('should determine if the front of given triangle is facing the origin', () => {
+                const vertices2D = [[0, 0], [0, 1], [1, 0]];
+                const frontFace = [0, 1, 2];
+                const backFace = [0, 2, 1];
+                assert.strictEqual(isFrontFace(vertices2D, frontFace), true);
+                assert.strictEqual(isFrontFace(vertices2D, backFace), false);
+            });
+        });
+
+        describe('splitIntoFrontAndBackFaces', () => {
+            const splitIntoFrontAndBackFaces = compareUtil.rotationUtil.splitIntoFrontAndBackFaces;
+            it('should split given faces into front facing and back facing', () => {
+                const vertices2D = [
+                    [0, 0], [0, 1], [1, 0],
+                    [1, 1], [1, 3], [3, 3], [3, 1]
+                ];
+                const faces = [
+                    [0, 1, 2],
+                    [0, 2, 1],
+                    [3, 4, 5, 6],
+                    [6, 4, 1, 2]
+                ];
+                assert.deepStrictEqual(
+                    splitIntoFrontAndBackFaces(vertices2D, faces),
+                    {
+                        frontFaces: [
+                            [0, 1, 2],
+                            [3, 4, 5, 6]
+                        ],
+                        backFaces: [
+                            [0, 2, 1],
+                            [6, 4, 1, 2]
+                        ]
+                    }
+                );
+            });
+        });
+    });
 });
