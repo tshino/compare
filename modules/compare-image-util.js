@@ -1579,3 +1579,7 @@ var compareImageUtil = (function() {
     getUniqueColors: getUniqueColors
   };
 })();
+
+if (typeof module !== 'undefined') {
+    module.exports = compareImageUtil;
+}
