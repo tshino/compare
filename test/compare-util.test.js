@@ -4,11 +4,7 @@ const CompareUtil = require('../modules/compare-util.js');
 
 const jsTestUtil = {
     dataURIFromArrayBuffer: function(ab) {
-        var array = new Uint8Array(ab);
-        var str = '';
-        for (var i = 0; i < array.length; ++i) {
-          str += String.fromCharCode(array[i]);
-        }
+        const str = Array.from(ab).map(u8 => String.fromCharCode(u8)).join('');
         return 'data:application/octet-stream;base64,' + btoa(str);
     }
 };
