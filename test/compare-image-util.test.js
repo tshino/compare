@@ -184,4 +184,69 @@ describe('CompareImageUtil', () => {
             assert.strictEqual(image4.format, compareImageUtil.FORMAT_F32x1);
         });
     });
+
+    describe('makeRegion', () => {
+        it('should make an image struct refering a region of another image', () => {
+            const image1 = compareImageUtil.makeImage(300, 200);
+
+            const region0 = compareImageUtil.makeRegion(image1);
+            assert.strictEqual(region0.width, 300);
+            assert.strictEqual(region0.height, 200);
+            assert.strictEqual(region0.pitch, 300);
+            assert.ok(image1.data === region0.data);
+            assert.strictEqual(region0.offset, 0);
+            assert.strictEqual(region0.channels, 4);
+            assert.strictEqual(region0.format, compareImageUtil.FORMAT_U8x4);
+
+            const region1 = compareImageUtil.makeRegion(image1, 30, 20);
+            assert.strictEqual(region1.width, 270);
+            assert.strictEqual(region1.height, 180);
+            assert.strictEqual(region1.pitch, 300);
+            assert.ok(image1.data === region1.data);
+            assert.strictEqual(region1.offset, 300 * 20 + 30);
+            assert.strictEqual(region1.channels, 4);
+            assert.strictEqual(region1.format, compareImageUtil.FORMAT_U8x4);
+
+            const region2 = compareImageUtil.makeRegion(image1, 30, 20, 130, 120);
+            assert.strictEqual(region2.width, 130);
+            assert.strictEqual(region2.height, 120);
+            assert.strictEqual(region2.pitch, 300);
+            assert.ok(image1.data === region2.data);
+            assert.strictEqual(region2.offset, 300 * 20 + 30);
+            assert.strictEqual(region2.channels, 4);
+            assert.strictEqual(region2.format, compareImageUtil.FORMAT_U8x4);
+
+            const imageData = { width: 300, height: 200, data: new Uint8Array(240000) };
+            const region3 = compareImageUtil.makeRegion(imageData, 10, 20, 30, 40);
+            assert.strictEqual(region3.width, 30);
+            assert.strictEqual(region3.height, 40);
+            assert.strictEqual(region3.pitch, 300);
+            assert.ok(imageData.data === region3.data);
+            assert.strictEqual(region3.offset, 300 * 20 + 10);
+            assert.strictEqual(region3.channels, 4);
+            assert.strictEqual(region3.format, compareImageUtil.FORMAT_U8x4);
+        });
+
+        it('should be able to deal with images of zero size', () => {
+            const image0x0 = compareImageUtil.makeImage(0, 0);
+
+            const region0x0 = compareImageUtil.makeRegion(image0x0);
+            assert.strictEqual(region0x0.width, 0);
+            assert.strictEqual(region0x0.height, 0);
+            assert.strictEqual(region0x0.pitch, 0);
+            assert.strictEqual(region0x0.data.length, 0);
+            assert.strictEqual(region0x0.offset, 0);
+            assert.strictEqual(region0x0.channels, 4);
+            assert.strictEqual(region0x0.format, compareImageUtil.FORMAT_U8x4);
+
+            const region0x0_2 = compareImageUtil.makeRegion(image0x0, 10, 10, 10, 10);
+            assert.strictEqual(region0x0_2.width, 0);
+            assert.strictEqual(region0x0_2.height, 0);
+            assert.strictEqual(region0x0_2.pitch, 0);
+            assert.strictEqual(region0x0_2.data.length, 0);
+            assert.strictEqual(region0x0_2.offset, 0);
+            assert.strictEqual(region0x0_2.channels, 4);
+            assert.strictEqual(region0x0_2.format, compareImageUtil.FORMAT_U8x4);
+        });
+    });
 });
