@@ -346,5 +346,51 @@ describe('CompareImageUtil', () => {
             assert.strictEqual(region13.pitch, 300);
             assert.ok(image1.data === region13.data);
         });
+
+        it('should be able to deal with too-big-range', () => {
+            const image1 = compareImageUtil.makeImage(300, 200);
+
+            const region1 = compareImageUtil.makeRegion(image1, 0, 0, 400, 300);
+            assert.strictEqual(region1.width, 300);
+            assert.strictEqual(region1.height, 200);
+            assert.strictEqual(region1.pitch, 300);
+            assert.strictEqual(region1.offset, 0);
+            assert.ok(image1.data === region1.data);
+
+            const region2 = compareImageUtil.makeRegion(image1, -50, -50);
+            assert.strictEqual(region2.width, 300);
+            assert.strictEqual(region2.height, 200);
+            assert.strictEqual(region2.pitch, 300);
+            assert.strictEqual(region2.offset, 0);
+            assert.ok(image1.data === region2.data);
+
+            const region3 = compareImageUtil.makeRegion(image1, -50, -50, 400, 300);
+            assert.strictEqual(region3.width, 300);
+            assert.strictEqual(region3.height, 200);
+            assert.strictEqual(region3.pitch, 300);
+            assert.strictEqual(region3.offset, 0);
+            assert.ok(image1.data === region3.data);
+
+            const region4 = compareImageUtil.makeRegion(image1, -50, -50, 300, 200);
+            assert.strictEqual(region4.width, 250);
+            assert.strictEqual(region4.height, 150);
+            assert.strictEqual(region4.pitch, 300);
+            assert.strictEqual(region4.offset, 0);
+            assert.ok(image1.data === region4.data);
+
+            const region5 = compareImageUtil.makeRegion(image1, -50, -50, 100, 100);
+            assert.strictEqual(region5.width, 50);
+            assert.strictEqual(region5.height, 50);
+            assert.strictEqual(region5.pitch, 300);
+            assert.strictEqual(region5.offset, 0);
+            assert.ok(image1.data === region5.data);
+
+            const region6 = compareImageUtil.makeRegion(image1, 50, 50, 300, 200);
+            assert.strictEqual(region6.width, 250);
+            assert.strictEqual(region6.height, 150);
+            assert.strictEqual(region6.pitch, 300);
+            assert.strictEqual(region6.offset, 300 * 50 + 50);
+            assert.ok(image1.data === region6.data);
+        });
     });
 });
