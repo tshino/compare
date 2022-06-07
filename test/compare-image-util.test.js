@@ -393,4 +393,69 @@ describe('CompareImageUtil', () => {
             assert.ok(image1.data === region6.data);
         });
     });
+
+    describe('fill', () => {
+        const at = function(image, x, y) {
+            const address = 4 * x + 4 * image.width * y;
+            return [
+                image.data[address + 0],
+                image.data[address + 1],
+                image.data[address + 2],
+                image.data[address + 3]
+            ];
+        };
+        it('should fill an image with the specified pixel value', () => {
+            const image1 = compareImageUtil.makeImage(300, 200);
+            for (let i = 0; i < 240000; ++i) {
+                image1.data[i] = 55;
+            }
+
+            compareImageUtil.fill(image1, 20, 40, 60, 80);
+
+            assert.deepStrictEqual(at(image1, 0, 0), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 1, 0), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 299, 0), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 299, 199), [20, 40, 60, 80]);
+
+            const region1 = compareImageUtil.makeRegion(image1, 20, 10, 100, 50);
+            for (let i = 0; i < 240000; ++i) {
+                image1.data[i] = 55;
+            }
+
+            compareImageUtil.fill(region1, 20, 40, 60, 80);
+
+            assert.deepStrictEqual(at(image1, 0, 0), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 299, 199), [55, 55, 55, 55]);
+
+            assert.deepStrictEqual(at(image1, 20, 9), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 19, 10), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 20, 10), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 119, 10), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 120, 10), [55, 55, 55, 55]);
+
+            assert.deepStrictEqual(at(image1, 19, 59), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 119, 59), [20, 40, 60, 80]);
+            assert.deepStrictEqual(at(image1, 120, 59), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 119, 60), [55, 55, 55, 55]);
+
+            for (let i = 0; i < 240000; ++i) {
+                image1.data[i] = 55;
+            }
+            const region2 = compareImageUtil.makeRegion(image1, 0, 0, 0, 0);
+            compareImageUtil.fill(region2, 10, 10, 10, 10);
+            const region3 = compareImageUtil.makeRegion(image1, 1, 0, 0, 0);
+            compareImageUtil.fill(region3, 20, 20, 20, 20);
+            const region4 = compareImageUtil.makeRegion(image1, -1, 0, 1, 1);
+            compareImageUtil.fill(region4, 30, 30, 30, 30);
+            const region5 = compareImageUtil.makeRegion(image1, 0, -1, 1, 1);
+            compareImageUtil.fill(region5, 40, 40, 40, 40);
+            const region6 = compareImageUtil.makeRegion(image1, 0, 0, 1, 0);
+            compareImageUtil.fill(region6, 50, 50, 50, 50);
+            const region7 = compareImageUtil.makeRegion(image1, 0, 0, 0, 1);
+            compareImageUtil.fill(region7, 60, 60, 60, 60);
+
+            assert.deepStrictEqual(at(image1, 0, 0), [55, 55, 55, 55]);
+            assert.deepStrictEqual(at(image1, 1, 0), [55, 55, 55, 55]);
+        });
+    });
 });
