@@ -395,7 +395,7 @@ describe('CompareImageUtil', () => {
     });
 
     describe('fill', () => {
-        const at = function(image, x, y) {
+        const at4 = function(image, x, y) {
             const address = 4 * x + 4 * image.width * y;
             return [
                 image.data[address + 0],
@@ -403,6 +403,18 @@ describe('CompareImageUtil', () => {
                 image.data[address + 2],
                 image.data[address + 3]
             ];
+        };
+        const at1 = function(image, x, y) {
+            return [
+                image.data[x + image.width * y]
+            ];
+        };
+        const at = function(image, x, y) {
+            if (image.format === compareImageUtil.FORMAT_U8x4) {
+                return at4(image, x, y);
+            } else {
+                return at1(image, x, y);
+            }
         };
         it('should fill an image with the specified pixel value', () => {
             const image1 = compareImageUtil.makeImage(300, 200);
@@ -456,6 +468,33 @@ describe('CompareImageUtil', () => {
 
             assert.deepStrictEqual(at(image1, 0, 0), [55, 55, 55, 55]);
             assert.deepStrictEqual(at(image1, 1, 0), [55, 55, 55, 55]);
+        });
+
+        it('should deal with F32 format', () => {
+            const image1 = compareImageUtil.makeImage(300, 200, compareImageUtil.FORMAT_F32x1);
+            for (let i = 0; i < 60000; ++i) {
+                image1.data[i] = 55;
+            }
+
+            compareImageUtil.fill(image1, 20);
+            assert.deepStrictEqual(at(image1, 0, 0), [20]);
+            assert.deepStrictEqual(at(image1, 1, 0), [20]);
+            assert.deepStrictEqual(at(image1, 2, 0), [20]);
+            assert.deepStrictEqual(at(image1, 3, 0), [20]);
+            assert.deepStrictEqual(at(image1, 4, 0), [20]);
+            assert.deepStrictEqual(at(image1, 299, 199), [20]);
+
+            const region1 = compareImageUtil.makeRegion(image1, 5, 5, 10, 5);
+            compareImageUtil.fill(region1, 70);
+
+            assert.deepStrictEqual(at(image1, 0, 0), [20]);
+            assert.deepStrictEqual(at(image1, 4, 5), [20]);
+            assert.deepStrictEqual(at(image1, 5, 5), [70]);
+            assert.deepStrictEqual(at(image1, 14, 5), [70]);
+            assert.deepStrictEqual(at(image1, 15, 5), [20]);
+            assert.deepStrictEqual(at(image1, 14, 9), [70]);
+            assert.deepStrictEqual(at(image1, 15, 9), [20]);
+            assert.deepStrictEqual(at(image1, 5, 10), [20]);
         });
     });
 });
