@@ -497,4 +497,26 @@ describe('CompareImageUtil', () => {
             assert.deepStrictEqual(at(image1, 5, 10), [20]);
         });
     });
+
+    describe('copy', () => {
+        it('should copy pixels from an image to another image', () => {
+            const imageData = { width: 4, height: 4, data: [] };
+            for (let i = 0; i < 64; ++i) {
+                imageData.data[i] = i;
+            }
+            const image1 = compareImageUtil.makeImage(imageData);
+            const image2 = compareImageUtil.makeImage(2, 2);
+            compareImageUtil.copy(image2, image1);
+
+            assert.strictEqual(image2.width, 2);
+            assert.strictEqual(image2.height, 2);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    0, 1, 2, 3, 4, 5, 6, 7,
+                    16, 17, 18, 19, 20, 21, 22, 23
+                ]
+            );
+        });
+    });
 });
