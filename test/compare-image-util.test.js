@@ -590,4 +590,29 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('flipV', () => {
+        it('should flip an image vertically', () => {
+            const imageData = { width: 3, height: 5, data: [] };
+            for (let i = 0; i < 60; ++i) {
+                imageData.data[i] = i;
+            }
+            const image1 = compareImageUtil.makeImage(imageData);
+            const image2 = compareImageUtil.makeImage(3, 5);
+            compareImageUtil.flipV(image2, image1);
+
+            assert.strictEqual(image2.width, 3);
+            assert.strictEqual(image2.height, 5);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+                    36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+                    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+                    12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+                ]
+            );
+        });
+    });
 });
