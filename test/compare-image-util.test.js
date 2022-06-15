@@ -615,4 +615,100 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('applyOrientation', () => {
+        it('should apply orientation to an image', () => {
+            const src = compareImageUtil.makeImage({
+                width: 2, height: 3, data: [
+                    0, 1, 2, 3, 4, 5, 6, 7,
+                    8, 9, 10, 11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20, 21, 22, 23
+                ]
+            });
+            const result1 = compareImageUtil.applyOrientation(src, 1);
+            assert.strictEqual(result1.width, 2);
+            assert.strictEqual(result1.height, 3);
+            assert.deepStrictEqual(
+                Array.from(result1.data),
+                [
+                    0, 1, 2, 3, 4, 5, 6, 7,
+                    8, 9, 10, 11, 12, 13, 14, 15,
+                    16, 17, 18, 19, 20, 21, 22, 23
+                ]
+            );
+            const result2 = compareImageUtil.applyOrientation(src, 2);
+            assert.strictEqual(result2.width, 2);
+            assert.strictEqual(result2.height, 3);
+            assert.deepStrictEqual(
+                Array.from(result2.data),
+                [
+                    4, 5, 6, 7, 0, 1, 2, 3,
+                    12, 13, 14, 15, 8, 9, 10, 11,
+                    20, 21, 22, 23, 16, 17, 18, 19
+                ]
+            );
+            const result3 = compareImageUtil.applyOrientation(src, 3);
+            assert.strictEqual(result3.width, 2);
+            assert.strictEqual(result3.height, 3);
+            assert.deepStrictEqual(
+                Array.from(result3.data),
+                [
+                    20, 21, 22, 23, 16, 17, 18, 19,
+                    12, 13, 14, 15, 8, 9, 10, 11,
+                    4, 5, 6, 7, 0, 1, 2, 3
+                ]
+            );
+            const result4 = compareImageUtil.applyOrientation(src, 4);
+            assert.strictEqual(result4.width, 2);
+            assert.strictEqual(result4.height, 3);
+            assert.deepStrictEqual(
+                Array.from(result4.data),
+                [
+                    16, 17, 18, 19, 20, 21, 22, 23,
+                    8, 9, 10, 11, 12, 13, 14, 15,
+                    0, 1, 2, 3, 4, 5, 6, 7
+                ]
+            );
+            const result5 = compareImageUtil.applyOrientation(src, 5);
+            assert.strictEqual(result5.width, 3);
+            assert.strictEqual(result5.height, 2);
+            assert.deepStrictEqual(
+                Array.from(result5.data),
+                [
+                    0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19,
+                    4, 5, 6, 7, 12, 13, 14, 15, 20, 21, 22, 23
+                ]
+            );
+            const result6 = compareImageUtil.applyOrientation(src, 6);
+            assert.strictEqual(result6.width, 3);
+            assert.strictEqual(result6.height, 2);
+            assert.deepStrictEqual(
+                Array.from(result6.data),
+                [
+                    16, 17, 18, 19, 8, 9, 10, 11, 0, 1, 2, 3,
+                    20, 21, 22, 23, 12, 13, 14, 15, 4, 5, 6, 7
+                ]
+            );
+            const result7 = compareImageUtil.applyOrientation(src, 7);
+            assert.strictEqual(result7.width, 3);
+            assert.strictEqual(result7.height, 2);
+            assert.deepStrictEqual(
+                Array.from(result7.data),
+                [
+                    20, 21, 22, 23, 12, 13, 14, 15, 4, 5, 6, 7,
+                    16, 17, 18, 19, 8, 9, 10, 11, 0, 1, 2, 3
+                ]
+            );
+            const result8 = compareImageUtil.applyOrientation(src, 8);
+            assert.strictEqual(result8.width, 3);
+            assert.strictEqual(result8.height, 2);
+            assert.deepStrictEqual(
+                Array.from(result8.data),
+                [
+                    4, 5, 6, 7, 12, 13, 14, 15, 20, 21, 22, 23,
+                    0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19
+                ]
+            );
+        });
+    });
 });
