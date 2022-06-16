@@ -710,5 +710,36 @@ describe('CompareImageUtil', () => {
                 ]
             );
         });
+
+        it('should deal with F32 format', () => {
+            const src = compareImageUtil.makeImage(2, 3, compareImageUtil.FORMAT_F32x1);
+            for (let i = 0; i < 6; ++i) {
+                src.data[i] = i;
+            }
+            const result1 = compareImageUtil.applyOrientation(src, 1);
+            assert.strictEqual(result1.width, 2);
+            assert.strictEqual(result1.height, 3);
+            assert.strictEqual(result1.channels, 1);
+            assert.deepStrictEqual(
+                Array.from(result1.data),
+                [0, 1, 2, 3, 4, 5]
+            );
+            const result2 = compareImageUtil.applyOrientation(src, 2);
+            assert.strictEqual(result2.width, 2);
+            assert.strictEqual(result2.height, 3);
+            assert.strictEqual(result2.channels, 1);
+            assert.deepStrictEqual(
+                Array.from(result2.data),
+                [1, 0, 3, 2, 5, 4]
+            );
+            const result3 = compareImageUtil.applyOrientation(src, 3);
+            assert.strictEqual(result3.width, 2);
+            assert.strictEqual(result3.height, 3);
+            assert.strictEqual(result3.channels, 1);
+            assert.deepStrictEqual(
+                Array.from(result3.data),
+                [5, 4, 3, 2, 1, 0]
+            );
+        });
     });
 });
