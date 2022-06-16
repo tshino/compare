@@ -518,6 +518,25 @@ describe('CompareImageUtil', () => {
                 ]
             );
         });
+
+        it('should deal with F32 format', () => {
+            const image1 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            for (let i = 0; i < 16; ++i) {
+                image1.data[i] = i;
+            }
+            const image2 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.copy(image2, image1);
+
+            assert.strictEqual(image2.width, 2);
+            assert.strictEqual(image2.height, 2);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    0, 1,
+                    4, 5
+                ],
+            );
+        });
     });
 
     describe('rotateCW', () => {
