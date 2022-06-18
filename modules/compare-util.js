@@ -14,7 +14,7 @@ const CompareUtil = function(window) {
   })();
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
-  var storageAvailable = function(type) {
+  const storageAvailable = function(type) {
     try {
       var storage = window[type], x = '__storage_test__';
       storage.setItem(x, x);
@@ -38,7 +38,7 @@ const CompareUtil = function(window) {
     }
   };
 
-  var drawImageAwareOfOrientation = function() {
+  const drawImageAwareOfOrientation = function() {
     return new Promise(function(resolve, reject) {
       var img = new Image();
       img.onload = function() {
@@ -59,7 +59,7 @@ const CompareUtil = function(window) {
     });
   };
 
-  var blobFromDataURI = function(dataURI, type) {
+  const blobFromDataURI = function(dataURI, type) {
     var parts = dataURI.split(',');
     type = type || parts[0].match(/:(.*?);/)[1];
     var str = atob(parts[1]);
@@ -71,14 +71,14 @@ const CompareUtil = function(window) {
     return new Blob([buffer], {type: type});
   };
 
-  var createObjectURL = function(blob) {
+  const createObjectURL = function(blob) {
     if (window.URL) {
       return window.URL.createObjectURL(blob);
     } else {
       return window.webkitURL.createObjectURL(blob);
     }
   };
-  var revokeObjectURL = function(url) {
+  const revokeObjectURL = function(url) {
     if (window.URL) {
       return window.URL.revokeObjectURL(url);
     } else {
@@ -86,8 +86,8 @@ const CompareUtil = function(window) {
     }
   };
 
-  var newWorker = function(relativePath) {
-    var newWorkerViaBlob = function(relativePath) {
+  const newWorker = function(relativePath) {
+    const newWorkerViaBlob = function(relativePath) {
       var baseURL = window.location.href.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
       var path = baseURL + relativePath;
       var array = [
@@ -110,7 +110,7 @@ const CompareUtil = function(window) {
     }
   };
 
-  var toggleFullscreen = function(element) {
+  const toggleFullscreen = function(element) {
     var fullscreen = document.fullscreenElement ||
                 document.webkitFullscreenElement ||
                 document.mozFullScreenElement ||
@@ -139,11 +139,11 @@ const CompareUtil = function(window) {
     }
   };
 
-  var clamp = function(num, lower, upper) {
+  const clamp = function(num, lower, upper) {
     return Math.max(lower, Math.min(upper, num));
   };
 
-  var calcGCD = function(a, b) {
+  const calcGCD = function(a, b) {
     var m = Math.max(a, b), n = Math.min(a, b);
     while (n > 0) {
       var r = m % n;
@@ -153,15 +153,15 @@ const CompareUtil = function(window) {
     return m;
   };
 
-  var addComma = function(num) {
+  const addComma = function(num) {
     return String(num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   };
 
-  var hyphenToMinus = function(str) {
+  const hyphenToMinus = function(str) {
     return String(str).replace(/\-/g, '\u2212');
   };
 
-  var toSignedFixed = function(num, digits) {
+  const toSignedFixed = function(num, digits) {
     digits = digits === undefined ? 0 : digits;
     var scale = Math.pow(10, digits);
     var intnum =  Math.round(num * scale);
@@ -169,7 +169,7 @@ const CompareUtil = function(window) {
     return sign + (Math.abs(intnum) / scale).toFixed(digits);
   };
 
-  var toPercent = function(num) {
+  const toPercent = function(num) {
     if (num === 0) return '0%';
     if (num === 1) return '100%';
     var digits =
@@ -189,7 +189,7 @@ const CompareUtil = function(window) {
   };
 
   var HexDigits = '0123456789ABCDEF';
-  var toHexTriplet = function(r, g, b) {
+  const toHexTriplet = function(r, g, b) {
     r = clamp(Math.round(r), 0, 255);
     g = clamp(Math.round(g), 0, 255);
     b = clamp(Math.round(b), 0, 255);
@@ -227,7 +227,7 @@ const CompareUtil = function(window) {
     [  0.5000, -0.4542, -0.0458 ]
   ]
   // RGB (sRGB) --> Linear RGB
-  var convertColorListRgbToLinear = function(rgbColorList) {
+  const convertColorListRgbToLinear = function(rgbColorList) {
     var colors = rgbColorList;
     var linearColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -243,7 +243,7 @@ const CompareUtil = function(window) {
     return linearColors;
   };
   // RGB (sRGB) --> xyY
-  var convertColorListRgbToXyy = function(rgbColorList) {
+  const convertColorListRgbToXyy = function(rgbColorList) {
     var colors = rgbColorList;
     var xyyColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -266,7 +266,7 @@ const CompareUtil = function(window) {
     return xyyColors;
   };
   // RGB --> HSV Cylinder
-  var convertRgbToHsvCylinder = function(r,g,b) {
+  const convertRgbToHsvCylinder = function(r,g,b) {
     var max = Math.max(r, g, b);
     var min = Math.min(r, g, b);
     var h = (
@@ -284,7 +284,7 @@ const CompareUtil = function(window) {
     return (x << 16) + (y << 8) + z;
   };
   // RGB --> HSV Cylinder
-  var convertColorListRgbToHsv = function(rgbColorList) {
+  const convertColorListRgbToHsv = function(rgbColorList) {
     var colors = rgbColorList;
     var hsvColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -297,7 +297,7 @@ const CompareUtil = function(window) {
     return hsvColors;
   };
   // RGB --> HSV Cylinder (Linear)
-  var convertColorListRgbToHsvLinear = function(rgbColorList) {
+  const convertColorListRgbToHsvLinear = function(rgbColorList) {
     var colors = rgbColorList;
     var hsvColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -313,7 +313,7 @@ const CompareUtil = function(window) {
     return hsvColors;
   };
   // RGB --> HSL Cylinder
-  var convertRgbToHslCylinder = function(r,g,b) {
+  const convertRgbToHslCylinder = function(r,g,b) {
     var max = Math.max(r, g, b);
     var min = Math.min(r, g, b);
     var h = (
@@ -331,7 +331,7 @@ const CompareUtil = function(window) {
     return (x << 16) + (y << 8) + z;
   };
   // RGB --> HSL Cylinder
-  var convertColorListRgbToHsl = function(rgbColorList) {
+  const convertColorListRgbToHsl = function(rgbColorList) {
     var colors = rgbColorList;
     var hslColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -344,7 +344,7 @@ const CompareUtil = function(window) {
     return hslColors;
   };
   // RGB --> HSL Cylinder (Linear)
-  var convertColorListRgbToHslLinear = function(rgbColorList) {
+  const convertColorListRgbToHslLinear = function(rgbColorList) {
     var colors = rgbColorList;
     var hslColors = new Uint32Array(colors.length);
     for (var k = 0; k < colors.length; k++) {
@@ -367,7 +367,7 @@ const CompareUtil = function(window) {
   // such as > 10MBytes takes unnecessary long execution time.
   // This binary view object provides O(1) random access of dataURI.
   //
-  var binaryFromDataURI = function(dataURI) {
+  const binaryFromDataURI = function(dataURI) {
     var offset = dataURI.indexOf(',') + 1;
     var isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
     var binary = null;
@@ -384,7 +384,7 @@ const CompareUtil = function(window) {
       len = binary.length;
     }
 
-    var read = function(addr) {
+    const read = function(addr) {
       if (addr >= len) {
         return null;
       }
@@ -398,16 +398,16 @@ const CompareUtil = function(window) {
         return binary.charCodeAt(addr);
       }
     };
-    var readBig16 = function(addr) {
+    const readBig16 = function(addr) {
       return read(addr) * 256 + read(addr + 1);
     };
-    var readLittle16 = function(addr) {
+    const readLittle16 = function(addr) {
       return read(addr) + read(addr + 1) * 256;
     };
-    var readBig32 = function(addr) {
+    const readBig32 = function(addr) {
       return readBig16(addr) * 65536 + readBig16(addr + 2);
     };
-    var readLittle32 = function(addr) {
+    const readLittle32 = function(addr) {
       return readLittle16(addr) + readLittle16(addr + 2) * 65536;
     };
 
@@ -421,7 +421,7 @@ const CompareUtil = function(window) {
     };
   };
 
-  var findPNGChunk = function(binary, callback) {
+  const findPNGChunk = function(binary, callback) {
     for (var p = 8; p + 8 <= binary.length; ) {
       var len = binary.big32(p);
       var chunk = binary.big32(p + 4);
@@ -432,14 +432,14 @@ const CompareUtil = function(window) {
     return null;
   };
 
-  var detectPNGChunk = function(binary, target, before) {
+  const detectPNGChunk = function(binary, target, before) {
     return findPNGChunk(binary, function(p, chunk) {
       if (chunk === target) { return p; }
       if (chunk === before) { return null; }
     });
   };
 
-  var findJPEGSegment = function(binary, callback) {
+  const findJPEGSegment = function(binary, callback) {
     for (var p = 0; p + 4 <= binary.length; ) {
       var m = binary.big16(p);
       if (m === 0xffda /* SOS */) { break; }
@@ -449,7 +449,7 @@ const CompareUtil = function(window) {
     }
     return null;
   };
-  var findAPPnSegment = function(binary, n, name, callback) {
+  const findAPPnSegment = function(binary, n, name, callback) {
     return findJPEGSegment(binary, function(p, marker) {
       if (marker === 0xffe0 + n && p + 4 + name.length <= binary.length) {
         var i = 0;
@@ -460,7 +460,7 @@ const CompareUtil = function(window) {
       }
     });
   };
-  var detectSOFnSegment = function(binary) {
+  const detectSOFnSegment = function(binary) {
     return findJPEGSegment(binary, function(p, marker) {
       if (0 <= [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15].indexOf(marker - 0xffc0) &&
           p + 10 <= binary.length) {
@@ -488,11 +488,11 @@ const CompareUtil = function(window) {
       }
     });
   };
-  var detectJFIFIdentifier = function(binary) {
+  const detectJFIFIdentifier = function(binary) {
     var name = [0x4a, 0x46, 0x49, 0x46, 0x00]; // JFIF\0
     return findAPPnSegment(binary, 0 /* APP0 */, name);
   };
-  var detectExifOrientation = function(binary) {
+  const detectExifOrientation = function(binary) {
     var name = [0x45, 0x78, 0x69, 0x66, 0x00]; // Exif\0
     return findAPPnSegment(binary, 1 /* APP1 */, name, function(p) {
       if (p + 20 > binary.length) { return null; }
@@ -508,11 +508,11 @@ const CompareUtil = function(window) {
       return null;
     });
   };
-  var detectMPFIdentifier = function(binary) {
+  const detectMPFIdentifier = function(binary) {
     var name = [0x4d, 0x50, 0x46, 0x00]; // MPF\0
     return findAPPnSegment(binary, 2 /* APP2 */, name);
   };
-  var detectAdobeIdentifier = function(binary) {
+  const detectAdobeIdentifier = function(binary) {
     var name = [0x41, 0x64, 0x6f, 0x62, 0x65]; // Adobe
     return findAPPnSegment(binary, 14 /* APP14 */, name, function(p) {
       if (p + 16 <= binary.length) {
@@ -523,7 +523,7 @@ const CompareUtil = function(window) {
     });
   };
 
-  var findWebPChunk = function(binary, target) {
+  const findWebPChunk = function(binary, target) {
     var offsets = [];
     for (var p = 12; p + 8 <= binary.length; ) {
       var chunk = binary.big32(p);
@@ -536,7 +536,7 @@ const CompareUtil = function(window) {
     return offsets;
   };
 
-  var calcMinMaxMean = function(list) {
+  const calcMinMaxMean = function(list) {
     if (list.length == 0) {
       return null;
     }
@@ -550,7 +550,7 @@ const CompareUtil = function(window) {
     var mean = sum / list.length;
     return { min: min, max: max, mean: mean };
   };
-  var findMeanByCadenceDetection = function(list, tolerance) {
+  const findMeanByCadenceDetection = function(list, tolerance) {
     var sum = 0, maxPeriod = Math.min(60, list.length >> 1);
     for (var i = 1; i <= maxPeriod; i++) {
       sum += list[i - 1];
@@ -575,7 +575,7 @@ const CompareUtil = function(window) {
     }
     return null;
   };
-  var findNearlyConstantValue = function(list, tolerance) {
+  const findNearlyConstantValue = function(list, tolerance) {
     if (list.length <= 1) {
       return null;
     }
@@ -592,7 +592,7 @@ const CompareUtil = function(window) {
     }
     return m.mean;
   };
-  var findApproxUniformFPS = function(delayList) {
+  const findApproxUniformFPS = function(delayList) {
     var uniformDelay = findNearlyConstantValue(delayList, 0.010 + 1e-7);
     if (uniformDelay !== null && 0 < uniformDelay) {
        return Math.round(10 / uniformDelay) / 10;
@@ -601,14 +601,14 @@ const CompareUtil = function(window) {
   };
 
   var formatReader = (function() {
-    var formatInfo = function(desc, color, anim) {
+    const formatInfo = function(desc, color, anim) {
       return {
         toString: function() { return desc; },
         color: color,
         anim: anim
       };
     };
-    var detectPNG = function(binary) {
+    const detectPNG = function(binary) {
       var desc = 'PNG';
       var color = null;
       var anim = undefined;
@@ -695,7 +695,7 @@ const CompareUtil = function(window) {
       }
       return formatInfo(desc, color, anim);
     };
-    var detectGIF = function(binary, magic, magic2) {
+    const detectGIF = function(binary, magic, magic2) {
       var desc = 'GIF';
       var color = null;
       var anim = undefined;
@@ -794,7 +794,7 @@ const CompareUtil = function(window) {
       color = color || 'unknown';
       return formatInfo(desc, color, anim);
     };
-    var detectBMP = function(binary, magic, magic2) {
+    const detectBMP = function(binary, magic, magic2) {
       // BMP
       var color = null;
       if (26 <= binary.length) {
@@ -804,7 +804,7 @@ const CompareUtil = function(window) {
         var bitCount = os2 ? binary.little16(24) : binary.little16(28);
         var compression = os2 ? 0 : binary.little32(30);
         var mask = [];
-        var calcMaskBits = function(mask) {
+        const calcMaskBits = function(mask) {
           var nlz = 0, ntz = 0, bit = 1;
           while (bit < mask && (mask & bit) === 0) {
             ntz += 1;
@@ -835,7 +835,7 @@ const CompareUtil = function(window) {
             ];
           }
         }
-        var makeRGBAMaskDesc = function(mask) {
+        const makeRGBAMaskDesc = function(mask) {
           var desc = '', bits = [], labels = ['R', 'G', 'B', 'A'];
           for (var i = 0; i < mask.length; i++) {
             if (0 < mask[i]) {
@@ -888,7 +888,7 @@ const CompareUtil = function(window) {
       color = color || 'unknown';
       return formatInfo('BMP', color);
     };
-    var detectJPEG = function(binary, magic, magic2) {
+    const detectJPEG = function(binary, magic, magic2) {
       // JPEG
       var desc = 'JPEG';
       var color = null;
@@ -905,14 +905,14 @@ const CompareUtil = function(window) {
       if (!color) {
         color = nf === 1 ? 'Grayscale 8' : nf === 3 ? 'YCbCr 8.8.8' : 'unknown';
       }
-      var samplingPattern = function(components) {
+      const samplingPattern = function(components) {
         var s = [];
         for (var i = 0; i < components.length; ++i) {
           s.push(components[i] + '=' + sof.samplingPattern[i]);
         }
         return s.join(' ');
       };
-      var sampling = function(s) {
+      const sampling = function(s) {
         if (!sof.coprime) {
           return s + '-variant ' + samplingPattern(['Y', 'Cb', 'Cr']);
         } else {
@@ -942,12 +942,12 @@ const CompareUtil = function(window) {
       //console.log(sof);
       return formatInfo(desc, color);
     };
-    var detectTIFF = function(binary, magic, magic2) {
+    const detectTIFF = function(binary, magic, magic2) {
       //console.log('TIFF');
       var color = null;
       var read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
       var read32 = magic === 0x4d4d002a ? binary.big32 : binary.little32;
-      var readIFDValue = function(type, count, offset) {
+      const readIFDValue = function(type, count, offset) {
         if (type < 1 || 5 < type) {
           return [];
         }
@@ -1011,7 +1011,7 @@ const CompareUtil = function(window) {
           }
           var alphaIndex = extraSamples.indexOf(1 /* Associated alpha data */);
           var maskIndex = extraSamples.indexOf(2 /* Unassociated alpha data */);
-          var makeAlphaNotation = function(baseName, baseIndices, withAlphaName) {
+          const makeAlphaNotation = function(baseName, baseIndices, withAlphaName) {
             //console.log('extraSamples', extraSamples);
             var numBaseSamples = baseIndices.length;
             var baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
@@ -1063,7 +1063,7 @@ const CompareUtil = function(window) {
       color = color || 'unknown';
       return formatInfo('TIFF', color);
     };
-    var readVP8ColorFormat = function(binary, offset, hasAlpha) {
+    const readVP8ColorFormat = function(binary, offset, hasAlpha) {
       offset += 3;
       // check start code '9D 01 2A'
       if (binary.length < offset + 3 ||
@@ -1084,7 +1084,7 @@ const CompareUtil = function(window) {
         return 'YCbCr 8.8.8 (12bpp 4:2:0)';
       }
     };
-    var readWebPLosslessColorFormat = function(binary, offset, hasAlpha) {
+    const readWebPLosslessColorFormat = function(binary, offset, hasAlpha) {
       // check signature
       if (binary.length < offset + 5 || binary.at(offset) !== 0x2F) {
         return 'unknown';
@@ -1101,7 +1101,7 @@ const CompareUtil = function(window) {
         return 'RGB 8.8.8 (24bpp)';
       }
     };
-    var detectWebP = function(binary) {
+    const detectWebP = function(binary) {
       var magic4 = binary.length < 16 ? 0 : binary.big32(12);
       var desc = 'WebP';
       var color = undefined;
@@ -1188,7 +1188,7 @@ const CompareUtil = function(window) {
       color = color || 'unknown';
       return formatInfo(desc, color, anim);
     };
-    var detectAVIF = function(binary, magic) {
+    const detectAVIF = function(binary, magic) {
       if (magic < 16) {
         return null;
       }
@@ -1210,7 +1210,7 @@ const CompareUtil = function(window) {
       }
       return null;
     };
-    var detectSVG = function(binary, magic, magic2) {
+    const detectSVG = function(binary, magic, magic2) {
       if ((magic === 0xefbbbf3c /* BOM + '<' */ &&
             magic2 === 0x3f786d6c /* '?xml' */) ||
         (magic === 0x3c3f786d /* '<?xm' */ &&
@@ -1241,7 +1241,7 @@ const CompareUtil = function(window) {
       detectSVG: detectSVG
     };
   })();
-  var detectImageFormat = function(binary) {
+  const detectImageFormat = function(binary) {
     var magic = binary.length < 4 ? 0 : binary.big32(0);
     var magic2 = binary.length < 8 ? 0 : binary.big32(4);
     var magic3 = binary.length < 12 ? 0 : binary.big32(8);
@@ -1287,22 +1287,22 @@ const CompareUtil = function(window) {
       7: { transposed: true,  transform: ' scale(-1,1) rotate(-90deg)' },
       8: { transposed: true,  transform: ' rotate(-90deg)' }
     };
-    var toString = function(orientation) {
+    const toString = function(orientation) {
       return orientation !== null ? (stringTable[orientation] || 'Invalid') : '‐';
     };
-    var isTransposed = function(orientation) {
+    const isTransposed = function(orientation) {
       var o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transposed;
     };
-    var getCSSTransform = function(orientation) {
+    const getCSSTransform = function(orientation) {
       var o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transform;
     };
-    var interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
+    const interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
       var w = canvasWidth - 1, h = canvasHeight - 1;
       return interpretXY2(orientation, w, h, x, y);
     };
-    var interpretXY2 = function(orientation, w, h, x, y) {
+    const interpretXY2 = function(orientation, w, h, x, y) {
       if (orientation === 2) { return { x: w-x, y: y };
       } else if (orientation === 3) { return { x: w-x, y: h-y };
       } else if (orientation === 4) { return { x: x, y: h-y };
@@ -1322,13 +1322,13 @@ const CompareUtil = function(window) {
     };
   })();
   var aspectRatioUtil = (function() {
-    var calcAspectRatio = function(w, h) {
+    const calcAspectRatio = function(w, h) {
       var gcd = calcGCD(w, h);
       w /= gcd;
       h /= gcd;
       return { w: w, h: h, ratio: w / h };
     };
-    var findApproxAspectRatio = function(exact) {
+    const findApproxAspectRatio = function(exact) {
       if (exact.w > 50 && exact.h > 50) {
         for (var i = 1; i <= 10; ++i) {
           var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
@@ -1343,10 +1343,10 @@ const CompareUtil = function(window) {
       }
       return null;
     };
-    var toString = function(ratio) {
+    const toString = function(ratio) {
       return addComma(ratio.w) + ':' + addComma(ratio.h);
     };
-    var makeInfo = function(w, h) {
+    const makeInfo = function(w, h) {
       var exact = calcAspectRatio(w, h);
       var approx = findApproxAspectRatio(exact);
       var desc = toString(exact);
@@ -1363,7 +1363,7 @@ const CompareUtil = function(window) {
       makeInfo: makeInfo
     };
   })();
-  var makeDurationInfo = function(formatInfo) {
+  const makeDurationInfo = function(formatInfo) {
     if (formatInfo && formatInfo.anim) {
       var num = formatInfo.anim.durationNum;
       var den = formatInfo.anim.durationDen;
@@ -1385,7 +1385,7 @@ const CompareUtil = function(window) {
     }
     return [null, '‐'];
   };
-  var makeFPSInfo = function(formatInfo, nonUniform) {
+  const makeFPSInfo = function(formatInfo, nonUniform) {
     if (formatInfo && formatInfo.anim) {
       var num = formatInfo.anim.fpsNum;
       var den = formatInfo.anim.fpsDen;
@@ -1412,20 +1412,20 @@ const CompareUtil = function(window) {
     }
     return [null, '‐'];
   };
-  var cursorKeyCodeToXY = function(keyCode, step) {
+  const cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
     var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
     var y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
     return { x: x, y: y };
   };
-  var calcInscribedRect = function(outerW, outerH, innerW, innerH) {
+  const calcInscribedRect = function(outerW, outerH, innerW, innerH) {
     var rect = {};
     var isLetterBox = outerW * innerH < outerH * innerW;
     rect.width = isLetterBox ? outerW : outerH * innerW / innerH;
     rect.height = isLetterBox ? outerW * innerH / innerW : outerH;
     return rect;
   };
-  var processKeyDownEvent = function(e, callback) {
+  const processKeyDownEvent = function(e, callback) {
     if (e.ctrlKey || e.altKey || e.metaKey) {
       return true;
     }
@@ -1450,7 +1450,7 @@ const CompareUtil = function(window) {
       }
     }
   };
-  var processWheelEvent = function(e, callback) {
+  const processWheelEvent = function(e, callback) {
     var event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
       return true;
@@ -1464,14 +1464,14 @@ const CompareUtil = function(window) {
       return false;
     }
   };
-  var makeTouchEventFilter = function() {
+  const makeTouchEventFilter = function() {
     var touchState = null;
     var tapPoint = null;
-    var resetState = function() {
+    const resetState = function() {
       touchState = null;
       tapPoint = null;
     };
-    var updateState = function(e, callback) {
+    const updateState = function(e, callback) {
       var event = e.originalEvent;
       if (event.touches.length === 1 || event.touches.length === 2) {
         var touches = Array.prototype.slice.call(event.touches);
@@ -1506,14 +1506,14 @@ const CompareUtil = function(window) {
         return false;
       }
     };
-    var onTouchStart = function(e) {
+    const onTouchStart = function(e) {
       return updateState(e, function(lastTouches, touches) {
         if (touches.length === 1) {
           tapPoint = touches[0];
         }
       });
     };
-    var onTouchMove = function(e, callback) {
+    const onTouchMove = function(e, callback) {
       return updateState(e, function(lastTouches, touches) {
         if (tapPoint) {
           if (touches.length !== 1 ||
@@ -1554,7 +1554,7 @@ const CompareUtil = function(window) {
         }
       });
     };
-    var onTouchEnd = function(e, callback) {
+    const onTouchEnd = function(e, callback) {
       if (touchState) {
         updateState(e);
         if (tapPoint && e.originalEvent.touches.length === 0) {
@@ -1574,7 +1574,7 @@ const CompareUtil = function(window) {
     };
   };
 
-  var makeZoomController = function(update, options) {
+  const makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
     var MAX_ZOOM_LEVEL    = 6.0;
     var ZOOM_STEP_KEY     = 0.25;
@@ -1604,32 +1604,32 @@ const CompareUtil = function(window) {
       resetDragState();
     };
     o.disable = function() { enabled = false; };
-    var setZoom = function(z) {
+    const setZoom = function(z) {
       o.zoom = z;
       o.scale = Math.round(Math.pow(2.0, z) * 100) / 100;
     };
-    var zoomRelative = function(delta) {
+    const zoomRelative = function(delta) {
       if (enabled) {
         setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
         update();
         return true;
       }
     };
-    var zoomIn = function() {
+    const zoomIn = function() {
       if (zoomOrigin) {
         return zoomRelativeToPoint(0, 0, +ZOOM_STEP_KEY, zoomOrigin);
       } else {
         return zoomRelative(+ZOOM_STEP_KEY);
       }
     };
-    var zoomOut = function() {
+    const zoomOut = function() {
       if (zoomOrigin) {
         return zoomRelativeToPoint(0, 0, -ZOOM_STEP_KEY, zoomOrigin);
       } else {
         return zoomRelative(-ZOOM_STEP_KEY);
       }
     };
-    var setOffset = function(x, y) {
+    const setOffset = function(x, y) {
       x = clamp(x, 0, 1);
       y = zoomXOnly ? 0.5 : clamp(y, 0, 1);
       if (o.offset.x !== x || o.offset.y !== y) {
@@ -1638,33 +1638,33 @@ const CompareUtil = function(window) {
         return true;
       }
     };
-    var getCenter = function() {
+    const getCenter = function() {
       return {
         x: (o.offset.x - 0.5) * (1 - 1 / o.scale),
         y: (o.offset.y - 0.5) * (1 - 1 / o.scale)
       };
     };
-    var moveRelativeWithoutUpdate = function(dx, dy) {
+    const moveRelativeWithoutUpdate = function(dx, dy) {
       if (1 < o.scale && enabled) {
         return setOffset(
                         o.offset.x + dx / (o.scale - 1),
                         o.offset.y + dy / (o.scale - 1));
       }
     };
-    var moveRelative = function(dx, dy) {
+    const moveRelative = function(dx, dy) {
       var result = moveRelativeWithoutUpdate(dx, dy);
       if (result) {
         update();
         return result;
       }
     };
-    var moveRelativePx = function(index, dx, dy) {
+    const moveRelativePx = function(index, dx, dy) {
       var base = getBaseSize(index);
       if (base) {
         moveRelative(-dx / base.w, -dy / base.h);
       }
     };
-    var zoomRelativeToPoint = function(dx, dy, delta, pos) {
+    const zoomRelativeToPoint = function(dx, dy, delta, pos) {
       if (enabled && pos) {
         if (dx !== 0 || dy !== 0) {
           moveRelativeWithoutUpdate(dx, dy);
@@ -1688,7 +1688,7 @@ const CompareUtil = function(window) {
         return true;
       }
     };
-    var zoomTo = function(x, y) {
+    const zoomTo = function(x, y) {
       if (!enabled) {
       } else if (o.zoom + ZOOM_STEP_DBLCLK < MAX_ZOOM_LEVEL) {
         setOffset(x, y);
@@ -1698,7 +1698,7 @@ const CompareUtil = function(window) {
         update();
       }
     };
-    var processKeyDown = function(e) {
+    const processKeyDown = function(e) {
       return processKeyDownEvent(e, {
         zoomIn: function() { if (zoomIn()) return false; },
         zoomOut: function() { if (zoomOut()) return false; },
@@ -1710,19 +1710,19 @@ const CompareUtil = function(window) {
         }
       });
     };
-    var setZoomOrigin = function(pos) {
+    const setZoomOrigin = function(pos) {
       zoomOrigin = pos;
     };
-    var resetZoomOrigin = function() {
+    const resetZoomOrigin = function() {
       zoomOrigin = null;
     };
-    var setPointCallback = function(callback) {
+    const setPointCallback = function(callback) {
       pointCallback = callback;
     };
-    var setDragStateCallback = function(callback) {
+    const setDragStateCallback = function(callback) {
       dragStateCallback = callback;
     };
-    var resetDragState = function() {
+    const resetDragState = function() {
       clickPoint = null;
       dragStartPoint = null;
       dragLastPoint = null;
@@ -1730,7 +1730,7 @@ const CompareUtil = function(window) {
         dragStateCallback(false, zoomXOnly);
       }
     };
-    var positionFromMouseEvent = function(e, target, index) {
+    const positionFromMouseEvent = function(e, target, index) {
       var base = getBaseSize(index);
       return base ? {
         index: index,
@@ -1740,13 +1740,13 @@ const CompareUtil = function(window) {
         baseH: base.h
       } : null;
     };
-    var processPointMouseDown = function(e, selector, target) {
+    const processPointMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index($(target).parent()) : null;
       if (e.which === 1) {
         clickPoint = positionFromMouseEvent(e, target, index);
       }
     };
-    var processMouseDown = function(e, selector, target) {
+    const processMouseDown = function(e, selector, target) {
       var index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
         var last = dragLastPoint;
@@ -1754,7 +1754,7 @@ const CompareUtil = function(window) {
         return false;
       }
     };
-    var processMouseMove = function(e, selector, target) {
+    const processMouseMove = function(e, selector, target) {
       if (dragLastPoint) {
         if (e.buttons !== 1) {
           resetDragState();
@@ -1778,13 +1778,13 @@ const CompareUtil = function(window) {
         }
       }
     };
-    var processMouseUp = function(e, selector, target) {
+    const processMouseUp = function(e, selector, target) {
       if (clickPoint && pointCallback) {
         pointCallback(clickPoint);
       }
       resetDragState();
     };
-    var processDblclick = function(e, selector, target) {
+    const processDblclick = function(e, selector, target) {
       var index = selector ? $(selector).index($(target).parent()) : null;
       var pos = positionFromMouseEvent(e, target, index);
       if (pos) {
@@ -1793,7 +1793,7 @@ const CompareUtil = function(window) {
       }
       return true;
     };
-    var processWheel = function(e, selector, relSelector, target) {
+    const processWheel = function(e, selector, relSelector, target) {
       return processWheelEvent(e, {
         zoom: function(steps) {
           if (zoomOrigin) {
@@ -1811,11 +1811,11 @@ const CompareUtil = function(window) {
         }
       });
     };
-    var resetTouchState = function() { touchFilter.resetState(); };
-    var processTouchStart = function(e) {
+    const resetTouchState = function() { touchFilter.resetState(); };
+    const processTouchStart = function(e) {
       return touchFilter.onTouchStart(e);
     };
-    var processTouchMove = function(e, selector, relSelector, target) {
+    const processTouchMove = function(e, selector, relSelector, target) {
       var index = selector ? $(selector).index(target) : null;
       var ret = touchFilter.onTouchMove(e, {
         move: function(dx, dy) {
@@ -1835,7 +1835,7 @@ const CompareUtil = function(window) {
         }
       });
     };
-    var processTouchEnd = function(e, selector, relSelector, target) {
+    const processTouchEnd = function(e, selector, relSelector, target) {
       return touchFilter.onTouchEnd(e, {
         pointClick: function(lastTouch) {
           if (pointCallback && relSelector) {
@@ -1847,7 +1847,7 @@ const CompareUtil = function(window) {
         }
       });
     };
-    var enableMouseAndTouch = function(root, filter, deepFilter, selector, relSelector) {
+    const enableMouseAndTouch = function(root, filter, deepFilter, selector, relSelector) {
       $(root).on('mousedown', deepFilter, function(e) {
         return processPointMouseDown(e, selector, this);
       });
@@ -1876,7 +1876,7 @@ const CompareUtil = function(window) {
         return processTouchEnd(e, selector, relSelector, this);
       });
     };
-    var makeTransform = function(index) {
+    const makeTransform = function(index) {
       var base = getBaseSize(index);
       var center = getCenter();
       return (
@@ -1910,27 +1910,27 @@ const CompareUtil = function(window) {
     o.makeTransform = makeTransform;
     return o;
   };
-  var makeRotationController = function(onrotate, onzoom, initialOrientation) {
+  const makeRotationController = function(onrotate, onzoom, initialOrientation) {
     initialOrientation = initialOrientation || { x: 30, y: -30 };
     var orientation = {
       x: initialOrientation.x,
       y: initialOrientation.y
     };
     var zoomLevel = 0.12;
-    var resetZoom = function() {
+    const resetZoom = function() {
       zoomLevel = 0.12;
     };
-    var getScale = function() {
+    const getScale = function() {
       return Math.round(Math.pow(2, zoomLevel) * 100) / 100;
     };
-    var rotate = function(dx, dy, scale) {
+    const rotate = function(dx, dy, scale) {
       orientation.x += dy * scale;
       orientation.y += dx * scale;
       orientation.x = clamp(orientation.x, -90, 90);
       orientation.y -= Math.floor(orientation.y / 360) * 360;
       onrotate();
     };
-    var zoom = function(delta) {
+    const zoom = function(delta) {
       var MAX_ZOOM_LEVEL = 6;
       zoomLevel = clamp(zoomLevel + delta, 0, MAX_ZOOM_LEVEL);
       onzoom();
@@ -1943,8 +1943,8 @@ const CompareUtil = function(window) {
       zoom: zoom
     };
   };
-  var makeRotationInputFilter = function(controller) {
-    var processKeyDown = function(e) {
+  const makeRotationInputFilter = function(controller) {
+    const processKeyDown = function(e) {
       return processKeyDownEvent(e, {
         zoomIn: function() { controller.zoom(0.25); return false; },
         zoomOut: function() { controller.zoom(-0.25); return false; },
@@ -1958,10 +1958,10 @@ const CompareUtil = function(window) {
     };
     var dragState = null;
     var dragStateCallback = null;
-    var setDragStateCallback = function(callback) {
+    const setDragStateCallback = function(callback) {
       dragStateCallback = callback;
     };
-    var processMouseDown = function(e) {
+    const processMouseDown = function(e) {
       if (e.which === 1) {
         dragState = { x: e.clientX, y: e.clientY };
         if (dragStateCallback) {
@@ -1970,7 +1970,7 @@ const CompareUtil = function(window) {
         return false;
       }
     };
-    var processMouseMove = function(e) {
+    const processMouseMove = function(e) {
       if (dragState) {
         if (e.buttons !== 1) {
           dragState = null;
@@ -1986,7 +1986,7 @@ const CompareUtil = function(window) {
         }
       }
     };
-    var processMouseUp = function(e) {
+    const processMouseUp = function(e) {
       if (dragState) {
         dragState = null;
         if (dragStateCallback) {
@@ -1994,7 +1994,7 @@ const CompareUtil = function(window) {
         }
       }
     };
-    var processWheel = function(e) {
+    const processWheel = function(e) {
       return processWheelEvent(e, {
         zoom: function(steps) {
           var ZOOM_STEP_WHEEL = 0.0625;
@@ -2003,16 +2003,16 @@ const CompareUtil = function(window) {
       });
     };
     var touchFilter = makeTouchEventFilter();
-    var processTouchMove = function(e) {
+    const processTouchMove = function(e) {
       return touchFilter.onTouchMove(e, {
         move: function(dx, dy) { controller.rotate(dx, dy, 0.3); },
         zoom: function(dx, dy, delta) { controller.zoom(delta); }
       });
     };
-    var processTouchEnd = function(e) {
+    const processTouchEnd = function(e) {
       touchFilter.resetState();
     };
-    var enableMouseAndTouch = function(root, filter, deepFilter) {
+    const enableMouseAndTouch = function(root, filter, deepFilter) {
       $(root).on('mousedown', deepFilter, processMouseDown);
       $(root).on('mousemove', filter, processMouseMove);
       $(root).on('mouseup', filter, processMouseUp);
@@ -2027,7 +2027,7 @@ const CompareUtil = function(window) {
     };
   };
   var vertexUtil = (function() {
-    var makeCube = function(sx, sy, sz) {
+    const makeCube = function(sx, sy, sz) {
       var v = [];
       var cx = sx / 2, cy = sy / 2, cz = sz / 2;
       for (var i = 0; i < 18; ++i) {
@@ -2043,7 +2043,7 @@ const CompareUtil = function(window) {
       [0, 12, 13, 1, 0], [4, 5, 17, 16, 4],
       [0, 4, 16, 12, 0], [1, 13, 17, 5, 1]
     ];
-    var make3DCylinder = function(r, sz) {
+    const make3DCylinder = function(r, sz) {
       var v = [], cz = sz / 2;
       for (var i = 0; i < 36; ++i) {
         var a = i / 18 * Math.PI;
@@ -2063,12 +2063,12 @@ const CompareUtil = function(window) {
       }
       return faces;
     })();
-    var getRightMostVertexOfCylinder = function(rotation) {
+    const getRightMostVertexOfCylinder = function(rotation) {
       var yaw10 = Math.round(rotation.yaw / 10);
       var index = 36 * Math.ceil(yaw10 / 36) - yaw10;
       return index;
     };
-    var makeCylinderSideFaces = function(rotation) {
+    const makeCylinderSideFaces = function(rotation) {
       var index = getRightMostVertexOfCylinder(rotation);
       var faces = [[], []];
       for (var i = 0; i <= 18; ++i) {
@@ -2077,14 +2077,14 @@ const CompareUtil = function(window) {
       }
       return faces;
     };
-    var makeCylinderFaces = function(rotation) {
+    const makeCylinderFaces = function(rotation) {
       var side = makeCylinderSideFaces(rotation);
       return cylinderTopAndBottomFaces.concat(side);
     };
     var cylinderDarkLines = [
       [72, 0, 1, 73, 25, 24, 72, 48, 49, 73, 72]
     ];
-    var makeCylinderContour = function(rotation) {
+    const makeCylinderContour = function(rotation) {
       var index = getRightMostVertexOfCylinder(rotation);
       return [
         [index * 2, index * 2 + 1],
@@ -2101,7 +2101,7 @@ const CompareUtil = function(window) {
     };
   })();
   var rotationUtil = (function() {
-    var isFrontFace = function(v2d, face) {
+    const isFrontFace = function(v2d, face) {
       var a = v2d[face[0]];
       var b = v2d[face[1]];
       var c = v2d[face[2]];
@@ -2109,7 +2109,7 @@ const CompareUtil = function(window) {
       var acx = c[0] - a[0], acy = c[1] - a[1];
       return abx * acy < aby * acx;
     };
-    var splitIntoFrontAndBackFaces = function(vertices2D, faces) {
+    const splitIntoFrontAndBackFaces = function(vertices2D, faces) {
       var frontFaces = [], backFaces = [];
       faces.forEach(function(face) {
         if (isFrontFace(vertices2D, face)) {
@@ -2125,7 +2125,7 @@ const CompareUtil = function(window) {
       splitIntoFrontAndBackFaces
     };
   })();
-  var makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
+  const makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
     var pitch = Math.round(orientation.x);
     var yaw = Math.round(orientation.y);
     var ax = pitch * (Math.PI / 180);
@@ -2139,13 +2139,13 @@ const CompareUtil = function(window) {
     var xr = sr * cos_ay, yr = -sr * sin_ay * sin_ax;
     var xg = -sg * sin_ay, yg = -sg * cos_ay * sin_ax;
     var yb = -sb * cos_ax;
-    var pos3DTo2D = function(x, y, z) {
+    const pos3DTo2D = function(x, y, z) {
       return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
     };
-    var vec3DTo2D = function(x, y, z) {
+    const vec3DTo2D = function(x, y, z) {
       return [ xr * x + xg * y, yr * x + yg * y + yb * z ];
     };
-    var vertices3DTo2D = function(v) {
+    const vertices3DTo2D = function(v) {
       return v.map(function(pos) {
         return pos3DTo2D(pos[0], pos[1], pos[2]);
       });
@@ -2158,11 +2158,11 @@ const CompareUtil = function(window) {
       vertices3DTo2D
     };
   };
-  var makeTaskQueue = function(workerPath, processResult) {
+  const makeTaskQueue = function(workerPath, processResult) {
     var worker = newWorker(workerPath);
     var taskCount = 0;
     var taskQueue = [];
-    var kickNextTask = function() {
+    const kickNextTask = function() {
       if (taskCount === 0 && 0 < taskQueue.length) {
         var task = taskQueue.shift();
         if (task.prepare && false === task.prepare(task.data)) {
@@ -2172,12 +2172,12 @@ const CompareUtil = function(window) {
         ++taskCount;
       }
     };
-    var addTask = function(data, prepare) {
+    const addTask = function(data, prepare) {
       var task = { data: data, prepare: prepare };
       taskQueue.push(task);
       window.setTimeout(kickNextTask, 0);
     };
-    var discardTasksOf = function(pred) {
+    const discardTasksOf = function(pred) {
       taskQueue = taskQueue.filter(function(task,i,a) { return !pred(task); });
     };
     worker.addEventListener('message', function(e) {
