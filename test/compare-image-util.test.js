@@ -761,4 +761,92 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('readSubPixel', () => {
+        it('should read pixel values in a ROI with subpixel coordinate', () => {
+            const checkFloatResult = function (name, result, expected) {
+                assert.strictEqual(result.width, 4, 'width of ' + name);
+                assert.strictEqual(result.height, 4, 'height of ' + name);
+                assert.strictEqual(result.channels, 1, 'channels of ' + name);
+                assert.strictEqual(result.format, compareImageUtil.FORMAT_F32x1, 'format of ' + name);
+                assert.strictEqual(result.data.length, 16, 'data.length of ' + name);
+                for (let i = 0; i < 16; ++i) {
+                    const label = (i + 1) + 'th pixel value of ' + name;
+                    assert.ok(1e-5 > Math.abs(expected[i] - result.data[i]), label);
+                }
+            };
+            const image1 = compareImageUtil.makeImage(4, 4);
+            const imageF = compareImageUtil.makeImage({
+                width: 4, height: 4, data: [
+                    55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+                ], channels: 1
+            });
+            compareImageUtil.fill(image1, 55, 55, 55, 255);
+            const expected1 = [
+                55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ];
+
+            const result1 = compareImageUtil.readSubPixel(image1, 0, 0, 4, 4);
+            checkFloatResult('result1', result1, expected1);
+            const result2 = compareImageUtil.readSubPixel(image1, 0.3, 0.3, 4, 4);
+            checkFloatResult('result2', result2, expected1);
+            const result3 = compareImageUtil.readSubPixel(image1, -1.7, -1.5, 4, 4);
+            checkFloatResult('result3', result3, expected1);
+
+            const result1F = compareImageUtil.readSubPixel(imageF, 0, 0, 4, 4);
+            checkFloatResult('result1F', result1F, expected1);
+            const result2F = compareImageUtil.readSubPixel(imageF, 0.3, 0.3, 4, 4);
+            checkFloatResult('result2F', result2F, expected1);
+            const result3F = compareImageUtil.readSubPixel(imageF, -1.7, -1.5, 4, 4);
+            checkFloatResult('result3F', result3F, expected1);
+
+            image1.data[0] = 11;
+            image1.data[4] = 11;
+            image1.data[16] = 11;
+            const result4 = compareImageUtil.readSubPixel(image1, 0, 0, 4, 4);
+            checkFloatResult('result4', result4, [
+                11, 11, 55, 55, 11, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result5 = compareImageUtil.readSubPixel(image1, 0.5, 0.5, 4, 4);
+            checkFloatResult('result5', result5, [
+                22, 44, 55, 55, 44, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result6 = compareImageUtil.readSubPixel(image1, -0.5, -0.5, 4, 4);
+            checkFloatResult('result6', result6, [
+                11, 11, 33, 55, 11, 22, 44, 55, 33, 44, 55, 55, 55, 55, 55, 55
+            ]);
+            const result7 = compareImageUtil.readSubPixel(image1, 0.1, 0, 4, 4);
+            checkFloatResult('result7', result7, [
+                11, 15.4, 55, 55, 15.4, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result8 = compareImageUtil.readSubPixel(image1, 0, 0.2, 4, 4);
+            checkFloatResult('result8', result8, [
+                11, 19.8, 55, 55, 19.8, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+
+            imageF.data[0] = 11;
+            imageF.data[1] = 11;
+            imageF.data[4] = 11;
+            const result4F = compareImageUtil.readSubPixel(imageF, 0, 0, 4, 4);
+            checkFloatResult('result4F', result4F, [
+                11, 11, 55, 55, 11, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result5F = compareImageUtil.readSubPixel(imageF, 0.5, 0.5, 4, 4);
+            checkFloatResult('result5F', result5F, [
+                22, 44, 55, 55, 44, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result6F = compareImageUtil.readSubPixel(imageF, -0.5, -0.5, 4, 4);
+            checkFloatResult('result6F', result6F, [
+                11, 11, 33, 55, 11, 22, 44, 55, 33, 44, 55, 55, 55, 55, 55, 55
+            ]);
+            const result7F = compareImageUtil.readSubPixel(imageF, 0.1, 0, 4, 4);
+            checkFloatResult('result7F', result7F, [
+                11, 15.4, 55, 55, 15.4, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+            const result8F = compareImageUtil.readSubPixel(imageF, 0, 0.2, 4, 4);
+            checkFloatResult('result8F', result8F, [
+                11, 19.8, 55, 55, 19.8, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55
+            ]);
+        });
+    });
 });
