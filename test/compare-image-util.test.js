@@ -849,4 +849,73 @@ describe('CompareImageUtil', () => {
             ]);
         });
     });
+
+    describe('convertToGrayscale', () => {
+        it('should convert an image to grayscale', () => {
+            const checkGrayscaleResult = function (name, result, expected) {
+                for (let i = 0; i < 16; ++i) {
+                    const label = (i + 1) + 'th pixel of ' + name;
+                    assert.strictEqual(result.data[i * 4 + 0], expected[i * 2], label);
+                    assert.strictEqual(result.data[i * 4 + 1], expected[i * 2], label);
+                    assert.strictEqual(result.data[i * 4 + 2], expected[i * 2], label);
+                    assert.strictEqual(result.data[i * 4 + 3], expected[i * 2 + 1], label + ' (alpha)');
+                }
+            };
+            const checkGrayscaleResultF32 = function (name, result, expected) {
+                for (let i = 0; i < 16; ++i) {
+                    const label = (i + 1) + 'th pixel of ' + name;
+                    assert.ok(1e-4 > Math.abs(expected[i] - result.data[i]), label);
+                }
+            };
+            const imageData = {
+                width: 4, height: 4, data: [
+                    0, 0, 0, 255, 85, 85, 85, 255, 170, 170, 170, 255, 255, 255, 255, 255,
+                    255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 128, 128, 128, 255,
+                    0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 255,
+                    80, 80, 80, 0, 80, 80, 80, 85, 80, 80, 80, 170, 80, 80, 80, 255
+                ]
+            };
+            const image1 = compareImageUtil.makeImage(imageData);
+            // RGBA ==> RGBA
+            const result1 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.fill(result1, 0, 0, 0, 0);
+            compareImageUtil.convertToGrayscale(result1, image1);
+            checkGrayscaleResult('result1', result1, [
+                0, 255, 85, 255, 170, 255, 255, 255,
+                76, 255, 150, 255, 29, 255, 128, 255,
+                179, 255, 105, 255, 226, 255, 255, 255,
+                80, 0, 80, 85, 80, 170, 80, 255
+            ]);
+            // RGBA ==> Y (F32)
+            const result2 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            //compareImageUtil.fill(result1, 0, 0, 0, 0);
+            compareImageUtil.convertToGrayscale(result2, image1);
+            checkGrayscaleResultF32('result2', result2, [
+                0, 85, 170, 255,
+                76.2450, 149.6850, 29.0700, 128,
+                178.7550, 105.3150, 225.9300, 255,
+                0, 26.6667, 53.3333, 80
+            ]);
+            // Y (F32) ==> RGBA
+            const result3 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.fill(result3, 0, 0, 0, 0);
+            compareImageUtil.convertToGrayscale(result3, result2);
+            checkGrayscaleResult('result3', result3, [
+                0, 255, 85, 255, 170, 255, 255, 255,
+                76, 255, 150, 255, 29, 255, 128, 255,
+                179, 255, 105, 255, 226, 255, 255, 255,
+                0, 255, 27, 255, 53, 255, 80, 255
+            ]);
+            // Y (F32) ==> Y (F32)
+            const result4 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            //compareImageUtil.fill(result1, 0, 0, 0, 0);
+            compareImageUtil.convertToGrayscale(result4, result2);
+            checkGrayscaleResultF32('result4', result4, [
+                0, 85, 170, 255,
+                76.2450, 149.6850, 29.0700, 128,
+                178.7550, 105.3150, 225.9300, 255,
+                0, 26.6667, 53.3333, 80
+            ]);
+        });
+    });
 });
