@@ -1,8 +1,8 @@
 ﻿'use strict';
 const CompareUtil = function(window) {
 
-  var browserName = (function() {
-    var ua = window.navigator.userAgent.toLowerCase();
+  const browserName = (function() {
+    const ua = window.navigator.userAgent.toLowerCase();
     return (
       (0 <= ua.indexOf('msie') || 0 <= ua.indexOf('trident')) ? 'msie' :
       0 <= ua.indexOf('edge') ? 'edge' :
@@ -16,7 +16,7 @@ const CompareUtil = function(window) {
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   const storageAvailable = function(type) {
     try {
-      var storage = window[type], x = '__storage_test__';
+      const storage = window[type], x = '__storage_test__';
       storage.setItem(x, x);
       storage.removeItem(x);
       return true;
@@ -40,14 +40,14 @@ const CompareUtil = function(window) {
 
   const drawImageAwareOfOrientation = function() {
     return new Promise(function(resolve, reject) {
-      var img = new Image();
+      const img = new Image();
       img.onload = function() {
-        var canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas');
         canvas.width = 2;
         canvas.height = 2;
-        var context = canvas.getContext('2d');
+        const context = canvas.getContext('2d');
         context.drawImage(img, 0, 0);
-        var imageData = context.getImageData(0, 0, 2, 2);
+        const imageData = context.getImageData(0, 0, 2, 2);
         resolve(imageData.data[4] == 0);
       };
       img.onerror = reject;
@@ -60,11 +60,11 @@ const CompareUtil = function(window) {
   };
 
   const blobFromDataURI = function(dataURI, type) {
-    var parts = dataURI.split(',');
+    const parts = dataURI.split(',');
     type = type || parts[0].match(/:(.*?);/)[1];
-    var str = atob(parts[1]);
-    var n = str.length;
-    var buffer = new Uint8Array(n);
+    const str = atob(parts[1]);
+    let n = str.length;
+    const buffer = new Uint8Array(n);
     while(n--) {
       buffer[n] = str.charCodeAt(n);
     }
@@ -88,14 +88,14 @@ const CompareUtil = function(window) {
 
   const newWorker = function(relativePath) {
     const newWorkerViaBlob = function(relativePath) {
-      var baseURL = window.location.href.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
-      var path = baseURL + relativePath;
-      var array = [
+      const baseURL = window.location.href.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
+      const path = baseURL + relativePath;
+      const array = [
         'var workerLocation = "' + path + '";' +
         'importScripts("' + path + '");'
       ];
-      var blob = new Blob(array, {type: 'text/javascript'});
-      var url = createObjectURL(blob);
+      const blob = new Blob(array, {type: 'text/javascript'});
+      const url = createObjectURL(blob);
       return new Worker(url);
     };
     try {
@@ -111,12 +111,12 @@ const CompareUtil = function(window) {
   };
 
   const toggleFullscreen = function(element) {
-    var fullscreen = document.fullscreenElement ||
+    const fullscreen = document.fullscreenElement ||
                 document.webkitFullscreenElement ||
                 document.mozFullScreenElement ||
                 document.msFullscreenElement;
     if (!fullscreen) {
-      var view = element;
+      const view = element;
       if (view.webkitRequestFullscreen) {
         view.webkitRequestFullscreen();
       } else if (view.mozRequestFullScreen) {
@@ -144,9 +144,9 @@ const CompareUtil = function(window) {
   };
 
   const calcGCD = function(a, b) {
-    var m = Math.max(a, b), n = Math.min(a, b);
+    let m = Math.max(a, b), n = Math.min(a, b);
     while (n > 0) {
-      var r = m % n;
+      const r = m % n;
       m = n;
       n = r;
     }
@@ -163,16 +163,16 @@ const CompareUtil = function(window) {
 
   const toSignedFixed = function(num, digits) {
     digits = digits === undefined ? 0 : digits;
-    var scale = Math.pow(10, digits);
-    var intnum =  Math.round(num * scale);
-    var sign = 0 < intnum ? '+' : 0 > intnum ? '\u2212' : '';
+    const scale = Math.pow(10, digits);
+    const intnum =  Math.round(num * scale);
+    const sign = 0 < intnum ? '+' : 0 > intnum ? '\u2212' : '';
     return sign + (Math.abs(intnum) / scale).toFixed(digits);
   };
 
   const toPercent = function(num) {
     if (num === 0) return '0%';
     if (num === 1) return '100%';
-    var digits =
+    const digits =
             num < 0.000001 ? 7 :
             num < 0.00001 ? 6 :
             num < 0.0001 ? 5 :
@@ -188,7 +188,7 @@ const CompareUtil = function(window) {
     return (num * 100).toFixed(digits) + '%';
   };
 
-  var HexDigits = '0123456789ABCDEF';
+  const HexDigits = '0123456789ABCDEF';
   const toHexTriplet = function(r, g, b) {
     r = clamp(Math.round(r), 0, 255);
     g = clamp(Math.round(g), 0, 255);
@@ -198,163 +198,163 @@ const CompareUtil = function(window) {
         HexDigits[g >> 4] + HexDigits[g % 16] +
         HexDigits[b >> 4] + HexDigits[b % 16];
   };
-  var srgb255ToLinear255 = (function() {
-    var srgb255ToLinear255 = new Float32Array(256);
-    for (var i = 0; i < 256; ++i) {
-      var c = i / 255;
-      var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  const srgb255ToLinear255 = (function() {
+    const srgb255ToLinear255 = new Float32Array(256);
+    for (let i = 0; i < 256; ++i) {
+      const c = i / 255;
+      const linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       srgb255ToLinear255[i] = linear * 255;
     }
     return srgb255ToLinear255;
   })();
-  var srgb255ToLinear8 = (function() {
-    var srgb255ToLinear8 = new Uint8Array(256);
-    for (var i = 0; i < 256; ++i) {
+  const srgb255ToLinear8 = (function() {
+    const srgb255ToLinear8 = new Uint8Array(256);
+    for (let i = 0; i < 256; ++i) {
       srgb255ToLinear8[i] = Math.round(srgb255ToLinear255[i]);
     }
     return srgb255ToLinear8;
   })();
   // BT.601: R'G'B' --> Y'CbCr
-  var colorMatrixBT601 = [
+  const colorMatrixBT601 = [
     [  0.2990,  0.5870,  0.1140 ],
     [ -0.1687, -0.3313,  0.5000 ],
     [  0.5000, -0.4187, -0.0813 ]
   ];
   // BT.709: R'G'B' --> Y'CbCr
-  var colorMatrixBT709 = [
+  const colorMatrixBT709 = [
     [  0.2126,  0.7152,  0.0722 ],
     [ -0.1146, -0.3854,  0.5000 ],
     [  0.5000, -0.4542, -0.0458 ]
   ]
   // RGB (sRGB) --> Linear RGB
   const convertColorListRgbToLinear = function(rgbColorList) {
-    var colors = rgbColorList;
-    var linearColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
-      var linr = srgb255ToLinear8[r];
-      var ling = srgb255ToLinear8[g];
-      var linb = srgb255ToLinear8[b];
+    const colors = rgbColorList;
+    const linearColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
+      const linr = srgb255ToLinear8[r];
+      const ling = srgb255ToLinear8[g];
+      const linb = srgb255ToLinear8[b];
       linearColors[k] = (linr << 16) + (ling << 8) + linb;
     }
     return linearColors;
   };
   // RGB (sRGB) --> xyY
   const convertColorListRgbToXyy = function(rgbColorList) {
-    var colors = rgbColorList;
-    var xyyColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
-      var linr = srgb255ToLinear255[r];
-      var ling = srgb255ToLinear255[g];
-      var linb = srgb255ToLinear255[b];
-      var capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
-      var capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
-      var capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
-      var xyz = capX + capY + capZ;
-      var x8 = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255 * 1.5);
-      var y8 = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255 * 1.5);
-      var capY8 = Math.round(capY);
+    const colors = rgbColorList;
+    const xyyColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
+      const linr = srgb255ToLinear255[r];
+      const ling = srgb255ToLinear255[g];
+      const linb = srgb255ToLinear255[b];
+      const capX = 0.4124564 * linr + 0.3575761 * ling + 0.1804375 * linb;
+      const capY = 0.2126729 * linr + 0.7151522 * ling + 0.0721750 * linb;
+      const capZ = 0.0193339 * linr + 0.1191920 * ling + 0.9503041 * linb;
+      const xyz = capX + capY + capZ;
+      const x8 = Math.round((xyz === 0 ? 0.3127 : capX / xyz) * 255 * 1.5);
+      const y8 = Math.round((xyz === 0 ? 0.3290 : capY / xyz) * 255 * 1.5);
+      const capY8 = Math.round(capY);
       xyyColors[k] = (x8 << 16) + (y8 << 8) + capY8;
     }
     return xyyColors;
   };
   // RGB --> HSV Cylinder
   const convertRgbToHsvCylinder = function(r,g,b) {
-    var max = Math.max(r, g, b);
-    var min = Math.min(r, g, b);
-    var h = (
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const h = (
       min === max ? 0 :
       max === r ? 60 * (g - b) / (max - min) :
       max === g ? 60 * (2 + (b - r) / (max - min)) :
       60 * (4 + (r - g) / (max - min))
     );
-    var s = max === 0 ? 0 : (max - min) / max;
-    var v = max;
-    var radH = h * (Math.PI / 180);
-    var x = Math.round(127.5 * (1 + Math.cos(radH) * s));
-    var y = Math.round(127.5 * (1 + Math.sin(radH) * s));
-    var z = Math.round(v);
+    const s = max === 0 ? 0 : (max - min) / max;
+    const v = max;
+    const radH = h * (Math.PI / 180);
+    const x = Math.round(127.5 * (1 + Math.cos(radH) * s));
+    const y = Math.round(127.5 * (1 + Math.sin(radH) * s));
+    const z = Math.round(v);
     return (x << 16) + (y << 8) + z;
   };
   // RGB --> HSV Cylinder
   const convertColorListRgbToHsv = function(rgbColorList) {
-    var colors = rgbColorList;
-    var hsvColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
+    const colors = rgbColorList;
+    const hsvColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
       hsvColors[k] = convertRgbToHsvCylinder(r, g, b);
     }
     return hsvColors;
   };
   // RGB --> HSV Cylinder (Linear)
   const convertColorListRgbToHsvLinear = function(rgbColorList) {
-    var colors = rgbColorList;
-    var hsvColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
-      var linr = srgb255ToLinear255[r];
-      var ling = srgb255ToLinear255[g];
-      var linb = srgb255ToLinear255[b];
+    const colors = rgbColorList;
+    const hsvColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
+      const linr = srgb255ToLinear255[r];
+      const ling = srgb255ToLinear255[g];
+      const linb = srgb255ToLinear255[b];
       hsvColors[k] = convertRgbToHsvCylinder(linr, ling, linb);
     }
     return hsvColors;
   };
   // RGB --> HSL Cylinder
   const convertRgbToHslCylinder = function(r,g,b) {
-    var max = Math.max(r, g, b);
-    var min = Math.min(r, g, b);
-    var h = (
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const h = (
       min === max ? 0 :
       max === r ? 60 * (g - b) / (max - min) :
       max === g ? 60 * (2 + (b - r) / (max - min)) :
       60 * (4 + (r - g) / (max - min))
     );
-    var l = (max + min) / 2;
-    var s = (l === 0 || l === 255) ? 0 : (max - min) / (255 - Math.abs(2 * l - 255));
-    var radH = h * (Math.PI / 180);
-    var x = Math.round(127.5 * (1 + Math.cos(radH) * s));
-    var y = Math.round(127.5 * (1 + Math.sin(radH) * s));
-    var z = Math.round(l);
+    const l = (max + min) / 2;
+    const s = (l === 0 || l === 255) ? 0 : (max - min) / (255 - Math.abs(2 * l - 255));
+    const radH = h * (Math.PI / 180);
+    const x = Math.round(127.5 * (1 + Math.cos(radH) * s));
+    const y = Math.round(127.5 * (1 + Math.sin(radH) * s));
+    const z = Math.round(l);
     return (x << 16) + (y << 8) + z;
   };
   // RGB --> HSL Cylinder
   const convertColorListRgbToHsl = function(rgbColorList) {
-    var colors = rgbColorList;
-    var hslColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
+    const colors = rgbColorList;
+    const hslColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
       hslColors[k] = convertRgbToHslCylinder(r, g, b);
     }
     return hslColors;
   };
   // RGB --> HSL Cylinder (Linear)
   const convertColorListRgbToHslLinear = function(rgbColorList) {
-    var colors = rgbColorList;
-    var hslColors = new Uint32Array(colors.length);
-    for (var k = 0; k < colors.length; k++) {
-      var rgb = colors[k];
-      var r = rgb >> 16;
-      var g = (rgb >> 8) & 255;
-      var b = rgb & 255;
-      var linr = srgb255ToLinear255[r];
-      var ling = srgb255ToLinear255[g];
-      var linb = srgb255ToLinear255[b];
+    const colors = rgbColorList;
+    const hslColors = new Uint32Array(colors.length);
+    for (let k = 0; k < colors.length; k++) {
+      const rgb = colors[k];
+      const r = rgb >> 16;
+      const g = (rgb >> 8) & 255;
+      const b = rgb & 255;
+      const linr = srgb255ToLinear255[r];
+      const ling = srgb255ToLinear255[g];
+      const linb = srgb255ToLinear255[b];
       hslColors[k] = convertRgbToHslCylinder(linr, ling, linb);
     }
     return hslColors;
@@ -368,10 +368,10 @@ const CompareUtil = function(window) {
   // This binary view object provides O(1) random access of dataURI.
   //
   const binaryFromDataURI = function(dataURI) {
-    var offset = dataURI.indexOf(',') + 1;
-    var isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
-    var binary = null;
-    var len;
+    const offset = dataURI.indexOf(',') + 1;
+    const isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
+    let binary = null;
+    let len;
 
     if (isBase64) {
       len = (dataURI.length - offset) / 4 * 3;
@@ -389,10 +389,10 @@ const CompareUtil = function(window) {
         return null;
       }
       if (isBase64) {
-        var mod = addr % 3;
-        var pos = (addr - mod) / 3 * 4;
-        var bytes = atob(dataURI.slice(offset + pos, offset + pos + 4));
-        var ret = bytes.charCodeAt(mod);
+        const mod = addr % 3;
+        const pos = (addr - mod) / 3 * 4;
+        const bytes = atob(dataURI.slice(offset + pos, offset + pos + 4));
+        const ret = bytes.charCodeAt(mod);
         return ret;
       } else {
         return binary.charCodeAt(addr);
@@ -422,10 +422,10 @@ const CompareUtil = function(window) {
   };
 
   const findPNGChunk = function(binary, callback) {
-    for (var p = 8; p + 8 <= binary.length; ) {
-      var len = binary.big32(p);
-      var chunk = binary.big32(p + 4);
-      var res = callback(p, chunk);
+    for (let p = 8; p + 8 <= binary.length; ) {
+      const len = binary.big32(p);
+      const chunk = binary.big32(p + 4);
+      const res = callback(p, chunk);
       if (res !== undefined) { return res; }
       p += len + 12;
     }
@@ -440,10 +440,10 @@ const CompareUtil = function(window) {
   };
 
   const findJPEGSegment = function(binary, callback) {
-    for (var p = 0; p + 4 <= binary.length; ) {
-      var m = binary.big16(p);
+    for (let p = 0; p + 4 <= binary.length; ) {
+      const m = binary.big16(p);
       if (m === 0xffda /* SOS */) { break; }
-      var res = callback(p, m);
+      const res = callback(p, m);
       if (res !== undefined) { return res; }
       p += 2 + (m === 0xffd8 /* SOI */ ? 0 : binary.big16(p + 2));
     }
@@ -452,7 +452,7 @@ const CompareUtil = function(window) {
   const findAPPnSegment = function(binary, n, name, callback) {
     return findJPEGSegment(binary, function(p, marker) {
       if (marker === 0xffe0 + n && p + 4 + name.length <= binary.length) {
-        var i = 0;
+        let i = 0;
         for (; i < name.length; ++i) {
           if (binary.at(p + 4 + i) !== name[i]) { break; }
         }
@@ -464,16 +464,16 @@ const CompareUtil = function(window) {
     return findJPEGSegment(binary, function(p, marker) {
       if (0 <= [0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15].indexOf(marker - 0xffc0) &&
           p + 10 <= binary.length) {
-        var nf = binary.at(p + 9);
+        const nf = binary.at(p + 9);
         if (nf === 3 && p + 10 + 9 <= binary.length) {
-          var c1 = binary.at(p + 11);
-          var c2 = binary.at(p + 14);
-          var c3 = binary.at(p + 17);
-          var sampling = c1 * 65536 + c2 * 256 + c3;
-          var horizontalGCD = calcGCD(c1 >> 4, calcGCD(c2 >> 4, c3 >> 4));
-          var verticalGCD = calcGCD(c1 % 16, calcGCD(c2 % 16, c3 % 16));
-          var coprime = 1 >= horizontalGCD && 1 >= verticalGCD;
-          var samplingPattern = [
+          const c1 = binary.at(p + 11);
+          const c2 = binary.at(p + 14);
+          const c3 = binary.at(p + 17);
+          let sampling = c1 * 65536 + c2 * 256 + c3;
+          const horizontalGCD = calcGCD(c1 >> 4, calcGCD(c2 >> 4, c3 >> 4));
+          const verticalGCD = calcGCD(c1 % 16, calcGCD(c2 % 16, c3 % 16));
+          const coprime = 1 >= horizontalGCD && 1 >= verticalGCD;
+          const samplingPattern = [
             (c1 >> 4) + 'x' + (c1 % 16),
             (c2 >> 4) + 'x' + (c2 % 16),
             (c3 >> 4) + 'x' + (c3 % 16)
