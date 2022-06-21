@@ -489,18 +489,18 @@ const CompareUtil = function(window) {
     });
   };
   const detectJFIFIdentifier = function(binary) {
-    var name = [0x4a, 0x46, 0x49, 0x46, 0x00]; // JFIF\0
+    const name = [0x4a, 0x46, 0x49, 0x46, 0x00]; // JFIF\0
     return findAPPnSegment(binary, 0 /* APP0 */, name);
   };
   const detectExifOrientation = function(binary) {
-    var name = [0x45, 0x78, 0x69, 0x66, 0x00]; // Exif\0
+    const name = [0x45, 0x78, 0x69, 0x66, 0x00]; // Exif\0
     return findAPPnSegment(binary, 1 /* APP1 */, name, function(p) {
       if (p + 20 > binary.length) { return null; }
-      var big = binary.big16(p + 10) === 0x4d4d; /* MM */
-      var read16 = big ? binary.big16 : binary.little16;
-      var fields = read16(p + 18);
+      const big = binary.big16(p + 10) === 0x4d4d; /* MM */
+      const read16 = big ? binary.big16 : binary.little16;
+      const fields = read16(p + 18);
       if (p + 20 + fields * 12 > binary.length) { return null; }
-      for (var i = 0, f = p + 20; i < fields; i++, f += 12) {
+      for (let i = 0, f = p + 20; i < fields; i++, f += 12) {
         if (read16(f) === 0x0112 /* ORIENTATION */) {
           return read16(f + 8);
         }
@@ -509,11 +509,11 @@ const CompareUtil = function(window) {
     });
   };
   const detectMPFIdentifier = function(binary) {
-    var name = [0x4d, 0x50, 0x46, 0x00]; // MPF\0
+    const name = [0x4d, 0x50, 0x46, 0x00]; // MPF\0
     return findAPPnSegment(binary, 2 /* APP2 */, name);
   };
   const detectAdobeIdentifier = function(binary) {
-    var name = [0x41, 0x64, 0x6f, 0x62, 0x65]; // Adobe
+    const name = [0x41, 0x64, 0x6f, 0x62, 0x65]; // Adobe
     return findAPPnSegment(binary, 14 /* APP14 */, name, function(p) {
       if (p + 16 <= binary.length) {
         return {
@@ -524,10 +524,10 @@ const CompareUtil = function(window) {
   };
 
   const findWebPChunk = function(binary, target) {
-    var offsets = [];
-    for (var p = 12; p + 8 <= binary.length; ) {
-      var chunk = binary.big32(p);
-      var len = binary.little32(p + 4);
+    const offsets = [];
+    for (let p = 12; p + 8 <= binary.length; ) {
+      const chunk = binary.big32(p);
+      const len = binary.little32(p + 4);
       if (chunk === target) {
         offsets.push(p);
       }
@@ -540,28 +540,29 @@ const CompareUtil = function(window) {
     if (list.length == 0) {
       return null;
     }
-    var min = list[0], max = min, sum = min;
-    for (var i = 1; i < list.length; i++) {
-      var x = list[i];
+    let min = list[0], max = min, sum = min;
+    for (let i = 1; i < list.length; i++) {
+      const x = list[i];
       sum += x;
       if (min > x) { min = x; }
       if (max < x) { max = x; }
     }
-    var mean = sum / list.length;
+    const mean = sum / list.length;
     return { min: min, max: max, mean: mean };
   };
   const findMeanByCadenceDetection = function(list, tolerance) {
-    var sum = 0, maxPeriod = Math.min(60, list.length >> 1);
-    for (var i = 1; i <= maxPeriod; i++) {
+    const maxPeriod = Math.min(60, list.length >> 1);
+    let sum = 0;
+    for (let i = 1; i <= maxPeriod; i++) {
       sum += list[i - 1];
       if (list[i] === list[0]) {
-        var period = i;
-        for (var j = i + 1; j < list.length; j++) {
+        let period = i;
+        for (let j = i + 1; j < list.length; j++) {
           if (list[j] === list[j % period]) {
             continue;
           }
           // allow exception only at the final frame
-          var error = Math.abs(list[j] - list[j % period]);
+          const error = Math.abs(list[j] - list[j % period]);
           if (j === list.length - 1 && error <= tolerance) {
             continue;
           }
@@ -579,28 +580,28 @@ const CompareUtil = function(window) {
     if (list.length <= 1) {
       return null;
     }
-    var m = calcMinMaxMean(list);
+    const m = calcMinMaxMean(list);
     if (m.min < m.mean - tolerance || m.mean + tolerance < m.max) {
       return null;
     }
     if (m.min === m.max) {
       return m.mean;
     }
-    var m2 = findMeanByCadenceDetection(list, tolerance);
+    const m2 = findMeanByCadenceDetection(list, tolerance);
     if (m2 !== null) {
       return m2;
     }
     return m.mean;
   };
   const findApproxUniformFPS = function(delayList) {
-    var uniformDelay = findNearlyConstantValue(delayList, 0.010 + 1e-7);
+    const uniformDelay = findNearlyConstantValue(delayList, 0.010 + 1e-7);
     if (uniformDelay !== null && 0 < uniformDelay) {
        return Math.round(10 / uniformDelay) / 10;
     }
     return null;
   };
 
-  var formatReader = (function() {
+  const formatReader = (function() {
     const formatInfo = function(desc, color, anim) {
       return {
         toString: function() { return desc; },
