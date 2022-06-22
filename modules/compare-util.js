@@ -2103,17 +2103,17 @@ const CompareUtil = function(window) {
       makeCylinderContour
     };
   })();
-  var rotationUtil = (function() {
+  const rotationUtil = (function() {
     const isFrontFace = function(v2d, face) {
-      var a = v2d[face[0]];
-      var b = v2d[face[1]];
-      var c = v2d[face[2]];
-      var abx = b[0] - a[0], aby = b[1] - a[1];
-      var acx = c[0] - a[0], acy = c[1] - a[1];
+      const a = v2d[face[0]];
+      const b = v2d[face[1]];
+      const c = v2d[face[2]];
+      const abx = b[0] - a[0], aby = b[1] - a[1];
+      const acx = c[0] - a[0], acy = c[1] - a[1];
       return abx * acy < aby * acx;
     };
     const splitIntoFrontAndBackFaces = function(vertices2D, faces) {
-      var frontFaces = [], backFaces = [];
+      const frontFaces = [], backFaces = [];
       faces.forEach(function(face) {
         if (isFrontFace(vertices2D, face)) {
           frontFaces.push(face);
@@ -2129,19 +2129,19 @@ const CompareUtil = function(window) {
     };
   })();
   const makeRotationCoefs = function(orientation, scale_r, scale_g, scale_b) {
-    var pitch = Math.round(orientation.x);
-    var yaw = Math.round(orientation.y);
-    var ax = pitch * (Math.PI / 180);
-    var ay = yaw * (Math.PI / 180);
-    var cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
-    var sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
-    var scale = 0.707;
-    var sr = scale * (scale_r || 1);
-    var sg = scale * (scale_g || 1);
-    var sb = scale * (scale_b || 1);
-    var xr = sr * cos_ay, yr = -sr * sin_ay * sin_ax;
-    var xg = -sg * sin_ay, yg = -sg * cos_ay * sin_ax;
-    var yb = -sb * cos_ax;
+    const pitch = Math.round(orientation.x);
+    const yaw = Math.round(orientation.y);
+    const ax = pitch * (Math.PI / 180);
+    const ay = yaw * (Math.PI / 180);
+    const cos_ax = Math.cos(ax), cos_ay = Math.cos(ay);
+    const sin_ax = Math.sin(ax), sin_ay = Math.sin(ay);
+    const scale = 0.707;
+    const sr = scale * (scale_r || 1);
+    const sg = scale * (scale_g || 1);
+    const sb = scale * (scale_b || 1);
+    const xr = sr * cos_ay, yr = -sr * sin_ay * sin_ax;
+    const xg = -sg * sin_ay, yg = -sg * cos_ay * sin_ax;
+    const yb = -sb * cos_ax;
     const pos3DTo2D = function(x, y, z) {
       return [ 160 + xr * x + xg * y, 160 + yr * x + yg * y + yb * z ];
     };
@@ -2162,12 +2162,12 @@ const CompareUtil = function(window) {
     };
   };
   const makeTaskQueue = function(workerPath, processResult) {
-    var worker = newWorker(workerPath);
-    var taskCount = 0;
-    var taskQueue = [];
+    const worker = newWorker(workerPath);
+    let taskCount = 0;
+    let taskQueue = [];
     const kickNextTask = function() {
       if (taskCount === 0 && 0 < taskQueue.length) {
-        var task = taskQueue.shift();
+        const task = taskQueue.shift();
         if (task.prepare && false === task.prepare(task.data)) {
           return;
         }
@@ -2176,7 +2176,7 @@ const CompareUtil = function(window) {
       }
     };
     const addTask = function(data, prepare) {
-      var task = { data: data, prepare: prepare };
+      const task = { data: data, prepare: prepare };
       taskQueue.push(task);
       window.setTimeout(kickNextTask, 0);
     };
