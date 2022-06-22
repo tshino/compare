@@ -1274,12 +1274,13 @@ const CompareUtil = function(window) {
     //alert(magic);
     return null;
   };
-  var orientationUtil = (function() {
-    var stringTable = [
+  const orientationUtil = (function() {
+    const stringTable = [
       undefined,
       'TopLeft', 'TopRight', 'BottomRight', 'BottomLeft',
-      'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom' ];
-    var cssTable = {
+      'LeftTop', 'RightTop', 'RightBottom', 'LeftBottom'
+    ];
+    const cssTable = {
       2: { transposed: false, transform: ' scale(-1,1)' },
       3: { transposed: false, transform: ' rotate(180deg)' },
       4: { transposed: false, transform: ' scale(-1,1) rotate(180deg)' },
@@ -1292,15 +1293,15 @@ const CompareUtil = function(window) {
       return orientation !== null ? (stringTable[orientation] || 'Invalid') : '‐';
     };
     const isTransposed = function(orientation) {
-      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      const o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transposed;
     };
     const getCSSTransform = function(orientation) {
-      var o = cssTable[orientation] || { transposed: false, transform: '' };
+      const o = cssTable[orientation] || { transposed: false, transform: '' };
       return o.transform;
     };
     const interpretXY = function(orientation, canvasWidth, canvasHeight, x, y) {
-      var w = canvasWidth - 1, h = canvasHeight - 1;
+      const w = canvasWidth - 1, h = canvasHeight - 1;
       return interpretXY2(orientation, w, h, x, y);
     };
     const interpretXY2 = function(orientation, w, h, x, y) {
@@ -1322,18 +1323,18 @@ const CompareUtil = function(window) {
       interpretXY2: interpretXY2
     };
   })();
-  var aspectRatioUtil = (function() {
+  const aspectRatioUtil = (function() {
     const calcAspectRatio = function(w, h) {
-      var gcd = calcGCD(w, h);
+      const gcd = calcGCD(w, h);
       w /= gcd;
       h /= gcd;
       return { w: w, h: h, ratio: w / h };
     };
     const findApproxAspectRatio = function(exact) {
       if (exact.w > 50 && exact.h > 50) {
-        for (var i = 1; i <= 10; ++i) {
-          var a = exact.w / exact.h * i, b = exact.h / exact.w * i;
-          var aa = Math.round(a), bb = Math.round(b);
+        for (let i = 1; i <= 10; ++i) {
+          const a = exact.w / exact.h * i, b = exact.h / exact.w * i;
+          const aa = Math.round(a), bb = Math.round(b);
           if (Math.abs(aa - a) < Math.min(i, aa) * 0.004) {
             return { w: aa, h: i };
           }
@@ -1348,9 +1349,9 @@ const CompareUtil = function(window) {
       return addComma(ratio.w) + ':' + addComma(ratio.h);
     };
     const makeInfo = function(w, h) {
-      var exact = calcAspectRatio(w, h);
-      var approx = findApproxAspectRatio(exact);
-      var desc = toString(exact);
+      const exact = calcAspectRatio(w, h);
+      const approx = findApproxAspectRatio(exact);
+      const desc = toString(exact);
       if (approx) {
         return [exact.ratio, desc, toString(approx)];
       } else {
@@ -1366,12 +1367,12 @@ const CompareUtil = function(window) {
   })();
   const makeDurationInfo = function(formatInfo) {
     if (formatInfo && formatInfo.anim) {
-      var num = formatInfo.anim.durationNum;
-      var den = formatInfo.anim.durationDen;
-      var value = num / den;
-      var desc = (num / den).toFixed(3);
+      let num = formatInfo.anim.durationNum;
+      let den = formatInfo.anim.durationDen;
+      const value = num / den;
+      const desc = (num / den).toFixed(3);
       if (0 !== num * 1000 % den) {
-        var gcd = calcGCD(num, den);
+        const gcd = calcGCD(num, den);
         num /= gcd;
         den /= gcd;
         if (formatInfo.anim.fpsNum !== null &&
@@ -1388,17 +1389,18 @@ const CompareUtil = function(window) {
   };
   const makeFPSInfo = function(formatInfo, nonUniform) {
     if (formatInfo && formatInfo.anim) {
-      var num = formatInfo.anim.fpsNum;
-      var den = formatInfo.anim.fpsDen;
+      let num = formatInfo.anim.fpsNum;
+      let den = formatInfo.anim.fpsDen;
       if (num !== null && den !== null) {
-        var value = num / den;
+        const value = num / den;
+        let desc;
         if (0 === num % den) {
-          var desc = String(num / den);
+          desc = String(num / den);
         } else {
-          var desc = (num / den).toFixed(2);
+          desc = (num / den).toFixed(2);
         }
         if (0 !== num * 100 % den) {
-          var gcd = calcGCD(num, den);
+          const gcd = calcGCD(num, den);
           num /= gcd;
           den /= gcd;
           return [value, num + '/' + den, desc];
@@ -1415,13 +1417,13 @@ const CompareUtil = function(window) {
   };
   const cursorKeyCodeToXY = function(keyCode, step) {
     step = step !== undefined ? step : 1;
-    var x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
-    var y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
+    const x = keyCode === 37 ? -step : keyCode === 39 ? step : 0;
+    const y = keyCode === 38 ? -step : keyCode === 40 ? step : 0;
     return { x: x, y: y };
   };
   const calcInscribedRect = function(outerW, outerH, innerW, innerH) {
-    var rect = {};
-    var isLetterBox = outerW * innerH < outerH * innerW;
+    const rect = {};
+    const isLetterBox = outerW * innerH < outerH * innerW;
     rect.width = isLetterBox ? outerW : outerH * innerW / innerH;
     rect.height = isLetterBox ? outerW * innerH / innerW : outerH;
     return rect;
@@ -1452,12 +1454,12 @@ const CompareUtil = function(window) {
     }
   };
   const processWheelEvent = function(e, callback) {
-    var event = e.originalEvent;
+    const event = e.originalEvent;
     if (event.ctrlKey || event.shiftKey || event.altKey || event.metaKey) {
       return true;
     }
-    var deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
-    var steps = clamp(event.deltaY * deltaScale, -3, 3);
+    const deltaScale = event.deltaMode === 0 ? /* PIXEL */ 0.1 : /* LINE */ 1.0;
+    const steps = clamp(event.deltaY * deltaScale, -3, 3);
     if (steps !== 0) {
       if (callback.zoom) {
         callback.zoom(steps);
