@@ -610,22 +610,22 @@ const CompareUtil = function(window) {
       };
     };
     const detectPNG = function(binary) {
-      var desc = 'PNG';
-      var color = null;
-      var anim = undefined;
-      var actl = detectPNGChunk(
+      let desc = 'PNG';
+      let color = null;
+      let anim = undefined;
+      const actl = detectPNGChunk(
                 binary, 0x6163544c /* acTL */, 0x49444154 /* IDAT */);
       if (actl && actl + 16 <= binary.length) {
-        var frameCount = binary.big32(actl + 8);
+        const frameCount = binary.big32(actl + 8);
         if (1 <= frameCount) {
-          var durationNum = 0, durationDen = 1, commonDelay;
-          var delayList = [];
+          let durationNum = 0, durationDen = 1, commonDelay;
+          const delayList = [];
           findPNGChunk(binary, function(p, chunk) {
             if (chunk === 0x6663544c /* fcTL */ && p + 34 <= binary.length) {
-              var num = binary.big16(p + 28);
-              var den = binary.big16(p + 30);
+              let num = binary.big16(p + 28);
+              let den = binary.big16(p + 30);
               if (den === 0) { den = 100; }
-              var gcd = calcGCD(num, den);
+              const gcd = calcGCD(num, den);
               num /= gcd;
               den /= gcd;
               if (commonDelay === undefined) { commonDelay = [num, den]; }
@@ -633,9 +633,9 @@ const CompareUtil = function(window) {
               delayList.push(num / den);
               durationNum = durationNum * den + num * durationDen;
               durationDen = durationDen * den;
-              var gcd = calcGCD(durationNum, durationDen);
-              durationNum /= gcd;
-              durationDen /= gcd;
+              const gcd2 = calcGCD(durationNum, durationDen);
+              durationNum /= gcd2;
+              durationDen /= gcd2;
             }
           });
           desc += ' (APNG)';
@@ -649,10 +649,10 @@ const CompareUtil = function(window) {
           };
         }
       }
-      var hasTRNS = detectPNGChunk(
+      const hasTRNS = detectPNGChunk(
                 binary, 0x74524e53 /* tRNS */, 0x49444154 /* IDAT */);
-      var depth = binary.at(24);
-      var colorMode = binary.at(25);
+      const depth = binary.at(24);
+      const colorMode = binary.at(25);
       switch (colorMode) {
         case 0:
           color = 'Grayscale';
