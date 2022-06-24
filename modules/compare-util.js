@@ -697,29 +697,29 @@ const CompareUtil = function(window) {
       return formatInfo(desc, color, anim);
     };
     const detectGIF = function(binary, magic, magic2) {
-      var desc = 'GIF';
-      var color = null;
-      var anim = undefined;
+      let desc = 'GIF';
+      let color = null;
+      let anim = undefined;
       if (13 <= binary.length) {
         //console.log('GIF sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
         //var size = [binary.little16(6), binary.little16(8)];
-        var bitfield = binary.at(10);
-        var gctFlag = bitfield >> 7;
-        var gctLength = bitfield & 0x07;
+        const bitfield = binary.at(10);
+        const gctFlag = bitfield >> 7;
+        const gctLength = bitfield & 0x07;
         //console.log('size', size.join('x'));
         //console.log('gct', gctFlag, gctLength);
-        var transparent, transparentIndex;
-        var block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
-        var frames = 0, commonDelay, delayList = [], duration = 0, animated = false;
+        let transparent, transparentIndex;
+        let block = 13 + (gctFlag ? 3 * Math.pow(2, gctLength + 1) : 0);
+        let frames = 0, commonDelay, delayList = [], duration = 0, animated = false;
         while (block + 3 <= binary.length) {
-          var initial = binary.at(block);
+          const initial = binary.at(block);
           if (initial === 0x21) {
-            var label = binary.at(block + 1);
+            const label = binary.at(block + 1);
             //console.log('ext', '0x' + label.toString(16));
             if (label === 0xf9 /* Graphic Control Extension */ &&
                 block + 8 <= binary.length) {
               transparent = binary.at(block + 3) & 0x01;
-              var delay = binary.little16(block + 4);
+              const delay = binary.little16(block + 4);
               if (commonDelay === undefined) { commonDelay = delay; }
               if (commonDelay !== delay) { commonDelay = null; }
               delayList.push(delay * 0.01);
@@ -728,8 +728,8 @@ const CompareUtil = function(window) {
               //console.log('transparent', transparent, transparentIndex);
             } else if (label === 0xff /* Application Extension */ &&
                 block + 14 <= binary.length) {
-              var app0 = binary.big32(block + 3);
-              var app1 = binary.big32(block + 7);
+              const app0 = binary.big32(block + 3);
+              const app1 = binary.big32(block + 7);
               //console.log(app0.toString(16), app1.toString(16));
               if (app0 === 0x4e455453 && app1 === 0x43415045 /* NETS CAPE */) {
                 desc += ' (Animated)';
@@ -737,8 +737,8 @@ const CompareUtil = function(window) {
               }
             }
             block += 2;
-            for (var off = 0; block + off < binary.length; ) {
-              var size = binary.at(block + off);
+            for (let off = 0; block + off < binary.length; ) {
+              const size = binary.at(block + off);
               if (size === 0 /* Block Terminator */) {
                 block += off + 1;
                 break;
@@ -748,28 +748,27 @@ const CompareUtil = function(window) {
             continue;
           } else if (initial === 0x2c /* Image Separator */ &&
                 block + 10 <= binary.length) {
-            var rect = [
-              binary.little16(block + 1),
-              binary.little16(block + 3),
-              binary.little16(block + 5),
-              binary.little16(block + 7)
-            ];
-            var localFlags = binary.at(block + 9);
-            var lctFlag = localFlags >> 7;
-            var lctLength = localFlags & 0x07;
+            // var rect = [
+            //   binary.little16(block + 1),
+            //   binary.little16(block + 3),
+            //   binary.little16(block + 5),
+            //   binary.little16(block + 7)
+            // ];
+            const localFlags = binary.at(block + 9);
+            const lctFlag = localFlags >> 7;
+            const lctLength = localFlags & 0x07;
             //console.log('rect', rect.join(' '));
             //console.log('lct', lctFlag, lctLength);
             if (frames === 0) {
-              var bpp = lctFlag ? (lctLength + 1) : (gctLength + 1);
+              const bpp = lctFlag ? (lctLength + 1) : (gctLength + 1);
               color = 'Indexed RGB 8.8.8 (' + bpp + 'bpp)';
               if (transparent && transparentIndex < Math.pow(2, bpp)) {
                 color += ' + Transparent';
               }
             }
             block += 10 + (lctFlag ? 3 * Math.pow(2, lctLength + 1) : 0);
-            var off = 1;
-            for (; block + off < binary.length; ) {
-              var size = binary.at(block + off);
+            for (let off = 1; block + off < binary.length; ) {
+              const size = binary.at(block + off);
               if (size === 0 /* Block Terminator */) {
                 block += off + 1;
                 break;
