@@ -796,16 +796,16 @@ const CompareUtil = function(window) {
     };
     const detectBMP = function(binary, magic, magic2) {
       // BMP
-      var color = null;
+      let color = null;
       if (26 <= binary.length) {
-        var offBits = binary.little32(10);
-        var biSize = binary.little32(14);
-        var os2 = 12 === biSize || binary.length < 54;
-        var bitCount = os2 ? binary.little16(24) : binary.little16(28);
-        var compression = os2 ? 0 : binary.little32(30);
-        var mask = [];
+        const offBits = binary.little32(10);
+        const biSize = binary.little32(14);
+        const os2 = 12 === biSize || binary.length < 54;
+        const bitCount = os2 ? binary.little16(24) : binary.little16(28);
+        const compression = os2 ? 0 : binary.little32(30);
+        let mask = [];
         const calcMaskBits = function(mask) {
-          var nlz = 0, ntz = 0, bit = 1;
+          let nlz = 0, ntz = 0, bit = 1;
           while (bit < mask && (mask & bit) === 0) {
             ntz += 1;
             bit = bit << 1;
@@ -836,8 +836,9 @@ const CompareUtil = function(window) {
           }
         }
         const makeRGBAMaskDesc = function(mask) {
-          var desc = '', bits = [], labels = ['R', 'G', 'B', 'A'];
-          for (var i = 0; i < mask.length; i++) {
+          const labels = ['R', 'G', 'B', 'A'];
+          let desc = '', bits = [];
+          for (let i = 0; i < mask.length; i++) {
             if (0 < mask[i]) {
               desc += labels[i];
               bits.push(mask[i]);
@@ -890,15 +891,15 @@ const CompareUtil = function(window) {
     };
     const detectJPEG = function(binary, magic, magic2) {
       // JPEG
-      var desc = 'JPEG';
-      var color = null;
+      let desc = 'JPEG';
+      let color = null;
       if (detectMPFIdentifier(binary)) {
         desc += ' (MPF)';
       }
-      var hasJFIF = detectJFIFIdentifier(binary);
-      var hasAdobe = detectAdobeIdentifier(binary);
-      var sof = detectSOFnSegment(binary);
-      var nf = sof ? sof.nf : null;
+      const hasJFIF = detectJFIFIdentifier(binary);
+      const hasAdobe = detectAdobeIdentifier(binary);
+      const sof = detectSOFnSegment(binary);
+      const nf = sof ? sof.nf : null;
       if (!hasJFIF && hasAdobe) {
         color = (hasAdobe.tr === 1 && nf === 3) ? 'YCbCr 8.8.8' : null;
       }
@@ -906,8 +907,8 @@ const CompareUtil = function(window) {
         color = nf === 1 ? 'Grayscale 8' : nf === 3 ? 'YCbCr 8.8.8' : 'unknown';
       }
       const samplingPattern = function(components) {
-        var s = [];
-        for (var i = 0; i < components.length; ++i) {
+        const s = [];
+        for (let i = 0; i < components.length; ++i) {
           s.push(components[i] + '=' + sof.samplingPattern[i]);
         }
         return s.join(' ');
