@@ -702,7 +702,7 @@ const CompareUtil = function(window) {
       let anim = undefined;
       if (13 <= binary.length) {
         //console.log('GIF sig', '0x' + (0x380000 + (magic2 >>> 16)).toString(16));
-        //var size = [binary.little16(6), binary.little16(8)];
+        //const size = [binary.little16(6), binary.little16(8)];
         const bitfield = binary.at(10);
         const gctFlag = bitfield >> 7;
         const gctLength = bitfield & 0x07;
@@ -748,7 +748,7 @@ const CompareUtil = function(window) {
             continue;
           } else if (initial === 0x2c /* Image Separator */ &&
                 block + 10 <= binary.length) {
-            // var rect = [
+            // const rect = [
             //   binary.little16(block + 1),
             //   binary.little16(block + 3),
             //   binary.little16(block + 5),
@@ -945,22 +945,22 @@ const CompareUtil = function(window) {
     };
     const detectTIFF = function(binary, magic, magic2) {
       //console.log('TIFF');
-      var color = null;
-      var read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
-      var read32 = magic === 0x4d4d002a ? binary.big32 : binary.little32;
+      let color = null;
+      const read16 = magic === 0x4d4d002a ? binary.big16 : binary.little16;
+      const read32 = magic === 0x4d4d002a ? binary.big32 : binary.little32;
       const readIFDValue = function(type, count, offset) {
         if (type < 1 || 5 < type) {
           return [];
         }
-        var bytes = [1, 1, 2, 4, 8][type - 1] * count;
+        const bytes = [1, 1, 2, 4, 8][type - 1] * count;
         if (4 < bytes) {
           offset = read32(offset);
           if (offset + bytes > binary.length) {
             return [];
           }
         }
-        var value = [];
-        for (var i = 0; i < count; ++i) {
+        let value = [];
+        for (let i = 0; i < count; ++i) {
           switch (type) {
             case 1: case 2:
               value[i] = binary.at(offset + i); break;
@@ -973,8 +973,8 @@ const CompareUtil = function(window) {
           }
         }
         if (type === 2 /* ASCII */) {
-          var string = '';
-          for (var i = 0; i < count - 1; ++i) {
+          let string = '';
+          for (let i = 0; i < count - 1; ++i) {
             string += String.fromCharCode(value[i]);
           }
           value = [ string ];
@@ -982,20 +982,20 @@ const CompareUtil = function(window) {
         return value;
       };
       if (8 <= binary.length) {
-        var ifd = read32(4);
-        var ifdCount = ifd + 2 <= binary.length ? read16(ifd) : 0;
+        const ifd = read32(4);
+        const ifdCount = ifd + 2 <= binary.length ? read16(ifd) : 0;
         if (ifd + 2 + ifdCount * 12 <= binary.length) {
-          var photometricInterpretation = null;
-          var bitsPerSample = [1];
-          var samplesPerPixel = 1;
-          var colorMap = [];
-          var extraSamples = [];
-          for (var i = 0; i < ifdCount; ++i) {
-            var offset = ifd + 2 + i * 12;
-            var tag = read16(offset);
-            var type = read16(offset + 2);
-            var count = read32(offset + 4);
-            var value = readIFDValue(type, count, offset + 8);
+          let photometricInterpretation = null;
+          let bitsPerSample = [1];
+          let samplesPerPixel = 1;
+          let colorMap = [];
+          let extraSamples = [];
+          for (let i = 0; i < ifdCount; ++i) {
+            const offset = ifd + 2 + i * 12;
+            const tag = read16(offset);
+            const type = read16(offset + 2);
+            const count = read32(offset + 4);
+            const value = readIFDValue(type, count, offset + 8);
             //console.log(' tag', '0x' + tag.toString(16), type, value);
             switch (tag) {
               case 262: /* 0x106 PhotometricInterpretation */
@@ -1010,20 +1010,20 @@ const CompareUtil = function(window) {
                 extraSamples = value; break;
             }
           }
-          var alphaIndex = extraSamples.indexOf(1 /* Associated alpha data */);
-          var maskIndex = extraSamples.indexOf(2 /* Unassociated alpha data */);
+          const alphaIndex = extraSamples.indexOf(1 /* Associated alpha data */);
+          let maskIndex = extraSamples.indexOf(2 /* Unassociated alpha data */);
           const makeAlphaNotation = function(baseName, baseIndices, withAlphaName) {
             //console.log('extraSamples', extraSamples);
-            var numBaseSamples = baseIndices.length;
-            var baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
-            var totalBaseBits = baseBits.reduce(function(a, b) { return a + b; }, 0);
+            const numBaseSamples = baseIndices.length;
+            const baseBits = baseIndices.map(function(i) { return bitsPerSample[i]; });
+            const totalBaseBits = baseBits.reduce(function(a, b) { return a + b; }, 0);
             if (0 <= alphaIndex && numBaseSamples + alphaIndex < bitsPerSample.length) {
-              var alphaBits = bitsPerSample[numBaseSamples + alphaIndex];
-              var name = withAlphaName + ' (pre-multiplied) ' + baseBits.join('.') + '.' + alphaBits;
+              const alphaBits = bitsPerSample[numBaseSamples + alphaIndex];
+              const name = withAlphaName + ' (pre-multiplied) ' + baseBits.join('.') + '.' + alphaBits;
               return name + ' (' + (totalBaseBits + alphaBits) +  'bpp)';
             } else if (0 <= maskIndex && numBaseSamples + maskIndex < bitsPerSample.length) {
-              var maskBits = bitsPerSample[numBaseSamples + maskIndex];
-              var name = withAlphaName + ' ' + baseBits.join('.') + '.' + maskBits;
+              const maskBits = bitsPerSample[numBaseSamples + maskIndex];
+              const name = withAlphaName + ' ' + baseBits.join('.') + '.' + maskBits;
               return name + ' (' + (totalBaseBits + maskBits) +  'bpp)';
             } else {
               return baseName + ' ' + baseBits.join('.') + ' (' + totalBaseBits + 'bpp)';
