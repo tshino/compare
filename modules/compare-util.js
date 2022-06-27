@@ -1090,8 +1090,8 @@ const CompareUtil = function(window) {
       if (binary.length < offset + 5 || binary.at(offset) !== 0x2F) {
         return 'unknown';
       }
-      var flags = binary.at(offset + 4) & 0xf0;
-      var version = flags & 0xe0;
+      const flags = binary.at(offset + 4) & 0xf0;
+      const version = flags & 0xe0;
       if (version !== 0) {
         return 'unknown';
       }
@@ -1103,10 +1103,10 @@ const CompareUtil = function(window) {
       }
     };
     const detectWebP = function(binary) {
-      var magic4 = binary.length < 16 ? 0 : binary.big32(12);
-      var desc = 'WebP';
-      var color = undefined;
-      var anim = undefined;
+      const magic4 = binary.length < 16 ? 0 : binary.big32(12);
+      let desc = 'WebP';
+      let color = undefined;
+      let anim = undefined;
       if (magic4 === 0x56503820 /* 'VP8 ' */) {
         desc += ' (Lossy)';
         color = readVP8ColorFormat(binary, 20, false);
@@ -1114,23 +1114,24 @@ const CompareUtil = function(window) {
         desc += ' (Lossless)';
         color = readWebPLosslessColorFormat(binary, 20, false);
       } else if (magic4 === 0x56503858 /* 'VP8X' */) {
-        var flags = binary.length < 24 ? 0 : binary.big32(20);
-        var animated = (flags & 0x02000000) !== 0;
-        var hasAlpha = (flags & 0x10000000) !== 0;
+        const flags = binary.length < 24 ? 0 : binary.big32(20);
+        const animated = (flags & 0x02000000) !== 0;
+        let hasAlpha = (flags & 0x10000000) !== 0;
         if (animated) {
-          var anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
-          var lossy = 0, lossless = 0, unknown = 0;
-          var duration = 0, commonDelay, delayList = [];
-          var colorList = [];
-          for (var i = 0, p; p = anmf[i]; i++) {
-            var delay = binary.length < p + 24 ? 0 : (binary.little32(p + 20) & 0xffffff);
+          const anmf = findWebPChunk(binary, 0x414E4D46 /* 'ANMF' */);
+          let lossy = 0, lossless = 0, unknown = 0;
+          let duration = 0, commonDelay;
+          const delayList = [];
+          const colorList = [];
+          for (let i = 0, p; p = anmf[i]; i++) {
+            const delay = binary.length < p + 24 ? 0 : (binary.little32(p + 20) & 0xffffff);
             if (commonDelay === undefined) { commonDelay = delay; }
             if (commonDelay !== delay) { commonDelay = null; }
             delayList.push(delay * 0.001);
             duration += delay;
             p += 24;
-            var f = binary.length < p + 8 ? 0 : binary.big32(p);
-            var hasALPH = false;
+            let f = binary.length < p + 8 ? 0 : binary.big32(p);
+            let hasALPH = false;
             if (f === 0x414C5048 /* 'ALPH' */) {
               hasALPH = true;
               p += 8 + ((binary.little32(p + 4) + 1) & 0xfffffffe);
@@ -1173,9 +1174,9 @@ const CompareUtil = function(window) {
             approxFPS: findApproxUniformFPS(delayList)
           };
         } else {
-          var alpha = findWebPChunk(binary, 0x414C5048 /* 'ALPH' */);
-          var vp8 = findWebPChunk(binary, 0x56503820 /* 'VP8 ' */);
-          var vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
+          const alpha = findWebPChunk(binary, 0x414C5048 /* 'ALPH' */);
+          const vp8 = findWebPChunk(binary, 0x56503820 /* 'VP8 ' */);
+          const vp8l = findWebPChunk(binary, 0x5650384C /* 'VP8L' */);
           if (0 < vp8.length) {
             desc += ' (Lossy)';
             hasAlpha = hasAlpha || (0 < alpha.length && alpha[0] < vp8[0]);
