@@ -1194,13 +1194,13 @@ const CompareUtil = function(window) {
       if (magic < 16) {
         return null;
       }
-      var major = binary.big32(8), minor = binary.big32(12);
-      var desc = null;
+      const major = binary.big32(8), minor = binary.big32(12);
+      let desc = null;
       if (major === 0x61766966 /* 'avif' */) {
         desc = 'AVIF';
       } else if (major == 0x6d696631 /* 'mif1'*/) {
-        for (var i = 0, n = magic - 16; i + 4 <= n; i += 4) {
-          var compatible = binary.big32(16 + i);
+        for (let i = 0, n = magic - 16; i + 4 <= n; i += 4) {
+          const compatible = binary.big32(16 + i);
           if (compatible === 0x61766966 /* 'avif' */) {
             desc = 'AVIF';
             break;
@@ -1218,14 +1218,14 @@ const CompareUtil = function(window) {
         (magic === 0x3c3f786d /* '<?xm' */ &&
             (magic2 & 0xff000000) === 0x6c000000 /* 'l' */)) {
         // XML
-        var i = 4;
-        for (var x; x = binary.at(i); ++i) {
+        let i = 4;
+        for (let x; x = binary.at(i); ++i) {
           if (x === 0x3c /* '<' */) {
-            var y = binary.at(i + 1);
+            const y = binary.at(i + 1);
             if (y !== 0x3f /* '?' */ && y !== 0x21 /* '!' */) { break; }
           }
         }
-        var sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
+        const sig1 = binary.length < i + 4 ? 0 : binary.big32(i);
         if (sig1 === 0x3c737667 /* <svg */) {
           return formatInfo('SVG');
         }
@@ -1244,9 +1244,9 @@ const CompareUtil = function(window) {
     };
   })();
   const detectImageFormat = function(binary) {
-    var magic = binary.length < 4 ? 0 : binary.big32(0);
-    var magic2 = binary.length < 8 ? 0 : binary.big32(4);
-    var magic3 = binary.length < 12 ? 0 : binary.big32(8);
+    const magic = binary.length < 4 ? 0 : binary.big32(0);
+    const magic2 = binary.length < 8 ? 0 : binary.big32(4);
+    const magic3 = binary.length < 12 ? 0 : binary.big32(8);
     if (magic === 0x89504e47) { // PNG
       return formatReader.detectPNG(binary);
     }
@@ -1268,7 +1268,7 @@ const CompareUtil = function(window) {
     if (magic2 === 0x66747970 /* ftyp */) { // AVIF
       return formatReader.detectAVIF(binary, magic);
     }
-    var svg = formatReader.detectSVG(binary, magic, magic2);
+    const svg = formatReader.detectSVG(binary, magic, magic2);
     if (svg !== null) {
       return svg;
     }
