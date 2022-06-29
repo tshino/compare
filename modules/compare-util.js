@@ -1469,16 +1469,16 @@ const CompareUtil = function(window) {
     }
   };
   const makeTouchEventFilter = function() {
-    var touchState = null;
-    var tapPoint = null;
+    let touchState = null;
+    let tapPoint = null;
     const resetState = function() {
       touchState = null;
       tapPoint = null;
     };
     const updateState = function(e, callback) {
-      var event = e.originalEvent;
+      const event = e.originalEvent;
       if (event.touches.length === 1 || event.touches.length === 2) {
-        var touches = Array.prototype.slice.call(event.touches);
+        const touches = Array.prototype.slice.call(event.touches);
         touches.sort(function(a, b) {
           return (
               a.identifier < b.identifier ? -1 :
@@ -1488,7 +1488,7 @@ const CompareUtil = function(window) {
         if (!touchState || touchState.length !== touches.length) {
           touchState = [];
         }
-        for (var i = 0; i < touches.length; ++i) {
+        for (let i = 0; i < touches.length; ++i) {
           if (!touchState[i] ||
                 touchState[i].identifier !== touches[i].identifier) {
             touchState[i] = {
@@ -1501,7 +1501,7 @@ const CompareUtil = function(window) {
         if (callback) {
           callback(touchState, touches);
         }
-        for (var i = 0; i < touches.length; ++i) {
+        for (let i = 0; i < touches.length; ++i) {
           touchState[i].x = touches[i].clientX;
           touchState[i].y = touches[i].clientY;
           touchState[i].pageX = touches[i].pageX;
@@ -1526,8 +1526,8 @@ const CompareUtil = function(window) {
             tapPoint = null;
           }
         }
-        var dx = 0, dy = 0;
-        for (var i = 0; i < touches.length; ++i) {
+        let dx = 0, dy = 0;
+        for (let i = 0; i < touches.length; ++i) {
           dx += touches[i].clientX - lastTouches[i].x;
           dy += touches[i].clientY - lastTouches[i].y;
         }
@@ -1538,16 +1538,16 @@ const CompareUtil = function(window) {
             callback.move(dx, dy);
           }
         } else if (touches.length === 2) {
-          var x0 = lastTouches[0].x - lastTouches[1].x;
-          var y0 = lastTouches[0].y - lastTouches[1].y;
-          var x1 = touches[0].clientX - touches[1].clientX;
-          var y1 = touches[0].clientY - touches[1].clientY;
-          var s0 = Math.sqrt(x0 * x0 + y0 * y0);
-          var s1 = Math.sqrt(x1 * x1 + y1 * y1);
+          const x0 = lastTouches[0].x - lastTouches[1].x;
+          const y0 = lastTouches[0].y - lastTouches[1].y;
+          const x1 = touches[0].clientX - touches[1].clientX;
+          const y1 = touches[0].clientY - touches[1].clientY;
+          const s0 = Math.sqrt(x0 * x0 + y0 * y0);
+          const s1 = Math.sqrt(x1 * x1 + y1 * y1);
           if (0 < s0 * s1) {
-            var r = Math.log(s1 / s0) / Math.LN2;
+            let r = Math.log(s1 / s0) / Math.LN2;
             r = clamp(r, -2, 2);
-            var center = {
+            const center = {
               pageX: (touches[0].pageX + touches[1].pageX) * 0.5,
               pageY: (touches[0].pageY + touches[1].pageY) * 0.5
             };
