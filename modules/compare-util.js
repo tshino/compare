@@ -1580,26 +1580,26 @@ const CompareUtil = function(window) {
 
   const makeZoomController = function(update, options) {
     options = options !== undefined ? options : {};
-    var MAX_ZOOM_LEVEL    = 6.0;
-    var ZOOM_STEP_KEY     = 0.25;
-    var ZOOM_STEP_WHEEL   = 0.0625;
-    var ZOOM_STEP_DBLCLK  = 2.00;
-    var cursorMoveDelta = options.cursorMoveDelta || 0.3;
-    var getBaseSize = options.getBaseSize || function(index) {};
-    var zoomXOnly = false;
-    var o = {
+    const MAX_ZOOM_LEVEL    = 6.0;
+    const ZOOM_STEP_KEY     = 0.25;
+    const ZOOM_STEP_WHEEL   = 0.0625;
+    const ZOOM_STEP_DBLCLK  = 2.00;
+    const cursorMoveDelta = options.cursorMoveDelta || 0.3;
+    let getBaseSize = options.getBaseSize || function(index) {};
+    let zoomXOnly = false;
+    const o = {
       zoom: 0,
       scale: 1,
       offset: { x: 0.5, y: 0.5 }
     };
-    var enabled = true;
-    var zoomOrigin = null;
-    var pointCallback = null;
-    var clickPoint = null;
-    var dragStartPoint = null;
-    var dragLastPoint = null;
-    var dragStateCallback = null;
-    var touchFilter = makeTouchEventFilter();
+    let enabled = true;
+    let zoomOrigin = null;
+    let pointCallback = null;
+    let clickPoint = null;
+    let dragStartPoint = null;
+    let dragLastPoint = null;
+    let dragStateCallback = null;
+    const touchFilter = makeTouchEventFilter();
     o.enable = function(options) {
       options = options !== undefined ? options : {};
       enabled = true;
@@ -1656,14 +1656,14 @@ const CompareUtil = function(window) {
       }
     };
     const moveRelative = function(dx, dy) {
-      var result = moveRelativeWithoutUpdate(dx, dy);
+      const result = moveRelativeWithoutUpdate(dx, dy);
       if (result) {
         update();
         return result;
       }
     };
     const moveRelativePx = function(index, dx, dy) {
-      var base = getBaseSize(index);
+      const base = getBaseSize(index);
       if (base) {
         moveRelative(-dx / base.w, -dy / base.h);
       }
@@ -1673,19 +1673,19 @@ const CompareUtil = function(window) {
         if (dx !== 0 || dy !== 0) {
           moveRelativeWithoutUpdate(dx, dy);
         }
-        var c1 = getCenter();
-        var s1 = o.scale;
+        const c1 = getCenter();
+        const s1 = o.scale;
         setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL)); // o.scale changes here
         if (1 < o.scale) {
-          var x = clamp(pos.x, 0, 1);
-          var y = clamp(pos.y, 0, 1);
-          var s2 = o.scale;
-          var px = x - 0.5;
-          var py = y - 0.5;
-          var c2x = s2 * px - s1 * (px - c1.x);
-          var c2y = s2 * py - s1 * (py - c1.y);
-          var o2x = c2x / (o.scale - 1) + 0.5;
-          var o2y = c2y / (o.scale - 1) + 0.5;
+          const x = clamp(pos.x, 0, 1);
+          const y = clamp(pos.y, 0, 1);
+          const s2 = o.scale;
+          const px = x - 0.5;
+          const py = y - 0.5;
+          const c2x = s2 * px - s1 * (px - c1.x);
+          const c2y = s2 * py - s1 * (py - c1.y);
+          const o2x = c2x / (o.scale - 1) + 0.5;
+          const o2y = c2y / (o.scale - 1) + 0.5;
           setOffset(o2x, o2y);
         }
         update();
@@ -1707,7 +1707,7 @@ const CompareUtil = function(window) {
         zoomIn: function() { if (zoomIn()) return false; },
         zoomOut: function() { if (zoomOut()) return false; },
         cursor: function() {
-          var d = cursorKeyCodeToXY(e.keyCode, cursorMoveDelta);
+          const d = cursorKeyCodeToXY(e.keyCode, cursorMoveDelta);
           if (moveRelative(d.x, d.y)) {
             return false;
           }
@@ -1735,7 +1735,7 @@ const CompareUtil = function(window) {
       }
     };
     const positionFromMouseEvent = function(e, target, index) {
-      var base = getBaseSize(index);
+      const base = getBaseSize(index);
       return base ? {
         index: index,
         x: (e.pageX - $(target).offset().left) / (o.scale * base.w),
@@ -1745,13 +1745,13 @@ const CompareUtil = function(window) {
       } : null;
     };
     const processPointMouseDown = function(e, selector, target) {
-      var index = selector ? $(selector).index($(target).parent()) : null;
+      const index = selector ? $(selector).index($(target).parent()) : null;
       if (e.which === 1) {
         clickPoint = positionFromMouseEvent(e, target, index);
       }
     };
     const processMouseDown = function(e, selector, target) {
-      var index = selector ? $(selector).index(target) : null;
+      const index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
         var last = dragLastPoint;
         dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
@@ -1763,10 +1763,10 @@ const CompareUtil = function(window) {
         if (e.buttons !== 1) {
           resetDragState();
         } else {
-          var index = selector ? $(selector).index(target) : null;
+          const index = selector ? $(selector).index(target) : null;
           if (clickPoint) {
-            var ax = Math.abs(e.clientX - dragStartPoint.x);
-            var ay = Math.abs(e.clientY - dragStartPoint.y);
+            const ax = Math.abs(e.clientX - dragStartPoint.x);
+            const ay = Math.abs(e.clientY - dragStartPoint.y);
             if (3 <= Math.max(ax, ay)) {
               clickPoint = null;
             }
@@ -1774,8 +1774,8 @@ const CompareUtil = function(window) {
           if (dragLastPoint.x === dragStartPoint.x && dragLastPoint.y === dragStartPoint.y) {
             dragStateCallback(true, zoomXOnly);
           }
-          var dx = e.clientX - dragLastPoint.x;
-          var dy = e.clientY - dragLastPoint.y;
+          const dx = e.clientX - dragLastPoint.x;
+          const dy = e.clientY - dragLastPoint.y;
           dragLastPoint = { x: e.clientX, y: e.clientY };
           moveRelativePx(index, dx, dy);
           return false;
@@ -1789,8 +1789,8 @@ const CompareUtil = function(window) {
       resetDragState();
     };
     const processDblclick = function(e, selector, target) {
-      var index = selector ? $(selector).index($(target).parent()) : null;
-      var pos = positionFromMouseEvent(e, target, index);
+      const index = selector ? $(selector).index($(target).parent()) : null;
+      const pos = positionFromMouseEvent(e, target, index);
       if (pos) {
         zoomTo(pos.x, pos.y);
         return false;
@@ -1803,10 +1803,10 @@ const CompareUtil = function(window) {
           if (zoomOrigin) {
             zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, zoomOrigin);
           } else if (selector && relSelector) {
-            var index = $(selector).index(target);
+            const index = $(selector).index(target);
             target = $(target).find(relSelector);
             if (target.length !== 0) {
-              var pos = positionFromMouseEvent(e, target, index);
+              const pos = positionFromMouseEvent(e, target, index);
               zoomRelativeToPoint(0, 0, -steps * ZOOM_STEP_WHEEL, pos);
             }
           } else {
@@ -1820,18 +1820,18 @@ const CompareUtil = function(window) {
       return touchFilter.onTouchStart(e);
     };
     const processTouchMove = function(e, selector, relSelector, target) {
-      var index = selector ? $(selector).index(target) : null;
-      var ret = touchFilter.onTouchMove(e, {
+      const index = selector ? $(selector).index(target) : null;
+      const ret = touchFilter.onTouchMove(e, {
         move: function(dx, dy) {
           moveRelativePx(index, dx, dy);
         },
         zoom: function(dx, dy, r, center) {
           if (center && selector && relSelector) {
             target = $(target).find(relSelector);
-            var base = getBaseSize(index);
+            const base = getBaseSize(index);
             dx = -dx / base.w;
             dy = -dy / base.h;
-            var pos = positionFromMouseEvent(center, target, index);
+            const pos = positionFromMouseEvent(center, target, index);
             zoomRelativeToPoint(dx, dy, r, pos);
           } else {
             zoomRelative(r);
@@ -1843,9 +1843,9 @@ const CompareUtil = function(window) {
       return touchFilter.onTouchEnd(e, {
         pointClick: function(lastTouch) {
           if (pointCallback && relSelector) {
-            var index = selector ? $(selector).index(target) : null;
+            const index = selector ? $(selector).index(target) : null;
             target = $(target).find(relSelector);
-            var pos = positionFromMouseEvent(lastTouch, target, index);
+            const pos = positionFromMouseEvent(lastTouch, target, index);
             pointCallback(pos);
           }
         }
@@ -1881,8 +1881,8 @@ const CompareUtil = function(window) {
       });
     };
     const makeTransform = function(index) {
-      var base = getBaseSize(index);
-      var center = getCenter();
+      const base = getBaseSize(index);
+      const center = getCenter();
       return (
         'scale(' + o.scale + (zoomXOnly ? ', 1) ' : ') ') +
         'translate(' + (-center.x * base.w) + 'px,' + (zoomXOnly ? 0 : -center.y * base.h) + 'px)'
