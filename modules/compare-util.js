@@ -1916,11 +1916,11 @@ const CompareUtil = function(window) {
   };
   const makeRotationController = function(onrotate, onzoom, initialOrientation) {
     initialOrientation = initialOrientation || { x: 30, y: -30 };
-    var orientation = {
+    const orientation = {
       x: initialOrientation.x,
       y: initialOrientation.y
     };
-    var zoomLevel = 0.12;
+    let zoomLevel = 0.12;
     const resetZoom = function() {
       zoomLevel = 0.12;
     };
@@ -1935,7 +1935,7 @@ const CompareUtil = function(window) {
       onrotate();
     };
     const zoom = function(delta) {
-      var MAX_ZOOM_LEVEL = 6;
+      const MAX_ZOOM_LEVEL = 6;
       zoomLevel = clamp(zoomLevel + delta, 0, MAX_ZOOM_LEVEL);
       onzoom();
     };
@@ -1953,15 +1953,15 @@ const CompareUtil = function(window) {
         zoomIn: function() { controller.zoom(0.25); return false; },
         zoomOut: function() { controller.zoom(-0.25); return false; },
         cursor: function() {
-          var step = e.shiftKey ? 10 : 1;
-          var d = cursorKeyCodeToXY(e.keyCode);
+          const step = e.shiftKey ? 10 : 1;
+          const d = cursorKeyCodeToXY(e.keyCode);
           controller.rotate(d.x, d.y, step);
           return false;
         }
       });
     };
-    var dragState = null;
-    var dragStateCallback = null;
+    let dragState = null;
+    let dragStateCallback = null;
     const setDragStateCallback = function(callback) {
       dragStateCallback = callback;
     };
@@ -1982,8 +1982,8 @@ const CompareUtil = function(window) {
             dragStateCallback(false, false);
           }
         } else {
-          var dx = e.clientX - dragState.x;
-          var dy = e.clientY - dragState.y;
+          const dx = e.clientX - dragState.x;
+          const dy = e.clientY - dragState.y;
           dragState = { x: e.clientX, y: e.clientY };
           controller.rotate(dx, dy, 0.5);
           return false;
@@ -2001,12 +2001,12 @@ const CompareUtil = function(window) {
     const processWheel = function(e) {
       return processWheelEvent(e, {
         zoom: function(steps) {
-          var ZOOM_STEP_WHEEL = 0.0625;
+          const ZOOM_STEP_WHEEL = 0.0625;
           controller.zoom(-steps * ZOOM_STEP_WHEEL);
         }
       });
     };
-    var touchFilter = makeTouchEventFilter();
+    const touchFilter = makeTouchEventFilter();
     const processTouchMove = function(e) {
       return touchFilter.onTouchMove(e, {
         move: function(dx, dy) { controller.rotate(dx, dy, 0.3); },
@@ -2030,7 +2030,7 @@ const CompareUtil = function(window) {
       setDragStateCallback
     };
   };
-  var vertexUtil = (function() {
+  const vertexUtil = (function() {
     const makeCube = function(sx, sy, sz) {
       var v = [];
       var cx = sx / 2, cy = sy / 2, cz = sz / 2;
