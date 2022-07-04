@@ -918,4 +918,41 @@ describe('CompareImageUtil', () => {
             ]);
         });
     });
+
+    describe('resizeNN', () => {
+        it('should resize an image with nearest neighbor filtering', () => {
+            const image1 = compareImageUtil.makeImage(2, 2);
+            const image2 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.fill(image1, 10, 20, 30, 40);
+            compareImageUtil.fill(image2, 0, 0, 0, 0);
+            compareImageUtil.resizeNN(image2, image1);
+
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40
+                ]
+            );
+
+            image1.data[0] = 255;
+            image1.data[1] = 255;
+            image1.data[2] = 255;
+            image1.data[3] = 255;
+            compareImageUtil.fill(image2, 0, 0, 0, 0);
+            compareImageUtil.resizeNN(image2, image1);
+
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    255, 255, 255, 255, 255, 255, 255, 255, 10, 20, 30, 40, 10, 20, 30, 40,
+                    255, 255, 255, 255, 255, 255, 255, 255, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40
+                ]
+            );
+        });
+    });
 });
