@@ -1753,7 +1753,7 @@ const CompareUtil = function(window) {
     const processMouseDown = function(e, selector, target) {
       const index = selector ? $(selector).index(target) : null;
       if (getBaseSize(index) && e.which === 1) {
-        var last = dragLastPoint;
+        // var last = dragLastPoint;
         dragStartPoint = dragLastPoint = { x: e.clientX, y: e.clientY };
         return false;
       }
@@ -2032,64 +2032,63 @@ const CompareUtil = function(window) {
   };
   const vertexUtil = (function() {
     const makeCube = function(sx, sy, sz) {
-      var v = [];
-      var cx = sx / 2, cy = sy / 2, cz = sz / 2;
-      for (var i = 0; i < 18; ++i) {
-        var posX = (Math.floor(i / 6) % 3) * cx - cx;
-        var posY = (Math.floor(i / 2) % 3) * cy - cy;
-        var posZ = (i % 2) * sz - cz;
+      const v = [];
+      const cx = sx / 2, cy = sy / 2, cz = sz / 2;
+      for (let i = 0; i < 18; ++i) {
+        const posX = (Math.floor(i / 6) % 3) * cx - cx;
+        const posY = (Math.floor(i / 2) % 3) * cy - cy;
+        const posZ = (i % 2) * sz - cz;
         v[i] = [posX, posY, posZ];
       }
       return v;
     };
-    var cubeFaces = [
+    const cubeFaces = [
       [0, 1, 5, 4, 0], [12, 16, 17, 13, 12],
       [0, 12, 13, 1, 0], [4, 5, 17, 16, 4],
       [0, 4, 16, 12, 0], [1, 13, 17, 5, 1]
     ];
     const make3DCylinder = function(r, sz) {
-      var v = [], cz = sz / 2;
-      for (var i = 0; i < 36; ++i) {
-        var a = i / 18 * Math.PI;
-        var posX = r * Math.cos(a);
-        var posY = r * Math.sin(a);
+      const v = [], cz = sz / 2;
+      for (let i = 0; i < 36; ++i) {
+        const a = i / 18 * Math.PI;
+        const posX = r * Math.cos(a);
+        const posY = r * Math.sin(a);
         v[i * 2] = [posX, posY, -cz];
         v[i * 2 + 1] = [posX, posY, cz];
       }
-      v = v.concat([[0, 0, -cz], [0, 0, cz]]);
-      return v;
+      return v.concat([[0, 0, -cz], [0, 0, cz]]);
     };
-    var cylinderTopAndBottomFaces = (function() {
-      var faces = [[], []];
-      for (var i = 0; i <= 36; ++i) {
+    const cylinderTopAndBottomFaces = (function() {
+      const faces = [[], []];
+      for (let i = 0; i <= 36; ++i) {
         faces[0][i] = ((36 - i) % 36) * 2;
         faces[1][i] = (i % 36) * 2 + 1;
       }
       return faces;
     })();
     const getRightMostVertexOfCylinder = function(rotation) {
-      var yaw10 = Math.round(rotation.yaw / 10);
-      var index = 36 * Math.ceil(yaw10 / 36) - yaw10;
+      const yaw10 = Math.round(rotation.yaw / 10);
+      const index = 36 * Math.ceil(yaw10 / 36) - yaw10;
       return index;
     };
     const makeCylinderSideFaces = function(rotation) {
-      var index = getRightMostVertexOfCylinder(rotation);
-      var faces = [[], []];
-      for (var i = 0; i <= 18; ++i) {
+      const index = getRightMostVertexOfCylinder(rotation);
+      const faces = [[], []];
+      for (let i = 0; i <= 18; ++i) {
         faces[0][i] = ((i + 18 + index) % 36) * 2;
         faces[1][i] = ((36 - i + index) % 36) * 2 + 1;
       }
       return faces;
     };
     const makeCylinderFaces = function(rotation) {
-      var side = makeCylinderSideFaces(rotation);
+      const side = makeCylinderSideFaces(rotation);
       return cylinderTopAndBottomFaces.concat(side);
     };
-    var cylinderDarkLines = [
+    const cylinderDarkLines = [
       [72, 0, 1, 73, 25, 24, 72, 48, 49, 73, 72]
     ];
     const makeCylinderContour = function(rotation) {
-      var index = getRightMostVertexOfCylinder(rotation);
+      const index = getRightMostVertexOfCylinder(rotation);
       return [
         [index * 2, index * 2 + 1],
         [(index + 18) % 36 * 2, (index + 18) % 36 * 2 + 1]
