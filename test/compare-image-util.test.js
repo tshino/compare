@@ -954,5 +954,36 @@ describe('CompareImageUtil', () => {
                 ]
             );
         });
+
+        it('should deal with F32 format', () => {
+            const image1 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_F32x1);
+            const image2 = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+
+            compareImageUtil.fill(image1, 10);
+            compareImageUtil.fill(image2, 0);
+            compareImageUtil.resizeNN(image2, image1);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    10, 10, 10, 10,
+                    10, 10, 10, 10,
+                    10, 10, 10, 10,
+                    10, 10, 10, 10
+                ]
+            );
+
+            image1.data[0] = 255;
+            compareImageUtil.fill(image2, 0);
+            compareImageUtil.resizeNN(image2, image1);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    255, 255, 10, 10,
+                    255, 255, 10, 10,
+                    10, 10, 10, 10,
+                    10, 10, 10, 10
+                ]
+            );
+        });
     });
 });
