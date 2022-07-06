@@ -93,25 +93,25 @@ const compareImageUtil = (function() {
       j += (src.pitch - w) * ch;
     }
   };
-  var rotateCW = function(dest, src) {
+  const rotateCW = function(dest, src) {
     applyOrientationImpl(dest, src, 6);
   };
-  var rotateCCW = function(dest, src) {
+  const rotateCCW = function(dest, src) {
     applyOrientationImpl(dest, src, 8);
   };
-  var flipH = function(dest, src) {
+  const flipH = function(dest, src) {
     applyOrientationImpl(dest, src, 2);
   };
-  var flipV = function(dest, src) {
+  const flipV = function(dest, src) {
     applyOrientationImpl(dest, src, 4);
   };
-  var applyOrientation = function(src, orientation) {
+  const applyOrientation = function(src, orientation) {
     return applyOrientationImpl(null, src, orientation);
   };
-  var applyOrientationImpl = function(dest, src, orientation) {
+  const applyOrientationImpl = function(dest, src, orientation) {
     src = makeImage(src);
-    var transposed = [5,6,7,8].indexOf(orientation) >= 0;
-    var w = src.width, h = src.height, format = src.format, ch = src.channels;
+    const transposed = [5,6,7,8].indexOf(orientation) >= 0;
+    let w = src.width, h = src.height, format = src.format, ch = src.channels;
     if (dest) {
       dest = makeImage(dest);
       if (ch !== dest.channels) {
@@ -123,13 +123,13 @@ const compareImageUtil = (function() {
       dest = transposed ? makeImage(h, w, format) : makeImage(w, h, format);
     }
     orientation = [2,3,4,5,6,7,8].indexOf(orientation) >= 0 ? orientation : 1;
-    var idx = ch * [1, -1, -1, 1, dest.pitch, dest.pitch, -dest.pitch, -dest.pitch][orientation - 1];
-    var idy = ch * [dest.pitch, dest.pitch, -dest.pitch, -dest.pitch, 1, -1, -1, 1][orientation - 1];
-    var i = ch * dest.offset + (idx < 0 ? idx * (1 - w) : 0) + (idy < 0 ? idy * (1 - h) : 0);
-    var j = ch * src.offset;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += idx, j += ch) {
-        for (var k = 0; k < ch; k++) {
+    const idx = ch * [1, -1, -1, 1, dest.pitch, dest.pitch, -dest.pitch, -dest.pitch][orientation - 1];
+    const idy = ch * [dest.pitch, dest.pitch, -dest.pitch, -dest.pitch, 1, -1, -1, 1][orientation - 1];
+    let i = ch * dest.offset + (idx < 0 ? idx * (1 - w) : 0) + (idy < 0 ? idy * (1 - h) : 0);
+    let j = ch * src.offset;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, i += idx, j += ch) {
+        for (let k = 0; k < ch; k++) {
           dest.data[i + k] = src.data[j + k];
         }
       }
