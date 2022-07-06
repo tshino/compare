@@ -1,14 +1,14 @@
 ﻿'use strict';
-var compareImageUtil = (function() {
+const compareImageUtil = (function() {
 
-  var FORMAT_U8x4  = 0x0104;
-  var FORMAT_F32x1 = 0x0401;
+  const FORMAT_U8x4  = 0x0104;
+  const FORMAT_F32x1 = 0x0401;
 
-  var channelsOf = function(format) {
+  const channelsOf = function(format) {
     return format ? (format & 0x00ff) : 0x0004;
   };
-  var newArrayOf = function(format, size) {
-    var elementType = format ? (format & 0xff00) : 0x0100;
+  const newArrayOf = function(format, size) {
+    const elementType = format ? (format & 0xff00) : 0x0100;
     if (elementType === 0x0400) {
       return new Float32Array(size);
     } else { // 0x0100
@@ -16,9 +16,9 @@ var compareImageUtil = (function() {
     }
   };
 
-  var makeImage = function(a, b, format) {
+  const makeImage = function(a, b, format) {
     if (b === undefined) {
-      var ch = a.channels !== undefined ? a.channels : 4;
+      const ch = a.channels !== undefined ? a.channels : 4;
       return {
         width:  a.width,
         height: a.height,
@@ -29,7 +29,7 @@ var compareImageUtil = (function() {
         format: (ch === 4 ? FORMAT_U8x4 : FORMAT_F32x1)
       };
     } else {
-      var ch = channelsOf(format);
+      const ch = channelsOf(format);
       return {
         width:    a,
         height:   b,
@@ -41,12 +41,12 @@ var compareImageUtil = (function() {
       };
     }
   };
-  var makeRegion = function(image, left, top, width, height) {
+  const makeRegion = function(image, left, top, width, height) {
     image = makeImage(image);
     left   = left   !== undefined ? left   : 0;
     top    = top    !== undefined ? top    : 0;
-    var right  = width  !== undefined ? left + width : image.width;
-    var bottom = height !== undefined ? top + height : image.height;
+    let right  = width  !== undefined ? left + width : image.width;
+    let bottom = height !== undefined ? top + height : image.height;
     left   = Math.max(0,    Math.min(image.width, left));
     top    = Math.max(0,    Math.min(image.height, top));
     right  = Math.max(left, Math.min(image.width, right));
@@ -61,32 +61,32 @@ var compareImageUtil = (function() {
       format: image.format
     };
   };
-  var fill = function(image, r, g, b, a) {
+  const fill = function(image, r, g, b, a) {
     image = makeImage(image);
-    var w = image.width, h = image.height;
-    var ch = image.channels;
-    var i = image.offset * ch;
-    var v = [r, g, b, a];
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        for (var k = 0; k < ch; k++, i++) {
+    const w = image.width, h = image.height;
+    const ch = image.channels;
+    let i = image.offset * ch;
+    const v = [r, g, b, a];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        for (let k = 0; k < ch; k++, i++) {
           image.data[i] = v[k];
         }
       }
       i += (image.pitch - w) * ch;
     }
   };
-  var copy = function(dest, src) {
+  const copy = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
     if (dest.channels !== src.channels) {
       return;
     }
-    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var ch = src.channels;
-    var i = dest.offset * ch, j = src.offset * ch;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w * ch; x++, i++, j++) {
+    const w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    const ch = src.channels;
+    let i = dest.offset * ch, j = src.offset * ch;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w * ch; x++, i++, j++) {
         dest.data[i] = src.data[j];
       }
       i += (dest.pitch - w) * ch;
