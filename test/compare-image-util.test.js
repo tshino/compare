@@ -986,4 +986,40 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('resizeBilinear', () => {
+        it('should resize an image with bilinear filtering', () => {
+            const image1 = compareImageUtil.makeImage(2, 2);
+            const image2 = compareImageUtil.makeImage(4, 4);
+
+            compareImageUtil.fill(image1, 10, 20, 30, 40);
+            compareImageUtil.fill(image2, 0, 0, 0, 0);
+            compareImageUtil.resizeBilinear(image2, image1);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40
+                ]
+            );
+
+            image1.data[0] = 255;
+            image1.data[1] = 255;
+            image1.data[2] = 255;
+            image1.data[3] = 255;
+            compareImageUtil.fill(image2, 0, 0, 0, 0);
+            compareImageUtil.resizeBilinear(image2, image1);
+            assert.deepStrictEqual(
+                Array.from(image2.data),
+                [
+                    255, 255, 255, 255, 194, 196, 199, 201, 71, 79, 86, 94, 10, 20, 30, 40,
+                    194, 196, 199, 201, 148, 152, 157, 161, 56, 64, 72, 80, 10, 20, 30, 40,
+                    71, 79, 86, 94, 56, 64, 72, 80, 25, 35, 44, 53, 10, 20, 30, 40,
+                    10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40, 10, 20, 30, 40
+                ]
+            );
+        });
+    });
 });
