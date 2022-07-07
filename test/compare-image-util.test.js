@@ -1022,4 +1022,96 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('gaussianBlur', () => {
+        const checkGrayscaleResult = function (name, result, expected) {
+            for (let i = 0; i < 64; ++i) {
+                const label = (i + 1) + 'th pixel of ' + name;
+                assert.strictEqual(result.data[i * 4 + 0], expected[i], label + ' (R)');
+                assert.strictEqual(result.data[i * 4 + 1], expected[i], label + ' (G)');
+                assert.strictEqual(result.data[i * 4 + 2], expected[i], label + ' (B)');
+                assert.strictEqual(result.data[i * 4 + 3], 255, label + ' (alpha)');
+            }
+        };
+        it('should apply Gaussian blur to an image', () => {
+            const image1 = compareImageUtil.makeImage(8, 8);
+            compareImageUtil.fill(image1, 0, 0, 0, 255);
+            const region1 = compareImageUtil.makeRegion(image1, 3, 3, 1, 1);
+            compareImageUtil.fill(region1, 255, 255, 255, 255);
+
+            const result1 = compareImageUtil.makeImage(8, 8);
+            compareImageUtil.fill(result1, 0, 0, 0, 0);
+
+            // stdev = 0
+            compareImageUtil.gaussianBlur(result1, image1, 0);
+            checkGrayscaleResult(
+                'gaussian stdev=0 of point',
+                result1,
+                [
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 255, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0
+                ]
+            );
+
+            // stdev = 1
+            compareImageUtil.gaussianBlur(result1, image1, 1);
+            checkGrayscaleResult(
+                'gaussian stdev=1 of point',
+                result1,
+                [
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 1, 3, 5, 3, 1, 0, 0,
+                    0, 3, 15, 25, 15, 3, 0, 0,
+                    0, 5, 25, 41, 25, 5, 0, 0,
+                    0, 3, 15, 25, 15, 3, 0, 0,
+                    0, 1, 3, 5, 3, 1, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0
+                ]
+            );
+
+            const region2 = compareImageUtil.makeRegion(image1, 0, 0, 4, 8);
+            compareImageUtil.fill(region2, 255, 255, 255, 255);
+
+            // stdev = 0
+            compareImageUtil.gaussianBlur(result1, image1, 0);
+            checkGrayscaleResult(
+                'gaussian stdev=0 of partition',
+                result1,
+                [
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0,
+                    255, 255, 255, 255, 0, 0, 0, 0
+                ]
+            );
+
+            // stdev = 1
+            compareImageUtil.gaussianBlur(result1, image1, 1);
+            checkGrayscaleResult(
+                'gaussian stdev=1 of partition',
+                result1,
+                [
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0,
+                    255, 254, 240, 178, 77, 15, 1, 0
+                ]
+            );
+        });
+    });
 });
