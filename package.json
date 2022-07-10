@@ -2,7 +2,7 @@
     "scripts": {
         "lint": "eslint .",
         "pretest": "npm run lint",
-        "test": "nyc mocha test/*.test.js"
+        "test": "nyc --reporter=text --reporter=html mocha test/*.test.js"
     },
     "devDependencies": {
         "eslint": "^8.19.0",
