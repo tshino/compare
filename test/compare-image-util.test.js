@@ -1165,4 +1165,206 @@ describe('CompareImageUtil', () => {
             );
         });
     });
+
+    describe('convolution, sobelX, sobelY, scharrX, scharrY', () => {
+        const makeImageForConvolutionTest = function (bitmap) {
+            const image = compareImageUtil.makeImage(4, 4);
+            for (let i = 0; i < 16; ++i) {
+                image.data[i * 4 + 0] = bitmap[i];
+                image.data[i * 4 + 1] = bitmap[i];
+                image.data[i * 4 + 2] = bitmap[i];
+                image.data[i * 4 + 3] = 255;
+            }
+            return image;
+        };
+        const makeImageForConvolutionTestF32 = function (bitmap) {
+            const image = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            for (let i = 0; i < 16; ++i) {
+                image.data[i] = bitmap[i];
+            }
+            return image;
+        };
+        const checkConvolutionResult = function (name, result, expected) {
+            for (let i = 0; i < 16; ++i) {
+                const label = (i + 1) + 'th pixel of ' + name;
+                assert.strictEqual(result.data[i * 4 + 0], 128 + expected[i], label);
+                assert.strictEqual(result.data[i * 4 + 1], 128 + expected[i], label);
+                assert.strictEqual(result.data[i * 4 + 2], 128 + expected[i], label);
+            }
+        };
+        const checkConvolutionResultF32 = function (name, result, expected) {
+            for (let i = 0; i < 16; ++i) {
+                const label = (i + 1) + 'th pixel of ' + name;
+                assert.ok(1e-5 > Math.abs(expected[i] - result.data[i]), label);
+            }
+        };
+
+        const image1Bitmap = [
+            0, 0, 0, 0,
+            0, 100, 100, 0,
+            0, 50, 0, 0,
+            0, 0, 0, 50
+        ];
+        const image1 = makeImageForConvolutionTest(image1Bitmap);
+        const image1F = makeImageForConvolutionTestF32(image1Bitmap);
+
+        const image2Bitmap = [
+            0, 0, 0, 0,
+            0, 10, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        ];
+        const image2 = makeImageForConvolutionTest(image2Bitmap);
+        const image2F = makeImageForConvolutionTestF32(image2Bitmap);
+
+        it('should apply convolution to an image', () => {
+            const result1 = compareImageUtil.makeImage(4, 4);
+            const result1F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.convolution(result1, image1, { w: 3, h: 1 }, [
+                1, 0, -1
+            ]);
+            compareImageUtil.convolution(result1F, image1F, { w: 3, h: 1 }, [
+                1, 0, -1
+            ]);
+            const expected1 = [
+                0, 0, 0, 0,
+                100, 100, -100, -100,
+                50, 0, -50, 0,
+                0, 0, 50, 50
+            ];
+            checkConvolutionResult('result1 (horizontal kernel)', result1, expected1);
+            checkConvolutionResultF32('result1F (horizontal kernel)', result1F, expected1);
+
+            const result2 = compareImageUtil.makeImage(4, 4);
+            const result2F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.convolution(result2, image1, { w: 1, h: 3 }, [
+                0.20,
+                0.60,
+                0.20
+            ]);
+            compareImageUtil.convolution(result2F, image1F, { w: 1, h: 3 }, [
+                0.20,
+                0.60,
+                0.20
+            ]);
+            const expected2 = [
+                0, 20, 20, 0,
+                0, 70, 60, 0,
+                0, 50, 20, 10,
+                0, 10, 0, 40
+            ];
+            checkConvolutionResult('result2 (vertical kernel)', result2, expected2);
+            checkConvolutionResultF32('result2F (vertical kernel)', result2F, expected2);
+
+            const result3 = compareImageUtil.makeImage(4, 4);
+            const result3F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            const kernel3 = [
+                0.0, 0.1, 0.0,
+                0.1, 0.6, 0.1,
+                0.0, 0.1, 0.0
+            ];
+            compareImageUtil.convolution(result3, image1, { w: 3, h: 3 }, kernel3);
+            compareImageUtil.convolution(result3F, image1F, { w: 3, h: 3 }, kernel3);
+            const expected3 = [
+                0, 10, 10, 0,
+                10, 75, 70, 10,
+                5, 40, 15, 5,
+                0, 5, 5, 40
+            ];
+            checkConvolutionResult('result3 (3x3 kernel)', result3, expected3);
+            checkConvolutionResultF32('result3F (3x3 kernel)', result3F, expected3);
+
+            const result4 = compareImageUtil.makeImage(4, 4);
+            const result4F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            const kernel4 = [
+                1, 2, 3,
+                4, 5, 6,
+                7, 8, 9
+            ];
+            compareImageUtil.convolution(result4, image2, { w: 3, h: 3 }, kernel4);
+            compareImageUtil.convolution(result4F, image2F, { w: 3, h: 3 }, kernel4);
+            const expected4 = [
+                10, 20, 30, 0,
+                40, 50, 60, 0,
+                70, 80, 90, 0,
+                0, 0, 0, 0
+            ];
+            checkConvolutionResult('result4 (3x3 kernel)', result4, expected4);
+            checkConvolutionResultF32('result4F (3x3 kernel)', result4F, expected4);
+
+            const result5 = compareImageUtil.makeImage(4, 4);
+            const result5F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            const kernel5 = [
+                1, 2, 3, 4, 5,
+                2, 3, 4, 5, 6,
+                3, 4, 5, 6, 7,
+                4, 5, 6, 7, 8,
+                5, 6, 7, 8, 9
+            ];
+            compareImageUtil.convolution(result5, image2, { w: 5, h: 5 }, kernel5);
+            compareImageUtil.convolution(result5F, image2F, { w: 5, h: 5 }, kernel5);
+            const expected5 = [
+                30, 40, 50, 60,
+                40, 50, 60, 70,
+                50, 60, 70, 80,
+                60, 70, 80, 90
+            ];
+            checkConvolutionResult('result5 (5x5 kernel)', result5, expected5);
+            checkConvolutionResultF32('result5F (5x5 kernel)', result5F, expected5);
+        });
+        it('should apply Sobel filter to an image', () => {
+            const result6 = compareImageUtil.makeImage(4, 4);
+            const result6F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.sobelX(result6, image2);
+            compareImageUtil.sobelX(result6F, image2F);
+            const expected6 = [
+                10, 0, -10, 0,
+                20, 0, -20, 0,
+                10, 0, -10, 0,
+                0, 0, 0, 0
+            ];
+            checkConvolutionResult('result6 (sobelX)', result6, expected6);
+            checkConvolutionResultF32('result6F (sobelX)', result6F, expected6);
+
+            const result7 = compareImageUtil.makeImage(4, 4);
+            const result7F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.sobelY(result7, image2);
+            compareImageUtil.sobelY(result7F, image2F);
+            const expected7 = [
+                10, 20, 10, 0,
+                0, 0, 0, 0,
+                -10, -20, -10, 0,
+                0, 0, 0, 0
+            ];
+            checkConvolutionResult('result7 (sobelY)', result7, expected7);
+            checkConvolutionResultF32('result7F (sobelY)', result7F, expected7);
+        });
+        it('should apply Scharr filter to an image', () => {
+            const result8 = compareImageUtil.makeImage(4, 4);
+            const result8F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.scharrX(result8, image2);
+            compareImageUtil.scharrX(result8F, image2F);
+            const expected8 = [
+                30, 0, -30, 0,
+                100, 0, -100, 0,
+                30, 0, -30, 0,
+                0, 0, 0, 0
+            ];
+            checkConvolutionResult('result8 (scharrX)', result8, expected8);
+            checkConvolutionResultF32('result8F (scharrX)', result8F, expected8);
+
+            const result9 = compareImageUtil.makeImage(4, 4);
+            const result9F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.scharrY(result9, image2);
+            compareImageUtil.scharrY(result9F, image2F);
+            const expected9 = [
+                30, 100, 30, 0,
+                0, 0, 0, 0,
+                -30, -100, -30, 0,
+                0, 0, 0, 0
+            ];
+            checkConvolutionResult('result9 (scharrY)', result9, expected9);
+            checkConvolutionResultF32('result9F (scharrY)', result9F, expected9);
+        });
+    });
 });
