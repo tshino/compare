@@ -1367,4 +1367,62 @@ describe('CompareImageUtil', () => {
             checkConvolutionResultF32('result9F (scharrY)', result9F, expected9);
         });
     });
+
+    describe('dilate3x1, dilate1x3, dilate3x3', () => {
+        const checkResult = function (name, result, expected) {
+            assert.strictEqual(result.data.length, expected.data.length, 'data.length of ' + name);
+            assert.strictEqual(result.width, expected.width, 'width of ' + name);
+            assert.strictEqual(result.height, expected.height, 'height of ' + name);
+            for (let i = 0; i < expected.data.length; ++i) {
+                const label = ((i >> 2) + 1) + 'th pixel of ' + name;
+                assert.strictEqual(result.data[i], expected.data[i], label);
+            }
+        };
+
+        it('should apply dilate filter to an image', () => {
+            const image1 = compareImageUtil.makeImage(4, 4);
+            const d1 = image1.data;
+            d1[20] = 255; d1[21] = 128; d1[22] = 64; d1[23] = 42;
+            d1[24] = 30; d1[25] = 60; d1[26] = 80; d1[27] = 90;
+            d1[44] = 10; d1[45] = 20; d1[46] = 30; d1[47] = 40;
+
+            const result3x1 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.dilate3x1(result3x1, image1);
+            const expected3x1 = {
+                width: 4, height: 4, data: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    255, 128, 64, 42, 255, 128, 80, 90, 255, 128, 80, 90, 30, 60, 80, 90,
+                    0, 0, 0, 0, 0, 0, 0, 0, 10, 20, 30, 40, 10, 20, 30, 40,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                ]
+            };
+            checkResult('result3x1', result3x1, expected3x1);
+
+            d1[48] = 50; d1[49] = 75; d1[50] = 85; d1[51] = 80;
+
+            const result1x3 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.dilate1x3(result1x3, image1);
+            const expected1x3 = {
+                width: 4, height: 4, data: [
+                    0, 0, 0, 0, 255, 128, 64, 42, 30, 60, 80, 90, 0, 0, 0, 0,
+                    0, 0, 0, 0, 255, 128, 64, 42, 30, 60, 80, 90, 10, 20, 30, 40,
+                    50, 75, 85, 80, 255, 128, 64, 42, 30, 60, 80, 90, 10, 20, 30, 40,
+                    50, 75, 85, 80, 0, 0, 0, 0, 0, 0, 0, 0, 10, 20, 30, 40
+                ]
+            };
+            checkResult('result1x3', result1x3, expected1x3);
+
+            const result3x3 = compareImageUtil.makeImage(4, 4);
+            compareImageUtil.dilate3x3(result3x3, image1);
+            const expected3x3 = {
+                width: 4, height: 4, data: [
+                    255, 128, 64, 42, 255, 128, 80, 90, 255, 128, 80, 90, 30, 60, 80, 90,
+                    255, 128, 64, 42, 255, 128, 80, 90, 255, 128, 80, 90, 30, 60, 80, 90,
+                    255, 128, 85, 80, 255, 128, 85, 90, 255, 128, 80, 90, 30, 60, 80, 90,
+                    50, 75, 85, 80, 50, 75, 85, 80, 10, 20, 30, 40, 10, 20, 30, 40
+                ]
+            };
+            checkResult('result3x3', result3x3, expected3x3);
+        });
+    });
 });
