@@ -1378,6 +1378,15 @@ describe('CompareImageUtil', () => {
                 assert.strictEqual(result.data[i], expected.data[i], label);
             }
         };
+        const checkResultF32 = function (name, result, expected) {
+            assert.strictEqual(result.data.length, expected.data.length, 'data.length of ' + name);
+            assert.strictEqual(result.width, expected.width, 'width of ' + name);
+            assert.strictEqual(result.height, expected.height, 'height of ' + name);
+            for (let i = 0; i < expected.data.length; ++i) {
+                const label = (i + 1) + 'th pixel of ' + name;
+                assert.strictEqual(result.data[i], expected.data[i], label);
+            }
+        };
 
         it('should apply dilate filter to an image', () => {
             const image1 = compareImageUtil.makeImage(4, 4);
@@ -1423,6 +1432,50 @@ describe('CompareImageUtil', () => {
                 ]
             };
             checkResult('result3x3', result3x3, expected3x3);
+        });
+
+        it('should deal with F32 format', () => {
+            const image1F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            const d1 = image1F.data;
+            d1[5] = 128; d1[6] = 60; d1[11] = 20;
+
+            const result3x1F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.dilate3x1(result3x1F, image1F);
+            const expected3x1F = {
+                width: 4, height: 4, data: [
+                    0, 0, 0, 0,
+                    128, 128, 128, 60,
+                    0, 0, 20, 20,
+                    0, 0, 0, 0
+                ]
+            };
+            checkResultF32('result3x1F', result3x1F, expected3x1F);
+
+            d1[12] = 50;
+
+            const result1x3F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.dilate1x3(result1x3F, image1F);
+            const expected1x3F = {
+                width: 4, height: 4, data: [
+                    0, 128, 60, 0,
+                    0, 128, 60, 20,
+                    50, 128, 60, 20,
+                    50, 0, 0, 20
+                ]
+            };
+            checkResultF32('result1x3F', result1x3F, expected1x3F);
+
+            const result3x3F = compareImageUtil.makeImage(4, 4, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.dilate3x3(result3x3F, image1F);
+            const expected3x3F = {
+                width: 4, height: 4, data: [
+                    128, 128, 128, 60,
+                    128, 128, 128, 60,
+                    128, 128, 128, 60,
+                    50, 50, 20, 20
+                ]
+            };
+            checkResultF32('result3x3F', result3x3F, expected3x3F);
         });
     });
 });
