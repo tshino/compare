@@ -175,22 +175,22 @@ const compareImageUtil = (function() {
     }
     return region;
   };
-  var convertToGrayscale = function(dest, src) {
+  const convertToGrayscale = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
-    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var i = dest.offset * dest.channels, j = src.offset * src.channels;
-    var read = src.channels === 4 ? function(k) {
-      var r = src.data[k    ];
-      var g = src.data[k + 1];
-      var b = src.data[k + 2];
-      var a = src.data[k + 3];
+    const w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    let i = dest.offset * dest.channels, j = src.offset * src.channels;
+    const read = src.channels === 4 ? function(k) {
+      const r = src.data[k    ];
+      const g = src.data[k + 1];
+      const b = src.data[k + 2];
+      const a = src.data[k + 3];
       return [a, 0.299 * r + 0.587 * g + 0.114 * b];
     } : function(k) {
       return [255, src.data[k]];
     };
-    var write = dest.channels === 4 ? function(k, val) {
-      var v = Math.round(val[1]);
+    const write = dest.channels === 4 ? function(k, val) {
+      const v = Math.round(val[1]);
       dest.data[k    ] = v;
       dest.data[k + 1] = v;
       dest.data[k + 2] = v;
@@ -198,8 +198,8 @@ const compareImageUtil = (function() {
     } : function(k, val) {
       dest.data[k] = val[1] * val[0] * (1/255);
     };
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += dest.channels, j += src.channels) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, i += dest.channels, j += src.channels) {
         write(i, read(j));
       }
       i += (dest.pitch - w) * dest.channels;
