@@ -138,38 +138,38 @@ const compareImageUtil = (function() {
     }
     return dest;
   };
-  var readSubPixel = function(src, left, top, width, height) {
+  const readSubPixel = function(src, left, top, width, height) {
     src = makeImage(src);
-    var region = makeImage(width, height, FORMAT_F32x1);
-    var iLeft = Math.floor(left);
-    var iTop = Math.floor(top);
-    var sampleX = [], sampleY = [];
-    for (var i = 0; i < width; ++i) {
+    const region = makeImage(width, height, FORMAT_F32x1);
+    const iLeft = Math.floor(left);
+    const iTop = Math.floor(top);
+    const sampleX = [], sampleY = [];
+    for (let i = 0; i < width; ++i) {
       sampleX[i * 2] = Math.max(0, Math.min(src.width - 1, iLeft + i));
       sampleX[i * 2 + 1] = Math.max(0, Math.min(src.width - 1, iLeft + i + 1));
     }
-    for (var i = 0; i < height; ++i) {
+    for (let i = 0; i < height; ++i) {
       sampleY[i * 2] = Math.max(0, Math.min(src.height - 1, iTop + i));
       sampleY[i * 2 + 1] = Math.max(0, Math.min(src.height - 1, iTop + i + 1));
     }
-    var rx = left - iLeft;
-    var ry = top - iTop;
-    var a00 = (1 - rx) * (1 - ry);
-    var a01 = rx * (1 - ry);
-    var a10 = (1 - rx) * ry;
-    var a11 = rx * ry;
-    var ch = src.channels;
-    var i = 0;
-    for (var b = 0; b < height; ++b) {
-      var y0 = sampleY[b * 2], y1 = sampleY[b * 2 + 1];
-      var k0 = (src.offset + src.pitch * y0) * ch;
-      var k1 = (src.offset + src.pitch * y1) * ch;
-      for (var a = 0; a < width; ++a) {
-        var x0 = sampleX[a * 2], x1 = sampleX[a * 2 + 1];
-        var c00 = a00 * src.data[k0 + x0 * ch];
-        var c01 = a01 * src.data[k0 + x1 * ch];
-        var c10 = a10 * src.data[k1 + x0 * ch];
-        var c11 = a11 * src.data[k1 + x1 * ch];
+    const rx = left - iLeft;
+    const ry = top - iTop;
+    const a00 = (1 - rx) * (1 - ry);
+    const a01 = rx * (1 - ry);
+    const a10 = (1 - rx) * ry;
+    const a11 = rx * ry;
+    const ch = src.channels;
+    let i = 0;
+    for (let b = 0; b < height; ++b) {
+      const y0 = sampleY[b * 2], y1 = sampleY[b * 2 + 1];
+      const k0 = (src.offset + src.pitch * y0) * ch;
+      const k1 = (src.offset + src.pitch * y1) * ch;
+      for (let a = 0; a < width; ++a) {
+        const x0 = sampleX[a * 2], x1 = sampleX[a * 2 + 1];
+        const c00 = a00 * src.data[k0 + x0 * ch];
+        const c01 = a01 * src.data[k0 + x1 * ch];
+        const c10 = a10 * src.data[k1 + x0 * ch];
+        const c11 = a11 * src.data[k1 + x1 * ch];
         region.data[i++] = c00 + c01 + c10 + c11;
       }
     }
