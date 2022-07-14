@@ -244,61 +244,61 @@ const compareImageUtil = (function() {
       i += (dest.pitch - w) * dest.channels;
     }
   };
-  var resizeBilinear = function(dest, src) {
+  const resizeBilinear = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
-    var w = dest.width, h = dest.height;
-    var sw = src.width, sh = src.height;
-    var mw = sw / w, mh = sh / h;
-    var ddata = dest.data, sdata = src.data;
-    var round = Math.round;
-    var floor = Math.floor;
-    var sxo = new Uint32Array(w * 2);
-    var fx = new Float32Array(w * 2);
-    for (var x = 0; x < w; x++) {
-      var rx = (x + 0.5) * mw - 0.5;
-      var sx0 = floor(rx);
-      var sx1 = sx0 + 1;
-      var fx1 = rx - sx0;
+    const w = dest.width, h = dest.height;
+    const sw = src.width, sh = src.height;
+    const mw = sw / w, mh = sh / h;
+    const ddata = dest.data, sdata = src.data;
+    const round = Math.round;
+    const floor = Math.floor;
+    const sxo = new Uint32Array(w * 2);
+    const fx = new Float32Array(w * 2);
+    for (let x = 0; x < w; x++) {
+      const rx = (x + 0.5) * mw - 0.5;
+      let sx0 = floor(rx);
+      let sx1 = sx0 + 1;
+      let fx1 = rx - sx0;
       if (sx0 < 0) { sx0 = sx1 = 0; fx1 = 0; }
       if (sx1 >= sw) { sx0 = sx1 = sw - 1; fx1 = 0; }
-      var fx0 = 1 - fx1;
+      const fx0 = 1 - fx1;
       sxo[x * 2    ] = sx0 * 4;
       sxo[x * 2 + 1] = sx1 * 4;
       fx[x * 2    ] = fx0;
       fx[x * 2 + 1] = fx1;
     }
-    var syo = new Uint32Array(h * 2);
-    var fy = new Float32Array(h * 2);
-    for (var y = 0; y < h; y++) {
-      var ry = (y + 0.5) * mh - 0.5;
-      var sy0 = floor(ry);
-      var sy1 = sy0 + 1;
-      var fy1 = ry - sy0;
+    const syo = new Uint32Array(h * 2);
+    const fy = new Float32Array(h * 2);
+    for (let y = 0; y < h; y++) {
+      const ry = (y + 0.5) * mh - 0.5;
+      let sy0 = floor(ry);
+      let sy1 = sy0 + 1;
+      let fy1 = ry - sy0;
       if (sy0 < 0) { sy0 = sy1 = 0; fy1 = 0; }
       if (sy1 >= sh) { sy0 = sy1 = sh - 1; fy1 = 0; }
-      var fy0 = 1 - fy1;
+      const fy0 = 1 - fy1;
       syo[y * 2    ] = w * sy0 * 4;
       syo[y * 2 + 1] = w * sy1 * 4;
       fy[y * 2    ] = fy0;
       fy[y * 2 + 1] = fy1;
     }
-    var kdata = new Float32Array(w * sh * 4);
-    var k = 0;
-    var j = src.offset * 4;
-    for (var jh = j + src.pitch * 4 * sh; j < jh; ) {
-      var f = 0;
-      for (var fw = w * 2; f < fw; k += 4) {
-        var j0  = j + sxo[f];
-        var fx0 = fx[f];
+    const kdata = new Float32Array(w * sh * 4);
+    let k = 0;
+    let j = src.offset * 4;
+    for (const jh = j + src.pitch * 4 * sh; j < jh; ) {
+      let f = 0;
+      for (const fw = w * 2; f < fw; k += 4) {
+        const j0  = j + sxo[f];
+        const fx0 = fx[f];
         f++;
-        var j1  = j + sxo[f];
-        var fx1 = fx[f];
+        const j1  = j + sxo[f];
+        const fx1 = fx[f];
         f++;
-        var r = sdata[j0    ] * fx0 + sdata[j1    ] * fx1;
-        var g = sdata[j0 + 1] * fx0 + sdata[j1 + 1] * fx1;
-        var b = sdata[j0 + 2] * fx0 + sdata[j1 + 2] * fx1;
-        var a = sdata[j0 + 3] * fx0 + sdata[j1 + 3] * fx1;
+        const r = sdata[j0    ] * fx0 + sdata[j1    ] * fx1;
+        const g = sdata[j0 + 1] * fx0 + sdata[j1 + 1] * fx1;
+        const b = sdata[j0 + 2] * fx0 + sdata[j1 + 2] * fx1;
+        const a = sdata[j0 + 3] * fx0 + sdata[j1 + 3] * fx1;
         kdata[k    ] = r;
         kdata[k + 1] = g;
         kdata[k + 2] = b;
@@ -306,21 +306,21 @@ const compareImageUtil = (function() {
       }
       j += src.pitch * 4;
     }
-    var i = dest.offset * 4;
-    var igap = (dest.pitch - w) * 4;
-    f = 0;
-    for (var fh = h * 2; f < fh; ) {
-      var k0 = syo[f];
-      var fy0 = fy[f];
+    let i = dest.offset * 4;
+    const igap = (dest.pitch - w) * 4;
+    let f = 0;
+    for (const fh = h * 2; f < fh; ) {
+      let k0 = syo[f];
+      const fy0 = fy[f];
       f++;
-      var k1 = syo[f];
-      var fy1 = fy[f];
+      let k1 = syo[f];
+      const fy1 = fy[f];
       f++;
-      for (var iw = i + w * 4; i < iw; i += 4, k0 += 4, k1 += 4) {
-        var r = kdata[k0    ] * fy0 + kdata[k1    ] * fy1;
-        var g = kdata[k0 + 1] * fy0 + kdata[k1 + 1] * fy1;
-        var b = kdata[k0 + 2] * fy0 + kdata[k1 + 2] * fy1;
-        var a = kdata[k0 + 3] * fy0 + kdata[k1 + 3] * fy1;
+      for (const iw = i + w * 4; i < iw; i += 4, k0 += 4, k1 += 4) {
+        const r = kdata[k0    ] * fy0 + kdata[k1    ] * fy1;
+        const g = kdata[k0 + 1] * fy0 + kdata[k1 + 1] * fy1;
+        const b = kdata[k0 + 2] * fy0 + kdata[k1 + 2] * fy1;
+        const a = kdata[k0 + 3] * fy0 + kdata[k1 + 3] * fy1;
         ddata[i    ] = round(r);
         ddata[i + 1] = round(g);
         ddata[i + 2] = round(b);
