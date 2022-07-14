@@ -798,7 +798,7 @@ function calcOpticalFlow( a, b, options ) {
   var pointsA = compareImageUtil.findCornerPoints(grayA);
   compareImageUtil.adjustCornerPointsSubPixel(grayA, pointsA);
   var pointsB = compareImageUtil.sparseOpticalFlow(grayA, grayB, pointsA);
-  points = [];
+  const points = [];
   for (var i = 0; i < pointsB.length; i++) {
     if (pointsB[i]) {
       points.push({
