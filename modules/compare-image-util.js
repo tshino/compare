@@ -329,64 +329,64 @@ const compareImageUtil = (function() {
       i += igap;
     }
   };
-  var resizeGeneral = function(dest, src, filterSize, filterFunc) {
+  const resizeGeneral = function(dest, src, filterSize, filterFunc) {
     dest = makeImage(dest);
     src = makeImage(src);
     if (src.channels !== dest.channels) {
       return;
     }
-    var ch = src.channels;
-    var w = dest.width, h = dest.height;
-    var sw = src.width, sh = src.height;
-    var mw = sw / w, mh = sh / h;
-    var ddata = dest.data, sdata = src.data;
-    var round = Math.round;
-    var floor = Math.floor;
-    var sxo = new Uint32Array(w * filterSize);
-    var fx = new Float32Array(w * filterSize);
-    for (var x = 0; x < w; x++) {
-      var rx = (x + 0.5) * mw - 0.5;
-      var sx = floor(rx) - filterSize / 2 + 1;
-      var sum = 0;
-      for (var f = 0; f < filterSize; ++f) {
-        var val = filterFunc(rx - sx);
+    const ch = src.channels;
+    const w = dest.width, h = dest.height;
+    const sw = src.width, sh = src.height;
+    const mw = sw / w, mh = sh / h;
+    const ddata = dest.data, sdata = src.data;
+    const round = Math.round;
+    const floor = Math.floor;
+    const sxo = new Uint32Array(w * filterSize);
+    const fx = new Float32Array(w * filterSize);
+    for (let x = 0; x < w; x++) {
+      const rx = (x + 0.5) * mw - 0.5;
+      let sx = floor(rx) - filterSize / 2 + 1;
+      let sum = 0;
+      for (let f = 0; f < filterSize; ++f) {
+        const val = filterFunc(rx - sx);
         sum += val;
         sxo[x * filterSize + f] = ch * Math.min(sw - 1, Math.max(0, sx));
         fx[x * filterSize + f] = val;
         ++sx;
       }
-      for (var f = 0; f < filterSize; ++f) {
+      for (let f = 0; f < filterSize; ++f) {
         fx[x * filterSize + f] /= sum;
       }
     }
-    var syo = new Uint32Array(h * filterSize);
-    var fy = new Float32Array(h * filterSize);
-    for (var y = 0; y < h; y++) {
-      var ry = (y + 0.5) * mh - 0.5;
-      var sy = floor(ry) - filterSize / 2 + 1;
-      var sum = 0;
-      for (var f = 0; f < filterSize; ++f) {
-        var val = filterFunc(ry - sy);
+    const syo = new Uint32Array(h * filterSize);
+    const fy = new Float32Array(h * filterSize);
+    for (let y = 0; y < h; y++) {
+      const ry = (y + 0.5) * mh - 0.5;
+      let sy = floor(ry) - filterSize / 2 + 1;
+      let sum = 0;
+      for (let f = 0; f < filterSize; ++f) {
+        const val = filterFunc(ry - sy);
         sum += val;
         syo[y * filterSize + f] = ch * w * Math.min(sh - 1, Math.max(0, sy));
         fy[y * filterSize + f] = val;
         ++sy;
       }
-      for (var f = 0; f < filterSize; ++f) {
+      for (let f = 0; f < filterSize; ++f) {
         fy[y * filterSize + f] /= sum;
       }
     }
-    var kdata = new Float32Array(w * sh * ch);
-    var k = 0;
-    var j = src.offset * ch;
-    for (var jh = j + src.pitch * ch * sh; j < jh; ) {
-      var f = 0;
+    const kdata = new Float32Array(w * sh * ch);
+    let k = 0;
+    let j = src.offset * ch;
+    for (const jh = j + src.pitch * ch * sh; j < jh; ) {
+      let f = 0;
       if (ch === 4) {
-        for (var fw = w * filterSize; f < fw; k += ch) {
-          var r = 0, g = 0, b = 0, a = 0;
-          for (var fi = f + filterSize; f < fi; f++) {
-            var j0  = j + sxo[f];
-            var fx0 = fx[f];
+        for (const fw = w * filterSize; f < fw; k += ch) {
+          let r = 0, g = 0, b = 0, a = 0;
+          for (const fi = f + filterSize; f < fi; f++) {
+            const j0  = j + sxo[f];
+            const fx0 = fx[f];
             r += sdata[j0    ] * fx0;
             g += sdata[j0 + 1] * fx0;
             b += sdata[j0 + 2] * fx0;
@@ -398,9 +398,9 @@ const compareImageUtil = (function() {
           kdata[k + 3] = a;
         }
       } else {
-        for (var fw = w * filterSize; f < fw; k += ch) {
-          var v = 0;
-          for (var fi = f + filterSize; f < fi; f++) {
+        for (const fw = w * filterSize; f < fw; k += ch) {
+          let v = 0;
+          for (const fi = f + filterSize; f < fi; f++) {
             v += sdata[j + sxo[f]] * fx[f];
           }
           kdata[k] = v;
@@ -408,23 +408,23 @@ const compareImageUtil = (function() {
       }
       j += src.pitch * ch;
     }
-    var i = dest.offset * ch;
-    var igap = (dest.pitch - w) * ch;
-    f = 0;
-    for (var fh = h * filterSize; f < fh; ) {
-      var k0a = [];
-      var fy0a = [];
-      for (var fi = 0; fi < filterSize; fi++, f++) {
+    let i = dest.offset * ch;
+    const igap = (dest.pitch - w) * ch;
+    let f = 0;
+    for (const fh = h * filterSize; f < fh; ) {
+      const k0a = [];
+      const fy0a = [];
+      for (let fi = 0; fi < filterSize; fi++, f++) {
         k0a[fi] = syo[f];
         fy0a[fi] = fy[f];
       }
-      var k = 0;
+      let k = 0;
       if (ch === 4) {
-        for (var iw = i + w * ch; i < iw; i += ch, k += ch) {
-          var r = 0, g = 0, b = 0, a = 0;
-          for (var fi = 0; fi < filterSize; fi++) {
-            var k0 = k0a[fi] + k;
-            var fy0 = fy0a[fi];
+        for (const iw = i + w * ch; i < iw; i += ch, k += ch) {
+          let r = 0, g = 0, b = 0, a = 0;
+          for (let fi = 0; fi < filterSize; fi++) {
+            const k0 = k0a[fi] + k;
+            const fy0 = fy0a[fi];
             r += kdata[k0    ] * fy0;
             g += kdata[k0 + 1] * fy0;
             b += kdata[k0 + 2] * fy0;
@@ -436,9 +436,9 @@ const compareImageUtil = (function() {
           ddata[i + 3] = round(Math.min(255, Math.max(0, a)));
         }
       } else {
-        for (var iw = i + w * ch; i < iw; i += ch, k += ch) {
-          var v = 0;
-          for (var fi = 0; fi < filterSize; fi++) {
+        for (const iw = i + w * ch; i < iw; i += ch, k += ch) {
+          let v = 0;
+          for (let fi = 0; fi < filterSize; fi++) {
             v += kdata[k0a[fi] + k] * fy0a[fi];
           }
           ddata[i] = v;
