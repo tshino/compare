@@ -447,8 +447,8 @@ const compareImageUtil = (function() {
       i += igap;
     }
   };
-  var resizeLanczos2 = function(dest, src) {
-    var sinc = function(x) {
+  const resizeLanczos2 = function(dest, src) {
+    const sinc = function(x) {
       x = x * Math.PI;
       if (-0.01 < x && x < 0.01) {
         return 1 + x * x * (-1 / 6 + x * x * (1 / 120));
@@ -460,8 +460,8 @@ const compareImageUtil = (function() {
       return sinc(x) * sinc(x / 2);
     });
   };
-  var resizeLanczos3 = function(dest, src) {
-    var sinc = function(x) {
+  const resizeLanczos3 = function(dest, src) {
+    const sinc = function(x) {
       x = x * Math.PI;
       if (-0.01 < x && x < 0.01) {
         return 1 + x * x * (-1 / 6 + x * x * (1 / 120));
@@ -473,7 +473,7 @@ const compareImageUtil = (function() {
       return sinc(x) * sinc(x / 3);
     });
   };
-  var resize = function(dest, src, method) {
+  const resize = function(dest, src, method) {
     method = method !== undefined ? method : 'bilinear';
     //console.time(method); for (var i = 0; i < 100; ++i) {
     if (method === 'nn') {
