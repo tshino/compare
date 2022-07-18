@@ -489,16 +489,16 @@ const compareImageUtil = (function() {
     }
     //} console.timeEnd(method);
   };
-  var gaussianBlur = function(dest, src, stdev) {
+  const gaussianBlur = function(dest, src, stdev) {
     //console.log('blur :' + src.width + 'x' + src.height + ' => ' +
     //            dest.width + 'x' + dest.height + ' (' + stdev + ')');
-    var filterSize = Math.round(4 * stdev) * 2;
+    const filterSize = Math.round(4 * stdev) * 2;
     if (filterSize === 0) {
       return resizeNN(dest, src);
     }
-    var a = 1 / Math.sqrt(2 * Math.PI * stdev * stdev);
-    var b = -1 / (2 * stdev * stdev);
-    var gaussian = function(x) {
+    const a = 1 / Math.sqrt(2 * Math.PI * stdev * stdev);
+    const b = -1 / (2 * stdev * stdev);
+    const gaussian = function(x) {
       return a * Math.exp(b * x * x);
     };
     return resizeGeneral(dest, src, filterSize, gaussian);
