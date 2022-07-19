@@ -503,17 +503,17 @@ const compareImageUtil = (function() {
     };
     return resizeGeneral(dest, src, filterSize, gaussian);
   };
-  var resizeWithGaussianBlur = function(dest, src) {
-    var lx = Math.log(dest.width / src.width);
-    var ly = Math.log(dest.height / src.height);
-    var n = Math.max(1, Math.round(Math.max(-lx, -ly) / Math.log(2)));
-    for (var k = 0; k < n; ++k) {
-      var sx = Math.exp(lx / n);
-      var sy = Math.exp(ly / n);
-      var w = Math.round(src.width * sx);
-      var h = Math.round(src.height * sy);
-      var temp = k + 1 < n ? makeImage(w, h) : dest;
-      var stdev = 0.5 / Math.min(sx, sy);
+  const resizeWithGaussianBlur = function(dest, src) {
+    const lx = Math.log(dest.width / src.width);
+    const ly = Math.log(dest.height / src.height);
+    const n = Math.max(1, Math.round(Math.max(-lx, -ly) / Math.log(2)));
+    for (let k = 0; k < n; ++k) {
+      const sx = Math.exp(lx / n);
+      const sy = Math.exp(ly / n);
+      const w = Math.round(src.width * sx);
+      const h = Math.round(src.height * sy);
+      const temp = k + 1 < n ? makeImage(w, h) : dest;
+      const stdev = 0.5 / Math.min(sx, sy);
       gaussianBlur(temp, src, stdev);
       src = temp;
     }
