@@ -587,56 +587,56 @@ const compareImageUtil = (function() {
       i += (dest.pitch - w) * dest.channels;
     }
   };
-  var sobelX = function(dest, src) {
+  const sobelX = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
       1, 0, -1,
       2, 0, -2,
       1, 0, -1
     ]);
   };
-  var sobelY = function(dest, src) {
+  const sobelY = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
        1,  2,  1,
        0,  0,  0,
       -1, -2, -1
     ]);
   };
-  var scharrX = function(dest, src) {
+  const scharrX = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
        3, 0,  -3,
       10, 0, -10,
        3, 0,  -3
     ]);
   };
-  var scharrY = function(dest, src) {
+  const scharrY = function(dest, src) {
     convolution(dest, src, { w: 3, h: 3 }, [
        3,  10,  3,
        0,   0,  0,
       -3, -10, -3
     ]);
   };
-  var dilate3x1 = function(dest, src) {
+  const dilate3x1 = function(dest, src) {
     dest = makeImage(dest);
     src = makeImage(src);
     if (dest.channels !== src.channels) {
       return;
     }
-    var w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
-    var ch = dest.channels;
+    const w = Math.min(dest.width, src.width), h = Math.min(dest.height, src.height);
+    const ch = dest.channels;
     if (w < 2) {
       copy(dest, src);
       return;
     }
-    var i = dest.offset * ch, j = src.offset * ch;
-    for (var y = 0; y < h; y++) {
-      for (var k = 0; k < ch; k++, i++, j++) {
+    let i = dest.offset * ch, j = src.offset * ch;
+    for (let y = 0; y < h; y++) {
+      for (let k = 0; k < ch; k++, i++, j++) {
         dest.data[i] = Math.max(src.data[j], src.data[j + ch]);
       }
       j -= ch;
-      for (var k = ch * (w - 2); k > 0; k--, i++, j++) {
+      for (let k = ch * (w - 2); k > 0; k--, i++, j++) {
         dest.data[i] = Math.max(src.data[j], src.data[j + ch], src.data[j + ch * 2]);
       }
-      for (var k = 0; k < ch; k++, i++, j++) {
+      for (let k = 0; k < ch; k++, i++, j++) {
         dest.data[i] = Math.max(src.data[j], src.data[j + ch]);
       }
       i += (dest.pitch - w) * ch;
