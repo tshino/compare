@@ -791,15 +791,15 @@ const compareImageUtil = (function() {
     console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
     return { imageOut: output, motionX: mx, motionY: my };
   };
-  var estimateMotionIteration = function(a, b, blurStdev) {
-    var max_iteration = 8;
-    var mx = 0, my = 0, imageOut = null;
-    var history = [];
-    for (var k = 0; k < max_iteration; ++k) {
-      var mxi = Math.round(mx);
-      var myi = Math.round(my);
+  const estimateMotionIteration = function(a, b, blurStdev) {
+    const max_iteration = 8;
+    let mx = 0, my = 0, imageOut = null;
+    const history = [];
+    for (let k = 0; k < max_iteration; ++k) {
+      const mxi = Math.round(mx);
+      const myi = Math.round(my);
       history.push({ mx: mxi, my: myi });
-      var result = estimateMotionImpl(a, b, -mxi, -myi, blurStdev);
+      const result = estimateMotionImpl(a, b, -mxi, -myi, blurStdev);
       if (result === null) {
         break;
       }
@@ -807,9 +807,9 @@ const compareImageUtil = (function() {
         imageOut = result.imageOut;
       }
       if (result.motionX !== null && result.motionY !== null) {
-        var nextX = mxi + result.motionX;
-        var nextY = myi + result.motionY;
-        var duplicate = history.filter(function(h) {
+        let nextX = mxi + result.motionX;
+        let nextY = myi + result.motionY;
+        const duplicate = history.filter(function(h) {
           return h.mx === Math.round(nextX) && h.my === Math.round(nextY);
         });
         if (0 < duplicate.length) {
