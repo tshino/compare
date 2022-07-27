@@ -672,11 +672,11 @@ const compareImageUtil = (function() {
     dilate3x1(temp, src);
     dilate1x3(dest, temp);
   };
-  var estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
+  const estimateMotionImpl = function(a, b, offsetX, offsetY, blurStdev) {
     offsetX = offsetX === undefined ? 0 : offsetX;
     offsetY = offsetY === undefined ? 0 : offsetY;
-    var offsetXi = Math.round(offsetX);
-    var offsetYi = Math.round(offsetY);
+    const offsetXi = Math.round(offsetX);
+    const offsetYi = Math.round(offsetY);
     if (0 !== offsetXi || 0 !== offsetYi) {
       if (Math.abs(offsetXi) >= a.width || Math.abs(offsetYi) >= a.height) {
         return null;
@@ -692,46 +692,46 @@ const compareImageUtil = (function() {
                      b.width - Math.abs(offsetXi),
                      b.height - Math.abs(offsetYi));
     }
-    var w = 256, h = 256;
-    var baseA = makeImage(w, h);
-    var baseB = makeImage(w, h);
-    var blurA = makeImage(w, h);
-    var blurB = makeImage(w, h);
+    const w = 256, h = 256;
+    const baseA = makeImage(w, h);
+    const baseB = makeImage(w, h);
+    const blurA = makeImage(w, h);
+    const blurB = makeImage(w, h);
     resizeWithGaussianBlur(baseA, a);
     resizeWithGaussianBlur(baseB, b);
     gaussianBlur(blurA, baseA, blurStdev);
     gaussianBlur(blurB, baseB, blurStdev);
-    var gradAX = makeImage(w, h);
-    var gradBX = makeImage(w, h);
-    var gradAY = makeImage(w, h);
-    var gradBY = makeImage(w, h);
+    const gradAX = makeImage(w, h);
+    const gradBX = makeImage(w, h);
+    const gradAY = makeImage(w, h);
+    const gradBY = makeImage(w, h);
     sobelX(gradAX, blurA);
     sobelX(gradBX, blurB);
     sobelY(gradAY, blurA);
     sobelY(gradBY, blurB);
-    var output = makeImage(w, h);
-    var images = [ blurA, blurB, gradAX, gradBX, gradAY, gradBY, output ];
-    var d = [];
-    var i = [];
-    for (var k = 0; k < images.length; k++) {
+    const output = makeImage(w, h);
+    const images = [ blurA, blurB, gradAX, gradBX, gradAY, gradBY, output ];
+    const d = [];
+    const i = [];
+    for (let k = 0; k < images.length; k++) {
       d[k] = images[k].data;
       i[k] = images[k].offset * 4;
     }
-    var weight = [];
-    var deltaX = [];
-    var deltaY = [];
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        for (var e = 0; e < 3; e++) {
-          var valA = d[0][i[0] + e];
-          var valB = d[1][i[1] + e];
-          var d2 = d[2][i[2] + e];
-          var d3 = d[3][i[3] + e];
-          var d4 = d[4][i[4] + e];
-          var d5 = d[5][i[5] + e];
+    const weight = [];
+    const deltaX = [];
+    const deltaY = [];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        for (let e = 0; e < 3; e++) {
+          const valA = d[0][i[0] + e];
+          const valB = d[1][i[1] + e];
+          const d2 = d[2][i[2] + e];
+          const d3 = d[3][i[3] + e];
+          const d4 = d[4][i[4] + e];
+          const d5 = d[5][i[5] + e];
           d[6][i[6] + e] = 0;
           //
-          var diff = valA - valB;
+          const diff = valA - valB;
           if (Math.abs(diff) < 1) {
             d[6][i[6] + e] = 64;
             continue;
@@ -740,19 +740,19 @@ const compareImageUtil = (function() {
               d4 === 0 || d4 === 255 || d5 === 0 || d5 === 255) {
             continue;
           }
-          var dAX = (d2 - 128) / 8;
-          var dBX = (d3 - 128) / 8;
-          var dAY = (d4 - 128) / 8;
-          var dBY = (d5 - 128) / 8;
-          var dX = (dAX + dBX) / 2;
-          var dY = (dAY + dBY) / 2;
-          var sq = Math.sqrt(dX * dX + dY * dY);
+          const dAX = (d2 - 128) / 8;
+          const dBX = (d3 - 128) / 8;
+          const dAY = (d4 - 128) / 8;
+          const dBY = (d5 - 128) / 8;
+          const dX = (dAX + dBX) / 2;
+          const dY = (dAY + dBY) / 2;
+          const sq = Math.sqrt(dX * dX + dY * dY);
           if (sq < 1 ||
               sq * 0.1 < Math.abs(dAX - dBX) ||
               sq * 0.1 < Math.abs(dAY - dBY)) {
             continue;
           }
-          var sq2 = diff / (sq * sq);
+          const sq2 = diff / (sq * sq);
           weight.push(Math.pow(diff, 4));
           deltaX.push(dX * sq2);
           deltaY.push(dY * sq2);
@@ -761,19 +761,19 @@ const compareImageUtil = (function() {
         }
         d[6][i[6] + 3] = 255;
         //
-        for (var k = 0; k < images.length; k++) {
+        for (let k = 0; k < images.length; k++) {
           i[k] += 4;
         }
       }
       //
-      for (var k = 0; k < images.length; k++) {
+      for (let k = 0; k < images.length; k++) {
         i[k] += (images[k].pitch - w) * 4;
       }
     }
-    var weightedAverageDelta = function() {
-      var count = deltaX.length;
-      var xsum = 0, ysum = 0, wsum = 0;
-      for (var k = 0; k < count; ++k) {
+    const weightedAverageDelta = function() {
+      const count = deltaX.length;
+      let xsum = 0, ysum = 0, wsum = 0;
+      for (let k = 0; k < count; ++k) {
         xsum += deltaX[k] * weight[k];
         ysum += deltaY[k] * weight[k];
         wsum += weight[k];
@@ -784,9 +784,9 @@ const compareImageUtil = (function() {
         ny: ysum / wsum
       };
     };
-    var delta = weightedAverageDelta();
-    var mx = delta === null ? null : delta.nx * a.width / w + (offsetX - offsetXi);
-    var my = delta === null ? null : delta.ny * a.height / h + (offsetY - offsetYi);
+    const delta = weightedAverageDelta();
+    const mx = delta === null ? null : delta.nx * a.width / w + (offsetX - offsetXi);
+    const my = delta === null ? null : delta.ny * a.height / h + (offsetY - offsetYi);
     console.log('motion x --> ' + (mx === null ? 'null' : mx.toFixed(3) + 'px'));
     console.log('motion y --> ' + (my === null ? 'null' : my.toFixed(3) + 'px'));
     return { imageOut: output, motionX: mx, motionY: my };
