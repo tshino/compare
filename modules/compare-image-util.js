@@ -834,16 +834,16 @@ const compareImageUtil = (function() {
     console.log('total mx --> ' + mx.toFixed(3) + 'px, my --> ' + my.toFixed(3) + 'px');
     return { imageOut: imageOut, motionX: mx, motionY: my };
   };
-  var estimateMotion = function(a, b) {
-    var stdev = [ 3, 5, 10, 20 ];
-    var results = [];
-    var result;
-    for (var k = 0; k < stdev.length; ++k) {
+  const estimateMotion = function(a, b) {
+    const stdev = [ 3, 5, 10, 20 ];
+    const results = [];
+    let result;
+    for (let k = 0; k < stdev.length; ++k) {
       result = estimateMotionIteration(a, b, stdev[k]);
       if (result.motionX === null || result.motionY === null) {
         continue;
       }
-      var sameResult = results.filter(function(e) {
+      const sameResult = results.filter(function(e) {
         return e.motionX === result.motionX && e.motionY === result.motionY;
       });
       if (0 < sameResult.length) {
