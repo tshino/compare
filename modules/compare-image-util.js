@@ -971,37 +971,37 @@ const compareImageUtil = (function() {
     }
     return result;
   };
-  var adjustCornerPointsSubPixel = function(image, corners) {
-    var maxIteration = 20;
-    var maxDistance = 10;
-    var size = maxDistance * 2 + 1;
-    var weight1 = new Float32Array(size);
-    for (var i = -maxDistance, k = 0; i <= maxDistance; i++) {
-      var r = i / maxDistance;
+  const adjustCornerPointsSubPixel = function(image, corners) {
+    const maxIteration = 20;
+    const maxDistance = 10;
+    const size = maxDistance * 2 + 1;
+    const weight1 = new Float32Array(size);
+    for (let i = -maxDistance, k = 0; i <= maxDistance; i++) {
+      const r = i / maxDistance;
       weight1[k++] = Math.exp(-r * r);
     }
-    var weight2 = new Float32Array(size * size);
-    for (var i = 0, k = 0; i < size; i++) {
-      for (var j = 0; j < size; j++) {
+    const weight2 = new Float32Array(size * size);
+    for (let i = 0, k = 0; i < size; i++) {
+      for (let j = 0; j < size; j++) {
         weight2[k++] = weight1[j] * weight1[i];
       }
     }
-    var s0 = maxDistance + 1, s1 = size + 2;
-    var eps = 0.03 * 0.03;
-    for (var m = 0; m < corners.length; m++) {
-      var x = corners[m].x;
-      var y = corners[m].y;
-      for (var n = 0; n < maxIteration; n++) {
-        var sample = readSubPixel(image, x - s0, y - s0, s1, s1);
-        var a = 0, b = 0, c = 0, bb1 = 0, bb2 = 0;
-        for (var i = -maxDistance, k = 0, o = s1 + 1; i <= maxDistance; i++, o += 2) {
-          for (var j = -maxDistance; j <= maxDistance; j++, o++) {
-            var w = weight2[k++];
-            var dx = sample.data[o + 1] - sample.data[o - 1];
-            var dy = sample.data[o + s1] - sample.data[o - s1];
-            var dxx = w * dx * dx;
-            var dxy = w * dx * dy;
-            var dyy = w * dy * dy;
+    const s0 = maxDistance + 1, s1 = size + 2;
+    const eps = 0.03 * 0.03;
+    for (let m = 0; m < corners.length; m++) {
+      let x = corners[m].x;
+      let y = corners[m].y;
+      for (let n = 0; n < maxIteration; n++) {
+        const sample = readSubPixel(image, x - s0, y - s0, s1, s1);
+        let a = 0, b = 0, c = 0, bb1 = 0, bb2 = 0;
+        for (let i = -maxDistance, k = 0, o = s1 + 1; i <= maxDistance; i++, o += 2) {
+          for (let j = -maxDistance; j <= maxDistance; j++, o++) {
+            const w = weight2[k++];
+            const dx = sample.data[o + 1] - sample.data[o - 1];
+            const dy = sample.data[o + s1] - sample.data[o - s1];
+            const dxx = w * dx * dx;
+            const dxy = w * dx * dy;
+            const dyy = w * dy * dy;
             a += dxx;
             b += dxy;
             c += dyy;
@@ -1009,16 +1009,16 @@ const compareImageUtil = (function() {
             bb2 += dxy * j + dyy * i;
           }
         }
-        var det = a * c - b * b;
+        const det = a * c - b * b;
         if (Math.abs(det) <= 1e-10) {
           break;
         }
-        var scale = 1 / det;
-        var sbb1 = scale * bb1;
-        var sbb2 = scale * bb2;
-        var ax = c * sbb1 - b * sbb2;
-        var ay = a * sbb2 - b * sbb1;
-        var error = ax * ax + ay * ay;
+        const scale = 1 / det;
+        const sbb1 = scale * bb1;
+        const sbb2 = scale * bb2;
+        const ax = c * sbb1 - b * sbb2;
+        const ay = a * sbb2 - b * sbb1;
+        const error = ax * ax + ay * ay;
         x += ax;
         y += ay;
         if (x < 0 || x >= image.width || y < 0 || y >= image.height) {
