@@ -916,17 +916,17 @@ const compareImageUtil = (function() {
     }
     return dest;
   };
-  var findCornerPoints = function(image) {
-    var w = image.width, h = image.height;
-    var corner = cornerValue(image);
-    var dilate = makeImage(w, h, corner.format);
+  const findCornerPoints = function(image) {
+    const w = image.width, h = image.height;
+    const corner = cornerValue(image);
+    const dilate = makeImage(w, h, corner.format);
     dilate3x3(dilate, corner);
-    var candidates = [];
-    var ch = corner.channels;
-    for (var y = 1; y + 1 < h; y++) {
-      var i = (1 + y * w) * ch;
-      for (var x = 1; x + 1 < w; x++, i += ch) {
-        var c = corner.data[i];
+    const candidates = [];
+    const ch = corner.channels;
+    for (let y = 1; y + 1 < h; y++) {
+      let i = (1 + y * w) * ch;
+      for (let x = 1; x + 1 < w; x++, i += ch) {
+        const c = corner.data[i];
         if (0 < c && c === dilate.data[i]) {
           candidates.push([c, i / ch]);
         }
@@ -939,23 +939,24 @@ const compareImageUtil = (function() {
         0
       );
     });
-    var gw = (w + 7) >> 3, margin = gw + 1;
-    var grid = [];
-    var result = [];
-    var tooNear = function(p1, p2) {
+    const gw = (w + 7) >> 3, margin = gw + 1;
+    const grid = [];
+    const result = [];
+    const tooNear = function(p1, p2) {
       return Math.max(Math.abs(p1.x - p2.x), Math.abs(p1.y - p2.y)) < 8;
     };
-    var near8 = [-gw - 1, -gw, -gw + 1, -1, 1, gw - 1, gw, gw + 1];
-    for (var i = 0, n = candidates.length; i < n; ++i) {
-      var o = candidates[i][1];
-      var x = o % w;
-      var y = (o - x) / w;
-      var cx = x >> 3, cy = y >> 3, c = cx + cy * gw + margin;
+    const near8 = [-gw - 1, -gw, -gw + 1, -1, 1, gw - 1, gw, gw + 1];
+    for (let i = 0, n = candidates.length; i < n; ++i) {
+      const o = candidates[i][1];
+      const x = o % w;
+      const y = (o - x) / w;
+      const cx = x >> 3, cy = y >> 3, c = cx + cy * gw + margin;
       if (grid[c] === undefined) {
-        var point = { x: x, y: y };
+        const point = { x: x, y: y };
         grid[c] = point;
-        for (var k = 0; k < 8; k++) {
-          var p = grid[c + near8[k]];
+        let k = 0;
+        for (; k < 8; k++) {
+          const p = grid[c + near8[k]];
           if (p && tooNear(point, p)) {
             break;
           }
