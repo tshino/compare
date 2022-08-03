@@ -1034,42 +1034,42 @@ const compareImageUtil = (function() {
       }
     }
   };
-  var sparseOpticalFlow = function(image1, image2, points, nextPoints) {
+  const sparseOpticalFlow = function(image1, image2, points, nextPoints) {
     image1 = makeImage(image1);
     image2 = makeImage(image2);
     if (image1.width !== image2.width || image1.height !== image2.height) {
       return [];
     }
     if (image1.channels !== 1) {
-      var gray = makeImage(image1.width, image1.height, FORMAT_F32x1);
+      const gray = makeImage(image1.width, image1.height, FORMAT_F32x1);
       convertToGrayscale(gray, image1);
       image1 = gray;
     }
     if (image2.channels !== 1) {
-      var gray = makeImage(image2.width, image2.height, FORMAT_F32x1);
+      const gray = makeImage(image2.width, image2.height, FORMAT_F32x1);
       convertToGrayscale(gray, image2);
       image2 = gray;
     }
     if (nextPoints === undefined) {
       nextPoints = [];
-      for (var i = 0, p; p = points[i]; i++) {
+      for (let i = 0, p; p = points[i]; i++) {
         nextPoints[i] = { x: p.x, y: p.y };
       }
     } else {
       nextPoints = Array.prototype.slice.call(nextPoints);
     }
     if (20 < Math.min(image1.width, image1.height)) {
-      var upperW = Math.ceil(image1.width / 2);
-      var upperH = Math.ceil(image1.height / 2);
-      var upper1 = makeImage(upperW, upperH, FORMAT_F32x1);
-      var upper2 = makeImage(upperW, upperH, FORMAT_F32x1);
-      var scale = function(p) {
+      const upperW = Math.ceil(image1.width / 2);
+      const upperH = Math.ceil(image1.height / 2);
+      const upper1 = makeImage(upperW, upperH, FORMAT_F32x1);
+      const upper2 = makeImage(upperW, upperH, FORMAT_F32x1);
+      const scale = function(p) {
         return p ? {
           x: (p.x + 0.5) * (upperW / image1.width) - 0.5,
           y: (p.y + 0.5) * (upperH / image1.height) - 0.5
         } : null;
       };
-      var unscale = function(p) {
+      const unscale = function(p) {
         return p ? {
           x: (p.x + 0.5) * (image1.width / upperW) - 0.5,
           y: (p.y + 0.5) * (image1.height / upperH) - 0.5
@@ -1077,16 +1077,16 @@ const compareImageUtil = (function() {
       };
       gaussianBlur(upper1, image1, 0.5);
       gaussianBlur(upper2, image2, 0.5);
-      var upperPoints = [];
-      for (var i = 0, p; p = points[i]; i++) {
+      const upperPoints = [];
+      for (let i = 0, p; p = points[i]; i++) {
         upperPoints[i] = scale(p);
         nextPoints[i] = scale(nextPoints[i]);
       }
-      var updatedPoints = sparseOpticalFlow(upper1, upper2, upperPoints, nextPoints);
-      for (var i = 0; i < points.length; i++) {
+      const updatedPoints = sparseOpticalFlow(upper1, upper2, upperPoints, nextPoints);
+      for (let i = 0; i < points.length; i++) {
         if (!updatedPoints[i] && nextPoints[i]) {
-          var np = nextPoints[i];
-          var border = 7;
+          const np = nextPoints[i];
+          const border = 7;
           if (np.x < border || image1.width - 1 - border < np.x ||
               np.y < border || image1.height - 1 - border < np.y) {
             updatedPoints[i] = np;
@@ -1095,24 +1095,24 @@ const compareImageUtil = (function() {
         nextPoints[i] = unscale(updatedPoints[i]);
       }
     }
-    var dx1 = makeImage(image1.width, image1.height, image1.format);
-    var dy1 = makeImage(image1.width, image1.height, image1.format);
-    var dScale = 1 / 32;
-    var dOffset = image1.channels === 4 ? -128 : 0;
+    const dx1 = makeImage(image1.width, image1.height, image1.format);
+    const dy1 = makeImage(image1.width, image1.height, image1.format);
+    const dScale = 1 / 32;
+    const dOffset = image1.channels === 4 ? -128 : 0;
     scharrX(dx1, image1);
     scharrY(dy1, image1);
-    for (var i = 0, p; p = points[i]; i++) {
-      var np = nextPoints[i];
+    for (let i = 0, p; p = points[i]; i++) {
+      const np = nextPoints[i];
       if (!np) {
         continue;
       }
-      var i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
-      var dxw = readSubPixel(dx1, p.x - 7, p.y - 7, 15, 15);
-      var dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);
-      var axx = 0, axy = 0, ayy = 0;
-      for (var k = 0; k < 15 * 15; k++) {
-        var dx = dxw.data[k] + dOffset;
-        var dy = dyw.data[k] + dOffset;
+      const i1w = readSubPixel(image1, p.x - 7, p.y - 7, 15, 15);
+      const dxw = readSubPixel(dx1, p.x - 7, p.y - 7, 15, 15);
+      const dyw = readSubPixel(dy1, p.x - 7, p.y - 7, 15, 15);
+      let axx = 0, axy = 0, ayy = 0;
+      for (let k = 0; k < 15 * 15; k++) {
+        const dx = dxw.data[k] + dOffset;
+        const dy = dyw.data[k] + dOffset;
         axx += dx * dx;
         axy += dx * dy;
         ayy += dy * dy;
@@ -1120,18 +1120,18 @@ const compareImageUtil = (function() {
       axx *= dScale * dScale;
       axy *= dScale * dScale;
       ayy *= dScale * dScale;
-      var d = axx * ayy - axy * axy;
-      var e = (axx + ayy - Math.sqrt((axx - ayy) * (axx - ayy) + 4 * axy * axy)) / (2 * 15 * 15);
+      const d = axx * ayy - axy * axy;
+      const e = (axx + ayy - Math.sqrt((axx - ayy) * (axx - ayy) + 4 * axy * axy)) / (2 * 15 * 15);
       if (e < 0.001 || d < 0.00001) {
         nextPoints[i] = null;
         continue;
       }
-      var m = dScale / d;
-      for (var j = 0; j < 20; j++) {
-        var i2w = readSubPixel(image2, np.x - 7, np.y - 7, 15, 15);
-        var bx = 0, by = 0;
-        for (var k = 0; k < 15 * 15; k++) {
-          var di = i2w.data[k] - i1w.data[k];
+      const m = dScale / d;
+      for (let j = 0; j < 20; j++) {
+        const i2w = readSubPixel(image2, np.x - 7, np.y - 7, 15, 15);
+        let bx = 0, by = 0;
+        for (let k = 0; k < 15 * 15; k++) {
+          const di = i2w.data[k] - i1w.data[k];
           bx += di * (dxw.data[k] + dOffset);
           by += di * (dyw.data[k] + dOffset);
         }
