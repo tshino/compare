@@ -1196,62 +1196,62 @@ const compareImageUtil = (function() {
   //    1 => belongs to a flat region
   //    2 => border between flat regions
   // 'colorMap' is an RGBA image which is anti-anti-aliased version of input.
-  var geometricTypeOfPixel = function(image) {
-    var UNCLASSIFIED = 0, FLAT = 1, BORDER = 2;
+  const geometricTypeOfPixel = function(image) {
+    const UNCLASSIFIED = 0, FLAT = 1, BORDER = 2;
     image = makeImage(image);
     if (image.channels !== 4) {
       return null;
     }
-    var temp = makeImage(image.width, image.height, image.format);
+    const temp = makeImage(image.width, image.height, image.format);
     copy(temp, image);
-    var pmaImage = makeImage(image.width, image.height, image.format);
+    const pmaImage = makeImage(image.width, image.height, image.format);
     copy(pmaImage, image);
     image = temp;
-    var w = image.width;
-    var h = image.height;
-    var ch = image.channels;
-    for (var i = 0, n = ch * w * h; i < n; i += ch) {
-      var a = pmaImage.data[i + 3];
+    const w = image.width;
+    const h = image.height;
+    const ch = image.channels;
+    for (let i = 0, n = ch * w * h; i < n; i += ch) {
+      const a = pmaImage.data[i + 3];
       if (a < 255) {
-        var s = a / 255;
+        const s = a / 255;
         pmaImage.data[i + 0] = Math.round(s * pmaImage.data[i + 0]);
         pmaImage.data[i + 1] = Math.round(s * pmaImage.data[i + 1]);
         pmaImage.data[i + 2] = Math.round(s * pmaImage.data[i + 2]);
       }
     }
-    var isSimilar = new Uint32Array(w * h);
-    var typeMap = new Uint8Array(w * h);
-    var colorMap = makeImage(w, h);
-    var xClamp = new Uint32Array(w + 4);
-    var yClamp = new Uint32Array(h + 4);
-    for (var x = 0; x < w + 4; x++) {
+    const isSimilar = new Uint32Array(w * h);
+    const typeMap = new Uint8Array(w * h);
+    const colorMap = makeImage(w, h);
+    const xClamp = new Uint32Array(w + 4);
+    const yClamp = new Uint32Array(h + 4);
+    for (let x = 0; x < w + 4; x++) {
       xClamp[x] = Math.max(0, Math.min(w - 1, x - 2));
     }
-    for (var y = 0; y < h + 4; y++) {
+    for (let y = 0; y < h + 4; y++) {
       yClamp[y] = Math.max(0, Math.min(h - 1, y - 2));
     }
-    for (var y = 0, i = 0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, f++) {
-        var r = pmaImage.data[i];
-        var g = pmaImage.data[i + 1];
-        var b = pmaImage.data[i + 2];
-        var a = pmaImage.data[i + 3];
-        var similar = 0; // bit pattern
-        for (var j = -2; j <= 2; j++) {
-          var yy = yClamp[y + j + 2];
+    for (let y = 0, i = 0, f = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, i += ch, f++) {
+        const r = pmaImage.data[i];
+        const g = pmaImage.data[i + 1];
+        const b = pmaImage.data[i + 2];
+        const a = pmaImage.data[i + 3];
+        let similar = 0; // bit pattern
+        for (let j = -2; j <= 2; j++) {
+          const yy = yClamp[y + j + 2];
           if (y + j < -1 || h < y + j) {
             similar = similar * 32;
             continue;
           }
-          var ii0 = ch * (w * yy);
-          for (var k = -2; k <= 2; k++) {
-            var xx = xClamp[x + k + 2];
+          const ii0 = ch * (w * yy);
+          for (let k = -2; k <= 2; k++) {
+            const xx = xClamp[x + k + 2];
             similar = similar * 2;
             if (x + k < -1 || w < x + k) {
               continue;
             }
-            var ii = ii0 + ch * xx;
-            var diff = 0;
+            const ii = ii0 + ch * xx;
+            let diff = 0;
             diff += Math.abs(pmaImage.data[ii] - r) * 2;
             diff += Math.abs(pmaImage.data[ii + 1] - g) * 5;
             diff += Math.abs(pmaImage.data[ii + 2] - b);
@@ -1281,15 +1281,15 @@ const compareImageUtil = (function() {
         typeMap[f] = (8 <= similarCount) ? FLAT : UNCLASSIFIED;
       }
     }
-    for (var y = 0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, f++) {
-        var similar = isSimilar[f];
+    for (let y = 0, f = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, f++) {
+        const similar = isSimilar[f];
         if (UNCLASSIFIED === typeMap[f]) {
-          var similarAndFlatCount = 0;
-          for (var dy = -2, m = 1<<24; dy <= 2; dy++) {
-            var yy = yClamp[y + dy + 2];
-            for (var dx = -2; dx <= 2; dx++, m = m >> 1) {
-              var xx = xClamp[x + dx + 2];
+          let similarAndFlatCount = 0;
+          for (let dy = -2, m = 1<<24; dy <= 2; dy++) {
+            const yy = yClamp[y + dy + 2];
+            for (let dx = -2; dx <= 2; dx++, m = m >> 1) {
+              const xx = xClamp[x + dx + 2];
               if ((similar & m) !== 0 && UNCLASSIFIED !== typeMap[xx + yy * w]) {
                 similarAndFlatCount++;
               }
@@ -1374,15 +1374,15 @@ const compareImageUtil = (function() {
             colorMap.data[f * 4 + 3] = nearColor[3];
           }
     };
-    for (var y = 0, i = 0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, f++) {
+    for (let y = 0, i = 0, f = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, i += ch, f++) {
         if (UNCLASSIFIED === typeMap[f]) {
           checkForBorderColor(x, y, i, f);
         }
       }
     }
-    for (var y = 0, i = 0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, i += ch, f++) {
+    for (let y = 0, i = 0, f = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, i += ch, f++) {
         if (typeMap[f] === FLAT &&
             (typeMap[xClamp[x + 2 - 1] * w + y] === BORDER ||
              typeMap[xClamp[x + 2 + 1] * w + y] === BORDER ||
