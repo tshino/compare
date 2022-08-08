@@ -1269,11 +1269,11 @@ const compareImageUtil = (function() {
         colorMap.data[f * 4 + 3] = image.data[i + 3];
       }
     }
-    for (var y = 0, f = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, f++) {
-        var similar = isSimilar[f];
-        var similarCount = 0;
-        for (var k = 0, m = 1; k < 25; k++, m *= 2) {
+    for (let y = 0, f = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, f++) {
+        const similar = isSimilar[f];
+        let similarCount = 0;
+        for (let k = 0, m = 1; k < 25; k++, m *= 2) {
           if ((similar & m) !== 0) {
             similarCount++;
           }
@@ -1301,28 +1301,28 @@ const compareImageUtil = (function() {
         }
       }
     }
-    var intermediateColorInfo = function(r, g, b, a, ii, jj) {
-      var ri = pmaImage.data[ii];
-      var gi = pmaImage.data[ii + 1];
-      var bi = pmaImage.data[ii + 2];
-      var ai = pmaImage.data[ii + 3];
-      var rj = pmaImage.data[jj];
-      var gj = pmaImage.data[jj + 1];
-      var bj = pmaImage.data[jj + 2];
-      var aj = pmaImage.data[jj + 3];
-      var rk = rj - ri;
-      var gk = gj - gi;
-      var bk = bj - bi;
-      var ak = aj - ai;
-      var dot1 = rk * rk + gk * gk + bk * bk + ak * ak;
-      var dot2 = (r - ri) * rk + (g - gi) * gk + (b - bi) * bk + (a - ai) * ak;
+    const intermediateColorInfo = function(r, g, b, a, ii, jj) {
+      const ri = pmaImage.data[ii];
+      const gi = pmaImage.data[ii + 1];
+      const bi = pmaImage.data[ii + 2];
+      const ai = pmaImage.data[ii + 3];
+      const rj = pmaImage.data[jj];
+      const gj = pmaImage.data[jj + 1];
+      const bj = pmaImage.data[jj + 2];
+      const aj = pmaImage.data[jj + 3];
+      const rk = rj - ri;
+      const gk = gj - gi;
+      const bk = bj - bi;
+      const ak = aj - ai;
+      const dot1 = rk * rk + gk * gk + bk * bk + ak * ak;
+      const dot2 = (r - ri) * rk + (g - gi) * gk + (b - bi) * bk + (a - ai) * ak;
       if (dot2 <= 0 || dot1 <= dot2) {
         return {
           isIntermediate: false
         };
       }
-      var s = dot2 / dot1;
-      var diff = 0;
+      const s = dot2 / dot1;
+      let diff = 0;
       diff += Math.abs(r - (ri + s * rk)) * 2;
       diff += Math.abs(g - (gi + s * gk)) * 5;
       diff += Math.abs(b - (bi + s * bk));
@@ -1332,47 +1332,47 @@ const compareImageUtil = (function() {
         whichIsNear: (s < 0.5 ? 0 : 1)
       };
     };
-    var checkForBorderColor = function(x, y, i, f) {
-          var r = pmaImage.data[i];
-          var g = pmaImage.data[i + 1];
-          var b = pmaImage.data[i + 2];
-          var a = pmaImage.data[i + 3];
-          var nearColors = [];
-          for (var dy = -2; dy <= 0; dy++) {
-            var y0 = yClamp[y + 2 + dy];
-            var y1 = yClamp[y + 2 - dy];
-            var ii0 = ch * (w * y0);
-            var jj0 = ch * (w * y1);
-            for (var dx = -2; dx <= 2; dx++) {
+    const checkForBorderColor = function(x, y, i, f) {
+        const r = pmaImage.data[i];
+        const g = pmaImage.data[i + 1];
+        const b = pmaImage.data[i + 2];
+        const a = pmaImage.data[i + 3];
+        const nearColors = [];
+        for (let dy = -2; dy <= 0; dy++) {
+            const y0 = yClamp[y + 2 + dy];
+            const y1 = yClamp[y + 2 - dy];
+            const ii0 = ch * (w * y0);
+            const jj0 = ch * (w * y1);
+            for (let dx = -2; dx <= 2; dx++) {
               if (dy === 0 && dx === 0) {
                 break;
               }
-              var x0 = xClamp[x + 2 + dx];
-              var x1 = xClamp[x + 2 - dx];
-              var f0 = f + w * (y0 - y) + x0 - x;
-              var f1 = f + w * (y1 - y) + x1 - x;
+              const x0 = xClamp[x + 2 + dx];
+              const x1 = xClamp[x + 2 - dx];
+              const f0 = f + w * (y0 - y) + x0 - x;
+              const f1 = f + w * (y1 - y) + x1 - x;
               if (typeMap[f0] !== FLAT || typeMap[f1] !== FLAT) {
                 continue;
               }
-              var ii = ii0 + ch * x0;
-              var jj = jj0 + ch * x1;
-              var im = intermediateColorInfo(r, g, b, a, ii, jj);
+              const ii = ii0 + ch * x0;
+              const jj = jj0 + ch * x1;
+              const im = intermediateColorInfo(r, g, b, a, ii, jj);
               if (im.isIntermediate) {
                 typeMap[f] = BORDER;
-                var near = im.whichIsNear === 0 ? ii : jj;
+                const near = im.whichIsNear === 0 ? ii : jj;
                 nearColors.push([
                   image.data[near], image.data[near + 1], image.data[near + 2], image.data[near + 3]
                 ]);
               }
             }
-          }
-          if (0 < nearColors.length) {
-            var nearColor = mostFrequentColor(nearColors);
+        }
+        if (0 < nearColors.length) {
+            const nearColor = mostFrequentColor(nearColors);
             colorMap.data[f * 4 + 0] = nearColor[0];
             colorMap.data[f * 4 + 1] = nearColor[1];
             colorMap.data[f * 4 + 2] = nearColor[2];
             colorMap.data[f * 4 + 3] = nearColor[3];
-          }
+        }
     };
     for (let y = 0, i = 0, f = 0; y < h; y++) {
       for (let x = 0; x < w; x++, i += ch, f++) {
