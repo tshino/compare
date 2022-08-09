@@ -1397,25 +1397,25 @@ const compareImageUtil = (function() {
       colorMap: colorMap
     };
   };
-  var growingTypedArray = function(type, initialCapacity) {
-    var capacity = initialCapacity;
-    var length = 0;
-    var buffer = new type(capacity);
-    var transfer = function(newCapacity) {
-      var newBuffer = new type(newCapacity);
-      for (var i = 0; i < length; i++) {
+  const growingTypedArray = function(type, initialCapacity) {
+    let capacity = initialCapacity;
+    let length = 0;
+    let buffer = new type(capacity);
+    const transfer = function(newCapacity) {
+      const newBuffer = new type(newCapacity);
+      for (let i = 0; i < length; i++) {
         newBuffer[i] = buffer[i];
       }
       return newBuffer;
     };
-    var push = function(elem) {
+    const push = function(elem) {
       if (length >= capacity) {
         capacity *= 2;
         buffer = transfer(capacity);
       }
       buffer[length++] = elem;
     };
-    var makeArray = function() {
+    const makeArray = function() {
       if (length === capacity) {
         return buffer;
       } else {
