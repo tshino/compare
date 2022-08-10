@@ -1435,12 +1435,12 @@ const compareImageUtil = (function() {
       makeArray: makeArray
     };
   };
-  var mergeUniqueColors = function(uc1, uc2) {
-    var n1 = uc1.colors.length, n2 = uc2.colors.length;
-    var colors = growingTypedArray(Uint32Array, n1 + n2);
-    var counts = growingTypedArray(Uint32Array, n1 + n2);
-    for (var i1 = 0, i2 = 0; i1 < n1 || i2 < n2; ) {
-      var k = i1 === n1 ? 2 :
+  const mergeUniqueColors = function(uc1, uc2) {
+    const n1 = uc1.colors.length, n2 = uc2.colors.length;
+    const colors = growingTypedArray(Uint32Array, n1 + n2);
+    const counts = growingTypedArray(Uint32Array, n1 + n2);
+    for (let i1 = 0, i2 = 0; i1 < n1 || i2 < n2; ) {
+      const k = i1 === n1 ? 2 :
               i2 === n2 ? 1 :
               uc1.colors[i1] < uc2.colors[i2] ? 1 :
               uc1.colors[i1] > uc2.colors[i2] ? 2 : 3;
