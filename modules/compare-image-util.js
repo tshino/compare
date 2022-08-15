@@ -1465,19 +1465,19 @@ const compareImageUtil = (function() {
       totalCount: uc1.totalCount + uc2.totalCount
     };
   };
-  var getUniqueColorsImpl = function(imageData, colorBuffer) {
+  const getUniqueColorsImpl = function(imageData, colorBuffer) {
     imageData = makeImage(imageData);
-    var w = imageData.width;
-    var h = imageData.height;
-    var colors = colorBuffer || new Uint32Array(w * h);
-    var ch = imageData.channels;
-    var i = 0;
-    var k = imageData.offset * ch;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++, k += ch, i++) {
-        var r = imageData.data[k + 0];
-        var g = imageData.data[k + 1];
-        var b = imageData.data[k + 2];
+    const w = imageData.width;
+    const h = imageData.height;
+    let colors = colorBuffer || new Uint32Array(w * h);
+    const ch = imageData.channels;
+    let i = 0;
+    let k = imageData.offset * ch;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++, k += ch, i++) {
+        const r = imageData.data[k + 0];
+        const g = imageData.data[k + 1];
+        const b = imageData.data[k + 2];
         colors[i] = (r << 16) + (g << 8) + b;
       }
       k += (imageData.pitch - w) * ch;
@@ -1489,10 +1489,10 @@ const compareImageUtil = (function() {
       colors = Array.prototype.slice.call(colors);
       colors.sort();
     }
-    var counts = growingTypedArray(Uint32Array, 16384);
-    var totalCount = 0;
-    var uniqueCount = 1;
-    for (var i = 1; i < colors.length; i += 1) {
+    const counts = growingTypedArray(Uint32Array, 16384);
+    let totalCount = 0;
+    let uniqueCount = 1;
+    for (let i = 1; i < colors.length; i += 1) {
       if (colors[i - 1] !== colors[i]) {
         colors[uniqueCount] = colors[i];
         counts.push(i - totalCount);
