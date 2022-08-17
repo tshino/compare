@@ -1507,27 +1507,27 @@ const compareImageUtil = (function() {
       totalCount: w * h
     };
   };
-  var getUniqueColors = function(imageData) {
-    var w = imageData.width;
-    var h = imageData.height;
-    var step = Math.ceil(4 * 1024 * 1024 / w);
-    var buffer = [];
-    var colorBuffer = [];
-    for (var y = 0; y < h; y += step) {
-      var r = makeRegion(imageData, 0, y, w, step);
-      var colorBufferSize = r.width * r.height;
+  const getUniqueColors = function(imageData) {
+    const w = imageData.width;
+    const h = imageData.height;
+    const step = Math.ceil(4 * 1024 * 1024 / w);
+    let buffer = [];
+    let colorBuffer = [];
+    for (let y = 0; y < h; y += step) {
+      const r = makeRegion(imageData, 0, y, w, step);
+      const colorBufferSize = r.width * r.height;
       if (colorBuffer.length !== colorBufferSize) {
         colorBuffer = null;
         colorBuffer = new Uint32Array(colorBufferSize);
       }
-      var u = getUniqueColorsImpl(r, colorBuffer);
+      const u = getUniqueColorsImpl(r, colorBuffer);
       buffer.push(u);
     }
     while (1 < buffer.length) {
-      var temp = [];
-      for (var i = 0; i < buffer.length; i += 2) {
+      const temp = [];
+      for (let i = 0; i < buffer.length; i += 2) {
         if (i + 1 < buffer.length) {
-          var u = mergeUniqueColors(buffer[i], buffer[i + 1]);
+          const u = mergeUniqueColors(buffer[i], buffer[i + 1]);
           temp.push(u);
         } else {
           temp.push(buffer[i]);
