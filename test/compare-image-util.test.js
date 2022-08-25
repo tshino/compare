@@ -1750,5 +1750,47 @@ describe('CompareImageUtil', () => {
                 { x: 24.5, y: 34.5 }, { x: 44.5, y: 34.5 }
             ]);
         });
+        it('should deel with F32 format (other shapes)', () => {
+            // Angle shape ('L')
+
+            const image9 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.fill(image9, 0);
+            compareImageUtil.fill(makeRegion(image9, 40, 20, 20, 40), 255);
+            compareImageUtil.fill(makeRegion(image9, 20, 40, 40, 20), 255);
+            const corners3 = [
+                { x: 39.5, y: 39.5 }
+            ];
+            compareImageUtil.adjustCornerPointsSubPixel(image9, corners3);
+            const result9 = compareImageUtil.sparseOpticalFlow(image9, image9, corners3);
+            checkOpticalFlowResult('result9', result9, 100, corners3);
+
+            const image10 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.fill(image10, 0);
+            compareImageUtil.fill(makeRegion(image10, 70, 25, 20, 40), 255);
+            compareImageUtil.fill(makeRegion(image10, 50, 45, 40, 20), 255);
+            const result10 = compareImageUtil.sparseOpticalFlow(image9, image10, corners3);
+            checkOpticalFlowResult('result10', result10, 10, [
+                { x: 69.5, y: 44.5 }
+            ]);
+
+            // thin line
+            const image11 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.fill(image11, 0);
+            compareImageUtil.fill(makeRegion(image11, 30, 30, 100, 5), 255);
+            const corners4 = [
+                { x: 29.1, y: 32.0 }, { x: 129.9, y: 32.0 }
+            ];
+            compareImageUtil.adjustCornerPointsSubPixel(image11, corners4);
+            const result11 = compareImageUtil.sparseOpticalFlow(image11, image11, corners4);
+            checkOpticalFlowResult('result11', result11, 100, corners4);
+
+            const image12 = makeImage(200, 200, compareImageUtil.FORMAT_F32x1);
+            compareImageUtil.fill(image12, 0);
+            compareImageUtil.fill(makeRegion(image12, 40, 40, 100, 5), 255);
+            const result12 = compareImageUtil.sparseOpticalFlow(image11, image12, corners4);
+            checkOpticalFlowResult('result12', result12, 10, [
+                { x: 39.1, y: 42.0 }, { x: 139.9, y: 42.0 }
+            ]);
+        });
     });
 });
