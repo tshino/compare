@@ -1793,4 +1793,17 @@ describe('CompareImageUtil', () => {
             ]);
         });
     });
+
+    describe('mostFrequentColor', () => {
+        it('should find the most frequently used color', () => {
+            const colors1 = [[0, 0, 0, 255]];
+            assert.deepStrictEqual(compareImageUtil.mostFrequentColor(colors1), [0, 0, 0, 255]);
+            const colors2 = [[0, 0, 0, 255], [0, 0, 0, 255]];
+            assert.deepStrictEqual(compareImageUtil.mostFrequentColor(colors2), [0, 0, 0, 255]);
+            const colors3 = [[0, 0, 0, 255], [0, 0, 0, 255], [0, 0, 255, 255]];
+            assert.deepStrictEqual(compareImageUtil.mostFrequentColor(colors3), [0, 0, 0, 255]);
+            const colors4 = [[0, 0, 255, 255], [0, 0, 0, 255], [0, 0, 0, 255]];
+            assert.deepStrictEqual(compareImageUtil.mostFrequentColor(colors4), [0, 0, 0, 255]);
+        });
+    });
 });
