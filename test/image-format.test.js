@@ -10,7 +10,7 @@ const jsTestUtil = {
     }
 };
 
-describe('CompareUtil', () => {
+describe('CompareUtil detectImageFormat', () => {
     const window = {
         navigator: {
             userAgent: 'ua'
@@ -135,22 +135,22 @@ describe('CompareUtil', () => {
         [ 'data/fullcolor/reduced/fullcolor_ycbcr888.jpg', 'JPEG', 'YCbCr 8.8.8 (24bpp 4:4:4)' ],
         [ 'data/fullcolor/reduced/fullcolor_ycbcr888.webp', 'WebP (Lossy)', 'YCbCr 8.8.8 (12bpp 4:2:0)' ],
     ];
-    describe('detectImageFormat (grayscale-perfect)', () => {
+    describe('(grayscale-perfect)', () => {
         it('should recognize file formats and color formats', async () => {
             await imageFormatDetectionTest(grayscalePerfectSamples);
         });
     });
-    describe('detectImageFormat (grayscale-reduced)', () => {
+    describe('(grayscale-reduced)', () => {
         it('should recognize file formats and color formats', async () => {
             await imageFormatDetectionTest(grayscaleReducedSamples);
         });
     });
-    describe('detectImageFormat (fullcolor-perfect)', () => {
+    describe('(fullcolor-perfect)', () => {
         it('should recognize file formats and color formats', async () => {
             await imageFormatDetectionTest(fullcolorPerfectSamples);
         });
     });
-    describe('detectImageFormat (fullcolor-reduced)', () => {
+    describe('(fullcolor-reduced)', () => {
         it('should recognize file formats and color formats', async () => {
             await imageFormatDetectionTest(fullcolorReducedSamples);
         });
