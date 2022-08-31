@@ -11,17 +11,17 @@
 </head>
 <body class="en">
 <script>
-var changeLang = function(lang) {
+const changeLang = function(lang) {
   if (lang !== '') {
-    var newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
+    const newURL = location.href.replace(/\?.*/, '') + '?lang=' + lang;
     window.history.replaceState('', '', newURL);
     document.body.setAttribute('class', lang);
     document.documentElement.setAttribute('lang', lang);
   }
 };
 (function() {
-  var m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
-  var lang = m ? m[1] : (
+  const m = location.search.match(/(?:\?|\&)lang\=([^&]+)/);
+  const lang = m ? m[1] : (
     (window.navigator.languages && window.navigator.languages[0]) ||
     window.navigator.language ||
     window.navigator.userLanguage ||
