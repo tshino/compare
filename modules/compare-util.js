@@ -1,8 +1,8 @@
 ﻿'use strict';
 const CompareUtil = function(window) {
 
-  const browserName = (function() {
-    const ua = window.navigator.userAgent.toLowerCase();
+  const browserNameOf = function(ua) {
+    ua = ua.toLowerCase();
     return (
       (0 <= ua.indexOf('msie') || 0 <= ua.indexOf('trident')) ? 'msie' :
       0 <= ua.indexOf('edge') ? 'edge' :
@@ -11,7 +11,8 @@ const CompareUtil = function(window) {
       0 <= ua.indexOf('firefox') ? 'firefox' :
       0 <= ua.indexOf('opera') ? 'opera' : ''
     );
-  })();
+  };
+  const browserName = browserNameOf(window.navigator.userAgent);
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   const storageAvailable = function(type) {
@@ -2194,6 +2195,7 @@ const CompareUtil = function(window) {
     };
   };
   return {
+    browserNameOf,
     browserName,
     storageAvailable,
     drawImageAwareOfOrientation,

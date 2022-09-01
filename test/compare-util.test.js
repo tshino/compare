@@ -17,6 +17,16 @@ describe('CompareUtil', () => {
     };
     const compareUtil = CompareUtil(window);
 
+    describe('browserNameOf', () => {
+        const chrome104 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36';
+        const firefox104 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0';
+        const oldEdge = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362';
+        it('should guess the browser name of given UA string', () => {
+            assert.strictEqual(compareUtil.browserNameOf(chrome104), 'chrome');
+            assert.strictEqual(compareUtil.browserNameOf(firefox104), 'firefox');
+            assert.strictEqual(compareUtil.browserNameOf(oldEdge), 'edge');
+        });
+    });
     describe('clamp', () => {
         it('should return clipped value', () => {
             assert.strictEqual(compareUtil.clamp(0, 0, 0), 0);
