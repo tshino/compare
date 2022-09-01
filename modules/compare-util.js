@@ -481,9 +481,9 @@ const CompareUtil = function(window) {
           if (!coprime) {
             sampling = (sampling & 0xf0f0f0) / horizontalGCD + (sampling & 0x0f0f0f) / verticalGCD;
           }
-          return { nf: nf, sampling: sampling, samplingPattern: samplingPattern, coprime: coprime };
+          return { nf, sampling, samplingPattern, coprime };
         } else {
-          return { nf: nf };
+          return { nf };
         }
       }
     });
@@ -548,7 +548,7 @@ const CompareUtil = function(window) {
       if (max < x) { max = x; }
     }
     const mean = sum / list.length;
-    return { min: min, max: max, mean: mean };
+    return { min, max, mean };
   };
   const findMeanByCadenceDetection = function(list, tolerance) {
     const maxPeriod = Math.min(60, list.length >> 1);
@@ -1233,14 +1233,14 @@ const CompareUtil = function(window) {
       return null;
     };
     return {
-      detectPNG: detectPNG,
-      detectGIF: detectGIF,
-      detectBMP: detectBMP,
-      detectJPEG: detectJPEG,
-      detectTIFF: detectTIFF,
-      detectWebP: detectWebP,
-      detectAVIF: detectAVIF,
-      detectSVG: detectSVG
+      detectPNG,
+      detectGIF,
+      detectBMP,
+      detectJPEG,
+      detectTIFF,
+      detectWebP,
+      detectAVIF,
+      detectSVG
     };
   })();
   const detectImageFormat = function(binary) {
@@ -1317,11 +1317,11 @@ const CompareUtil = function(window) {
       }
     };
     return {
-      toString: toString,
-      isTransposed: isTransposed,
-      getCSSTransform: getCSSTransform,
-      interpretXY: interpretXY,
-      interpretXY2: interpretXY2
+      toString,
+      isTransposed,
+      getCSSTransform,
+      interpretXY,
+      interpretXY2
     };
   })();
   const aspectRatioUtil = (function() {
@@ -1360,10 +1360,10 @@ const CompareUtil = function(window) {
       }
     };
     return {
-      calcAspectRatio: calcAspectRatio,
-      findApproxAspectRatio: findApproxAspectRatio,
-      toString: toString,
-      makeInfo: makeInfo
+      calcAspectRatio,
+      findApproxAspectRatio,
+      toString,
+      makeInfo
     };
   })();
   const makeDurationInfo = function(formatInfo) {
@@ -1571,10 +1571,10 @@ const CompareUtil = function(window) {
       }
     };
     return {
-      resetState: resetState,
-      onTouchStart: onTouchStart,
-      onTouchMove: onTouchMove,
-      onTouchEnd: onTouchEnd
+      resetState,
+      onTouchStart,
+      onTouchMove,
+      onTouchEnd
     };
   };
 
@@ -1940,11 +1940,11 @@ const CompareUtil = function(window) {
       onzoom();
     };
     return {
-      orientation: orientation,
-      getScale: getScale,
-      resetZoom: resetZoom,
-      rotate: rotate,
-      zoom: zoom
+      orientation,
+      getScale,
+      resetZoom,
+      rotate,
+      zoom
     };
   };
   const makeRotationInputFilter = function(controller) {
@@ -2189,8 +2189,8 @@ const CompareUtil = function(window) {
       window.setTimeout(kickNextTask, 0);
     }, false);
     return {
-      addTask: addTask,
-      discardTasksOf: discardTasksOf
+      addTask,
+      discardTasksOf
     };
   };
   return {
