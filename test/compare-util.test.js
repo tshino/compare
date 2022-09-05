@@ -22,11 +22,13 @@ describe('CompareUtil', () => {
         const firefox104 = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0';
         const oldEdge = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362';
         const msie = 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
+        const safari = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15';
         it('should guess the browser name of given UA string', () => {
             assert.strictEqual(compareUtil.browserNameOf(chrome104), 'chrome');
             assert.strictEqual(compareUtil.browserNameOf(firefox104), 'firefox');
             assert.strictEqual(compareUtil.browserNameOf(oldEdge), 'edge');
             assert.strictEqual(compareUtil.browserNameOf(msie), 'msie');
+            assert.strictEqual(compareUtil.browserNameOf(safari), 'safari');
         });
     });
     describe('clamp', () => {
