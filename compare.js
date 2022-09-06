@@ -4433,24 +4433,11 @@ $( function() {
           $('#diffSaveFigureHelper').attr('href', url);
           jQuery('#diffSaveFigureHelper')[0].click();
         };
-        if (typeof fig.canvas.toBlob === 'function') {
-          fig.canvas.toBlob(function(blob) {
+        fig.canvas.toBlob(function(blob) {
             var url = compareUtil.createObjectURL(blob);
             download(url);
             compareUtil.revokeObjectURL(url);
-          });
-        } else {
-          window.setTimeout(function() {
-            var url = compareUtil.createObjectURL(
-                        compareUtil.blobFromDataURI(
-                          fig.canvas.toDataURL(),
-                          'image/png'));
-            download(url);
-            window.setTimeout(function() {
-              compareUtil.revokeObjectURL(url);
-            }, 500);
-          }, 0);
-        }
+        });
         return false;
       });
     };

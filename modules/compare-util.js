@@ -60,18 +60,6 @@ const CompareUtil = function(window) {
     });
   };
 
-  const blobFromDataURI = function(dataURI, type) {
-    const parts = dataURI.split(',');
-    type = type || parts[0].match(/:(.*?);/)[1];
-    const str = atob(parts[1]);
-    let n = str.length;
-    const buffer = new Uint8Array(n);
-    while(n--) {
-      buffer[n] = str.charCodeAt(n);
-    }
-    return new Blob([buffer], {type: type});
-  };
-
   const createObjectURL = function(blob) {
     if (window.URL) {
       return window.URL.createObjectURL(blob);
@@ -2199,7 +2187,6 @@ const CompareUtil = function(window) {
     browserName,
     storageAvailable,
     drawImageAwareOfOrientation,
-    blobFromDataURI,
     createObjectURL,
     revokeObjectURL,
     newWorker,
