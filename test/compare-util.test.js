@@ -1959,4 +1959,32 @@ describe('CompareUtil', () => {
             });
         });
     });
+
+    describe('makeRotationCoefs', () => {
+        it('should return coefficients and some utility functions', () => {
+            const ret1 = compareUtil.makeRotationCoefs({x: 0, y: 0});
+
+            assert.strictEqual(ret1.pitch, 0);
+            assert.strictEqual(ret1.yaw, 0);
+            assert.ok(Math.abs(ret1.xr - 0.707) <= 0.0001);
+            assert.ok(Math.abs(ret1.yr - 0.000) <= 0.0001);
+            assert.ok(Math.abs(ret1.xg - 0.000) <= 0.0001);
+            assert.ok(Math.abs(ret1.yg - 0.000) <= 0.0001);
+            assert.ok(Math.abs(ret1.yb - -0.707) <= 0.0001);
+
+            assert.ok(Math.abs(ret1.pos3DTo2D(0, 0, 0)[0] - 160) <= 0.01);
+            assert.ok(Math.abs(ret1.pos3DTo2D(0, 0, 0)[1] - 160) <= 0.01);
+            assert.ok(Math.abs(ret1.pos3DTo2D(127.5, 127.5, 0)[0] - 250.14) <= 0.01);
+            assert.ok(Math.abs(ret1.pos3DTo2D(127.5, 127.5, 0)[1] - 160) <= 0.01);
+            assert.ok(Math.abs(ret1.pos3DTo2D(0, 127.5, 127.5)[0] - 160) <= 0.01);
+            assert.ok(Math.abs(ret1.pos3DTo2D(0, 127.5, 127.5)[1] - 69.86) <= 0.01);
+
+            assert.ok(Math.abs(ret1.vec3DTo2D(0, 0, 0)[0]) <= 0.01);
+            assert.ok(Math.abs(ret1.vec3DTo2D(0, 0, 0)[1]) <= 0.01);
+            assert.ok(Math.abs(ret1.vec3DTo2D(127.5, 127.5, 0)[0] - 90.14) <= 0.01);
+            assert.ok(Math.abs(ret1.vec3DTo2D(127.5, 127.5, 0)[1]) <= 0.01);
+            assert.ok(Math.abs(ret1.vec3DTo2D(0, 127.5, 127.5)[0]) <= 0.01);
+            assert.ok(Math.abs(ret1.vec3DTo2D(0, 127.5, 127.5)[1] - -90.14) <= 0.01);
+        });
+    });
 });
