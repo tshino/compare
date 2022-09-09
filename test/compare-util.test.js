@@ -1961,6 +1961,24 @@ describe('CompareUtil', () => {
     });
 
     describe('makeRotationCoefs', () => {
+        const mae2D = function(array1, array2, msg) {
+            let sad = 0;
+            let count = 0;
+            assert.strictEqual(array1.length, array2.length, msg);
+            for (let i = 0; i < array1.length; i++) {
+                const sub1 = array1[i];
+                const sub2 = array2[i];
+                let subSad = 0;
+                assert.strictEqual(sub1.length, sub2.length, msg);
+                for (let j = 0; j < sub1.length; j++) {
+                    subSad += Math.abs(sub1[j] - sub2[j]);
+                    count += 1;
+                }
+                sad += subSad;
+            }
+            return sad / count;
+        };
+
         it('should return coefficients and some utility functions', () => {
             const ret1 = compareUtil.makeRotationCoefs({x: 0, y: 0});
 
@@ -1985,6 +2003,14 @@ describe('CompareUtil', () => {
             assert.ok(Math.abs(ret1.vec3DTo2D(127.5, 127.5, 0)[1]) <= 0.01);
             assert.ok(Math.abs(ret1.vec3DTo2D(0, 127.5, 127.5)[0]) <= 0.01);
             assert.ok(Math.abs(ret1.vec3DTo2D(0, 127.5, 127.5)[1] - -90.14) <= 0.01);
+
+            const vertices = [
+                [0, 0, 0], [127.5, 127.5, 0], [0, 127.5, 127.5]
+            ];
+            const expected = [
+                [160, 160], [250.14, 160], [160, 69.86]
+            ];
+            assert.ok(mae2D(ret1.vertices3DTo2D(vertices), expected) <= 0.01);
         });
     });
 });
