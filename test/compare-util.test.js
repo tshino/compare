@@ -1918,6 +1918,35 @@ describe('CompareUtil', () => {
         });
     });
 
+    describe('vertexUtil', () => {
+        describe('makeCube', () => {
+            it('should make vertices of a cube', () => {
+                const cube = compareUtil.vertexUtil.makeCube(6, 4, 2);
+                const expected = [
+                    [-3, -2, -1],
+                    [-3, -2, 1],
+                    [-3, 0, -1],
+                    [-3, 0, 1],
+                    [-3, 2, -1],
+                    [-3, 2, 1],
+                    [0, -2, -1],
+                    [0, -2, 1],
+                    [0, 0, -1],
+                    [0, 0, 1],
+                    [0, 2, -1],
+                    [0, 2, 1],
+                    [3, -2, -1],
+                    [3, -2, 1],
+                    [3, 0, -1],
+                    [3, 0, 1],
+                    [3, 2, -1],
+                    [3, 2, 1]
+                ];
+                assert.deepStrictEqual(cube, expected);
+            });
+        });
+    });
+
     describe('rotationUtil', () => {
         describe('isFrontFace', () => {
             const isFrontFace = compareUtil.rotationUtil.isFrontFace;
