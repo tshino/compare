@@ -54,7 +54,7 @@ $( function() {
   $('.swapbtn').click(swapBaseAndTargetImage);
 
   $(window).resize(viewManagement.onResize);
-  var onKeyDownOnDialogs = function(e) {
+  const onKeyDownOnDialogs = function(e) {
         if (e.ctrlKey || e.altKey || e.metaKey) {
           return true;
         }
@@ -100,7 +100,7 @@ $( function() {
         }
         return true;
   };
-  var onKeyDownOnViews = function(e) {
+  const onKeyDownOnViews = function(e) {
       if (e.altKey || e.metaKey) {
         return true;
       }
@@ -277,7 +277,7 @@ $( function() {
       viewZoom.resetZoomOrigin();
     }
   );
-  var updateNavBox = function() {
+  const updateNavBox = function() {
     if (1 <= images.length && !dialog) {
       $('#navBox').show();
     } else {
@@ -334,7 +334,7 @@ $( function() {
   });
   var baseImageIndex = null;
   var targetImageIndex = null;
-  var setDragStateClass = function(target, dragging, horizontal) {
+  const setDragStateClass = function(target, dragging, horizontal) {
     if (dragging) {
       $(target).addClass('dragging');
     } else {
@@ -352,12 +352,12 @@ $( function() {
   );
 
   var textUtil = (function() {
-    var toggleLang = function() {
+    const toggleLang = function() {
       var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
       $('#selectLang').val(lang);
       changeLang(lang);
     };
-    var setText = function(target, text) {
+    const setText = function(target, text) {
       for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
         var e = target.find('.' + lang);
         if (0 === e.length) {
@@ -387,13 +387,13 @@ $( function() {
     var imageScaling = 'smooth';
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
-    var isSingleView = function() {
+    const isSingleView = function() {
       return singleView;
     };
-    var isOverlayMode = function() {
+    const isOverlayMode = function() {
       return overlayMode;
     };
-    var numberFromIndex = function(index) {
+    const numberFromIndex = function(index) {
       for (var i = 0, img; img = images[i]; i++) {
         if (img.index === index) {
           return i + 1;
@@ -401,13 +401,13 @@ $( function() {
       }
       return null;
     };
-    var indexFromNumber = function(number) {
+    const indexFromNumber = function(number) {
       if (1 <= number && number <= images.length) {
         return images[number - 1].index;
       }
       return null;
     };
-    var getSelectedImageIndices = function() {
+    const getSelectedImageIndices = function() {
       var indices = [];
       if (singleView) {
         indices.push(currentImageIndex - 1);
@@ -417,20 +417,20 @@ $( function() {
       }
       return indices;
     };
-    var getLayoutMode = function() {
+    const getLayoutMode = function() {
       return layoutMode;
     };
-    var resetLayoutState = function() {
+    const resetLayoutState = function() {
       currentImageIndex = 0;
       viewZoom.setZoom(0);
       viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
     };
-    var toAllImageView = function() {
+    const toAllImageView = function() {
       currentImageIndex = 0;
       updateLayout();
     };
-    var toSingleImageView = function(index) {
+    const toSingleImageView = function(index) {
       var prevImageIndex = currentImageIndex;
       if (index === null ||
           !entries[index].visible) {
@@ -443,7 +443,7 @@ $( function() {
         updateLayout();
       }
     };
-    var toggleSingleView = function(index) {
+    const toggleSingleView = function(index) {
       if (index === null || index === undefined) {
         if (0 === lastSingleViewImageIndex) {
           flipSingleView(true);
@@ -457,7 +457,7 @@ $( function() {
         toSingleImageView(index);
       }
     };
-    var flipSingleView = function(forward) {
+    const flipSingleView = function(forward) {
       if (0 < images.length) {
         var k = forward ? 0 : images.length - 1;
         for (var i = 0, img; img = images[i]; i++) {
@@ -476,11 +476,11 @@ $( function() {
         return false;
       }
     };
-    var onResize = function() {
+    const onResize = function() {
       layoutMode = null;
       updateLayout();
     };
-    var arrangeLayout = function() {
+    const arrangeLayout = function() {
       if (singleView) {
         currentImageIndex = 0;
       } else if (layoutMode === 'x') {
@@ -490,7 +490,7 @@ $( function() {
       }
       updateLayout();
     };
-    var toggleOverlay = function() {
+    const toggleOverlay = function() {
       if (!overlayMode && 2 <= images.length) {
         if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
           currentImageIndex = images[1].index + 1;
@@ -506,7 +506,7 @@ $( function() {
         updateLayout();
       }
     };
-    var update = function() {
+    const update = function() {
       singleView =
               currentImageIndex !== 0 &&
               currentImageIndex <= entries.length;
@@ -517,10 +517,10 @@ $( function() {
         layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
       }
     };
-    var getCurrentIndexOr = function(defaultIndex) {
+    const getCurrentIndexOr = function(defaultIndex) {
       return singleView ? currentImageIndex - 1 : defaultIndex;
     };
-    var makeImageLayoutParam = function() {
+    const makeImageLayoutParam = function() {
       var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
       var numSlots = singleView ? 1 : Math.max(numVisibleEntries, 2);
       var numColumns = layoutMode === 'x' ? numSlots : 1;
@@ -538,7 +538,7 @@ $( function() {
         boxW: boxW, boxH: boxH
       };
     };
-    var updateImageBox = function(box, img, boxW, boxH) {
+    const updateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
         img.boxW = boxW;
         img.boxH = boxH;
@@ -579,14 +579,14 @@ $( function() {
         background : overlayMode ? '#000' : ''
       });
     };
-    var updateImageScaling = function() {
+    const updateImageScaling = function() {
       if (imageScaling === 'pixel') {
         $('#view .imageBox .image').addClass('pixelated');
       } else {
         $('#view .imageBox .image').removeClass('pixelated');
       }
     };
-    var onUpdateLayout = function() {
+    const onUpdateLayout = function() {
       var param = makeImageLayoutParam();
       var indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
@@ -616,7 +616,7 @@ $( function() {
       });
       updateImageScaling();
     };
-    var updateEmptyBoxTextColor = function() {
+    const updateEmptyBoxTextColor = function() {
       if ($('#view').hasClass('useChecker')) {
         var textColor = '#222';
       } else {
@@ -626,16 +626,16 @@ $( function() {
       }
       $('#view .dropHere').css({color: textColor, borderColor: textColor});
     };
-    var setBackgroundColor = function(color) {
+    const setBackgroundColor = function(color) {
       backgroundColor = color;
       $('#view').css({'background-color': color});
       updateEmptyBoxTextColor();
     };
-    var setCheckerPattern = function(enable) {
+    const setCheckerPattern = function(enable) {
       enable ? $('#view').addClass('useChecker') : $('#view').removeClass('useChecker');
       updateEmptyBoxTextColor();
     };
-    var setImageScaling = function(type) {
+    const setImageScaling = function(type) {
       imageScaling = type;
       updateImageScaling();
     };
@@ -663,7 +663,7 @@ $( function() {
       setImageScaling: setImageScaling
     };
   })();
-  var removeEntry = function(index) {
+  const removeEntry = function(index) {
     var ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
       ent.visible = false;
@@ -701,7 +701,7 @@ $( function() {
       updateDOM();
     }
   };
-  var findImageIndexOtherThan = function(index) {
+  const findImageIndexOtherThan = function(index) {
     for (var i = 0, img; img = images[i]; ++i) {
       if (img.index !== index) {
         return img.index;
@@ -709,7 +709,7 @@ $( function() {
     }
     return null;
   };
-  var setBaseAndTargetImage = function(baseIndex, targetIndex) {
+  const setBaseAndTargetImage = function(baseIndex, targetIndex) {
     if (baseIndex === null && targetIndex === null) {
       baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
       if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
@@ -727,7 +727,7 @@ $( function() {
       }
     }
   };
-  var changeBaseImage = function(index) {
+  const changeBaseImage = function(index) {
     if (index < entries.length &&
         entries[index].ready() &&
         baseImageIndex !== null &&
@@ -736,7 +736,7 @@ $( function() {
       return true;
     }
   };
-  var changeTargetImage = function(index) {
+  const changeTargetImage = function(index) {
     if (index < entries.length &&
         entries[index].ready() &&
         baseImageIndex !== null && targetImageIndex !== null &&
@@ -745,7 +745,7 @@ $( function() {
       return true;
     }
   };
-  var makeImageNameWithIndex = function(tag, img) {
+  const makeImageNameWithIndex = function(tag, img) {
     var number = viewManagement.numberFromIndex(img.index);
     var elem = $(tag).css({ wordBreak : 'break-all' });
     if (number !== null) {
@@ -757,7 +757,7 @@ $( function() {
   // ROI map
   var roiMap = (function() {
     var enableMap = false;
-    var toggle = function() {
+    const toggle = function() {
       if (!enableMap) {
         if (0 < images.length) {
           enableMap = true;
@@ -768,10 +768,10 @@ $( function() {
         updateLayout();
       }
     };
-    var onUpdateLayout = function() {
+    const onUpdateLayout = function() {
       $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     };
-    var updateMap = function(img) {
+    const updateMap = function(img) {
       var roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
       $('#mapROI').attr({
         x : 100 * roi[0] + '%',
@@ -785,7 +785,7 @@ $( function() {
       $('#map svg').width(w).height(h);
       $('#map').width(w).height(h);
     };
-    var onUpdateTransform = function() {
+    const onUpdateTransform = function() {
       if (enableMap && images.length) {
         var index = viewManagement.getCurrentIndexOr(0);
         var img = entries[index].ready() ? entries[index] : images[0];
@@ -798,7 +798,7 @@ $( function() {
       onUpdateTransform: onUpdateTransform
     };
   })();
-  var makeImageOverlayOnUpdateLayout = function(key, make) {
+  const makeImageOverlayOnUpdateLayout = function(key, make) {
       return function(enable, img, w, h) {
         if (enable) {
           if (img.element && !img[key]) {
@@ -822,7 +822,7 @@ $( function() {
     var mainGridInterval = 100;
     var auxGridInterval = 10;
     var onChangeCallback = null;
-    var toggle = function() {
+    const toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
       updateLayout();
@@ -830,7 +830,7 @@ $( function() {
         onChangeCallback();
       }
     };
-    var setInterval = function(main, aux) {
+    const setInterval = function(main, aux) {
       if (mainGridInterval !== main || auxGridInterval !== aux) {
         mainGridInterval = main;
         auxGridInterval = aux;
@@ -848,10 +848,10 @@ $( function() {
         }
       }
     };
-    var setOnChange = function(onchange) {
+    const setOnChange = function(onchange) {
       onChangeCallback = onchange;
     };
-    var makePathDesc = function(size, step, skip) {
+    const makePathDesc = function(size, step, skip) {
       var desc = '';
       for (var k = step; k < size.w; k += step) {
         if (skip && (k % skip) === 0) continue;
@@ -863,7 +863,7 @@ $( function() {
       }
       return desc;
     };
-    var makeGrid = function(w, h, color) {
+    const makeGrid = function(w, h, color) {
       var size = { w: w, h: h };
       var vbox = '0 0 ' + w + ' ' + h;
       color = color || 'white';
@@ -877,10 +877,10 @@ $( function() {
       ).width(w).height(h);
     };
     var onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
-    var onUpdateImageBox = function(img, w, h) {
+    const onUpdateImageBox = function(img, w, h) {
       onUpdateLayoutImpl(enableGrid, img, w, h);
     };
-    var updateGridStyle = function(grid, width, baseWidth, scale, commonStyle) {
+    const updateGridStyle = function(grid, width, baseWidth, scale, commonStyle) {
       var base = 0.5 * width / (baseWidth * scale);
       var strokeWidth = [
           (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
@@ -894,7 +894,7 @@ $( function() {
             attr('opacity', opacity[index]);
       });
     };
-    var onUpdateTransform = function(ent, commonStyle) {
+    const onUpdateTransform = function(ent, commonStyle) {
       if (ent.grid) {
         updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
       }
@@ -920,14 +920,14 @@ $( function() {
     var onShowCallback = [];
     var onUpdateCallback = [];
     var onRemoveCallback = [];
-    var makeInitialPosition = function(index) {
+    const makeInitialPosition = function(index) {
       var img = entries[index];
       var center = viewZoom.getCenter();
       var x = (0.5 + center.x) * img.width;
       var y = (0.5 + center.y) * img.height;
       return { x: x, y: y };
     };
-    var addObserver = function(onShow, onUpdate, onRemove) {
+    const addObserver = function(onShow, onUpdate, onRemove) {
       if (onShow) {
         onShowCallback.push(onShow);
       }
@@ -938,7 +938,7 @@ $( function() {
         onRemoveCallback.push(onRemove);
       }
     };
-    var enable = function() {
+    const enable = function() {
       var index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
       if (!enableCrossCursor && 0 <= index) {
         enableCrossCursor = true;
@@ -951,7 +951,7 @@ $( function() {
       }
       return enableCrossCursor;
     };
-    var disable = function() {
+    const disable = function() {
       if (enableCrossCursor) {
         enableCrossCursor = false;
         onRemoveCallback.forEach(function(val) { val(); });
@@ -959,41 +959,41 @@ $( function() {
         updateLayout();
       }
     };
-    var toggle = function() {
+    const toggle = function() {
       if (!enableCrossCursor) {
         enable();
       } else {
         disable();
       }
     };
-    var getPosition = function(index) {
+    const getPosition = function(index) {
       index = index !== undefined ? index : primaryIndex;
       return positions[index];
     };
-    var setIndex = function(index, fixed) {
+    const setIndex = function(index, fixed) {
       primaryIndex = index;
       fixedPosition = fixed;
     };
-    var getIndex = function() {
+    const getIndex = function() {
       return primaryIndex;
     };
-    var getNormalizedPosition = function() {
+    const getNormalizedPosition = function() {
       return {
         x: (0.5 + positions[primaryIndex].x) / entries[primaryIndex].width,
         y: (0.5 + positions[primaryIndex].y) / entries[primaryIndex].height,
         isInView: positions[primaryIndex].isInView
       };
     };
-    var isFixed = function() {
+    const isFixed = function() {
       return fixedPosition;
     };
-    var isInsideROI = function(roi, x, y) {
+    const isInsideROI = function(roi, x, y) {
       return (
         roi[0] <= x && x <= roi[2] &&
         roi[1] <= y && y <= roi[3]
       );
     };
-    var onRemoveEntry = function(index) {
+    const onRemoveEntry = function(index) {
       if (enableCrossCursor && primaryIndex === index) {
         primaryIndex = null;
         for (var i = 0; i < images.length; i++) {
@@ -1008,7 +1008,7 @@ $( function() {
         }
       }
     };
-    var makePathDesc = function(img, x, y) {
+    const makePathDesc = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
@@ -1017,7 +1017,7 @@ $( function() {
       desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
       return desc;
     };
-    var makeLabelAttr = function(img, roi, x, y) {
+    const makeLabelAttr = function(img, roi, x, y) {
       var attr = makeLabelAttrOnTransform(img, roi, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
       if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
@@ -1029,7 +1029,7 @@ $( function() {
       }
       return attr;
     };
-    var makeLabelAttrOnTransform = function(ent, roi, x, y) {
+    const makeLabelAttrOnTransform = function(ent, roi, x, y) {
       var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
       var sx = ent.flippedX ? -1 : 1;
       var sy = ent.flippedY ? -1 : 1;
@@ -1044,7 +1044,7 @@ $( function() {
       var a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
       return ent.transposed ? [a1, a0] : [a0, a1];
     };
-    var addCrossCursor = function(img, desc) {
+    const addCrossCursor = function(img, desc) {
       var size = { w: img.canvasWidth, h: img.canvasHeight };
       var vbox = '0 0 ' + size.w + ' ' + size.h;
       var filter_id = 'drop-shadow' + img.index;
@@ -1064,13 +1064,13 @@ $( function() {
         height(size.h);
       img.view.append(img.cursor);
     };
-    var removeCrossCursor = function(img) {
+    const removeCrossCursor = function(img) {
       if (img.cursor) {
         $(img.cursor).remove();
         img.cursor = null;
       }
     };
-    var updateCrossCursor = function(img, x, y) {
+    const updateCrossCursor = function(img, x, y) {
       if (!img.element) {
         return;
       }
@@ -1091,7 +1091,7 @@ $( function() {
         $(this).attr(labelsAttr[i]).text(i === 0 ? x : y);
       });
     };
-    var setPosition = function(index, x, y, fixed) {
+    const setPosition = function(index, x, y, fixed) {
       fixed = fixed !== undefined ? fixed : fixedPosition;
       var rx = (Math.floor(x) + 0.5) / entries[index].width;
       var ry = (Math.floor(y) + 0.5) / entries[index].height;
@@ -1103,7 +1103,7 @@ $( function() {
       }
       onUpdateCallback.forEach(function(val) { val(true); });
     };
-    var adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
+    const adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
       var img = entries[primaryIndex];
       var center = viewZoom.getCenter();
       var rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
@@ -1117,7 +1117,7 @@ $( function() {
         viewZoom.moveRelative(0, 0 < ry ? delta : -delta);
       }
     };
-    var processKeyDown = function(e) {
+    const processKeyDown = function(e) {
       if (e.ctrlKey || e.altKey || e.metaKey) {
         return true;
       }
@@ -1139,7 +1139,7 @@ $( function() {
         }
       }
     };
-    var processClick = function(e) {
+    const processClick = function(e) {
       var pos = getPosition(e.index);
       var ent = entries[e.index];
       var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
@@ -1152,7 +1152,7 @@ $( function() {
       }
       setPosition(e.index, x, y, fixed);
     };
-    var processMouseMove = function(e, selector, target) {
+    const processMouseMove = function(e, selector, target) {
       if (enableCrossCursor && !fixedPosition) {
         var index = selector ? $(selector).index($(target).parent()) : null;
         var pos = viewZoom.positionFromMouseEvent(e, target, index);
@@ -1164,7 +1164,7 @@ $( function() {
         }
       }
     };
-    var onUpdateImageBox = function(img, w, h) {
+    const onUpdateImageBox = function(img, w, h) {
       if (enableCrossCursor) {
         var pos = positions[img.index];
         var x = pos ? (pos.x || 0) : 0;
@@ -1177,7 +1177,7 @@ $( function() {
         $(img.cursor).css({ width: w+'px', height: h+'px' });
       }
     };
-    var onUpdateTransformEach = function(ent, commonStyle) {
+    const onUpdateTransformEach = function(ent, commonStyle) {
       if (ent.cursor) {
         var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
@@ -1192,7 +1192,7 @@ $( function() {
         });
       }
     };
-    var onUpdateTransform = function() {
+    const onUpdateTransform = function() {
       if (enableCrossCursor) {
         onUpdateCallback.forEach(function(val) { val(false); });
       }
@@ -1221,15 +1221,15 @@ $( function() {
   var hud = (function() {
     var hudPlacement = { right: true, bottom: true };
     var onUpdateLayoutCallback = null;
-    var initialize = function() {
+    const initialize = function() {
       $('#view').on('mousedown', 'div.hudContainer', function(e) {
         e.stopPropagation();
       });
     };
-    var setObserver = function(onUpdateLayout) {
+    const setObserver = function(onUpdateLayout) {
       onUpdateLayoutCallback = onUpdateLayout;
     };
-    var adjustHUDPlacementToAvoidPoint = function(position) {
+    const adjustHUDPlacementToAvoidPoint = function(position) {
       var center = viewZoom.getCenter();
       var relative = {
           x: (position.x - (center.x + 0.5)) * viewZoom.scale,
@@ -1244,7 +1244,7 @@ $( function() {
         img.view.find('div.hudContainer').css(style);
       }
     };
-    var adjustPlacement = function() {
+    const adjustPlacement = function() {
       var index = crossCursor.getIndex();
       var pos = crossCursor.getPosition(index);
       adjustHUDPlacementToAvoidPoint({
@@ -1252,7 +1252,7 @@ $( function() {
         y: pos.y / entries[index].height
       });
     };
-    var append = function(img, hud) {
+    const append = function(img, hud) {
       if (img && img.view) {
         var container = img.view.find('div.hudContainer');
         if (0 === container.length) {
@@ -1262,7 +1262,7 @@ $( function() {
         container.append(hud);
       }
     };
-    var onUpdateImageBox = function(img) {
+    const onUpdateImageBox = function(img) {
       if (onUpdateLayoutCallback) {
         onUpdateLayoutCallback(img);
       }
@@ -1277,7 +1277,7 @@ $( function() {
   })();
 
   var colorHUD = (function() {
-    var updateColorHUD = function(img) {
+    const updateColorHUD = function(img) {
       if (!img.colorHUD) {
         return;
       }
@@ -1305,10 +1305,10 @@ $( function() {
         });
       }
     };
-    var showHUD = function() {
+    const showHUD = function() {
       $('#pickerbtn').addClass('current');
     };
-    var updateHUD = function(pointChanged) {
+    const updateHUD = function(pointChanged) {
       if (pointChanged) {
         for (var i = 0, img; img = images[i]; i++) {
           updateColorHUD(img);
@@ -1316,10 +1316,10 @@ $( function() {
       }
       hud.adjustPlacement();
     };
-    var removeHUD = function() {
+    const removeHUD = function() {
       $('#pickerbtn').removeClass('current');
     };
-    var addColorHUD = function(img) {
+    const addColorHUD = function(img) {
       img.colorHUD = $(
         '<div class="dark hud" style="pointer-events: auto; min-width: 180px">' +
           '<span style="display: inline-block; font-size: 12px">' +
@@ -1347,7 +1347,7 @@ $( function() {
       img.colorHUD.show();
       updateColorHUD(img);
     };
-    var onUpdateLayout = function(img) {
+    const onUpdateLayout = function(img) {
       if (crossCursor.isEnabled()) {
         if (!img.colorHUD) {
           addColorHUD(img);
@@ -1357,7 +1357,7 @@ $( function() {
         img.colorHUD = null;
       }
     };
-    var initialize = function() {
+    const initialize = function() {
       crossCursor.addObserver(showHUD, updateHUD, removeHUD);
       hud.setObserver(onUpdateLayout);
     };
@@ -1365,7 +1365,7 @@ $( function() {
       initialize: initialize
     };
   })();
-  var swapBaseAndTargetImage = function() {
+  const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
       setBaseAndTargetImage(targetImageIndex, baseImageIndex);
       if (dialog) {
@@ -1375,7 +1375,7 @@ $( function() {
   };
   var dialogUtil = (function() {
     var onShow = [], onHide = [];
-    var addObserver = function(show, hide) {
+    const addObserver = function(show, hide) {
       if (show) {
         onShow.push(show);
       }
@@ -1383,7 +1383,7 @@ $( function() {
         onHide.push(hide);
       }
     };
-    var hideDialog = function() {
+    const hideDialog = function() {
       if (dialog) {
         if (dialog.onclose) {
           dialog.onclose();
@@ -1394,7 +1394,7 @@ $( function() {
         onHide.forEach(function(val) { val(); });
       }
     };
-    var showDialog = function(target, parent, update, onclose, initialFocus) {
+    const showDialog = function(target, parent, update, onclose, initialFocus) {
       dialog = {
         element: target,
         close: parent || hideDialog,
@@ -1406,7 +1406,7 @@ $( function() {
       initialFocus.focus();
       onShow.forEach(function(val) { val(); });
     };
-    var initFigureZoom = function(options) {
+    const initFigureZoom = function(options) {
       if (options.enableZoom) {
         figureZoom.enable({
           zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
@@ -1420,7 +1420,7 @@ $( function() {
         figureZoom.disable();
       }
     };
-    var adjustDialogPosition = function() {
+    const adjustDialogPosition = function() {
       if (dialog) {
         var target = dialog.element, dlg = dialog.element.children();
         var offset = dlg.offset();
@@ -1432,10 +1432,10 @@ $( function() {
         }
       }
     };
-    var enableMouse = function(target) {
+    const enableMouse = function(target) {
       var dlg = target.children();
       var draggingPoint = null;
-      var moveDialog = function(dx, dy) {
+      const moveDialog = function(dx, dy) {
         var offset = dlg.offset();
         dlg.offset({ left: offset.left + dx, top: offset.top + dy });
       };
@@ -1466,14 +1466,14 @@ $( function() {
         }
       });
     };
-    var initDialog = function(target, parent) {
+    const initDialog = function(target, parent) {
       target.on('click', parent || hideDialog);
       target.children().on('click', function(e) { e.stopPropagation(); return true; });
       enableMouse(target);
       target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
         css({display:'inline', margin:'0px', padding:'0px', border:'0px'}));
     };
-    var defineDialog = function(target, update, parent, options) {
+    const defineDialog = function(target, update, parent, options) {
       options = options !== undefined ? options : {};
       initDialog(target, parent);
       return function() {
@@ -1510,8 +1510,8 @@ $( function() {
       var mySerial = serial;
       $('#messageBox').css('display', 'block');
       textUtil.setText($('#messageBoxBody'), text);
-      var close = function(delay) {
-        var doClose = function() {
+      const close = function(delay) {
+        const doClose = function() {
           if (serial === mySerial) {
             $('#messageBox').css('display', '');
           }
@@ -1533,20 +1533,20 @@ $( function() {
     if (compareUtil.storageAvailable('localStorage')) {
       storage = window.localStorage;
     }
-    var openBGColor = function() {
+    const openBGColor = function() {
       $('#settingsBGColor').click();
     };
-    var configItem = function(key, initialValue, setter) {
-      var set = function(value) {
+    const configItem = function(key, initialValue, setter) {
+      const set = function(value) {
         setter(value);
         if (storage) {
           storage.setItem(key, value);
         }
       };
-      var reset = function() {
+      const reset = function() {
         set(initialValue);
       };
-      var load = function() {
+      const load = function() {
         var value = storage && storage.getItem(key);
         setter(value || initialValue);
       };
@@ -1577,7 +1577,7 @@ $( function() {
       ).addClass('current');
       viewManagement.setImageScaling(value);
     });
-    var gridIntervalValues = function(value) {
+    const gridIntervalValues = function(value) {
       var num = value.split('/');
       var aux = compareUtil.clamp(parseInt(num[0]) || 4, 1, 256);
       var main = compareUtil.clamp(parseInt(num[1]) || 16, 1, 256);
@@ -1602,18 +1602,18 @@ $( function() {
       grid.setInterval(num[1], num[0]);
     });
     var configItems = [bgColor, bgPattern, imageScaling, gridInterval];
-    var loadConfig = function(key) {
+    const loadConfig = function(key) {
       configItems.forEach(function(item) {
         if (key === undefined || key === item.key) {
           item.load();
         }
       });
     };
-    var supportsCSSImageRenderingPixelated = function() {
+    const supportsCSSImageRenderingPixelated = function() {
       var n = compareUtil.browserName;
       return 0 <= ['msie', 'chrome', 'safari', 'firefox', 'opera'].indexOf(n);
     };
-    var startup = function() {
+    const startup = function() {
       if (!supportsCSSImageRenderingPixelated()) {
         $('#settingsImageScalingRow').hide();
       }
@@ -1635,7 +1635,7 @@ $( function() {
       $('#settingsImageScalingButtons button').on('click', function(e) {
         imageScaling.set($(this).attr('data-value'));
       });
-      var updateGridInterval = function(value) {
+      const updateGridInterval = function(value) {
         if (value === 'other') {
           gridInterval.set(
             $('#settingsGridIntervalFreeAux').val() + '/' +
@@ -1686,7 +1686,7 @@ $( function() {
         addCapturedImage(canvas);
       }
     });
-    var onUpdate = function() {
+    const onUpdate = function() {
       if (error) {
         return;
       }
@@ -1742,7 +1742,7 @@ $( function() {
         });
       }
     };
-    var onClose = function() {
+    const onClose = function() {
       if (stream) {
         stream.getVideoTracks()[0].stop();
         stream = null;
@@ -1765,7 +1765,7 @@ $( function() {
   })();
   // Image Information
   var infoDialog = (function() {
-    var makeDescriptionWithApprox = function(exact, approx) {
+    const makeDescriptionWithApprox = function(exact, approx) {
       if (typeof exact === 'string') {
         exact = { en: exact, ja: exact };
       }
@@ -1774,7 +1774,7 @@ $( function() {
         ja: exact.ja + '\n(約 ' + approx + ')'
       });
     };
-    var makeCellValue = function(data) {
+    const makeCellValue = function(data) {
       var value = data[0], desc = data[1], approx = data[2];
       if (approx !== undefined) {
         return [value, makeDescriptionWithApprox(desc, approx)];
@@ -1784,7 +1784,7 @@ $( function() {
         return [value, textUtil.setText($('<span>'), desc)];
       }
     };
-    var makeOrientationInfo = function(img) {
+    const makeOrientationInfo = function(img) {
       var orientation = compareUtil.orientationUtil.toString(img.orientationExif);
       var desc = img.orientationExif ? $('<span>').append(
         $('<img src="res/orientation.svg" width="30">').css({
@@ -1811,7 +1811,7 @@ $( function() {
       $('#infoLastModified')
     ];
     var unknown = [null, '‐'];
-    var makeTableValue = function(img) {
+    const makeTableValue = function(img) {
       return [
         [null, makeImageNameWithIndex('<span>', img)],
         img.format === '' ? unknown : [img.format, img.format],
@@ -1827,13 +1827,13 @@ $( function() {
         [img.lastModified, img.lastModified ? img.lastModified.toLocaleString() : '-']
       ];
     };
-    var updateTableCell = function(val) {
+    const updateTableCell = function(val) {
       for (var j = 0, v; v = val[j]; ++j) {
         var desc = v[1], e = $('<td>').css('max-width', '300px');
         rows[j].append(typeof desc === 'string' ? e.text(desc) : e.append(desc));
       }
     };
-    var updateTableCellForComparison = function(index, val, base, isBase) {
+    const updateTableCellForComparison = function(index, val, base, isBase) {
       var name = rows[0].children().last();
       if (isBase) {
         name.append($('<br>'), textUtil.setText($('<span>').css('font-size', '0.8em'), {
@@ -1855,7 +1855,7 @@ $( function() {
         }
       }
     };
-    var updateTable = function() {
+    const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
       if (images.length !== 0) {
         setBaseAndTargetImage(null, null);
@@ -1900,10 +1900,10 @@ $( function() {
   var nowLoadingDialog = (function() {
     var loading = [];
     var toggleNowLoading = dialogUtil.defineDialog($('#loading'));
-    var add = function(entry) {
+    const add = function(entry) {
       loading.push(entry);
     };
-    var update = function() {
+    const update = function() {
       if ($('#loading').is(':visible')) {
         dialogUtil.hideDialog();
       }
@@ -1960,7 +1960,7 @@ $( function() {
       update: update
     };
   })();
-  var getImageData = function(img) {
+  const getImageData = function(img) {
     if (!img.imageData) {
       var w = img.canvasWidth;
       var h = img.canvasHeight;
@@ -1979,38 +1979,38 @@ $( function() {
     return img.imageData;
   };
   var figureUtil = (function() {
-    var makeBlankFigure = function(w, h) {
+    const makeBlankFigure = function(w, h) {
       var canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
       var context = canvas.getContext('2d');
       return { canvas: canvas, context: context };
     };
-    var canvasFromImage = function(image, w, h) {
+    const canvasFromImage = function(image, w, h) {
       var fig = makeBlankFigure(w, h);
       fig.context.drawImage(image, 0, 0, w, h);
       return fig.canvas;
     };
-    var copyImageBits = function(src, dest) {
+    const copyImageBits = function(src, dest) {
       for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
         dest.data[i] = src.data[i];
       }
     };
-    var makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
+    const makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
       var grad = ctx.createLinearGradient(x0,y0,x1,y1);
       for (var i = 0; i < stops.length; i++) {
         grad.addColorStop(stops[i][0], stops[i][1]);
       }
       return grad;
     };
-    var drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
+    const drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
       context.fillStyle = color;
       for (var i = 0; i < n; ++i) {
         var v = h * Math.pow(hist[i + offset] / max, 0.5);
         context.fillRect((x + i) * 3, y - v, 3, v);
       }
     };
-    var drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
+    const drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
       var dLen = Math.sqrt(dx * dx + dy * dy);
       var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
       ctx.font = '24px sans-serif';
@@ -2040,7 +2040,7 @@ $( function() {
       drawAxes: drawAxes
     };
   })();
-  var updateFigureTable = function(target, propName, update, styles, transformOnly) {
+  const updateFigureTable = function(target, propName, update, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
       return null;
@@ -2072,7 +2072,7 @@ $( function() {
     }
     return figIndices;
   };
-  var makeFigureStyles = function(w, h, margin, background, zoomController) {
+  const makeFigureStyles = function(w, h, margin, background, zoomController) {
     var styles = { figW: w, figH: h, figMargin: margin, baseW: w, baseH: h };
     styles.cellStyle = {
       minWidth: (w + margin * 2) + 'px',
@@ -2089,7 +2089,7 @@ $( function() {
     };
     return styles;
   };
-  var updateFigureStylesForActualSize = function(styles, w, h) {
+  const updateFigureStylesForActualSize = function(styles, w, h) {
     var rect = compareUtil.calcInscribedRect(styles.figW, styles.figH, w, h);
     styles.baseW = rect.width;
     styles.baseH = rect.height;
@@ -2099,7 +2099,7 @@ $( function() {
     return styles;
   };
 
-  var processTaskResult = function(data) {
+  const processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
       var img = entries[data.index[0]];
@@ -2138,7 +2138,7 @@ $( function() {
       break;
     }
   };
-  var attachImageDataToTask = function(data) {
+  const attachImageDataToTask = function(data) {
     data.imageData = [];
     for (var i = 0; i < data.index.length; ++i) {
       data.imageData[i] = getImageData(entries[data.index[i]]);
@@ -2149,16 +2149,16 @@ $( function() {
     }
   };
   var taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js', processTaskResult);
-  var discardTasksOfCommand = function(cmd) {
+  const discardTasksOfCommand = function(cmd) {
     taskQueue.discardTasksOf(function(task) { return task.cmd === cmd; });
   };
-  var discardTasksOfEntryByIndex = function(index) {
+  const discardTasksOfEntryByIndex = function(index) {
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
 
-  var makeModeSwitch = function(parent, initialValue, onchange, toggle) {
+  const makeModeSwitch = function(parent, initialValue, onchange, toggle) {
     var currentType = initialValue;
-    var set = function(type) {
+    const set = function(type) {
       if (currentType !== type) {
         currentType = type;
         var index = toggle ? [true, false].indexOf(type) : type;
@@ -2175,7 +2175,7 @@ $( function() {
       set: set
     };
   };
-  var makeToggleSwitch = function(parent, initialValue, onchange) {
+  const makeToggleSwitch = function(parent, initialValue, onchange) {
     return makeModeSwitch(parent, initialValue, onchange, true);
   };
   // Histogram
@@ -2187,12 +2187,12 @@ $( function() {
       var point = figureZoom.positionFromMouseEvent(e, this, null);
       onFigurePointed(point);
     });
-    var onFigurePointed = function(point) {
+    const onFigurePointed = function(point) {
       var x = Math.floor(point.x * figW * 256 / 768);
       if (0 <= x && x <= 255) {
         var infoRow = $('#histoTable tr.info');
         infoRow.children().remove();
-        var addInfo = function(target, label, color, hist, offset) {
+        const addInfo = function(target, label, color, hist, offset) {
           var value = hist[offset + x];
           var info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
           var span = $('<span>').text(info).css({
@@ -2224,10 +2224,10 @@ $( function() {
         }
       }
     };
-    var processClick = function(point) {
+    const processClick = function(point) {
       onFigurePointed(point);
     };
-    var repaint = function() {
+    const repaint = function() {
       discardTasksOfCommand('calcHistogram');
       for (var i = 0, img; img = images[i]; i++) {
         img.histogram = null;
@@ -2240,7 +2240,7 @@ $( function() {
     });
     var histogramRowLayout = makeToggleSwitch('#histogramRowLayout', true, repaint);
     var histogramAuxType2 = makeModeSwitch('#histogramAuxType2', 0, repaint);
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (histogramType.current() === 0) {
         $('#histogramRowLayout').show();
         $('#histogramAuxType2').hide();
@@ -2253,7 +2253,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcHistogram',
         type:     histogramType.current(),
@@ -2261,14 +2261,14 @@ $( function() {
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var makeFigure = function(type, auxType2, hist) {
+    const makeFigure = function(type, auxType2, hist) {
       var fig = figureUtil.makeBlankFigure(figW, figH);
       var context = fig.context;
       var max = 0;
       for (var i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
-      var drawGrid = function() {
+      const drawGrid = function() {
         for (var k = 16; k < 255; k += 16) {
           context.strokeStyle = (k % 64 === 0) ? '#888' : '#444';
           context.lineWidth = 1;
@@ -2323,7 +2323,7 @@ $( function() {
         });
       }
       figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
-      var drawAxesLabels = function(context, comp) {
+      const drawAxesLabels = function(context, comp) {
         context.font = '30px sans-serif';
         context.textAlign = 'left';
         for (var i = 0; i < comp.length; i += 3) {
@@ -2334,14 +2334,14 @@ $( function() {
       drawAxesLabels(context, comp);
       return fig.canvas;
     };
-    var updateFigure = function(type, auxTypes, img, hist) {
+    const updateFigure = function(type, auxTypes, img, hist) {
       if (type === histogramType.current() && auxTypes[0] === histogramAuxType2.current()) {
         img.histogramData = hist;
         img.histogram = makeFigure(type, auxTypes[0], hist);
         updateTable();
       }
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       var w = figW / 2, h = figH / 2, margin = 8;
       var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
       var indices = updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
@@ -2367,7 +2367,7 @@ $( function() {
   // Waveform
   var waveformDialog = (function() {
     var figH = 256 + 18;
-    var repaint = function() {
+    const repaint = function() {
       discardTasksOfCommand('calcWaveform');
       for (var i = 0, img; img = images[i]; i++) {
         img.waveform = null;
@@ -2381,7 +2381,7 @@ $( function() {
     var waveformAuxType = makeModeSwitch('#waveformAuxType', 0, repaint);
     var waveformColumnLayout = makeToggleSwitch('#waveformColumnLayout', true, repaint);
     var waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (waveformType.current() === 0) {
         $('#waveformColumnLayout').show();
         $('#waveformAuxType').show();
@@ -2397,7 +2397,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcWaveform',
         type:     waveformType.current(),
@@ -2408,7 +2408,7 @@ $( function() {
         flipped:  img.transposed ? img.flippedY : img.flippedX
       }, attachImageDataToTask);
     };
-    var makeFigure = function(type, w, h, histW, hist) {
+    const makeFigure = function(type, w, h, histW, hist) {
       var histN = new Uint32Array(histW);
       for (var i = 0; i < w; ++i) {
         var x = Math.round((i + 0.5) / w * histW - 0.5);
@@ -2482,7 +2482,7 @@ $( function() {
         }
       }
       context.putImageData(bits, 0, 0);
-      var drawGrid = function(x, w, color, alpha) {
+      const drawGrid = function(x, w, color, alpha) {
         context.strokeStyle = color;
         context.globalAlpha = alpha;
         context.lineWidth = 0.5;
@@ -2523,7 +2523,7 @@ $( function() {
           var comp = [ '#ddd', 0, 'Y', '#44f', 16, 'Cb', '#f44', 44, 'Cr' ];
         }
       }
-      var drawAxesLabels = function(context, comp) {
+      const drawAxesLabels = function(context, comp) {
         context.font = '16px sans-serif';
         context.scale(figW / 300, 1);
         context.textAlign = 'left';
@@ -2535,7 +2535,7 @@ $( function() {
       drawAxesLabels(context, comp);
       return fig.canvas;
     };
-    var updateFigure = function(type, auxTypes, img, histW, hist) {
+    const updateFigure = function(type, auxTypes, img, histW, hist) {
       if (type === waveformType.current() &&
           auxTypes[0] === waveformAuxType.current() &&
           auxTypes[1] === waveformAuxType2.current()) {
@@ -2545,7 +2545,7 @@ $( function() {
         updateTable();
       }
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       var w = 320, h = figH, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
       updateFigureTable('#waveTable', 'waveform', updateAsync, styles, transformOnly);
@@ -2559,7 +2559,7 @@ $( function() {
       toggle: toggle
     };
   })();
-  var makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
+  const makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
     var bits = context.createImageData(w, h);
     var i = 0, k = 0;
     if (mode === 0) { // RGB
@@ -2593,7 +2593,7 @@ $( function() {
     }
     return bits;
   };
-  var makeDistributionImageDataRGBA = function(context, w, h, dist, colorMap, max, scale) {
+  const makeDistributionImageDataRGBA = function(context, w, h, dist, colorMap, max, scale) {
     var bits = context.createImageData(w, h);
     var i = 0, k = 0;
     var offsetG = w * h;
@@ -2617,7 +2617,7 @@ $( function() {
   };
   // Vectorscope
   var vectorscopeDialog = (function() {
-    var repaint = function() {
+    const repaint = function() {
       discardTasksOfCommand('calcVectorscope');
       for (var i = 0, img; img = images[i]; i++) {
         img.vectorscope = null;
@@ -2631,7 +2631,7 @@ $( function() {
     var colorMode = makeToggleSwitch('#vectorscopeColor', false, repaint);
     var vectorscopeAuxType = makeModeSwitch('#vectorscopeAuxType', 0, repaint);
     var vectorscopeAuxType2 = makeModeSwitch('#vectorscopeAuxType2', 0, repaint);
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (vectorscopeType.current() === 0) { // 0:Cb-Cr
         $('#vectorscopeAuxType').hide();
         $('#vectorscopeAuxType2').show();
@@ -2646,7 +2646,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcVectorscope',
         type:     vectorscopeType.current(),
@@ -2655,7 +2655,7 @@ $( function() {
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var makeFigure = function(type, auxType2, color, fig, w, h, result) {
+    const makeFigure = function(type, auxType2, color, fig, w, h, result) {
       var context = fig.context;
       if (color) { // with color
         var bits = makeDistributionImageDataRGBA(context, 320, 320, result.dist, result.colorMap, w * h, 255);
@@ -2663,13 +2663,13 @@ $( function() {
         var bits = makeDistributionImageData(context, 320, 320, result.dist, w * h, 255, 1);
       }
       context.putImageData(bits, 0, 0);
-      var srgbToLinear = function(c) {
+      const srgbToLinear = function(c) {
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       };
       var mat = auxType2 === 0 ?
             compareUtil.colorMatrixBT601 :  // 0: bt601
             compareUtil.colorMatrixBT709;   // 1: bt709
-      var calcxy = function(r, g, b) {
+      const calcxy = function(r, g, b) {
         if (type === 0) { // Cb-Cr
           var cb = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
           var cr = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
@@ -2785,7 +2785,7 @@ $( function() {
       }
       return fig.canvas;
     };
-    var updateFigure = function(type, color, auxTypes, img, result) {
+    const updateFigure = function(type, color, auxTypes, img, result) {
       if (type !== vectorscopeType.current() || color !== colorMode.current() ||
           auxTypes[0] !== vectorscopeAuxType.current() ||
           auxTypes[1] !== vectorscopeAuxType2.current()) {
@@ -2813,7 +2813,7 @@ $( function() {
         notify();
       }
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       var w = 320, h = 320, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
       updateFigureTable('#vectorscopeTable', 'vectorscope', updateAsync, styles, transformOnly);
@@ -2821,7 +2821,7 @@ $( function() {
     var toggle = dialogUtil.defineDialog($('#vectorscope'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
-    var processKeyDown = function(e) {
+    const processKeyDown = function(e) {
       if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
         return false;
@@ -2833,7 +2833,7 @@ $( function() {
       processKeyDown: processKeyDown
     };
   })();
-  var makeAxesDesc = function(v, lines) {
+  const makeAxesDesc = function(v, lines) {
     return lines.map(function(a) {
       return (
         'M' + v[a[0]].join(',') +
@@ -2841,7 +2841,7 @@ $( function() {
       );
     }).join('');
   };
-  var makeAxesSVG = function(vbox, labels, axesDesc, grayAxesDesc) {
+  const makeAxesSVG = function(vbox, labels, axesDesc, grayAxesDesc) {
     var labelsSVG = labels.map(function(label) {
       return '<text>' + label.text + '</text>';
     }).join('');
@@ -2855,7 +2855,7 @@ $( function() {
       '<g class="labels" font-size="12" text-anchor="middle" dominant-baseline="middle">' + labelsSVG + '</g>' +
     '</svg>');
   };
-  var updateAxesLabels = function(svg, labels, rotation) {
+  const updateAxesLabels = function(svg, labels, rotation) {
     $(svg).find('g.labels text').each(function(i) {
       var label = labels[i];
       var xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
@@ -2890,7 +2890,7 @@ $( function() {
     var TYPE_HSL = 2;
     var TYPE_YCbCr = 3;
     var TYPE_CIExyY = 4;
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       var currentType = colorDistType.current();
       if (currentType === TYPE_RGB ||
           currentType === TYPE_HSV ||
@@ -2906,7 +2906,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcColorTable',
         index:    [img.index]
@@ -2920,8 +2920,8 @@ $( function() {
     var vertices3DCube = compareUtil.vertexUtil.makeCube(256, 256, 256);
     var cubeFaces = compareUtil.vertexUtil.cubeFaces;
     var verticesCylinder = compareUtil.vertexUtil.make3DCylinder(128, 256);
-    var makeVertices3DYCbCr = function(mat) {
-      var p3d = function(r, g, b, z) {
+    const makeVertices3DYCbCr = function(mat) {
+      const p3d = function(r, g, b, z) {
         return [
           mat[1][0] * (r - 128) + mat[1][1] * (g - 128) + mat[1][2] * (b - 128),
           mat[2][0] * (r - 128) + mat[2][1] * (g - 128) + mat[2][2] * (b - 128),
@@ -2969,10 +2969,10 @@ $( function() {
       [18, 21], [19, 22], [20, 23]
     ];
     var assets = null;
-    var invalidateAssets = function() {
+    const invalidateAssets = function() {
       assets = null;
     };
-    var updateAssets = function() {
+    const updateAssets = function() {
       if (assets === null) {
         var currentType = colorDistType.current();
         assets = {};
@@ -3049,7 +3049,7 @@ $( function() {
         }
       }
     };
-    var makeFigure = function(fig, colorTable) {
+    const makeFigure = function(fig, colorTable) {
       var context = fig.context;
       var distMax = colorTable.totalCount;
       var dist = new Uint32Array(320 * 320);
@@ -3103,7 +3103,7 @@ $( function() {
       var coef_xb = coef_b[0], coef_yb = coef_b[1];
       var org_x = 160 - 127.5 * (coef_xr + coef_xg + coef_xb);
       var org_y = 160 - 127.5 * (coef_yr + coef_yg + coef_yb);
-      var colorToOffset = function(r, g, b) {
+      const colorToOffset = function(r, g, b) {
         var plotx = Math.floor(org_x + coef_xr * r + coef_xg * g + coef_xb * b);
         var ploty = Math.floor(org_y + coef_yr * r + coef_yg * g + coef_yb * b);
         var offset = ploty * 320 + plotx;
@@ -3153,7 +3153,7 @@ $( function() {
       }
       updateAxesLabels(fig.axes, assets.labels, rotation);
     };
-    var redrawFigureAll = function() {
+    const redrawFigureAll = function() {
       for (var i = 0, img; img = images[i]; i++) {
         if (img.colorTable) {
           var fig = {
@@ -3165,7 +3165,7 @@ $( function() {
         }
       }
     };
-    var createFigure = function(img) {
+    const createFigure = function(img) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       if (img.colorTable) {
         makeFigure(fig, img.colorTable);
@@ -3173,7 +3173,7 @@ $( function() {
       img.colorDist = fig.canvas;
       img.colorDistAxes = fig.axes;
     };
-    var updateFigure = function(img) {
+    const updateFigure = function(img) {
       if (img === undefined) {
         for (var i = 0; img = images[i]; i++) {
           createFigure(img);
@@ -3183,7 +3183,7 @@ $( function() {
       }
       updateTable();
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       var w = 320, h = 320, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#444');
       var scale = rotationController.getScale();
@@ -3197,7 +3197,7 @@ $( function() {
     rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
       setDragStateClass('#colorDist', dragging, horizontal);
     });
-    var processKeyDown = function(e) {
+    const processKeyDown = function(e) {
       if (e.keyCode === 81/* q */) {
         colorMode.set(!colorMode.current());
         return false;
@@ -3223,7 +3223,7 @@ $( function() {
     var waveform3DAuxType2 = makeModeSwitch('#waveform3DAuxType2', 0, function(type) {
       updateFigure();
     });
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (waveform3DType.current() === 1 ||
           waveform3DType.current() === 2 ||
           waveform3DType.current() === 3) { // R,G,B
@@ -3235,7 +3235,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calc3DWaveform',
         baseSize: 512,
@@ -3247,7 +3247,7 @@ $( function() {
       function() { updateTable(/* transformOnly = */ true); },
       { x: 20, y: -110 }
     );
-    var makeColorGradientStops = function(type) {
+    const makeColorGradientStops = function(type) {
       var color2 =
           type === 0 ? '#fff' :
           (type === 1 || type === 4) ? '#f00' :
@@ -3273,7 +3273,7 @@ $( function() {
       }
       return colorStopsForType;
     })();
-    var drawVerticalColorBar = function(ctx, v, colorStops) {
+    const drawVerticalColorBar = function(ctx, v, colorStops) {
       var bar = (function() {
         var x = 320/2, y0, y1;
         for (var i = 0, corners = [0, 4, 12, 16]; i < 4; i++) {
@@ -3291,7 +3291,7 @@ $( function() {
       );
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
     };
-    var makeWaveformY = function(n, waveform, mat) {
+    const makeWaveformY = function(n, waveform, mat) {
       var m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
       var waveformY = new Uint8Array(n);
       for (var k = 0; k < n; k++) {
@@ -3302,7 +3302,7 @@ $( function() {
       }
       return waveformY;
     };
-    var makeFigure = function(fig, waveform3D) {
+    const makeFigure = function(fig, waveform3D) {
       var type = waveform3DType.current();
       if (waveform3DAuxType.current() === 1 && 1 <= type && type <= 3 ) {
         type += 3;
@@ -3396,7 +3396,7 @@ $( function() {
       }
       updateAxesLabels(fig.axes, labels, rotation);
     };
-    var redrawFigureAll = function() {
+    const redrawFigureAll = function() {
       for (var i = 0, img; img = images[i]; i++) {
         if (img.waveform3D) {
           var fig = {
@@ -3408,7 +3408,7 @@ $( function() {
         }
       }
     };
-    var createFigure = function(img) {
+    const createFigure = function(img) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       if (img.waveform3D) {
         makeFigure(fig, img.waveform3D);
@@ -3416,7 +3416,7 @@ $( function() {
       img.waveform3DFig = fig.canvas;
       img.waveform3DFigAxes = fig.axes;
     };
-    var updateFigure = function(img) {
+    const updateFigure = function(img) {
       if (img === undefined) {
         for (var i = 0; img = images[i]; i++) {
           createFigure(img);
@@ -3426,7 +3426,7 @@ $( function() {
       }
       updateTable();
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       var w = 320, h = 320, margin = 10;
       var styles = makeFigureStyles(w, h, margin, '#444');
       var scale = rotationController.getScale();
@@ -3448,7 +3448,7 @@ $( function() {
     };
   })();
   var colorFreqDialog = (function() {
-    var drawFigure = function(reducedColorTable) {
+    const drawFigure = function(reducedColorTable) {
       var colorList = reducedColorTable.colorList;
       var height = 480;
       var fig = figureUtil.makeBlankFigure(256, height);
@@ -3504,16 +3504,16 @@ $( function() {
       }
       return $(fig.canvas).width(256).height(380);
     };
-    var updateAsync = function(img) {
+    const updateAsync = function(img) {
       taskQueue.addTask({
         cmd:      'calcReducedColorTable',
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var updateFigure = function(img) {
+    const updateFigure = function(img) {
       updateTable();
     };
-    var updateTable = function() {
+    const updateTable = function() {
       var target = $('#colorFreqTable');
       target.find('td').remove();
       for (var i = 0, img; img = images[i]; i++) {
@@ -3546,7 +3546,7 @@ $( function() {
       toggle: toggle
     };
   })();
-  var makeImageNameSelector = function(selectedIndex, onchange) {
+  const makeImageNameSelector = function(selectedIndex, onchange) {
     var select = $('<select>').on('change', function(e) {
       var index = parseInt(this.options[this.selectedIndex].value);
       onchange(index);
@@ -3578,7 +3578,7 @@ $( function() {
       }
       updateTable();
     });
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (metricsMode.current() === 0) {
         $('#metricsAuxType2').hide();
       } else {
@@ -3586,7 +3586,7 @@ $( function() {
       }
     };
     updateAuxOption();
-    var metricsToString = function(metrics, imgA) {
+    const metricsToString = function(metrics, imgA) {
       if (typeof metrics === 'string' || metrics.en !== undefined) {
         return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
       }
@@ -3620,7 +3620,7 @@ $( function() {
                 ' (' + compareUtil.toPercent(metrics.ae/imgA.width/imgA.height) + ')'
       };
     };
-    var updateTable = function() {
+    const updateTable = function() {
       $('#metricsTable td:not(.prop)').remove();
       textUtil.setText($('#metricsModeLabel'),
         metricsMode.current() === 0 ? { en: 'RGB', ja: 'RGB' } : { en: 'Luminance', ja: '輝度' }
@@ -3646,7 +3646,7 @@ $( function() {
         updateTableCell(img);
       }
     };
-    var updateTableCell = function(img) {
+    const updateTableCell = function(img) {
       if (img.index === baseImageIndex) {
         return;
       }
@@ -3682,7 +3682,7 @@ $( function() {
         )
       );
       var values = metricsToString(a.metrics[b.index], a);
-      var setMetricsValue = function(row, value) {
+      const setMetricsValue = function(row, value) {
         if (typeof value === 'string') {
           row.append($('<td>').text(value));
         } else {
@@ -3698,7 +3698,7 @@ $( function() {
       setMetricsValue($('#nccValue'), values.ncc);
       setMetricsValue($('#aeValue'), values.ae);
     };
-    var updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
+    const updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
       if (auxTypes[0] === metricsAuxType2.current()) {
         entries[baseIndex].metrics[targetIndex] = result;
         entries[targetIndex].metrics[baseIndex] = result;
@@ -3712,7 +3712,7 @@ $( function() {
       toggle: toggle
     };
   })();
-  var setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
+  const setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
     $(baseSelector).children().remove();
     $(targetSelector).children().remove();
     if (images.length < 2) {
@@ -3734,7 +3734,7 @@ $( function() {
       })
     );
   };
-  var updateBaseImageSelector = function(target, baseImageIndex, repaint) {
+  const updateBaseImageSelector = function(target, baseImageIndex, repaint) {
     var baseCell = $(target).find('tr.basename td:not(.prop)');
     baseCell.children().remove();
     if (baseImageIndex === null || images.length === 0) {
@@ -3748,7 +3748,7 @@ $( function() {
       );
     }
   };
-  var updatePairwiseFigureTable = function(target, propName, update, repaint, styles, transformOnly) {
+  const updatePairwiseFigureTable = function(target, propName, update, repaint, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
       return;
@@ -3786,7 +3786,7 @@ $( function() {
   // Tone Curve Estimation
   var toneCurveDialog = (function() {
     var toneCurveParam = {};
-    var repaint = function() {
+    const repaint = function() {
       discardTasksOfCommand('calcToneCurve');
       for (var i = 0, img; img = images[i]; i++) {
         img.toneCurve = null;
@@ -3802,21 +3802,21 @@ $( function() {
       updateAuxOption();
     });
     var toneCurveAuxType2 = makeModeSwitch('#toneCurveAuxType2', 0, repaint);
-    var updateAuxOption = function() {
+    const updateAuxOption = function() {
       if (toneCurveType.current() === 0) {
         $('#toneCurveAuxType2').hide();
       } else {
         $('#toneCurveAuxType2').show();
       }
     };
-    var onRemoveEntry = function(index) {
+    const onRemoveEntry = function(index) {
       for (var i = 0, img; img = images[i]; i++) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
       $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
-    var updateAsync = function(baseImage, targetImage) {
+    const updateAsync = function(baseImage, targetImage) {
       taskQueue.addTask({
           cmd:      'calcToneCurve',
           type:     toneCurveType.current(),
@@ -3828,7 +3828,7 @@ $( function() {
           }
       }, attachImageDataToTask);
     };
-    var makeToneMapFigure = function(toneMapData, type) {
+    const makeToneMapFigure = function(toneMapData, type) {
       var fig = figureUtil.makeBlankFigure(320, 320);
       var dist = toneMapData.dist;
       var max = toneMapData.max;
@@ -3838,17 +3838,17 @@ $( function() {
       fig.context.putImageData(bits, 32, 32);
       return fig;
     };
-    var makeFigure = function(type, toneCurve) {
+    const makeFigure = function(type, toneCurve) {
       var numComponents = type === 0 ? 3 : 1;
       var components = toneCurve.components;
       var vbox = '0 0 ' + 320 + ' ' + 320;
       var curvePaths = [];
-      var pointToCoord = function(p) {
+      const pointToCoord = function(p) {
         var x = 32 + p[0];
         var y = 288 - p[1];
         return x.toFixed(2) + ',' + y.toFixed(2);
       };
-      var pointToPath = function(conf, p0, p1) {
+      const pointToPath = function(conf, p0, p1) {
         var MIN_OPACITY = 0.2;
         var opacity = Math.max(MIN_OPACITY, conf);
         return '<path opacity="' + opacity.toFixed(2) + '"' +
@@ -3891,7 +3891,7 @@ $( function() {
       fig.axes = $(curve + axes);
       return fig;
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       if (images.length !== 0 && !transformOnly) {
         setBaseAndTargetImage(null, null);
         if (toneCurveParam.type !== toneCurveType.current() ||
@@ -3904,7 +3904,7 @@ $( function() {
       var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
       updatePairwiseFigureTable('#toneCurveTable', 'toneCurve', updateAsync, repaint, styles, transformOnly);
     };
-    var updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
+    const updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveParam.type &&
           auxTypes[0] === toneCurveParam.auxTypes[0] &&
           baseIndex === toneCurveParam.base) {
@@ -3934,7 +3934,7 @@ $( function() {
         onFigurePointed(point);
       }
     });
-    var findPointedVector = function(point) {
+    const findPointedVector = function(point) {
       var w = opticalFlowResult.result.image.width;
       var h = opticalFlowResult.result.image.height;
       var px = point.x * w;
@@ -3966,7 +3966,7 @@ $( function() {
       'M1,3L9,7 m-1,-3l1,3l-3,1',
       'M3,1L7,9 m1,-3l-1,3l-3,-1',
     ];
-    var makeArrowMark = function(dx, dy) {
+    const makeArrowMark = function(dx, dy) {
       var arrowType = (dy < 0 ? 0 : 4) + (dx < 0 ? 0 : 2) + (Math.abs(dy) < Math.abs(dx) ? 0 : 1);
       var desc = arrowMarkDesc[arrowType];
       return $('<svg viewBox="0 0 10 10"><path fill="none" stroke="white" stroke-width="0.8" d="' + desc + '"></path></svg>').css({
@@ -3976,7 +3976,7 @@ $( function() {
         heigit: '12px'
       });
     };
-    var updateMotionVectorPopup = function() {
+    const updateMotionVectorPopup = function() {
       var dx = pointedVector.x1 - pointedVector.x0;
       var dy = pointedVector.y1 - pointedVector.y0;
       var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
@@ -4004,7 +4004,7 @@ $( function() {
         transformOrigin: 'left bottom'
       });
     };
-    var updateMotionVectorInfo = function() {
+    const updateMotionVectorInfo = function() {
       var dx = pointedVector.x1 - pointedVector.x0;
       var dy = pointedVector.y1 - pointedVector.y0;
       var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
@@ -4012,7 +4012,7 @@ $( function() {
       $('#opticalFlowSelectedDeltaX').text(dxText);
       $('#opticalFlowSelectedDeltaY').text(dyText);
     };
-    var onFigurePointed = function(point) {
+    const onFigurePointed = function(point) {
       if (opticalFlowResult.result !== null) {
         var nearest = findPointedVector(point);
         if (nearest) {
@@ -4029,17 +4029,17 @@ $( function() {
         }
       }
     };
-    var processClick = function(point) {
+    const processClick = function(point) {
       onFigurePointed(point);
     };
-    var onRemoveEntry = function(index) {
+    const onRemoveEntry = function(index) {
       if (opticalFlowResult.base === index || opticalFlowResult.target === index) {
         $('#opticalFlowResult > *').remove();
         opticalFlowResult.result = null;
         pointedVector = null;
       }
     };
-    var updateOptionsDOM = function() {
+    const updateOptionsDOM = function() {
       $('#opticalFlowResult > *').remove();
       $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
       $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
@@ -4049,7 +4049,7 @@ $( function() {
       }
       return true;
     };
-    var updateAsync = function() {
+    const updateAsync = function() {
       opticalFlowResult.base   = baseImageIndex;
       opticalFlowResult.target = targetImageIndex;
       opticalFlowResult.result  = null;
@@ -4066,7 +4066,7 @@ $( function() {
         }, attachImageDataToTask);
       }
     };
-    var makeFigure = function(styles) {
+    const makeFigure = function(styles) {
       var w = opticalFlowResult.result.image.width;
       var h = opticalFlowResult.result.image.height;
       var fig = figureUtil.makeBlankFigure(w, h);
@@ -4075,7 +4075,7 @@ $( function() {
       var vectorPaths = [];
       var circles = [];
       fig.context.putImageData(bits, 0, 0);
-      var pointToCoord = function(x, y) {
+      const pointToCoord = function(x, y) {
         return x.toFixed(2) + ',' + y.toFixed(2);
       };
       for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
@@ -4108,7 +4108,7 @@ $( function() {
       }
       $('#opticalFlowResult').append(overlay).append(popup).css(styles.cellStyle);
     };
-    var updateStatistics = function() {
+    const updateStatistics = function() {
       if (opticalFlowResult.result.points.length === 0) {
         $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
       } else {
@@ -4124,7 +4124,7 @@ $( function() {
         $('#opticalFlowDeltaY').text(compareUtil.toSignedFixed(avgDY, 2) + 'px');
       }
     };
-    var updateReport = function(styles) {
+    const updateReport = function(styles) {
       makeFigure(styles);
       updateStatistics();
       if (opticalFlowResult.result.points.length === 0) {
@@ -4140,11 +4140,11 @@ $( function() {
         });
       }
     };
-    var updateHeader = function() {
+    const updateHeader = function() {
       var gridbtn = $('#opticalFlowGridBtn');
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
-    var updateTableDOM = function() {
+    const updateTableDOM = function() {
       if (false === updateOptionsDOM()) {
         return;
       }
@@ -4166,7 +4166,7 @@ $( function() {
         updateReport(styles);
       }
     };
-    var updateGridStyle = function() {
+    const updateGridStyle = function() {
       if (opticalFlowResult.result !== null && opticalFlowResult.grid) {
         grid.updateGridStyle(
           opticalFlowResult.grid,
@@ -4175,7 +4175,7 @@ $( function() {
           figureZoom.scale);
       }
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       if (transformOnly) {
         if (opticalFlowResult.result !== null) {
           $('#opticalFlowResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
@@ -4187,7 +4187,7 @@ $( function() {
         updateTableDOM();
       }
     };
-    var updateFigure = function(baseIndex, targetIndex, result) {
+    const updateFigure = function(baseIndex, targetIndex, result) {
       if (opticalFlowResult.base === baseIndex && opticalFlowResult.target === targetIndex) {
         opticalFlowResult.result = result;
         pointedVector = null;
@@ -4225,7 +4225,7 @@ $( function() {
     $('#diffGridBtn').click(grid.toggle);
     var diffImageBrightness = 8;
     $('#diffImageBrightness').val(diffImageBrightness);
-    var applyBrightness = function() {
+    const applyBrightness = function() {
       $('#diffResult .figMain').css('filter', 'brightness(' + diffImageBrightness + ')');
     };
     $('#diffImageBrightness').on('change', function(e) {
@@ -4246,7 +4246,7 @@ $( function() {
       updateImageTypeFootnote();
       updateTable();
     });
-    var updateImageTypeFootnote = function() {
+    const updateImageTypeFootnote = function() {
       if (diffOptions.imageType === 0) {
         $('#diffImageType0Footnote').show();
         $('#diffImageType1Footnote').hide();
@@ -4278,13 +4278,13 @@ $( function() {
       updateTable();
       return false;
     });
-    var onRemoveEntry = function(index) {
+    const onRemoveEntry = function(index) {
       if (diffResult.base === index || diffResult.target === index) {
         $('#diffResult *').remove();
         diffResult.result = null;
       }
     };
-    var updateOptionsDOM = function(styles) {
+    const updateOptionsDOM = function(styles) {
       $('.diffDimension').css({display:'none'});
       $('#diffDetectedMaxAE').text('');
       $('#diffIgnoreAEResult').text('');
@@ -4315,7 +4315,7 @@ $( function() {
       }
       return true;
     };
-    var updateAsync = function() {
+    const updateAsync = function() {
       diffResult.base   = baseImageIndex;
       diffResult.target = targetImageIndex;
       diffResult.ignoreAE = diffOptions.ignoreAE;
@@ -4345,7 +4345,7 @@ $( function() {
         }, attachImageDataToTask);
       }
     };
-    var makeHistogramFigure = function(hist, ignoreAE) {
+    const makeHistogramFigure = function(hist, ignoreAE) {
       ignoreAE = compareUtil.clamp(ignoreAE, 0, 255);
       var fig = figureUtil.makeBlankFigure(256 * 3, 320);
       var context = fig.context;
@@ -4361,7 +4361,7 @@ $( function() {
       figureUtil.drawHistogram(context, '#fff', hist, max, ignoreAE + 1, 255 - ignoreAE, ignoreAE + 1, 320, 300);
       return fig.canvas;
     };
-    var updateReport = function(styles) {
+    const updateReport = function(styles) {
       $('#diffDetectedMaxAE').text(diffResult.result.summary.maxAE);
       if (diffOptions.ignoreAE !== 0) {
         var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
@@ -4428,7 +4428,7 @@ $( function() {
           en: 'Encoding the image...',
           ja: '画像をエンコード中...'
         });
-        var download = function(url) {
+        const download = function(url) {
           msg.close(300);
           $('#diffSaveFigureHelper').attr('href', url);
           jQuery('#diffSaveFigureHelper')[0].click();
@@ -4441,17 +4441,17 @@ $( function() {
         return false;
       });
     };
-    var updateHeader = function() {
+    const updateHeader = function() {
       var gridbtn = $('#diffGridBtn');
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
-    var figureStyles = function() {
+    const figureStyles = function() {
       var figW = Math.max(480, Math.round($('#view').width() * 0.5));
       var figH = Math.max(320, Math.round($('#view').height() * 0.55));
       var figMargin = 8;
       return makeFigureStyles(figW, figH, figMargin, '#000');
     };
-    var updateTableDOM = function() {
+    const updateTableDOM = function() {
       var styles = figureStyles();
       if (false === updateOptionsDOM(styles)) {
         return;
@@ -4477,7 +4477,7 @@ $( function() {
         updateReport(styles);
       }
     };
-    var updateGridStyle = function() {
+    const updateGridStyle = function() {
       if (diffResult.result !== null && diffResult.grid) {
         grid.updateGridStyle(
           diffResult.grid,
@@ -4486,7 +4486,7 @@ $( function() {
           figureZoom.scale);
       }
     };
-    var updateTable = function(transformOnly) {
+    const updateTable = function(transformOnly) {
       if (transformOnly) {
         if (diffResult.result !== null) {
           $('#diffResult > *').css('transform', 'translate(-50%,0%) ' + figureZoom.makeTransform());
@@ -4497,7 +4497,7 @@ $( function() {
         updateTableDOM();
       }
     };
-    var updateFigure = function(baseIndex, targetIndex, options, result) {
+    const updateFigure = function(baseIndex, targetIndex, options, result) {
       if (diffResult.base === baseIndex && diffResult.target === targetIndex &&
           diffResult.ignoreAE === options.ignoreAE &&
           diffResult.imageType === options.imageType &&
@@ -4525,10 +4525,10 @@ $( function() {
       toggle: toggle
     };
   })();
-  var resetMouseDrag = function() {
+  const resetMouseDrag = function() {
     viewZoom.resetDragState();
   };
-  var toggleFullscreen = function() {
+  const toggleFullscreen = function() {
     resetMouseDrag();
     compareUtil.toggleFullscreen($('#viewroot').get(0));
   };
@@ -4583,7 +4583,7 @@ $( function() {
       })(),
       'pseudocolor': (function() {
         var colorMap = new Uint8Array(3 * 256);
-        var tone = function(a) {
+        const tone = function(a) {
           return Math.round(255 * Math.pow(a, 1/2.2));
         };
         for (var i = 0; i < 256; ++i) {
@@ -4598,7 +4598,7 @@ $( function() {
       })()
     };
     var colorBars = {};
-    var makeColorBar = function(colorMap) {
+    const makeColorBar = function(colorMap) {
       var fig = figureUtil.makeBlankFigure(512 + 2, 44);
       for (var i = 0; i < 256; ++i) {
         var color = 'rgb(' + colorMap[i] + ',' +
@@ -4620,7 +4620,7 @@ $( function() {
       reset();
       updateDOM();
     });
-    var changeColorSpace = function(cs) {
+    const changeColorSpace = function(cs) {
       var lastComponent = (component === null || component === 0) ? null :
                             colorSpaces[colorSpace].components[component - 1];
       colorSpace = cs;
@@ -4661,24 +4661,24 @@ $( function() {
         updateModeIndicator();
       }
     });
-    var reset = function() {
+    const reset = function() {
       if (component !== null) {
         component = null;
         updateModeIndicator();
       }
     };
-    var toggle = function() {
+    const toggle = function() {
       component = component === null ? 0 : null;
       updateModeIndicator();
       updateDOM();
     };
-    var toggleContour = function() {
+    const toggleContour = function() {
       enableContour = !enableContour;
       if (component !== null && component !== 0) {
         updateDOM();
       }
     };
-    var changeMode = function(reverse) {
+    const changeMode = function(reverse) {
       var numOptions = colorSpaces[colorSpace].components.length + 1;
       if (!alphaEnabled && colorSpaces[colorSpace].components[numOptions - 2] === 'A') {
         numOptions -= 1;
@@ -4689,17 +4689,17 @@ $( function() {
       updateModeIndicator();
       updateDOM();
     };
-    var changeModeReverse = function() {
+    const changeModeReverse = function() {
       changeMode(/* reverse= */ true);
     };
-    var enableAlpha = function() {
+    const enableAlpha = function() {
       if (!alphaEnabled) {
         alphaEnabled = true;
         $('#altViewEnableAlpha').prop('checked', true);
         updateModeIndicator();
       }
     };
-    var updateModeIndicator = function() {
+    const updateModeIndicator = function() {
       if (component !== null) {
         $('#altViewMode .mode-sw').css({ display: 'none' });
         var sw = $(colorSpaces[colorSpace].modeSwitch).css({ display: '' });
@@ -4725,7 +4725,7 @@ $( function() {
       }
     };
     // WIP
-    var makeContour = function(channelImage) {
+    const makeContour = function(channelImage) {
       //console.time('makeConcour');
       var w = channelImage.width;
       var h = channelImage.height;
@@ -4786,7 +4786,7 @@ $( function() {
       //console.timeEnd('makeConcour');
       return contour;
     };
-    var getAltImage = function(ent) {
+    const getAltImage = function(ent) {
       if (component === null || component === 0) {
         return null;
       }
@@ -4833,7 +4833,7 @@ $( function() {
         contour: contour
       };
     };
-    var onUpdateImageBox = function(img, w, h) {
+    const onUpdateImageBox = function(img, w, h) {
       if (img.view && component !== null) {
         if (img.contour) {
           $(img.view).find('.contour').remove();
@@ -4844,12 +4844,12 @@ $( function() {
         }
       }
     };
-    var onUpdateTransform = function(ent, commonStyle) {
+    const onUpdateTransform = function(ent, commonStyle) {
       if (ent.contour) {
         $(ent.contour).css(commonStyle);
       }
     };
-    var currentMode = function() {
+    const currentMode = function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
     return {
@@ -4886,7 +4886,7 @@ $( function() {
     $('#fullscreen').click(toggleFullscreen);
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
-    var newSelectorButton = function(index) {
+    const newSelectorButton = function(index) {
       var number = viewManagement.numberFromIndex(index);
       var button = $('<button/>').addClass('selector').
         text(number).
@@ -4898,17 +4898,17 @@ $( function() {
       $('#next').before(button);
       return button;
     };
-    var updateSelectorButtons = function() {
+    const updateSelectorButtons = function() {
       $('.selector').remove();
       for (var i = 0, ent; ent = entries[i]; i++) {
         newSelectorButton(ent.index);
       }
     };
-    var updateArrangeButton = function() {
+    const updateArrangeButton = function() {
       var layoutMode = viewManagement.getLayoutMode();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
-    var updateSelectorButtonState = function() {
+    const updateSelectorButtonState = function() {
       var indices = viewManagement.getSelectedImageIndices();
       var selectors = $('.selector');
       selectors.removeClass('current');
@@ -4921,7 +4921,7 @@ $( function() {
         }
       });
     };
-    var updateOverlayModeIndicator = function() {
+    const updateOverlayModeIndicator = function() {
       if (viewManagement.isOverlayMode()) {
         var indices = viewManagement.getSelectedImageIndices();
         var numbers = indices.map(function(i) { return viewManagement.numberFromIndex(i); });
@@ -4938,7 +4938,7 @@ $( function() {
         $('#overlay').removeClass('current');
       }
     };
-    var onUpdateLayout = function() {
+    const onUpdateLayout = function() {
       updateArrangeButton();
       updateSelectorButtonState();
       updateOverlayModeIndicator();
@@ -4948,7 +4948,7 @@ $( function() {
       onUpdateLayout: onUpdateLayout
     };
   })();
-  var updateDOM = function() {
+  const updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
     if (images.length === 0) {
       viewZoom.disable();
@@ -4991,7 +4991,7 @@ $( function() {
     resetMouseDrag();
     updateLayout();
   };
-  var updateLayout = function() {
+  const updateLayout = function() {
     viewManagement.update();
     viewManagement.onUpdateLayout();
     sideBar.onUpdateLayout();
@@ -5024,7 +5024,7 @@ $( function() {
     var ua = window.navigator.userAgent.toLowerCase();
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
-  var setEntryImage = function(entry, image, w, h) {
+  const setEntryImage = function(entry, image, w, h) {
     var canvas = image.nodeName === 'CANVAS' ? image : figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
     entry.mainImage  = image;
@@ -5051,13 +5051,13 @@ $( function() {
     updateDOM();
     nowLoadingDialog.update();
   };
-  var setEntryError = function(entry, message) {
+  const setEntryError = function(entry, message) {
     entry.loading = false;
     entry.error = message;
     updateDOM();
     nowLoadingDialog.update();
   };
-  var setupEntryWithDataURI = function(entry, dataURI) {
+  const setupEntryWithDataURI = function(entry, dataURI) {
     var binary = compareUtil.binaryFromDataURI(dataURI);
     var formatInfo = compareUtil.detectImageFormat(binary);
     var format = formatInfo ? formatInfo.toString() : null;
@@ -5104,10 +5104,10 @@ $( function() {
       });
     img.src = dataURI;
   };
-  var setupEntryWithCanvas = function(entry, canvas) {
+  const setupEntryWithCanvas = function(entry, canvas) {
     setEntryImage(entry, canvas, canvas.width, canvas.height);
   };
-  var newEntry = function(file) {
+  const newEntry = function(file) {
       var lastModified = file.lastModified || file.lastModifiedDate;
       var entry = {
             index           : null,
@@ -5149,7 +5149,7 @@ $( function() {
       };
       return entry;
   };
-  var addCapturedImage = function(canvas) {
+  const addCapturedImage = function(canvas) {
       var file = {
         name: 'captured image',
         lastModified: Date.now()
@@ -5160,7 +5160,7 @@ $( function() {
       viewManagement.resetLayoutState();
       setupEntryWithCanvas(entry, canvas);
   };
-  var addFile = function(file) {
+  const addFile = function(file) {
       var entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
@@ -5185,7 +5185,7 @@ $( function() {
       };
       reader.readAsDataURL(file);
   };
-  var addFiles = function(files) {
+  const addFiles = function(files) {
     var sorted = Array.prototype.slice.call(files);
     sorted.sort(function(a, b) {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
