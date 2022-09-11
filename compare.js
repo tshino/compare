@@ -23,11 +23,11 @@ $( function() {
   });
   // Paste clipboard image on the page (Ctrl+V)
   $(document.body).on('paste', function(e) {
-    var data = e.originalEvent.clipboardData;
+    const data = e.originalEvent.clipboardData;
     if (data && data.items) {
-      var files = [];
-      for (var i = 0, item; item = data.items[i]; i++) {
-        var file = item.getAsFile();
+      const files = [];
+      for (let i = 0, item; item = data.items[i]; i++) {
+        const file = item.getAsFile();
         if (file) {
           files.push(file);
         }
@@ -66,13 +66,13 @@ $( function() {
         // '1' - '9' (48-57 or 96-105 for numpad)
         if ((49 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
             (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
-          var num = e.keyCode % 48;
-          var sw = $(dialog.element).find('.mode-sw').eq(0).children('button:nth-child('+num+')');
+          const num = e.keyCode % 48;
+          const sw = $(dialog.element).find('.mode-sw').eq(0).children('button:nth-child('+num+')');
           if (sw.length === 1) {
             sw.click();
             return false;
           }
-          var index = viewManagement.indexFromNumber(num);
+          const index = viewManagement.indexFromNumber(num);
           if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
               index !== null && changeTargetImage(index)) {
             dialog.update();
@@ -104,15 +104,15 @@ $( function() {
       if (e.altKey || e.metaKey) {
         return true;
       }
-      var shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
+      const shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
       // '0' - '9' (48-57 or 96-105 for numpad)
       if ((48 <= e.keyCode && e.keyCode <= 57 && shift === '') ||
           (96 <= e.keyCode && e.keyCode <= 105 && shift === '')) {
-        var number = e.keyCode % 48;
+        const number = e.keyCode % 48;
         if (number === 0) {
           viewManagement.toAllImageView();
         } else {
-          var index = viewManagement.indexFromNumber(number);
+          const index = viewManagement.indexFromNumber(number);
           if (index !== null) {
             viewManagement.toggleSingleView(index);
           }
@@ -164,7 +164,7 @@ $( function() {
       }
       // Delete (46)
       if (e.keyCode === 46 && shift === '' && 0 < images.length) {
-        var index = viewManagement.getCurrentIndexOr(images[0].index);
+        const index = viewManagement.getCurrentIndexOr(images[0].index);
         removeEntry(index);
         return false;
       }
@@ -189,7 +189,7 @@ $( function() {
       }
   });
   
-  var keypressMap = {
+  const keypressMap = {
     // '@' (64)
     64 : { global: true, func: textUtil.toggleLang },
     // '?' (63)
@@ -266,7 +266,7 @@ $( function() {
   crossCursor.addObserver(
     null,
     function(pointChanged) {
-      var pos = crossCursor.getNormalizedPosition();
+      const pos = crossCursor.getNormalizedPosition();
       if (pos.isInView) {
         viewZoom.setZoomOrigin(pos);
       } else {
@@ -295,7 +295,7 @@ $( function() {
     setDragStateClass('#view', dragging, horizontal);
   });
   $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    var selector = '#view > div.imageBox';
+    const selector = '#view > div.imageBox';
     return crossCursor.processMouseMove(e, selector, this);
   });
   figureZoom.setPointCallback(function(e) {
