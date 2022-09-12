@@ -1918,6 +1918,134 @@ describe('CompareUtil', () => {
         });
     });
 
+    describe('processKeyDownEvent', () => {
+        const processKeyDownEvent = compareUtil.processKeyDownEvent;
+        const makeEvent = function(def) {
+            const event = {};
+            event.keyCode = def.keyCode !== undefined ? def.keyCode : 0;
+            event.ctrlKey = def.ctrlKey || false;
+            event.altKey = def.altKey || false;
+            event.metaKey = def.metaKey || false;
+            event.shiftKey = def.shiftKey || false;
+            return event;
+        };
+        it('should invoke callback that is corresponding to keydown event', () => {
+            const log = [];
+            const callbacks = {
+                zoomIn: () => { log.push('zoomIn'); },
+                zoomOut: () => { log.push('zoomOut'); },
+                cursor: () => { log.push('cursor'); }
+            };
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 59 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 59, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 187 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 187, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 107 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 107, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 33 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomIn']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 173 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 173, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 189 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 189, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 109 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 109, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 34 }), callbacks);
+            assert.deepStrictEqual(log, ['zoomOut']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 37 }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 37, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 38 }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 38, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 39 }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 39, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 40 }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 40, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, ['cursor']);
+        });
+        it('should not invoke callbacks for irrelevant event', () => {
+            const log = [];
+            const callbacks = {
+                zoomIn: () => { log.push('zoomIn'); },
+                zoomOut: () => { log.push('zoomOut'); },
+                cursor: () => { log.push('cursor'); }
+            };
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 65 }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 33, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 34, shiftKey: true }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 37, ctrlKey: true }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 37, altKey: true }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processKeyDownEvent(makeEvent({ keyCode: 37, metaKey: true }), callbacks);
+            assert.deepStrictEqual(log, []);
+        });
+        it('should return the value returned by the callback', () => {
+            const callbacks = {
+                zoomIn: () => { return 'a'; },
+                zoomOut: () => { return 'b'; },
+                cursor: () => { return 'c'; }
+            };
+            assert.strictEqual(processKeyDownEvent(makeEvent({ keyCode: 59 }), callbacks), 'a');
+            assert.strictEqual(processKeyDownEvent(makeEvent({ keyCode: 173 }), callbacks), 'b');
+            assert.strictEqual(processKeyDownEvent(makeEvent({ keyCode: 37 }), callbacks), 'c');
+        });
+        it('should not invoke callback if not defined', () => {
+            assert.ok(processKeyDownEvent(makeEvent({ keyCode: 59 }), {}) === undefined);
+            assert.ok(processKeyDownEvent(makeEvent({ keyCode: 173 }), {}) === undefined);
+            assert.ok(processKeyDownEvent(makeEvent({ keyCode: 37 }), {}) === undefined);
+        });
+    });
+
     describe('vertexUtil', () => {
         describe('makeCube', () => {
             it('should make vertices of a cube', () => {
