@@ -315,25 +315,25 @@ $( function() {
   updateDOM();
 });
 
-  var entries = [];
-  var images = [];
-  var viewZoom = compareUtil.makeZoomController(updateTransform, {
+  const entries = [];
+  let images = [];
+  const viewZoom = compareUtil.makeZoomController(updateTransform, {
     getBaseSize: function(index) {
       if (entries[index] && entries[index].ready()) {
         return { w: entries[index].baseWidth, h: entries[index].baseHeight };
       }
     }
   });
-  var dialog = null;
-  var figureZoom = compareUtil.makeZoomController(function() {
+  let dialog = null;
+  const figureZoom = compareUtil.makeZoomController(function() {
     if (dialog && dialog.update) {
       dialog.update(true /* transformOnly */);
     }
   }, {
     cursorMoveDelta: 0.125
   });
-  var baseImageIndex = null;
-  var targetImageIndex = null;
+  let baseImageIndex = null;
+  let targetImageIndex = null;
   const setDragStateClass = function(target, dragging, horizontal) {
     if (dragging) {
       $(target).addClass('dragging');
