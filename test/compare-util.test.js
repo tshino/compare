@@ -2128,6 +2128,11 @@ describe('CompareUtil', () => {
         });
     });
 
+    // TODO: add tests for makeTouchEventFilter
+    // TODO: add tests for makeZoomController
+    // TODO: add tests for makeRotationController
+    // TODO: add tests for makeRotationInputFilter
+
     describe('vertexUtil', () => {
         describe('makeCube', () => {
             it('should make vertices of a cube', () => {
@@ -2155,6 +2160,23 @@ describe('CompareUtil', () => {
                 assert.deepStrictEqual(cube, expected);
             });
         });
+
+        describe('cubeFaces', () => {
+            it('should be an array of arrays of indices to form six faces of a cube', () => {
+                const cubeFaces = compareUtil.vertexUtil.cubeFaces;
+                assert.strictEqual(cubeFaces.length, 6);
+                assert.strictEqual(cubeFaces[0].length, 5);
+                assert.strictEqual(cubeFaces[1].length, 5);
+                assert.strictEqual(cubeFaces[5].length, 5);
+                assert.strictEqual(cubeFaces[0][0], cubeFaces[0][4]);
+                assert.strictEqual(cubeFaces[1][0], cubeFaces[1][4]);
+                assert.strictEqual(cubeFaces[5][0], cubeFaces[5][4]);
+            });
+        });
+        // TODO: add tests for make3DCylinder
+        // TODO: add tests for makeCylinderFaces
+        // TODO: add tests for cylinderDarkLines
+        // TODO: add tests for makeCylinderContour
     });
 
     describe('rotationUtil', () => {
