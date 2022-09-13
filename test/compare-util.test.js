@@ -1929,7 +1929,7 @@ describe('CompareUtil', () => {
             event.shiftKey = def.shiftKey || false;
             return event;
         };
-        it('should invoke callback that is corresponding to keydown event', () => {
+        it('should invoke callback that is corresponding to given keydown event', () => {
             const log = [];
             const callbacks = {
                 zoomIn: () => { log.push('zoomIn'); },
@@ -2043,6 +2043,88 @@ describe('CompareUtil', () => {
             assert.ok(processKeyDownEvent(makeEvent({ keyCode: 59 }), {}) === undefined);
             assert.ok(processKeyDownEvent(makeEvent({ keyCode: 173 }), {}) === undefined);
             assert.ok(processKeyDownEvent(makeEvent({ keyCode: 37 }), {}) === undefined);
+        });
+    });
+
+    describe('processWheelEvent', () => {
+        const processWheelEvent = compareUtil.processWheelEvent;
+        const makeEvent = function(def) {
+            const org = {};
+            const event = { originalEvent: org };
+            org.deltaMode = def.deltaMode !== undefined ? def.deltaMode : 0;
+            org.deltaY = def.deltaY !== undefined ? def.deltaY : 0;
+            org.ctrlKey = def.ctrlKey || false;
+            org.altKey = def.altKey || false;
+            org.metaKey = def.metaKey || false;
+            org.shiftKey = def.shiftKey || false;
+            return event;
+        };
+        const PIXEL = 0, LINE = 1, PAGE = 2;
+        it('should invoke callback that is corresponding to given wheel event', () => {
+            const log = [];
+            const callbacks = {
+                zoom: (steps) => { log.push(`zoom:${steps.toFixed(1)}`); }
+            };
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PIXEL, deltaY: 20 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:2.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PIXEL, deltaY: -20 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:-2.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: LINE, deltaY: 1 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:1.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: LINE, deltaY: -1 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:-1.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PAGE, deltaY: 2 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:2.0']);
+        });
+        it('should clamp the delta value', () => {
+            const log = [];
+            const callbacks = {
+                zoom: (steps) => { log.push(`zoom:${steps.toFixed(1)}`); }
+            };
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PIXEL, deltaY: 50 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:3.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PIXEL, deltaY: -100 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:-3.0']);
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: LINE, deltaY: 10 }), callbacks);
+            assert.deepStrictEqual(log, ['zoom:3.0']);
+        });
+        it('should not invoke callback if the delta value is zero', () => {
+            const log = [];
+            const callbacks = {
+                zoom: (steps) => { log.push(`zoom:${steps.toFixed(1)}`); }
+            };
+            log.length = 0;
+            processWheelEvent(makeEvent({ deltaMode: PIXEL, deltaY: 0 }), callbacks);
+            assert.deepStrictEqual(log, []);
+        });
+        it('should not invoke callbacks for irrelevant event', () => {
+            const log = [];
+            const callbacks = {
+                zoom: (steps) => { log.push(`zoom:${steps.toFixed(1)}`); }
+            };
+            log.length = 0;
+            processWheelEvent(makeEvent({ ctrlKey: true, deltaMode: LINE, deltaY: 3 }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processWheelEvent(makeEvent({ shiftKey: true, deltaMode: LINE, deltaY: 3 }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processWheelEvent(makeEvent({ altKey: true, deltaMode: LINE, deltaY: 3 }), callbacks);
+            assert.deepStrictEqual(log, []);
+            log.length = 0;
+            processWheelEvent(makeEvent({ metaKey: true, deltaMode: LINE, deltaY: 3 }), callbacks);
+            assert.deepStrictEqual(log, []);
+        });
+        it('should not invoke callback if not defined', () => {
+            assert.ok(processWheelEvent(makeEvent({ deltaMode: LINE, deltaY: 3 }), {}) === false);
         });
     });
 
