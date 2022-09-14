@@ -2135,7 +2135,7 @@ describe('CompareUtil', () => {
 
     describe('vertexUtil', () => {
         describe('makeCube', () => {
-            it('should make vertices of a cube', () => {
+            it('should make an array of vertices of a cube', () => {
                 const cube = compareUtil.vertexUtil.makeCube(6, 4, 2);
                 const expected = [
                     [-3, -2, -1],
@@ -2173,7 +2173,22 @@ describe('CompareUtil', () => {
                 assert.strictEqual(cubeFaces[5][0], cubeFaces[5][4]);
             });
         });
-        // TODO: add tests for make3DCylinder
+
+        describe('make3DCylinder', () => {
+            it('should make an array of vertices of a cylinder', () => {
+                const cylinder = compareUtil.vertexUtil.make3DCylinder(2, 3);
+                assert.strictEqual(cylinder.length, 36 * 2 + 2);
+                assert.deepStrictEqual(cylinder[0], [2, 0, -1.5]);
+                assert.deepStrictEqual(cylinder[1], [2, 0, 1.5]);
+                assert.ok(Math.abs(cylinder[36][0] - -2) < 1e-5);
+                assert.ok(Math.abs(cylinder[36][1] - 0) < 1e-5);
+                assert.ok(Math.abs(cylinder[36][2] - -1.5) < 1e-5);
+                assert.ok(Math.abs(cylinder[37][2] - 1.5) < 1e-5);
+                assert.deepStrictEqual(cylinder[72], [0, 0, -1.5]);
+                assert.deepStrictEqual(cylinder[73], [0, 0, 1.5]);
+            });
+        });
+
         // TODO: add tests for makeCylinderFaces
         // TODO: add tests for cylinderDarkLines
         // TODO: add tests for makeCylinderContour
