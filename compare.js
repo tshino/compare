@@ -532,10 +532,12 @@ $( function() {
       boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - IMAGEBOX_MARGIN_W);
       boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - IMAGEBOX_MARGIN_H);
       return {
-        numVisibleEntries: numVisibleEntries,
-        numSlots: numSlots,
-        viewW: viewW, viewH: viewH,
-        boxW: boxW, boxH: boxH
+        numVisibleEntries,
+        numSlots,
+        viewW,
+        viewH,
+        boxW,
+        boxH
       };
     };
     const updateImageBox = function(box, img, boxW, boxH) {
@@ -641,31 +643,31 @@ $( function() {
       updateImageScaling();
     };
     return {
-      isSingleView: isSingleView,
-      isOverlayMode: isOverlayMode,
-      numberFromIndex: numberFromIndex,
-      indexFromNumber: indexFromNumber,
-      getSelectedImageIndices: getSelectedImageIndices,
-      getLayoutMode: getLayoutMode,
-      resetLayoutState: resetLayoutState,
-      toAllImageView: toAllImageView,
-      toSingleImageView: toSingleImageView,
-      toggleSingleView: toggleSingleView,
-      flipSingleView: flipSingleView,
-      onResize: onResize,
-      arrangeLayout: arrangeLayout,
-      toggleOverlay: toggleOverlay,
-      update: update,
-      getCurrentIndexOr: getCurrentIndexOr,
-      makeImageLayoutParam: makeImageLayoutParam,
-      onUpdateLayout: onUpdateLayout,
-      setBackgroundColor: setBackgroundColor,
-      setCheckerPattern: setCheckerPattern,
-      setImageScaling: setImageScaling
+      isSingleView,
+      isOverlayMode,
+      numberFromIndex,
+      indexFromNumber,
+      getSelectedImageIndices,
+      getLayoutMode,
+      resetLayoutState,
+      toAllImageView,
+      toSingleImageView,
+      toggleSingleView,
+      flipSingleView,
+      onResize,
+      arrangeLayout,
+      toggleOverlay,
+      update,
+      getCurrentIndexOr,
+      makeImageLayoutParam,
+      onUpdateLayout,
+      setBackgroundColor,
+      setCheckerPattern,
+      setImageScaling
     };
   })();
   const removeEntry = function(index) {
-    var ent = entries[index];
+    const ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
       ent.visible = false;
       if (ent.element) {
@@ -703,7 +705,7 @@ $( function() {
     }
   };
   const findImageIndexOtherThan = function(index) {
-    for (var i = 0, img; img = images[i]; ++i) {
+    for (let i = 0, img; img = images[i]; ++i) {
       if (img.index !== index) {
         return img.index;
       }
@@ -747,8 +749,8 @@ $( function() {
     }
   };
   const makeImageNameWithIndex = function(tag, img) {
-    var number = viewManagement.numberFromIndex(img.index);
-    var elem = $(tag).css({ wordBreak : 'break-all' });
+    const number = viewManagement.numberFromIndex(img.index);
+    const elem = $(tag).css({ wordBreak : 'break-all' });
     if (number !== null) {
       elem.append($('<span class="imageIndex"/>').text(number));
     }
@@ -756,8 +758,8 @@ $( function() {
   };
 
   // ROI map
-  var roiMap = (function() {
-    var enableMap = false;
+  const roiMap = (function() {
+    let enableMap = false;
     const toggle = function() {
       if (!enableMap) {
         if (0 < images.length) {
@@ -773,30 +775,30 @@ $( function() {
       $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     };
     const updateMap = function(img) {
-      var roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
+      const roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
       $('#mapROI').attr({
         x : 100 * roi[0] + '%',
         y : 100 * roi[1] + '%',
         width : 100 * (roi[2] - roi[0]) + '%',
         height : 100 * (roi[3] - roi[1]) + '%'
       });
-      var s = 120 / Math.max(img.width, img.height);
-      var w = img.width * s;
-      var h = img.height * s;
+      const s = 120 / Math.max(img.width, img.height);
+      const w = img.width * s;
+      const h = img.height * s;
       $('#map svg').width(w).height(h);
       $('#map').width(w).height(h);
     };
     const onUpdateTransform = function() {
       if (enableMap && images.length) {
-        var index = viewManagement.getCurrentIndexOr(0);
-        var img = entries[index].ready() ? entries[index] : images[0];
+        const index = viewManagement.getCurrentIndexOr(0);
+        const img = entries[index].ready() ? entries[index] : images[0];
         updateMap(img);
       }
     };
     return {
-      toggle: toggle,
-      onUpdateLayout: onUpdateLayout,
-      onUpdateTransform: onUpdateTransform
+      toggle,
+      onUpdateLayout,
+      onUpdateTransform
     };
   })();
   const makeImageOverlayOnUpdateLayout = function(key, make) {
