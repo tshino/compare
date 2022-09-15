@@ -247,7 +247,7 @@ $( function() {
     if (e.altKey || e.metaKey || e.target.localName === 'input') {
       return true;
     }
-    var m = keypressMap[e.which];
+    const m = keypressMap[e.which];
     if (dialog && (!m || !m.global)) {
       return true;
     }
@@ -346,20 +346,20 @@ $( function() {
       $(target).removeClass('horizontal-dragging');
     }
   };
-  var drawImageAwareOfOrientation = false;
+  let drawImageAwareOfOrientation = false;
   compareUtil.drawImageAwareOfOrientation().then(
     function(result) { drawImageAwareOfOrientation = result; }
   );
 
-  var textUtil = (function() {
+  const textUtil = (function() {
     const toggleLang = function() {
-      var lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
+      const lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
       $('#selectLang').val(lang);
       changeLang(lang);
     };
     const setText = function(target, text) {
-      for (var i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
-        var e = target.find('.' + lang);
+      for (let i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
+        let e = target.find('.' + lang);
         if (0 === e.length) {
           e = $('<span>').addClass(lang);
           target.append(e);
@@ -374,17 +374,17 @@ $( function() {
     };
   })();
   // View management functions
-  var viewManagement = (function() {
-    var IMAGEBOX_MIN_SIZE = 32;
-    var IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
-    var currentImageIndex = 0;
-    var lastSingleViewImageIndex = 0;
-    var singleView = false;
-    var overlayMode = false;
-    var overlayBaseIndex = null;
-    var layoutMode = null;
-    var backgroundColor = '#000000';
-    var imageScaling = 'smooth';
+  const viewManagement = (function() {
+    const IMAGEBOX_MIN_SIZE = 32;
+    const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
+    let currentImageIndex = 0;
+    let lastSingleViewImageIndex = 0;
+    let singleView = false;
+    let overlayMode = false;
+    let overlayBaseIndex = null;
+    let layoutMode = null;
+    let backgroundColor = '#000000';
+    let imageScaling = 'smooth';
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
     const isSingleView = function() {
@@ -394,7 +394,7 @@ $( function() {
       return overlayMode;
     };
     const numberFromIndex = function(index) {
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         if (img.index === index) {
           return i + 1;
         }
@@ -408,7 +408,7 @@ $( function() {
       return null;
     };
     const getSelectedImageIndices = function() {
-      var indices = [];
+      const indices = [];
       if (singleView) {
         indices.push(currentImageIndex - 1);
         if (overlayMode && overlayBaseIndex !== currentImageIndex - 1) {
@@ -431,7 +431,7 @@ $( function() {
       updateLayout();
     };
     const toSingleImageView = function(index) {
-      var prevImageIndex = currentImageIndex;
+      const prevImageIndex = currentImageIndex;
       if (index === null ||
           !entries[index].visible) {
         currentImageIndex = 0;
@@ -459,8 +459,8 @@ $( function() {
     };
     const flipSingleView = function(forward) {
       if (0 < images.length) {
-        var k = forward ? 0 : images.length - 1;
-        for (var i = 0, img; img = images[i]; i++) {
+        let k = forward ? 0 : images.length - 1;
+        for (let i = 0, img; img = images[i]; i++) {
           if (currentImageIndex === 1 + img.index) {
             if (forward) {
               k = (i + 1) % images.length;
@@ -521,14 +521,14 @@ $( function() {
       return singleView ? currentImageIndex - 1 : defaultIndex;
     };
     const makeImageLayoutParam = function() {
-      var numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
-      var numSlots = singleView ? 1 : Math.max(numVisibleEntries, 2);
-      var numColumns = layoutMode === 'x' ? numSlots : 1;
-      var numRows    = layoutMode !== 'x' ? numSlots : 1;
-      var viewW = $('#view').width();
-      var viewH = $('#view').height();
-      var boxW = viewW / numColumns;
-      var boxH = viewH / numRows;
+      const numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
+      const numSlots = singleView ? 1 : Math.max(numVisibleEntries, 2);
+      const numColumns = layoutMode === 'x' ? numSlots : 1;
+      const numRows    = layoutMode !== 'x' ? numSlots : 1;
+      const viewW = $('#view').width();
+      const viewH = $('#view').height();
+      let boxW = viewW / numColumns;
+      let boxH = viewH / numRows;
       boxW = compareUtil.clamp(boxW, IMAGEBOX_MIN_SIZE, boxW - IMAGEBOX_MARGIN_W);
       boxH = compareUtil.clamp(boxH, IMAGEBOX_MIN_SIZE, boxH - IMAGEBOX_MARGIN_H);
       return {
@@ -542,12 +542,12 @@ $( function() {
       if (img.element) {
         img.boxW = boxW;
         img.boxH = boxH;
-        var rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
+        const rect = compareUtil.calcInscribedRect(boxW, boxH, img.width, img.height);
         img.baseWidth = rect.width;
         img.baseHeight = rect.height;
         img.calcNormalizedROI = function(zoomScale, zoomCenter) {
-          var roiW = img.boxW / (img.baseWidth * zoomScale);
-          var roiH = img.boxH / (img.baseHeight * zoomScale);
+          const roiW = img.boxW / (img.baseWidth * zoomScale);
+          const roiH = img.boxH / (img.baseHeight * zoomScale);
           return [
             compareUtil.clamp(0.5 + zoomCenter.x - 0.5 * roiW, 0, 1),
             compareUtil.clamp(0.5 + zoomCenter.y - 0.5 * roiH, 0, 1),
@@ -556,20 +556,20 @@ $( function() {
           ];
         };
         img.calcROI = function(zoomScale, zoomCenter) {
-          var nROI = img.calcNormalizedROI(zoomScale, zoomCenter);
-          var w = img.width, h = img.height;
+          const nROI = img.calcNormalizedROI(zoomScale, zoomCenter);
+          const w = img.width, h = img.height;
           return [ nROI[0] * w, nROI[1] * h, nROI[2] * w, nROI[3] * h ];
         };
-        var w = img.transposed ? rect.height : rect.width;
-        var h = img.transposed ? rect.width : rect.height;
+        const w = img.transposed ? rect.height : rect.width;
+        const h = img.transposed ? rect.width : rect.height;
         $(img.element).css({ width: w+'px', height: h+'px' });
         altView.onUpdateImageBox(img, w, h);
         grid.onUpdateImageBox(img, w, h);
         crossCursor.onUpdateImageBox(img, w, h);
         hud.onUpdateImageBox(img);
       }
-      var index = img.index;
-      var isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
+      const index = img.index;
+      const isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
       $(box).css({
         display : '',
         position : overlayMode ? 'absolute' : '',
@@ -587,8 +587,8 @@ $( function() {
       }
     };
     const onUpdateLayout = function() {
-      var param = makeImageLayoutParam();
-      var indices = getSelectedImageIndices();
+      const param = makeImageLayoutParam();
+      const indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       $('#viewHud').css('width', param.viewW);
       if (1 <= images.length && !dialog) {
@@ -602,8 +602,8 @@ $( function() {
         $('#prev,#next').hide();
       }
       $('#view > div.imageBox').each(function(index) {
-        var hide = singleView && 0 > indices.indexOf(index);
-        var img = entries[index];
+        const hide = singleView && 0 > indices.indexOf(index);
+        const img = entries[index];
         if (hide || !img || !img.visible) {
           $(this).css({ display : 'none' });
         } else {
@@ -611,18 +611,19 @@ $( function() {
         }
       });
       $('#view > div.emptyBox').each(function(index) {
-        var hide = singleView || param.numVisibleEntries + index >= param.numSlots;
+        const hide = singleView || param.numVisibleEntries + index >= param.numSlots;
         $(this).css({ display : (hide ? 'none' : '') });
       });
       updateImageScaling();
     };
     const updateEmptyBoxTextColor = function() {
+      let textColor;
       if ($('#view').hasClass('useChecker')) {
-        var textColor = '#222';
+        textColor = '#222';
       } else {
-        var rgb = parseInt(backgroundColor.substr(1), 16);
-        var y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
-        var textColor = (96 <= y) ? '#444' : '#888';
+        const rgb = parseInt(backgroundColor.substr(1), 16);
+        const y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
+        textColor = (96 <= y) ? '#444' : '#888';
       }
       $('#view .dropHere').css({color: textColor, borderColor: textColor});
     };
