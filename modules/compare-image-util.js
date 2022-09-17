@@ -1056,7 +1056,7 @@ const compareImageUtil = (function() {
         nextPoints[i] = { x: p.x, y: p.y };
       }
     } else {
-      nextPoints = Array.prototype.slice.call(nextPoints);
+      nextPoints = Array.from(nextPoints);
     }
     if (20 < Math.min(image1.width, image1.height)) {
       const upperW = Math.ceil(image1.width / 2);
@@ -1182,7 +1182,7 @@ const compareImageUtil = (function() {
     if (1 === colors.length) {
       return colors[0];
     }
-    const list = Array.prototype.slice.call(colors);
+    const list = Array.from(colors);
     while (1 < list.length) {
       const index = mostDistantColorIndex(list);
       list.splice(index, 1);
