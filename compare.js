@@ -5153,23 +5153,23 @@ $( function() {
       return entry;
   };
   const addCapturedImage = function(canvas) {
-      var file = {
+      const file = {
         name: 'captured image',
         lastModified: Date.now()
       };
-      var entry = newEntry(file);
+      const entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
       viewManagement.resetLayoutState();
       setupEntryWithCanvas(entry, canvas);
   };
   const addFile = function(file) {
-      var entry = newEntry(file);
+      const entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
       nowLoadingDialog.add(entry);
-      
-      var reader = new FileReader();
+
+      const reader = new FileReader();
       reader.onprogress = function(e) {
         if (e.lengthComputable && 0 < e.total) {
           entry.progress = Math.round(e.loaded * 100 / e.total);
@@ -5189,11 +5189,11 @@ $( function() {
       reader.readAsDataURL(file);
   };
   const addFiles = function(files) {
-    var sorted = Array.prototype.slice.call(files);
+    const sorted = Array.from(files);
     sorted.sort(function(a, b) {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
     });
-    for (var i = 0, f; f = sorted[i]; i++) {
+    for (const f of sorted) {
       addFile(f);
     }
     viewManagement.resetLayoutState();
