@@ -5023,12 +5023,12 @@ $( function() {
     crossCursor.onUpdateTransform();
   }
 
-  var NEEDS_IOS_EXIF_WORKAROUND = (function() {
-    var ua = window.navigator.userAgent.toLowerCase();
+  const NEEDS_IOS_EXIF_WORKAROUND = (function() {
+    const ua = window.navigator.userAgent.toLowerCase();
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
   const setEntryImage = function(entry, image, w, h) {
-    var canvas = image.nodeName === 'CANVAS' ? image : figureUtil.canvasFromImage(image, w, h);
+    const canvas = image.nodeName === 'CANVAS' ? image : figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
     entry.mainImage  = image;
     entry.element    = entry.mainImage;
@@ -5047,7 +5047,7 @@ $( function() {
     entry.interpretXY2 = function(x, y) {
       return compareUtil.orientationUtil.interpretXY2(entry.orientation, w, h, x, y);
     };
-    var leftTop = entry.interpretXY2(0, 0);
+    const leftTop = entry.interpretXY2(0, 0);
     entry.flippedX = leftTop.x !== 0;
     entry.flippedY = leftTop.y !== 0;
     //
@@ -5061,13 +5061,13 @@ $( function() {
     nowLoadingDialog.update();
   };
   const setupEntryWithDataURI = function(entry, dataURI) {
-    var binary = compareUtil.binaryFromDataURI(dataURI);
-    var formatInfo = compareUtil.detectImageFormat(binary);
-    var format = formatInfo ? formatInfo.toString() : null;
-    var isPNG  = format && 0 <= format.indexOf('PNG');
-    var isJPEG = format && 0 <= format.indexOf('JPEG');
-    var isGIF  = format && 0 <= format.indexOf('GIF');
-    var isBMP  = format && 0 <= format.indexOf('BMP');
+    const binary = compareUtil.binaryFromDataURI(dataURI);
+    const formatInfo = compareUtil.detectImageFormat(binary);
+    const format = formatInfo ? formatInfo.toString() : null;
+    const isPNG  = format && 0 <= format.indexOf('PNG');
+    const isJPEG = format && 0 <= format.indexOf('JPEG');
+    const isGIF  = format && 0 <= format.indexOf('GIF');
+    const isBMP  = format && 0 <= format.indexOf('BMP');
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
@@ -5083,21 +5083,21 @@ $( function() {
         entry.orientation = entry.orientationExif;
       }
     }
-    var useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
-    var img = new Image;
+    const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
+    const img = new Image;
     $(img).on('load', function() {
-        var w = img.naturalWidth;
-        var h = img.naturalHeight;
+        let w = img.naturalWidth;
+        let h = img.naturalHeight;
         if (entry.format === 'SVG' && (w === 0 && h === 0)) {
           w = 150;
           h = 150;
           entry.sizeUnknown = true;
         }
-        var mainImage = useCanvasToDisplay ? figureUtil.canvasFromImage(img, w, h) : img;
+        const mainImage = useCanvasToDisplay ? figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
       }).
       on('error', function() {
-        var message = 'Failed.';
+        let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
         } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
@@ -5111,8 +5111,8 @@ $( function() {
     setEntryImage(entry, canvas, canvas.width, canvas.height);
   };
   const newEntry = function(file) {
-      var lastModified = file.lastModified || file.lastModifiedDate;
-      var entry = {
+      const lastModified = file.lastModified || file.lastModifiedDate;
+      const entry = {
             index           : null,
             name            : file.name,
             size            : file.size,
@@ -5147,7 +5147,7 @@ $( function() {
             progress    : 0,
             error       : null,
             visible     : true,
-            
+
             ready   : function() { return null !== this.element; }
       };
       return entry;
