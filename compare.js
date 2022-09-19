@@ -4870,7 +4870,7 @@ $( function() {
     };
   })();
   // Side Bar
-  var sideBar = (function() {
+  const sideBar = (function() {
     $('#add').click(function() {
       $('#file').click();
     });
@@ -4890,8 +4890,8 @@ $( function() {
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
     const newSelectorButton = function(index) {
-      var number = viewManagement.numberFromIndex(index);
-      var button = $('<button/>').addClass('selector').
+      const number = viewManagement.numberFromIndex(index);
+      const button = $('<button/>').addClass('selector').
         text(number).
         click(function(e) { viewManagement.toSingleImageView(index); });
       if (number <= 9) {
@@ -4903,20 +4903,20 @@ $( function() {
     };
     const updateSelectorButtons = function() {
       $('.selector').remove();
-      for (var i = 0, ent; ent = entries[i]; i++) {
+      for (const ent of entries) {
         newSelectorButton(ent.index);
       }
     };
     const updateArrangeButton = function() {
-      var layoutMode = viewManagement.getLayoutMode();
+      const layoutMode = viewManagement.getLayoutMode();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     const updateSelectorButtonState = function() {
       const indices = viewManagement.getSelectedImageIndices();
       const selectors = $('.selector');
       selectors.removeClass('current');
-      for (let i = 0; i < indices.length; i++) {
-        selectors.eq(indices[i]).addClass('current');
+      for (const index of indices) {
+        selectors.eq(index).addClass('current');
       }
       selectors.each(function(index) {
         if (index < entries.length && !entries[index].visible) {
@@ -5002,7 +5002,7 @@ $( function() {
     updateTransform();
     dialogUtil.adjustDialogPosition();
   };
-  
+
   function updateTransform() {
     for (let i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
