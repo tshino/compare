@@ -4912,10 +4912,10 @@ $( function() {
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     const updateSelectorButtonState = function() {
-      var indices = viewManagement.getSelectedImageIndices();
-      var selectors = $('.selector');
+      const indices = viewManagement.getSelectedImageIndices();
+      const selectors = $('.selector');
       selectors.removeClass('current');
-      for (var i = 0; i < indices.length; i++) {
+      for (let i = 0; i < indices.length; i++) {
         selectors.eq(indices[i]).addClass('current');
       }
       selectors.each(function(index) {
@@ -4926,10 +4926,10 @@ $( function() {
     };
     const updateOverlayModeIndicator = function() {
       if (viewManagement.isOverlayMode()) {
-        var indices = viewManagement.getSelectedImageIndices();
-        var numbers = indices.map(function(i) { return viewManagement.numberFromIndex(i); });
+        const indices = viewManagement.getSelectedImageIndices();
+        const numbers = indices.map(function(i) { return viewManagement.numberFromIndex(i); });
         numbers.sort();
-        var modeDesc = numbers.join(' + ') + (numbers.length === 1 ? ' only' : '');
+        const modeDesc = numbers.join(' + ') + (numbers.length === 1 ? ' only' : '');
         textUtil.setText($('#mode h3'), {
           en: 'OVERLAY MODE : ' + modeDesc,
           ja: 'オーバーレイモード : ' + modeDesc });
@@ -4958,7 +4958,7 @@ $( function() {
     } else {
       viewZoom.enable();
     }
-    for (var i = 0, ent; ent = entries[i]; i++) {
+    for (let i = 0, ent; ent = entries[i]; i++) {
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>');
           $('#drop').before(ent.view);
@@ -4975,7 +4975,7 @@ $( function() {
         if (ent.element) {
           if (ent.altViewMode !== altView.currentMode()) {
             ent.view.find('.image').remove();
-            var altImage = altView.getAltImage(ent);
+            const altImage = altView.getAltImage(ent);
             ent.element = altImage ? altImage.image : ent.mainImage;
             ent.contour = altImage ? altImage.contour : null;
             ent.altViewMode = altImage ? altView.currentMode() : null;
@@ -5004,7 +5004,7 @@ $( function() {
   };
   
   function updateTransform() {
-    for (var i = 0, ent; ent = entries[i]; i++) {
+    for (let i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
         style = {
           left        : '50%',
