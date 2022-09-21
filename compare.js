@@ -4536,13 +4536,13 @@ $( function() {
     compareUtil.toggleFullscreen($('#viewroot').get(0));
   };
   // Alt View
-  var altView = (function() {
-    var colorSpace = $('#altViewColorSpace').val();
-    var mapping = $('.altViewMapping').val();
-    var component = null;
-    var alphaEnabled = $('#altViewEnableAlpha').prop('checked');
-    var enableContour = false;
-    var colorSpaces = {
+  const altView = (function() {
+    let colorSpace = $('#altViewColorSpace').val();
+    let mapping = $('.altViewMapping').val();
+    let component = null;
+    let alphaEnabled = $('#altViewEnableAlpha').prop('checked');
+    let enableContour = false;
+    const colorSpaces = {
       'rgb': {
         modeSwitch: '#altViewModeSwRGB',
         components: [ 'R', 'G', 'B', 'A' ],
@@ -4574,10 +4574,10 @@ $( function() {
         ]
       }
     };
-    var colorMaps = {
+    const colorMaps = {
       'grayscale': (function() {
-        var colorMap = new Uint8Array(3 * 256);
-        for (var i = 0; i < 256; ++i) {
+        const colorMap = new Uint8Array(3 * 256);
+        for (let i = 0; i < 256; ++i) {
           colorMap[i + 0] = i;
           colorMap[i + 256] = i;
           colorMap[i + 512] = i;
@@ -4585,12 +4585,12 @@ $( function() {
         return colorMap;
       })(),
       'pseudocolor': (function() {
-        var colorMap = new Uint8Array(3 * 256);
+        const colorMap = new Uint8Array(3 * 256);
         const tone = function(a) {
           return Math.round(255 * Math.pow(a, 1/2.2));
         };
-        for (var i = 0; i < 256; ++i) {
-          var a = (i - 40) * 5.8 / 255;
+        for (let i = 0; i < 256; ++i) {
+          let a = (i - 40) * 5.8 / 255;
           a = a - Math.floor(a);
           a = a * a * (3 - 2 * a);
           colorMap[i + 0] = tone(i < 128 ? 0 : i < 172 ? a : i < 216 ? 1 : 1 - a);
@@ -4600,16 +4600,16 @@ $( function() {
         return colorMap;
       })()
     };
-    var colorBars = {};
+    const colorBars = {};
     const makeColorBar = function(colorMap) {
-      var fig = figureUtil.makeBlankFigure(512 + 2, 44);
-      for (var i = 0; i < 256; ++i) {
-        var color = 'rgb(' + colorMap[i] + ',' +
+      const fig = figureUtil.makeBlankFigure(512 + 2, 44);
+      for (let i = 0; i < 256; ++i) {
+        const color = 'rgb(' + colorMap[i] + ',' +
                 colorMap[i + 256] + ',' + colorMap[i + 512] + ')';
         fig.context.fillStyle = color;
         fig.context.fillRect(1 + i * 2, 0, 2, 44);
       }
-      var axes = [
+      const axes = [
         { pos: 0.5,   align: 'left',   label: '0' },
         { pos: 64.5,  align: 'center', label: '64' },
         { pos: 128.5, align: 'center', label: '128' },
@@ -4624,11 +4624,11 @@ $( function() {
       updateDOM();
     });
     const changeColorSpace = function(cs) {
-      var lastComponent = (component === null || component === 0) ? null :
+      const lastComponent = (component === null || component === 0) ? null :
                             colorSpaces[colorSpace].components[component - 1];
       colorSpace = cs;
       if (component !== null) {
-        var sameComponent = colorSpaces[colorSpace].components.indexOf(lastComponent);
+        const sameComponent = colorSpaces[colorSpace].components.indexOf(lastComponent);
         if (0 <= sameComponent) {
           component = sameComponent + 1;
         } else {
@@ -4682,7 +4682,7 @@ $( function() {
       }
     };
     const changeMode = function(reverse) {
-      var numOptions = colorSpaces[colorSpace].components.length + 1;
+      let numOptions = colorSpaces[colorSpace].components.length + 1;
       if (!alphaEnabled && colorSpaces[colorSpace].components[numOptions - 2] === 'A') {
         numOptions -= 1;
       }
@@ -4705,10 +4705,10 @@ $( function() {
     const updateModeIndicator = function() {
       if (component !== null) {
         $('#altViewMode .mode-sw').css({ display: 'none' });
-        var sw = $(colorSpaces[colorSpace].modeSwitch).css({ display: '' });
-        var buttons = sw.find('button').removeClass('current');
+        const sw = $(colorSpaces[colorSpace].modeSwitch).css({ display: '' });
+        const buttons = sw.find('button').removeClass('current');
         buttons.eq(component).addClass('current');
-        var alpha = colorSpaces[colorSpace].components.indexOf('A');
+        const alpha = colorSpaces[colorSpace].components.indexOf('A');
         if (0 <= alpha) {
           buttons.eq(alpha + 1).css({ display: alphaEnabled ? '' : 'none' });
         }
@@ -4730,16 +4730,16 @@ $( function() {
     // WIP
     const makeContour = function(channelImage) {
       //console.time('makeConcour');
-      var w = channelImage.width;
-      var h = channelImage.height;
-      var ch = channelImage.data;
-      for (var i = 0, n = w * h; i < n; ++i) {
+      const w = channelImage.width;
+      const h = channelImage.height;
+      const ch = channelImage.data;
+      for (let i = 0, n = w * h; i < n; ++i) {
         ch[i] = ch[i] >> 5;
       }
-      var paths = [];
-      for (var y = 0, i = 0; y + 1 < h; ++y) {
-        var start = null;
-        for (var x = 0; x < w; ++x, ++i) {
+      const paths = [];
+      for (let y = 0, i = 0; y + 1 < h; ++y) {
+        let start = null;
+        for (let x = 0; x < w; ++x, ++i) {
           if (ch[i] !== ch[i + w]) {
             if (start === null) {
               paths.push([x, y + 1, x + 1, y + 1]);
@@ -4752,9 +4752,9 @@ $( function() {
           }
         }
       }
-      for (var x = 0; x + 1 < w; ++x) {
-        var start = null;
-        for (var y = 0, i = x; y < h; ++y, i += w) {
+      for (let x = 0; x + 1 < w; ++x) {
+        let start = null;
+        for (let y = 0, i = x; y < h; ++y, i += w) {
           if (ch[i] !== ch[i + 1]) {
             if (start === null) {
               paths.push([x + 1, y, x + 1, y + 1]);
@@ -4767,8 +4767,8 @@ $( function() {
           }
         }
       }
-      var vbox = '0 0 ' + w + ' ' + h;
-      var pathDesc = paths.map(function(p) {
+      const vbox = '0 0 ' + w + ' ' + h;
+      const pathDesc = paths.map(function(p) {
         if (p[0] === p[2]) {
           return 'M' + p[0] + ' ' + p[1] + 'v' + (p[3] - p[1]);
         } else if (p[1] === p[3]) {
@@ -4778,7 +4778,7 @@ $( function() {
       });
       //console.log('pathDesc.length', pathDesc.length);
       //console.log('pathDesc.join().length', pathDesc.join('').length);
-      var contour = $(
+      const contour = $(
         '<svg class="imageOverlay contour" viewBox="' + vbox + '">' +
           '<g stroke="#ff00ff" stroke-width="0.2" fill="none">' +
             '<path d="' + pathDesc.join('') + '"></path>' +
@@ -4793,28 +4793,28 @@ $( function() {
       if (component === null || component === 0) {
         return null;
       }
-      var imageData = getImageData(ent);
+      const imageData = getImageData(ent);
       if (!imageData) {
         return null;
       }
-      var w = imageData.width, h = imageData.height;
-      var altView = figureUtil.makeBlankFigure(w, h);
-      var altImageData = altView.context.createImageData(w, h);
-      var coef = colorSpaces[colorSpace].coef[component - 1];
-      var r = coef[0], g = coef[1], b = coef[2], a = coef[3], c = coef[4];
-      var src = imageData.data;
-      var dest = altImageData.data;
-      var colorMap = colorMaps[mapping];
-      var contour = null;
+      const w = imageData.width, h = imageData.height;
+      const altView = figureUtil.makeBlankFigure(w, h);
+      const altImageData = altView.context.createImageData(w, h);
+      const coef = colorSpaces[colorSpace].coef[component - 1];
+      const r = coef[0], g = coef[1], b = coef[2], a = coef[3], c = coef[4];
+      const src = imageData.data;
+      const dest = altImageData.data;
+      const colorMap = colorMaps[mapping];
+      let contour = null;
       if (enableContour) {
-        var channelImage = { data: new Uint8Array(w * h), width: w, height: h };
-        var ch = channelImage.data;
-        for (var i = 0, j = 0, n = 4 * w * h; i < n; i += 4, j++) {
-          var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
+        const channelImage = { data: new Uint8Array(w * h), width: w, height: h };
+        const ch = channelImage.data;
+        for (let i = 0, j = 0, n = 4 * w * h; i < n; i += 4, j++) {
+          const x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
           ch[j] = x;
         }
-        for (var i = 0, j = 0, n = w * h; j < n; i += 4, j++) {
-          var x = ch[j];
+        for (let i = 0, j = 0, n = w * h; j < n; i += 4, j++) {
+          const x = ch[j];
           dest[i + 0] = colorMap[x];
           dest[i + 1] = colorMap[x + 256];
           dest[i + 2] = colorMap[x + 512];
@@ -4822,8 +4822,8 @@ $( function() {
         }
         contour = makeContour(channelImage);
       } else {
-        for (var i = 0, n = 4 * w * h; i < n; i += 4) {
-          var x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
+        for (let i = 0, n = 4 * w * h; i < n; i += 4) {
+          const x = Math.round(c + r * src[i] + g * src[i + 1] + b * src[i + 2] + a * src[i + 3]);
           dest[i + 0] = colorMap[x];
           dest[i + 1] = colorMap[x + 256];
           dest[i + 2] = colorMap[x + 512];
@@ -4856,17 +4856,17 @@ $( function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
     return {
-      reset: reset,
-      toggle: toggle,
-      toggleContour: toggleContour,
-      changeMode: changeMode,
-      changeModeReverse: changeModeReverse,
-      enableAlpha: enableAlpha,
-      getAltImage: getAltImage,
+      reset,
+      toggle,
+      toggleContour,
+      changeMode,
+      changeModeReverse,
+      enableAlpha,
+      getAltImage,
       active: function() { return null !== component; },
-      onUpdateImageBox: onUpdateImageBox,
-      onUpdateTransform: onUpdateTransform,
-      currentMode: currentMode
+      onUpdateImageBox,
+      onUpdateTransform,
+      currentMode
     };
   })();
   // Side Bar
@@ -4947,8 +4947,8 @@ $( function() {
       updateOverlayModeIndicator();
     };
     return {
-      updateSelectorButtons: updateSelectorButtons,
-      onUpdateLayout: onUpdateLayout
+      updateSelectorButtons,
+      onUpdateLayout
     };
   })();
   const updateDOM = function() {
