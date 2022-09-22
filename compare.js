@@ -4214,9 +4214,9 @@ $( function() {
     };
   })();
   // Image Diff
-  var diffDialog = (function() {
-    var diffResult = {};
-    var diffOptions = {
+  const diffDialog = (function() {
+    const diffResult = {};
+    const diffOptions = {
       ignoreAE: 0,
       imageType: 0,
       resizeToLarger: true,
@@ -4226,7 +4226,7 @@ $( function() {
       offsetY: 0
     };
     $('#diffGridBtn').click(grid.toggle);
-    var diffImageBrightness = 8;
+    let diffImageBrightness = 8;
     $('#diffImageBrightness').val(diffImageBrightness);
     const applyBrightness = function() {
       $('#diffResult .figMain').css('filter', 'brightness(' + diffImageBrightness + ')');
@@ -4244,7 +4244,7 @@ $( function() {
         return false;
       }
     });
-    var diffImageType = makeModeSwitch('#diffImageType', 0, function(type) {
+    const diffImageType = makeModeSwitch('#diffImageType', 0, function(type) {
       diffOptions.imageType = type;
       updateImageTypeFootnote();
       updateTable();
@@ -4260,7 +4260,7 @@ $( function() {
     };
     updateImageTypeFootnote();
     $('.diffDimensionOption').on('change', function(e) {
-      var o = this.options[this.selectedIndex].value;
+      const o = this.options[this.selectedIndex].value;
       diffOptions.resizeToLarger = o === 'resize';
       diffOptions.ignoreRemainder = o === 'min';
       updateTable();
@@ -4309,8 +4309,8 @@ $( function() {
       if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
         return false;
       }
-      var a = entries[baseImageIndex];
-      var b = entries[targetImageIndex];
+      const a = entries[baseImageIndex];
+      const b = entries[targetImageIndex];
       if (a.width === b.width && a.height === b.height) {
         $('.diffDimension').css({display:'none'});
       } else {
@@ -4350,14 +4350,14 @@ $( function() {
     };
     const makeHistogramFigure = function(hist, ignoreAE) {
       ignoreAE = compareUtil.clamp(ignoreAE, 0, 255);
-      var fig = figureUtil.makeBlankFigure(256 * 3, 320);
-      var context = fig.context;
+      const fig = figureUtil.makeBlankFigure(256 * 3, 320);
+      const context = fig.context;
       context.fillStyle = '#222';
       context.fillRect(0,0,256*3,320);
       context.fillStyle = '#66f';
       context.fillRect(0,0,(ignoreAE + 1)*3,320);
-      var max = 0;
-      for (var i = 0; i < hist.length; ++i) {
+      let max = 0;
+      for (let i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
       figureUtil.drawHistogram(context, '#ccc', hist, max, 0, ignoreAE + 1, 0, 320, 300);
@@ -4367,8 +4367,8 @@ $( function() {
     const updateReport = function(styles) {
       $('#diffDetectedMaxAE').text(diffResult.result.summary.maxAE);
       if (diffOptions.ignoreAE !== 0) {
-        var rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
-        var percent = compareUtil.toPercent(rate);
+        const rate = diffResult.result.summary.countIgnoreAE / diffResult.result.summary.total;
+        const percent = compareUtil.toPercent(rate);
         $('#diffIgnoreAEResult').text(percent);
         $('#diffIgnoredUnmatchedRange').text('(≦' + diffOptions.ignoreAE + ')');
         $('#diffUnmatchedRange').text('(>' + diffOptions.ignoreAE + ')');
@@ -4376,24 +4376,24 @@ $( function() {
         $('#diffIgnoredUnmatchedRange').text('');
         $('#diffUnmatchedRange').text('');
       }
-      var histFig = makeHistogramFigure(diffResult.result.summary.histogram, diffOptions.ignoreAE);
+      const histFig = makeHistogramFigure(diffResult.result.summary.histogram, diffOptions.ignoreAE);
       $('#diffAEHistogram').append($(histFig).css({ width: '320px', height: '160px' }));
-      var w = diffResult.result.image.width;
-      var h = diffResult.result.image.height;
-      var fig = figureUtil.makeBlankFigure(w, h);
-      var bits = fig.context.createImageData(w, h);
+      const w = diffResult.result.image.width;
+      const h = diffResult.result.image.height;
+      const fig = figureUtil.makeBlankFigure(w, h);
+      const bits = fig.context.createImageData(w, h);
       figureUtil.copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
       styles = updateFigureStylesForActualSize(styles, w, h);
       diffResult.baseWidth = styles.baseW;
       diffResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
-      var figMain = $(fig.canvas).css(styles.style).addClass('figMain');
+      const figMain = $(fig.canvas).css(styles.style).addClass('figMain');
       $('#diffResult').css(styles.cellStyle).append(figMain);
       if (diffOptions.imageType === 1) {
         applyBrightness();
       }
-      var gridColor = diffOptions.imageType === 0 ? 'white' : '#f0f';
+      const gridColor = diffOptions.imageType === 0 ? 'white' : '#f0f';
       diffResult.grid = grid.isEnabled() ? grid.makeGrid(w, h, gridColor).css(styles.style) : null;
       if (diffResult.grid) {
         $('#diffResult').append(diffResult.grid);
@@ -4412,8 +4412,8 @@ $( function() {
           });
         }
       } else {
-        var matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
-        var percent = compareUtil.toPercent(matchRate);
+        const matchRate = diffResult.result.summary.match / diffResult.result.summary.total;
+        const percent = compareUtil.toPercent(matchRate);
         if (0 === diffResult.result.summary.countIgnoreAE) {
           textUtil.setText($('#diffSummary'), {
             en: percent + ' pixels are matched',
@@ -4427,7 +4427,7 @@ $( function() {
         }
       }
       $('#diffSaveFigure').show().off('click').click(function() {
-        var msg = openMessageBox({
+        const msg = openMessageBox({
           en: 'Encoding the image...',
           ja: '画像をエンコード中...'
         });
@@ -4437,7 +4437,7 @@ $( function() {
           jQuery('#diffSaveFigureHelper')[0].click();
         };
         fig.canvas.toBlob(function(blob) {
-            var url = compareUtil.createObjectURL(blob);
+            const url = compareUtil.createObjectURL(blob);
             download(url);
             compareUtil.revokeObjectURL(url);
         });
@@ -4445,17 +4445,17 @@ $( function() {
       });
     };
     const updateHeader = function() {
-      var gridbtn = $('#diffGridBtn');
+      const gridbtn = $('#diffGridBtn');
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
     const figureStyles = function() {
-      var figW = Math.max(480, Math.round($('#view').width() * 0.5));
-      var figH = Math.max(320, Math.round($('#view').height() * 0.55));
-      var figMargin = 8;
+      const figW = Math.max(480, Math.round($('#view').width() * 0.5));
+      const figH = Math.max(320, Math.round($('#view').height() * 0.55));
+      const figMargin = 8;
       return makeFigureStyles(figW, figH, figMargin, '#000');
     };
     const updateTableDOM = function() {
-      var styles = figureStyles();
+      const styles = figureStyles();
       if (false === updateOptionsDOM(styles)) {
         return;
       }
@@ -4513,7 +4513,7 @@ $( function() {
       }
       updateTable();
     };
-    var toggle = dialogUtil.defineDialog($('#diff'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#diff'), updateTable, toggleAnalysis, {
       enableZoom: true,
       getBaseSize: function() {
         return diffResult ? { w: diffResult.baseWidth, h: diffResult.baseHeight } : null;
@@ -4522,10 +4522,10 @@ $( function() {
       onClose: function() { grid.setOnChange(null); }
     });
     return {
-      onRemoveEntry: onRemoveEntry,
-      updateTable: updateTable,
-      updateFigure: updateFigure,
-      toggle: toggle
+      onRemoveEntry,
+      updateTable,
+      updateFigure,
+      toggle
     };
   })();
   const resetMouseDrag = function() {
