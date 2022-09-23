@@ -3927,26 +3927,26 @@ $( function() {
     };
   })();
   // Optical Flow
-  var opticalFlowDialog = (function() {
-    var opticalFlowResult = {};
-    var pointedVector = null;
+  const opticalFlowDialog = (function() {
+    const opticalFlowResult = {};
+    let pointedVector = null;
     $('#opticalFlowGridBtn').click(grid.toggle);
     $('#opticalFlow').on('mousemove', 'td.fig > *', function(e) {
       if (opticalFlowResult.result !== null) {
-        var point = figureZoom.positionFromMouseEvent(e, this, null);
+        const point = figureZoom.positionFromMouseEvent(e, this, null);
         onFigurePointed(point);
       }
     });
     const findPointedVector = function(point) {
-      var w = opticalFlowResult.result.image.width;
-      var h = opticalFlowResult.result.image.height;
-      var px = point.x * w;
-      var py = point.y * h;
-      var nearest = 0, distance = w + h, size = 0;
-      for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
-        var distX = px - (p.x0 + p.x1) * 0.5;
-        var distY = py - (p.y0 + p.y1) * 0.5;
-        var d = Math.sqrt(distX * distX + distY * distY);
+      const w = opticalFlowResult.result.image.width;
+      const h = opticalFlowResult.result.image.height;
+      const px = point.x * w;
+      const py = point.y * h;
+      let nearest = 0, distance = w + h, size = 0;
+      for (let i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+        const distX = px - (p.x0 + p.x1) * 0.5;
+        const distY = py - (p.y0 + p.y1) * 0.5;
+        const d = Math.sqrt(distX * distX + distY * distY);
         if (d < distance) {
           nearest = p;
           distance = d;
@@ -3959,7 +3959,7 @@ $( function() {
         return null;
       }
     };
-    var arrowMarkDesc = [
+    const arrowMarkDesc = [
       'M9,7L1,3 m1,3l-1,-3l3,-1',
       'M7,9L3,1 m-1,3l1,-3l3,1',
       'M1,7L9,3 m-3,-1l3,1l-1,3',
@@ -3970,8 +3970,8 @@ $( function() {
       'M3,1L7,9 m1,-3l-1,3l-3,-1',
     ];
     const makeArrowMark = function(dx, dy) {
-      var arrowType = (dy < 0 ? 0 : 4) + (dx < 0 ? 0 : 2) + (Math.abs(dy) < Math.abs(dx) ? 0 : 1);
-      var desc = arrowMarkDesc[arrowType];
+      const arrowType = (dy < 0 ? 0 : 4) + (dx < 0 ? 0 : 2) + (Math.abs(dy) < Math.abs(dx) ? 0 : 1);
+      const desc = arrowMarkDesc[arrowType];
       return $('<svg viewBox="0 0 10 10"><path fill="none" stroke="white" stroke-width="0.8" d="' + desc + '"></path></svg>').css({
         display: 'inline-block',
         verticalAlign: '-10%',
@@ -3980,17 +3980,17 @@ $( function() {
       });
     };
     const updateMotionVectorPopup = function() {
-      var dx = pointedVector.x1 - pointedVector.x0;
-      var dy = pointedVector.y1 - pointedVector.y0;
-      var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
-      var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
-      var w = opticalFlowResult.result.image.width;
-      var h = opticalFlowResult.result.image.height;
-      var popupX = (pointedVector.x1 / w) * 100 + '%';
-      var popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
-      var arrowMark = makeArrowMark(dx, dy);
-      var text = $('<span>').text(dxText + ', ' + dyText);
-      var span = $('#opticalFlowResult > div > span');
+      const dx = pointedVector.x1 - pointedVector.x0;
+      const dy = pointedVector.y1 - pointedVector.y0;
+      const dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
+      const dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
+      const w = opticalFlowResult.result.image.width;
+      const h = opticalFlowResult.result.image.height;
+      const popupX = (pointedVector.x1 / w) * 100 + '%';
+      const popupY = (1 - (pointedVector.y1 / h)) * 100 + '%';
+      const arrowMark = makeArrowMark(dx, dy);
+      const text = $('<span>').text(dxText + ', ' + dyText);
+      const span = $('#opticalFlowResult > div > span');
       span.children().remove();
       span.append(arrowMark).append(text).show().css({
         position: 'absolute',
@@ -4008,16 +4008,16 @@ $( function() {
       });
     };
     const updateMotionVectorInfo = function() {
-      var dx = pointedVector.x1 - pointedVector.x0;
-      var dy = pointedVector.y1 - pointedVector.y0;
-      var dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
-      var dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
+      const dx = pointedVector.x1 - pointedVector.x0;
+      const dy = pointedVector.y1 - pointedVector.y0;
+      const dxText = compareUtil.toSignedFixed(dx, 2) + 'px';
+      const dyText = compareUtil.toSignedFixed(dy, 2) + 'px';
       $('#opticalFlowSelectedDeltaX').text(dxText);
       $('#opticalFlowSelectedDeltaY').text(dyText);
     };
     const onFigurePointed = function(point) {
       if (opticalFlowResult.result !== null) {
-        var nearest = findPointedVector(point);
+        const nearest = findPointedVector(point);
         if (nearest) {
           if (pointedVector === null || pointedVector !== nearest) {
             pointedVector = nearest;
@@ -4070,18 +4070,18 @@ $( function() {
       }
     };
     const makeFigure = function(styles) {
-      var w = opticalFlowResult.result.image.width;
-      var h = opticalFlowResult.result.image.height;
-      var fig = figureUtil.makeBlankFigure(w, h);
-      var bits = fig.context.createImageData(w, h);
+      const w = opticalFlowResult.result.image.width;
+      const h = opticalFlowResult.result.image.height;
+      const fig = figureUtil.makeBlankFigure(w, h);
+      const bits = fig.context.createImageData(w, h);
       figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
-      var vectorPaths = [];
-      var circles = [];
+      const vectorPaths = [];
+      const circles = [];
       fig.context.putImageData(bits, 0, 0);
       const pointToCoord = function(x, y) {
         return x.toFixed(2) + ',' + y.toFixed(2);
       };
-      for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+      for (const p of opticalFlowResult.result.points) {
         vectorPaths.push(
           'M ' + pointToCoord(p.x0 + 0.5, p.y0 + 0.5) +
           ' L ' + pointToCoord(p.x1 + 0.5, p.y1 + 0.5)
@@ -4091,7 +4091,7 @@ $( function() {
           '</circle>'
         );
       }
-      var strokes =
+      const strokes =
           '<g stroke="#ff4" stroke-width="0.3" fill="none">' + circles + '</g>' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.6" d="' + vectorPaths.join(' ') + '"></path>' +
@@ -4100,10 +4100,10 @@ $( function() {
       opticalFlowResult.baseWidth = styles.baseW;
       opticalFlowResult.baseHeight = styles.baseH;
       styles.style.transform = 'translate(-50%,0%) ' + figureZoom.makeTransform();
-      var picture = $(fig.canvas).css(styles.style).addClass('figMain');
-      var overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + strokes + '</svg>').css(styles.style);
+      const picture = $(fig.canvas).css(styles.style).addClass('figMain');
+      const overlay = $('<svg viewBox="0 0 ' + w + ' ' + h + '">' + strokes + '</svg>').css(styles.style);
       opticalFlowResult.grid = grid.isEnabled() ? grid.makeGrid(w, h).css(styles.style) : null;
-      var popup = $('<div>').append($('<span>')).css(styles.style);
+      const popup = $('<div>').append($('<span>')).css(styles.style);
       $('#opticalFlowResult').append(picture);
       if (opticalFlowResult.grid) {
         $('#opticalFlowResult').append(opticalFlowResult.grid);
@@ -4115,14 +4115,14 @@ $( function() {
       if (opticalFlowResult.result.points.length === 0) {
         $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
       } else {
-        var sumDX = 0;
-        var sumDY = 0;
-        for (var i = 0, p; p = opticalFlowResult.result.points[i]; i++) {
+        let sumDX = 0;
+        let sumDY = 0;
+        for (const p of opticalFlowResult.result.points) {
           sumDX += p.x1 - p.x0;
           sumDY += p.y1 - p.y0;
         }
-        var avgDX = sumDX / opticalFlowResult.result.points.length;
-        var avgDY = sumDY / opticalFlowResult.result.points.length;
+        const avgDX = sumDX / opticalFlowResult.result.points.length;
+        const avgDY = sumDY / opticalFlowResult.result.points.length;
         $('#opticalFlowDeltaX').text(compareUtil.toSignedFixed(avgDX, 2) + 'px');
         $('#opticalFlowDeltaY').text(compareUtil.toSignedFixed(avgDY, 2) + 'px');
       }
@@ -4136,7 +4136,7 @@ $( function() {
           ja: 'オプティカルフローを検出できませんでした'
         });
       } else {
-        var num = opticalFlowResult.result.points.length;
+        const num = opticalFlowResult.result.points.length;
         textUtil.setText($('#opticalFlowSummary'), {
           en: 'Optical flow detected for ' + num + ' points',
           ja: 'オプティカルフローが ' + num + ' 点で検出されました'
@@ -4144,7 +4144,7 @@ $( function() {
       }
     };
     const updateHeader = function() {
-      var gridbtn = $('#opticalFlowGridBtn');
+      const gridbtn = $('#opticalFlowGridBtn');
       grid.isEnabled() ? gridbtn.addClass('current') : gridbtn.removeClass('current');
     };
     const updateTableDOM = function() {
@@ -4154,9 +4154,9 @@ $( function() {
       if (opticalFlowResult.base !== baseImageIndex || opticalFlowResult.target !== targetImageIndex) {
         updateAsync();
       }
-      var figW = Math.max(600, Math.round($('#view').width() * 0.65));
-      var figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
-      var styles = makeFigureStyles(figW, figH, figMargin, '#000');
+      const figW = Math.max(600, Math.round($('#view').width() * 0.65));
+      const figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
+      const styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (opticalFlowResult.result === null) {
         $('#opticalFlowResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
@@ -4197,7 +4197,7 @@ $( function() {
       }
       updateTable();
     };
-    var toggle = dialogUtil.defineDialog($('#opticalFlow'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#opticalFlow'), updateTable, toggleAnalysis, {
       enableZoom: true,
       getBaseSize: function() {
         return opticalFlowResult ? { w: opticalFlowResult.baseWidth, h: opticalFlowResult.baseHeight } : null;
@@ -4206,11 +4206,11 @@ $( function() {
       onClose: function() { grid.setOnChange(null); }
     });
     return {
-      processClick: processClick,
-      onRemoveEntry: onRemoveEntry,
-      updateTable: updateTable,
-      updateFigure: updateFigure,
-      toggle: toggle
+      processClick,
+      onRemoveEntry,
+      updateTable,
+      updateFigure,
+      toggle
     };
   })();
   // Image Diff
