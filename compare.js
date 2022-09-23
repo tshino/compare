@@ -3787,11 +3787,11 @@ $( function() {
     }
   };
   // Tone Curve Estimation
-  var toneCurveDialog = (function() {
-    var toneCurveParam = {};
+  const toneCurveDialog = (function() {
+    const toneCurveParam = {};
     const repaint = function() {
       discardTasksOfCommand('calcToneCurve');
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
@@ -3800,11 +3800,11 @@ $( function() {
       toneCurveParam.base = baseImageIndex;
       updateTable();
     };
-    var toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
+    const toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
       repaint();
       updateAuxOption();
     });
-    var toneCurveAuxType2 = makeModeSwitch('#toneCurveAuxType2', 0, repaint);
+    const toneCurveAuxType2 = makeModeSwitch('#toneCurveAuxType2', 0, repaint);
     const updateAuxOption = function() {
       if (toneCurveType.current() === 0) {
         $('#toneCurveAuxType2').hide();
@@ -3813,7 +3813,7 @@ $( function() {
       }
     };
     const onRemoveEntry = function(index) {
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
@@ -3832,59 +3832,59 @@ $( function() {
       }, attachImageDataToTask);
     };
     const makeToneMapFigure = function(toneMapData, type) {
-      var fig = figureUtil.makeBlankFigure(320, 320);
-      var dist = toneMapData.dist;
-      var max = toneMapData.max;
-      var bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
+      const fig = figureUtil.makeBlankFigure(320, 320);
+      const dist = toneMapData.dist;
+      const max = toneMapData.max;
+      const bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
       fig.context.fillStyle = '#000';
       fig.context.fillRect(0, 0, 320, 320);
       fig.context.putImageData(bits, 32, 32);
       return fig;
     };
     const makeFigure = function(type, toneCurve) {
-      var numComponents = type === 0 ? 3 : 1;
-      var components = toneCurve.components;
-      var vbox = '0 0 ' + 320 + ' ' + 320;
-      var curvePaths = [];
+      const numComponents = type === 0 ? 3 : 1;
+      const components = toneCurve.components;
+      const vbox = '0 0 ' + 320 + ' ' + 320;
+      const curvePaths = [];
       const pointToCoord = function(p) {
-        var x = 32 + p[0];
-        var y = 288 - p[1];
+        const x = 32 + p[0];
+        const y = 288 - p[1];
         return x.toFixed(2) + ',' + y.toFixed(2);
       };
       const pointToPath = function(conf, p0, p1) {
-        var MIN_OPACITY = 0.2;
-        var opacity = Math.max(MIN_OPACITY, conf);
+        const MIN_OPACITY = 0.2;
+        const opacity = Math.max(MIN_OPACITY, conf);
         return '<path opacity="' + opacity.toFixed(2) + '"' +
                ' d="M ' + pointToCoord(p0) + ' L ' + pointToCoord(p1) + '"></path>';
       };
-      for (var c = 0; c < numComponents; ++c) {
-        var result = components[c];
-        var color = type === 0 ? ['#f00', '#0f0', '#00f'][c] : '#fff';
+      for (let c = 0; c < numComponents; ++c) {
+        const result = components[c];
+        const color = type === 0 ? ['#f00', '#0f0', '#00f'][c] : '#fff';
         curvePaths[c] = '<g stroke="' + color + '" ' +
             'style="mix-blend-mode: lighten" ' +
             'fill="none" stroke-width="1">';
         curvePaths[c] += pointToPath(0, [0, 0], result.points[0]);
-        for (var i = 1, p0 = result.points[0], p1; p1 = result.points[i]; i++, p0 = p1) {
-          var conf = Math.min(result.conf[i - 1], result.conf[i]);
+        for (let i = 1, p0 = result.points[0], p1; p1 = result.points[i]; i++, p0 = p1) {
+          const conf = Math.min(result.conf[i - 1], result.conf[i]);
           curvePaths[c] += pointToPath(conf, p0, p1);
         }
         curvePaths[c] += pointToPath(0, result.points[result.points.length - 1], [256, 256]);
         curvePaths[c] += '</g>';
       }
-      var axesDesc = 'M 32,16 L 32,288 L 304,288';
-      var scaleDesc = '';
-      for (var i = 1; i <= 8; ++i) {
-        var x = 32 + i / 8 * 256;
-        var y = 288 - i / 8 * 256;
+      const axesDesc = 'M 32,16 L 32,288 L 304,288';
+      let scaleDesc = '';
+      for (let i = 1; i <= 8; ++i) {
+        const x = 32 + i / 8 * 256;
+        const y = 288 - i / 8 * 256;
         scaleDesc += 'M 32,' + y + ' l 256,0 ';
         scaleDesc += 'M ' + x + ',288 l 0,-256 ';
       }
-      var fig = makeToneMapFigure(toneCurve.toneMap, type);
-      var curve = (
+      const fig = makeToneMapFigure(toneCurve.toneMap, type);
+      const curve = (
         '<svg viewBox="' + vbox + '">' +
           curvePaths.join() +
         '</svg>');
-      var axes = (
+      const axes = (
         '<svg viewBox="' + vbox + '">' +
           '<g stroke="white" fill="none">' +
             '<path stroke-width="0.1" d="' + scaleDesc + '"></path>' +
@@ -3903,27 +3903,27 @@ $( function() {
           return repaint();
         }
       }
-      var figW = 320, figH = 320, figMargin = 8;
-      var styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
+      const figW = 320, figH = 320, figMargin = 8;
+      const styles = makeFigureStyles(figW, figH, figMargin, '#666', figureZoom);
       updatePairwiseFigureTable('#toneCurveTable', 'toneCurve', updateAsync, repaint, styles, transformOnly);
     };
     const updateFigure = function(type, auxTypes, baseIndex, targetIndex, result) {
       if (type === toneCurveParam.type &&
           auxTypes[0] === toneCurveParam.auxTypes[0] &&
           baseIndex === toneCurveParam.base) {
-        var figData = makeFigure(type, result);
+        const figData = makeFigure(type, result);
         entries[targetIndex].toneCurve = figData.canvas;
         entries[targetIndex].toneCurveAxes = figData.axes;
       }
       updateTable();
     };
-    var toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     return {
-      onRemoveEntry: onRemoveEntry,
-      updateFigure: updateFigure,
-      toggle: toggle
+      onRemoveEntry,
+      updateFigure,
+      toggle
     };
   })();
   // Optical Flow
