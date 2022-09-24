@@ -3738,7 +3738,7 @@ $( function() {
     );
   };
   const updateBaseImageSelector = function(target, baseImageIndex, repaint) {
-    var baseCell = $(target).find('tr.basename td:not(.prop)');
+    const baseCell = $(target).find('tr.basename td:not(.prop)');
     baseCell.children().remove();
     if (baseImageIndex === null || images.length === 0) {
       baseCell.append($('<span>').text('no data'));
@@ -3757,12 +3757,13 @@ $( function() {
       return;
     }
     updateBaseImageSelector(target, baseImageIndex, repaint);
-    var baseCell = $(target).find('tr.basename td:not(.prop)');
-    var labelRow = $(target).find('tr.label');
-    var figureRow = $(target).find('tr.figure');
+    const baseCell = $(target).find('tr.basename td:not(.prop)');
+    const labelRow = $(target).find('tr.label');
+    const figureRow = $(target).find('tr.figure');
     labelRow.find('td:not(.prop)').remove();
     figureRow.find('td:not(.prop)').remove();
-    for (var k = 0, count = 0, img; img = images[k]; k++) {
+    let count = 0;
+    for (let k = 0, img; img = images[k]; k++) {
       if (img.index === baseImageIndex) {
         continue;
       }
@@ -3771,11 +3772,11 @@ $( function() {
         img[propName] = figureUtil.makeBlankFigure(8,8).canvas;
         update(entries[baseImageIndex], img);
       }
-      var label = makeImageNameWithIndex('<span>', img);
+      const label = makeImageNameWithIndex('<span>', img);
       labelRow.append($('<td>').append(label));
-      var figCell = $('<td class="fig">').css(styles.cellStyle);
+      const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
-      var axes = img[propName + 'Axes'];
+      const axes = img[propName + 'Axes'];
       if (axes) {
         figCell.append($(axes).css(styles.style));
       }
