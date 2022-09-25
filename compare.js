@@ -3569,14 +3569,14 @@ $( function() {
     );
   };
   // Image Quality Metrics
-  var metricsDialog = (function() {
-    var metricsMode = makeModeSwitch('#metricsMode', 0, function(type) {
+  const metricsDialog = (function() {
+    const metricsMode = makeModeSwitch('#metricsMode', 0, function(type) {
       updateTable();
       updateAuxOption();
     });
-    var metricsAuxType2 = makeModeSwitch('#metricsAuxType2', 0, function() {
+    const metricsAuxType2 = makeModeSwitch('#metricsAuxType2', 0, function() {
       discardTasksOfCommand('calcMetrics');
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.metrics = [];
       }
       updateTable();
@@ -3593,7 +3593,7 @@ $( function() {
       if (typeof metrics === 'string' || metrics.en !== undefined) {
         return { psnr: metrics, rmse: metrics, mse: metrics, mae: metrics, ssd: metrics, sad: metrics, ncc: metrics, ae: metrics };
       }
-      var m = metricsMode.current() === 0 ? metrics : metrics.y;
+      const m = metricsMode.current() === 0 ? metrics : metrics.y;
       return {
         psnr:
             isNaN(m.psnr) ? '‐' :
@@ -3628,7 +3628,7 @@ $( function() {
       textUtil.setText($('#metricsModeLabel'),
         metricsMode.current() === 0 ? { en: 'RGB', ja: 'RGB' } : { en: 'Luminance', ja: '輝度' }
       );
-      var rowCount = $('#metricsTable tr').length;
+      const rowCount = $('#metricsTable tr').length;
       if (images.length === 0) {
         $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
         return;
@@ -3645,7 +3645,7 @@ $( function() {
           })
         )
       );
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         updateTableCell(img);
       }
     };
@@ -3653,15 +3653,15 @@ $( function() {
       if (img.index === baseImageIndex) {
         return;
       }
-      var a = entries[baseImageIndex];
-      var b = img;
+      const a = entries[baseImageIndex];
+      const b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
-        var message = { en: '‐ (different size)', ja: '‐ (サイズが不一致)' };
+        const message = { en: '‐ (different size)', ja: '‐ (サイズが不一致)' };
         a.metrics[b.index] = message;
         b.metrics[a.index] = message;
       }
       if (!a.metrics[b.index]) {
-        var message = { en: 'calculating...', ja: '計算中...' };
+        const message = { en: 'calculating...', ja: '計算中...' };
         a.metrics[b.index] = message;
         b.metrics[a.index] = message;
         taskQueue.addTask({
@@ -3684,7 +3684,7 @@ $( function() {
           })
         )
       );
-      var values = metricsToString(a.metrics[b.index], a);
+      const values = metricsToString(a.metrics[b.index], a);
       const setMetricsValue = function(row, value) {
         if (typeof value === 'string') {
           row.append($('<td>').text(value));
@@ -3708,11 +3708,11 @@ $( function() {
       }
       updateTable();
     };
-    var toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
+    const toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
     return {
-      updateTable: updateTable,
-      updateFigure: updateFigure,
-      toggle: toggle
+      updateTable,
+      updateFigure,
+      toggle
     };
   })();
   const setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
