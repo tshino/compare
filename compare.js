@@ -3450,18 +3450,18 @@ $( function() {
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
   })();
-  var colorFreqDialog = (function() {
+  const colorFreqDialog = (function() {
     const drawFigure = function(reducedColorTable) {
-      var colorList = reducedColorTable.colorList;
-      var height = 480;
-      var fig = figureUtil.makeBlankFigure(256, height);
-      var context = fig.context;
+      const colorList = reducedColorTable.colorList;
+      const height = 480;
+      const fig = figureUtil.makeBlankFigure(256, height);
+      const context = fig.context;
       context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
-      var topCount = colorList[0][1];
-      var numImportant = Math.min(24, colorList.length);
-      var threshold = Math.max(1, reducedColorTable.totalCount / 100000);
-      for (var k = 0; k < numImportant; k++) {
+      const topCount = colorList[0][1];
+      let numImportant = Math.min(24, colorList.length);
+      const threshold = Math.max(1, reducedColorTable.totalCount / 100000);
+      for (let k = 0; k < numImportant; k++) {
         if (colorList[k][1] <= threshold) {
           numImportant = k;
           break;
@@ -3470,30 +3470,30 @@ $( function() {
       if (numImportant + 1 === colorList.length) {
         numImportant = colorList.length;
       }
-      var numEntries = numImportant < colorList.length ? numImportant + 1 : numImportant;
+      const numEntries = numImportant < colorList.length ? numImportant + 1 : numImportant;
       context.font = '14px sans-serif';
-      var others = null;
+      let others = null;
       if (numImportant < colorList.length) {
         others = [0, 0, 0, 0, 0];
-        for (var k = numImportant; k < colorList.length; k++) {
+        for (let k = numImportant; k < colorList.length; k++) {
           others[1] += colorList[k][1];
           others[2] += colorList[k][2];
           others[3] += colorList[k][3];
           others[4] += colorList[k][4];
         }
       }
-      for (var k = 0; k < numEntries; k++) {
-        var entry = (k === numImportant) ? others : colorList[k];
-        var count = entry[1];
-        var r = Math.round(entry[2] / count);
-        var g = Math.round(entry[3] / count);
-        var b = Math.round(entry[4] / count);
-        var frequency = count / topCount;
-        var rgb = compareUtil.toHexTriplet(r, g, b);
-        var y0 = k / numEntries * height;
-        var y1 = (k + 1) / numEntries * height;
-        var ratio = count / reducedColorTable.totalCount;
-        var label = entry === others ? 'Others' : rgb;
+      for (let k = 0; k < numEntries; k++) {
+        const entry = (k === numImportant) ? others : colorList[k];
+        const count = entry[1];
+        const r = Math.round(entry[2] / count);
+        const g = Math.round(entry[3] / count);
+        const b = Math.round(entry[4] / count);
+        const frequency = count / topCount;
+        const rgb = compareUtil.toHexTriplet(r, g, b);
+        const y0 = k / numEntries * height;
+        const y1 = (k + 1) / numEntries * height;
+        const ratio = count / reducedColorTable.totalCount;
+        const label = entry === others ? 'Others' : rgb;
         context.fillStyle = rgb;
         context.fillRect(1, y0 + 1, 80 - 2, y1 - y0 - 2);
         context.fillStyle = '#aaa';
@@ -3517,12 +3517,12 @@ $( function() {
       updateTable();
     };
     const updateTable = function() {
-      var target = $('#colorFreqTable');
+      const target = $('#colorFreqTable');
       target.find('td').remove();
-      for (var i = 0, img; img = images[i]; i++) {
-        var label = makeImageNameWithIndex('<td>', img);
+      for (let i = 0, img; img = images[i]; i++) {
+        const label = makeImageNameWithIndex('<td>', img);
         target.find('tr').eq(0).append(label);
-        var cell = $('<td>');
+        const cell = $('<td>');
         target.find('tr').eq(1).append(cell);
         if (!img.reducedColorTable) {
           img.reducedColorTable = {};
@@ -3534,35 +3534,35 @@ $( function() {
           cell.text('calculating...');
           continue;
         }
-        var figure = drawFigure(img.reducedColorTable);
+        const figure = drawFigure(img.reducedColorTable);
         cell.append(figure);
       }
-      if (i === 0) {
+      if (images.length === 0) {
         target.find('tr').eq(0).append(
           $('<td>').text('no data')
         );
       }
     };
-    var toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
+    const toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
     return {
-      updateFigure: updateFigure,
-      toggle: toggle
+      updateFigure,
+      toggle
     };
   })();
   const makeImageNameSelector = function(selectedIndex, onchange) {
-    var select = $('<select>').on('change', function(e) {
-      var index = parseInt(this.options[this.selectedIndex].value);
+    const select = $('<select>').on('change', function(e) {
+      const index = parseInt(this.options[this.selectedIndex].value);
       onchange(index);
       return false;
     });
-    for (var i = 0, img; img = images[i]; i++) {
-      var option = $('<option>').text(img.name).attr('value', img.index);
+    for (let i = 0, img; img = images[i]; i++) {
+      const option = $('<option>').text(img.name).attr('value', img.index);
       select.append(option);
       if (img.index === selectedIndex) {
         option.attr('selected','');
       }
     }
-    var number = viewManagement.numberFromIndex(selectedIndex);
+    const number = viewManagement.numberFromIndex(selectedIndex);
     return $('<span>').append(
       $('<span class="imageIndex"/>').text(number),
       select
