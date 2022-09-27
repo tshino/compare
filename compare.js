@@ -3215,15 +3215,15 @@ $( function() {
     };
   })();
   // 3D Waveform
-  var waveform3DDialog = (function() {
-    var waveform3DType = makeModeSwitch('#waveform3DType', 0, function(type) {
+  const waveform3DDialog = (function() {
+    const waveform3DType = makeModeSwitch('#waveform3DType', 0, function(type) {
       updateFigure();
       updateAuxOption();
     });
-    var waveform3DAuxType = makeModeSwitch('#waveform3DAuxType', 0, function(type) {
+    const waveform3DAuxType = makeModeSwitch('#waveform3DAuxType', 0, function(type) {
       updateFigure();
     });
-    var waveform3DAuxType2 = makeModeSwitch('#waveform3DAuxType2', 0, function(type) {
+    const waveform3DAuxType2 = makeModeSwitch('#waveform3DAuxType2', 0, function(type) {
       updateFigure();
     });
     const updateAuxOption = function() {
@@ -3245,42 +3245,42 @@ $( function() {
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var rotationController = compareUtil.makeRotationController(
+    const rotationController = compareUtil.makeRotationController(
       function() { redrawFigureAll(); },
       function() { updateTable(/* transformOnly = */ true); },
       { x: 20, y: -110 }
     );
     const makeColorGradientStops = function(type) {
-      var color2 =
+      const color2 =
           type === 0 ? '#fff' :
           (type === 1 || type === 4) ? '#f00' :
           (type === 2 || type === 5) ? '#0f0' :
           '#00f';
+      const colorStops = [[0, '#000']];
       if (type <= 3) {
-        var colorStops = [[0, '#000'], [1, color2]];
+        colorStops.push([1, color2]);
       } else {
-        var colorStops = [[0, '#000']];
-        var prefix = type === 4 ? '#' : type === 5 ? '#0' : '#00';
-        var suffix = type === 4 ? '00' : type === 5 ? '0' : '';
-        for (var i = 1; i < 16; i++) {
-          var c = compareUtil.srgb255ToLinear255[i * 0x11] / 255;
+        const prefix = type === 4 ? '#' : type === 5 ? '#0' : '#00';
+        const suffix = type === 4 ? '00' : type === 5 ? '0' : '';
+        for (let i = 1; i < 16; i++) {
+          const c = compareUtil.srgb255ToLinear255[i * 0x11] / 255;
           colorStops.push([c, prefix + i.toString(16) + suffix]);
         }
       }
       return colorStops;
     };
-    var colorStopsForType = (function(){
-      colorStopsForType = [];
-      for (var type = 0; type < 7; type++) {
+    const colorStopsForType = (function(){
+      const colorStopsForType = [];
+      for (let type = 0; type < 7; type++) {
         colorStopsForType.push(makeColorGradientStops(type));
       }
       return colorStopsForType;
     })();
     const drawVerticalColorBar = function(ctx, v, colorStops) {
-      var bar = (function() {
-        var x = 320/2, y0, y1;
-        for (var i = 0, corners = [0, 4, 12, 16]; i < 4; i++) {
-          var k = corners[i];
+      const bar = (function() {
+        let x = 320/2, y0, y1;
+        for (let i = 0, corners = [0, 4, 12, 16]; i < 4; i++) {
+          const k = corners[i];
           if (x > v[k][0]) {
             x = v[k][0];
             y0 = v[k + 1][1];
@@ -3295,51 +3295,52 @@ $( function() {
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
     };
     const makeWaveformY = function(n, waveform, mat) {
-      var m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
-      var waveformY = new Uint8Array(n);
-      for (var k = 0; k < n; k++) {
-        var r = waveform[k * 3];
-        var g = waveform[k * 3 + 1];
-        var b = waveform[k * 3 + 2];
+      const m0 = mat[0][0], m1 = mat[0][1], m2 = mat[0][2];
+      const waveformY = new Uint8Array(n);
+      for (let k = 0; k < n; k++) {
+        const r = waveform[k * 3];
+        const g = waveform[k * 3 + 1];
+        const b = waveform[k * 3 + 2];
         waveformY[k] = Math.round(m0 * r + m1 * g + m2 * b);
       }
       return waveformY;
     };
     const makeFigure = function(fig, waveform3D) {
-      var type = waveform3DType.current();
+      let type = waveform3DType.current();
       if (waveform3DAuxType.current() === 1 && 1 <= type && type <= 3 ) {
         type += 3;
       }
-      var context = fig.context;
-      var w = waveform3D.width;
-      var h = waveform3D.height;
-      var waveform = waveform3D.waveform;
+      const context = fig.context;
+      const w = waveform3D.width;
+      const h = waveform3D.height;
+      const waveform = waveform3D.waveform;
+      let waveformY;
       if (type === 0) { // Y
         if (waveform3DAuxType2.current() === 0) { // 0:bt601
           if (waveform3D.Y601 === undefined) {
             waveform3D.Y601 = makeWaveformY(w * h, waveform, compareUtil.colorMatrixBT601);
           }
-          var waveformY = waveform3D.Y601;
+          waveformY = waveform3D.Y601;
         } else { // 1:bt709
           if (waveform3D.Y709 === undefined) {
             waveform3D.Y709 = makeWaveformY(w * h, waveform, compareUtil.colorMatrixBT709);
           }
-          var waveformY = waveform3D.Y709;
+          waveformY = waveform3D.Y709;
         }
       }
-      var distMax = w * h * 1; // common for all type;
-      var dist = new Uint32Array(320 * 320);
-      var colorMap = new Float32Array(320 * 320 * 3);
-      var vertices3DCube = compareUtil.vertexUtil.makeCube(h, w, 256);
-      var scale = 256 / Math.max(w, h);
-      var rotation = compareUtil.makeRotationCoefs(rotationController.orientation, scale, scale, 1);
-      var xr = rotation.xr, yr = rotation.yr;
-      var xg = rotation.xg, yg = rotation.yg;
-      var yb = rotation.yb;
-      var org = rotation.pos3DTo2D(-0.5 * (h - 1), -0.5 * (w - 1), -127.5);
-      var toLinear = compareUtil.srgb255ToLinear8;
-      var r, g, b;
-      var getZValue =
+      const distMax = w * h * 1; // common for all type;
+      const dist = new Uint32Array(320 * 320);
+      const colorMap = new Float32Array(320 * 320 * 3);
+      const vertices3DCube = compareUtil.vertexUtil.makeCube(h, w, 256);
+      const scale = 256 / Math.max(w, h);
+      const rotation = compareUtil.makeRotationCoefs(rotationController.orientation, scale, scale, 1);
+      const xr = rotation.xr, yr = rotation.yr;
+      const xg = rotation.xg, yg = rotation.yg;
+      const yb = rotation.yb;
+      const org = rotation.pos3DTo2D(-0.5 * (h - 1), -0.5 * (w - 1), -127.5);
+      const toLinear = compareUtil.srgb255ToLinear8;
+      let r, g, b;
+      const getZValue =
           type === 0 ? function(k) { return waveformY[k]; } :
           type === 1 ? function() { return r; } :
           type === 2 ? function() { return g; } :
@@ -3347,17 +3348,17 @@ $( function() {
           type === 4 ? function() { return toLinear[r]; } :
           type === 5 ? function() { return toLinear[g]; } :
           function() { return toLinear[b]; };
-      for (var y = 0, k = 0; y < h; y += 1) {
-        var plotx0 = org[0] + xr * y;
-        var ploty0 = org[1] + yr * y;
-        for (var x = 0; x < w; x += 1, k += 1) {
+      for (let y = 0, k = 0; y < h; y += 1) {
+        let plotx0 = org[0] + xr * y;
+        let ploty0 = org[1] + yr * y;
+        for (let x = 0; x < w; x += 1, k += 1) {
           r = waveform[k * 3];
           g = waveform[k * 3 + 1];
           b = waveform[k * 3 + 2];
-          var c = getZValue(k);
-          var plotx = Math.floor(plotx0);
-          var ploty = Math.floor(ploty0 + yb * c);
-          var offset = ploty * 320 + plotx;
+          const c = getZValue(k);
+          const plotx = Math.floor(plotx0);
+          const ploty = Math.floor(ploty0 + yb * c);
+          const offset = ploty * 320 + plotx;
           dist[offset] += 1;
           colorMap[offset] += r;
           colorMap[offset + 102400] += g;
@@ -3366,16 +3367,16 @@ $( function() {
           ploty0 += yg;
         }
       }
-      var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
+      const bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       context.putImageData(bits, 0, 0);
-      var vbox = '0 0 320 320';
-      var v = rotation.vertices3DTo2D(vertices3DCube);
+      const vbox = '0 0 320 320';
+      const v = rotation.vertices3DTo2D(vertices3DCube);
       drawVerticalColorBar(context, v, colorStopsForType[type]);
-      var lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, compareUtil.vertexUtil.cubeFaces);
-      var axesDesc = makeAxesDesc(v, lines.frontFaces);
-      var grayAxesDesc = makeAxesDesc(v, lines.backFaces);
-      var s = 12 / scale;
-      var labels = [
+      const lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, compareUtil.vertexUtil.cubeFaces);
+      const axesDesc = makeAxesDesc(v, lines.frontFaces);
+      const grayAxesDesc = makeAxesDesc(v, lines.backFaces);
+      const s = 12 / scale;
+      const labels = [
           { pos: [-h/2-s, -w/2-s, -140], text: 'O', color: '#888', hidden: (xr < 0 && 0 < yr && 0 < xg) },
           { pos: [h/2+s, -w/2-s, -140], text: 'y', color: '#08f', hidden: (xr < 0 && yr < 0 && xg < 0) },
           { pos: [-h/2-s, w/2+s, -140], text: 'x', color: '#08f', hidden: (0 < xg && yg < 0 && 0 < yr) },
@@ -3400,9 +3401,9 @@ $( function() {
       updateAxesLabels(fig.axes, labels, rotation);
     };
     const redrawFigureAll = function() {
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         if (img.waveform3D) {
-          var fig = {
+          const fig = {
             canvas : img.waveform3DFig,
             context : img.waveform3DFig.getContext('2d'),
             axes : img.waveform3DFigAxes
@@ -3412,7 +3413,7 @@ $( function() {
       }
     };
     const createFigure = function(img) {
-      var fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = figureUtil.makeBlankFigure(320, 320);
       if (img.waveform3D) {
         makeFigure(fig, img.waveform3D);
       }
@@ -3421,7 +3422,7 @@ $( function() {
     };
     const updateFigure = function(img) {
       if (img === undefined) {
-        for (var i = 0; img = images[i]; i++) {
+        for (let i = 0; img = images[i]; i++) {
           createFigure(img);
         }
       } else {
@@ -3430,22 +3431,22 @@ $( function() {
       updateTable();
     };
     const updateTable = function(transformOnly) {
-      var w = 320, h = 320, margin = 10;
-      var styles = makeFigureStyles(w, h, margin, '#444');
-      var scale = rotationController.getScale();
+      const w = 320, h = 320, margin = 10;
+      const styles = makeFigureStyles(w, h, margin, '#444');
+      const scale = rotationController.getScale();
       styles.style.transform += ' scale(' + scale + ')';
       updateFigureTable('#waveform3DTable', 'waveform3DFig', updateAsync, styles, transformOnly);
     };
-    var toggle = dialogUtil.defineDialog($('#waveform3D'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#waveform3D'), updateTable, toggleAnalysis, {
       onOpen: rotationController.resetZoom
     });
-    var rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
+    const rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
     rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
       setDragStateClass('#waveform3D', dragging, horizontal);
     });
     return {
-      updateFigure: updateFigure,
-      toggle: toggle,
+      updateFigure,
+      toggle,
       processKeyDown: rotationInputFilter.processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
