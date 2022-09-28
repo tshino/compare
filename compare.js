@@ -2870,31 +2870,31 @@ $( function() {
     });
   };
   // 3D Color Distribution
-  var colorDistDialog = (function() {
-    var colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
+  const colorDistDialog = (function() {
+    const colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       invalidateAssets();
       updateFigure();
       updateAuxOption();
     });
-    var colorMode = makeToggleSwitch('#colorDistColor', true, function() {
+    const colorMode = makeToggleSwitch('#colorDistColor', true, function() {
       invalidateAssets();
       updateFigure();
     });
-    var colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
+    const colorDistAuxType = makeModeSwitch('#colorDistAuxType', 0, function(type) {
       invalidateAssets();
       updateFigure();
     });
-    var colorDistAuxType2 = makeModeSwitch('#colorDistAuxType2', 0, function(type) {
+    const colorDistAuxType2 = makeModeSwitch('#colorDistAuxType2', 0, function(type) {
       invalidateAssets();
       updateFigure();
     });
-    var TYPE_RGB = 0;
-    var TYPE_HSV = 1;
-    var TYPE_HSL = 2;
-    var TYPE_YCbCr = 3;
-    var TYPE_CIExyY = 4;
+    const TYPE_RGB = 0;
+    const TYPE_HSV = 1;
+    const TYPE_HSL = 2;
+    const TYPE_YCbCr = 3;
+    const TYPE_CIExyY = 4;
     const updateAuxOption = function() {
-      var currentType = colorDistType.current();
+      const currentType = colorDistType.current();
       if (currentType === TYPE_RGB ||
           currentType === TYPE_HSV ||
           currentType === TYPE_HSL) {
@@ -2915,14 +2915,14 @@ $( function() {
         index:    [img.index]
       }, attachImageDataToTask);
     };
-    var rotationController = compareUtil.makeRotationController(
+    const rotationController = compareUtil.makeRotationController(
       function() { redrawFigureAll(); },
       function() { updateTable(/* transformOnly = */ true); },
       { x: 20, y: -60 }
     );
-    var vertices3DCube = compareUtil.vertexUtil.makeCube(256, 256, 256);
-    var cubeFaces = compareUtil.vertexUtil.cubeFaces;
-    var verticesCylinder = compareUtil.vertexUtil.make3DCylinder(128, 256);
+    const vertices3DCube = compareUtil.vertexUtil.makeCube(256, 256, 256);
+    const cubeFaces = compareUtil.vertexUtil.cubeFaces;
+    const verticesCylinder = compareUtil.vertexUtil.make3DCylinder(128, 256);
     const makeVertices3DYCbCr = function(mat) {
       const p3d = function(r, g, b, z) {
         return [
@@ -2946,17 +2946,17 @@ $( function() {
         p3d(256, 0, 256, 256)
       ]);
     };
-    var vertices3DYCbCr601 = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
-    var vertices3DYCbCr709 = makeVertices3DYCbCr(compareUtil.colorMatrixBT709);
-    var facesYCbCr = cubeFaces.concat([
+    const vertices3DYCbCr601 = makeVertices3DYCbCr(compareUtil.colorMatrixBT601);
+    const vertices3DYCbCr709 = makeVertices3DYCbCr(compareUtil.colorMatrixBT709);
+    const facesYCbCr = cubeFaces.concat([
       [18, 23, 20, 22, 19, 21, 18], // lower hexagon
       [24, 27, 25, 28, 26, 29, 24] // upper hexagon
     ]);
-    var darkLinesYCbCr = [
+    const darkLinesYCbCr = [
       [2, 14], [6, 10], [8, 9], [3, 15], [7, 11],
       [18, 24], [21, 27], [19, 25], [22, 28], [20, 26], [23, 29]
     ];
-    var vertices3DCIEXyy = vertices3DCube.concat([
+    const vertices3DCIEXyy = vertices3DCube.concat([
       [244.8 - 128, 126.2 - 128, -128], // lower chromaticity points
       [114.8 - 128, 229.5 - 128, -128],
       [57.4 - 128, 23 - 128, -128],
@@ -2964,20 +2964,20 @@ $( function() {
       [114.8 - 128, 229.5 - 128, 128],
       [57.4 - 128, 23 - 128, 128]
     ]);
-    var facesCIEXyy = cubeFaces.concat([
+    const facesCIEXyy = cubeFaces.concat([
       [18, 20, 19, 18], [21, 22, 23, 21]
     ]);
-    var darkLinesCIEXyy = [
+    const darkLinesCIEXyy = [
       [10, 14], [11, 15], // diagonal
       [18, 21], [19, 22], [20, 23]
     ];
-    var assets = null;
+    let assets = null;
     const invalidateAssets = function() {
       assets = null;
     };
     const updateAssets = function() {
       if (assets === null) {
-        var currentType = colorDistType.current();
+        const currentType = colorDistType.current();
         assets = {};
         if (currentType === TYPE_RGB) {
           assets.vertices3D = vertices3DCube;
@@ -3022,7 +3022,7 @@ $( function() {
             { pos: [-80, -140, -140], text: 'H=240', color: '#00f', hidden: false }
           ];
           assets.updateLabelsVisibility = function(labels, rotation) {
-            var xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
+            const xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
             labels[2].hidden = (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg));
             labels[3].hidden = (-xr*1.73-xg < 0 && yb * 4 < yg*1.73-yr && yg*1.73-yr < -4 * Math.abs(-yr*1.73-yg));
             labels[4].hidden = (-xr*1.73+xg > 0 && yb * 4 < yg*-1.73-yr && yg*-1.73-yr < -4 * Math.abs(-yr*1.73+yg));
@@ -3035,7 +3035,7 @@ $( function() {
             { pos: [0, 140, -140], text: 'Cr', color: '#08f', hidden: false }
           ];
           assets.updateLabelsVisibility = function(labels, rotation) {
-            var xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
+            const xr = rotation.xr, yr = rotation.yr, xg = rotation.xg, yg = rotation.yg, yb = rotation.yb;
             labels[2].hidden = (xg < 0 && yb * 2 < yr && yr < -2 * Math.abs(yg));
             labels[3].hidden = (0 < xr && yb * 2 < yg && yg < -2 * Math.abs(yr));
           };
@@ -3053,18 +3053,19 @@ $( function() {
       }
     };
     const makeFigure = function(fig, colorTable) {
-      var context = fig.context;
-      var distMax = colorTable.totalCount;
-      var dist = new Uint32Array(320 * 320);
+      const context = fig.context;
+      const distMax = colorTable.totalCount;
+      const dist = new Uint32Array(320 * 320);
+      let colorMap = null;
       if (colorMode.current() === true) { // RGB with Color
-        var colorMap = new Float32Array(320 * 320 * 3);
+        colorMap = new Float32Array(320 * 320 * 3);
       }
-      var colors = colorTable.colors;
-      var counts = colorTable.counts;
-      var rotation = compareUtil.makeRotationCoefs(rotationController.orientation);
-      var rgbColors = colors;
-      var convertOption = null;
-      var currentType = colorDistType.current();
+      let colors = colorTable.colors;
+      const counts = colorTable.counts;
+      const rotation = compareUtil.makeRotationCoefs(rotationController.orientation);
+      const rgbColors = colors;
+      let convertOption = null;
+      const currentType = colorDistType.current();
       if (currentType === TYPE_RGB) {
         convertOption = colorDistAuxType.current() === 0 ?
             null :
@@ -3086,39 +3087,40 @@ $( function() {
         }
         colors = colorTable[convertOption[0]];
       }
+      let coef_r, coef_g, coef_b;
       if (currentType === TYPE_RGB ||
           currentType === TYPE_HSV ||
           currentType === TYPE_HSL ||
           currentType === TYPE_CIExyY) {
-        var coef_r = rotation.vec3DTo2D(1, 0, 0);
-        var coef_g = rotation.vec3DTo2D(0, 1, 0);
-        var coef_b = rotation.vec3DTo2D(0, 0, 1);
+        coef_r = rotation.vec3DTo2D(1, 0, 0);
+        coef_g = rotation.vec3DTo2D(0, 1, 0);
+        coef_b = rotation.vec3DTo2D(0, 0, 1);
       } else { // TYPE_YCbCr
         var mat = colorDistAuxType2.current() === 0 ?
             compareUtil.colorMatrixBT601 :
             compareUtil.colorMatrixBT709;
-        var coef_r = rotation.vec3DTo2D(mat[1][0], mat[2][0], mat[0][0]);
-        var coef_g = rotation.vec3DTo2D(mat[1][1], mat[2][1], mat[0][1]);
-        var coef_b = rotation.vec3DTo2D(mat[1][2], mat[2][2], mat[0][2]);
+        coef_r = rotation.vec3DTo2D(mat[1][0], mat[2][0], mat[0][0]);
+        coef_g = rotation.vec3DTo2D(mat[1][1], mat[2][1], mat[0][1]);
+        coef_b = rotation.vec3DTo2D(mat[1][2], mat[2][2], mat[0][2]);
       }
-      var coef_xr = coef_r[0], coef_yr = coef_r[1];
-      var coef_xg = coef_g[0], coef_yg = coef_g[1];
-      var coef_xb = coef_b[0], coef_yb = coef_b[1];
-      var org_x = 160 - 127.5 * (coef_xr + coef_xg + coef_xb);
-      var org_y = 160 - 127.5 * (coef_yr + coef_yg + coef_yb);
+      const coef_xr = coef_r[0], coef_yr = coef_r[1];
+      const coef_xg = coef_g[0], coef_yg = coef_g[1];
+      const coef_xb = coef_b[0], coef_yb = coef_b[1];
+      const org_x = 160 - 127.5 * (coef_xr + coef_xg + coef_xb);
+      const org_y = 160 - 127.5 * (coef_yr + coef_yg + coef_yb);
       const colorToOffset = function(r, g, b) {
-        var plotx = Math.floor(org_x + coef_xr * r + coef_xg * g + coef_xb * b);
-        var ploty = Math.floor(org_y + coef_yr * r + coef_yg * g + coef_yb * b);
-        var offset = ploty * 320 + plotx;
+        const plotx = Math.floor(org_x + coef_xr * r + coef_xg * g + coef_xb * b);
+        const ploty = Math.floor(org_y + coef_yr * r + coef_yg * g + coef_yb * b);
+        const offset = ploty * 320 + plotx;
         return offset;
       };
-      for (var k = 0, n = colors.length; k < n; k += 1) {
-        var rgb = colors[k];
-        var r = rgb >> 16;
-        var g = (rgb >> 8) & 255;
-        var b = rgb & 255;
-        var offset = colorToOffset(r, g, b);
-        var count = counts[k];
+      for (let k = 0, n = colors.length; k < n; k += 1) {
+        let rgb = colors[k];
+        let r = rgb >> 16;
+        let g = (rgb >> 8) & 255;
+        let b = rgb & 255;
+        const offset = colorToOffset(r, g, b);
+        const count = counts[k];
         dist[offset] += count;
         if (colorMap) { // RGB with Color
           if (rgbColors !== colors) {
@@ -3132,21 +3134,22 @@ $( function() {
           colorMap[offset + 204800] += count * b;
         }
       }
+      let bits;
       if (colorMap) { // RGB with Color
-        var bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
+        bits = makeDistributionImageDataRGBA(context, 320, 320, dist, colorMap, distMax, 255);
       } else { // RGB without Color
-        var bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
+        bits = makeDistributionImageData(context, 320, 320, dist, distMax, 255, 1);
       }
       context.putImageData(bits, 0, 0);
-      var vbox = '0 0 320 320';
+      const vbox = '0 0 320 320';
       updateAssets();
-      var v = rotation.vertices3DTo2D(assets.vertices3D);
-      var faces = assets.makeFaces(rotation);
-      var lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, faces);
-      var darkLines = lines.backFaces.concat(assets.darkLines);
-      var whiteLines = lines.frontFaces.concat(assets.makeAdditionalWhiteLines(rotation));
-      var axesDesc = makeAxesDesc(v, whiteLines);
-      var grayAxesDesc = makeAxesDesc(v, darkLines);
+      const v = rotation.vertices3DTo2D(assets.vertices3D);
+      const faces = assets.makeFaces(rotation);
+      const lines = compareUtil.rotationUtil.splitIntoFrontAndBackFaces(v, faces);
+      const darkLines = lines.backFaces.concat(assets.darkLines);
+      const whiteLines = lines.frontFaces.concat(assets.makeAdditionalWhiteLines(rotation));
+      const axesDesc = makeAxesDesc(v, whiteLines);
+      const grayAxesDesc = makeAxesDesc(v, darkLines);
       assets.updateLabelsVisibility(assets.labels, rotation);
       if (!fig.axes) {
         fig.axes = makeAxesSVG(vbox, assets.labels, axesDesc, grayAxesDesc);
@@ -3157,9 +3160,9 @@ $( function() {
       updateAxesLabels(fig.axes, assets.labels, rotation);
     };
     const redrawFigureAll = function() {
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         if (img.colorTable) {
-          var fig = {
+          const fig = {
             canvas : img.colorDist,
             context : img.colorDist.getContext('2d'),
             axes : img.colorDistAxes
@@ -3169,7 +3172,7 @@ $( function() {
       }
     };
     const createFigure = function(img) {
-      var fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = figureUtil.makeBlankFigure(320, 320);
       if (img.colorTable) {
         makeFigure(fig, img.colorTable);
       }
@@ -3178,7 +3181,7 @@ $( function() {
     };
     const updateFigure = function(img) {
       if (img === undefined) {
-        for (var i = 0; img = images[i]; i++) {
+        for (let i = 0; img = images[i]; i++) {
           createFigure(img);
         }
       } else {
@@ -3187,16 +3190,16 @@ $( function() {
       updateTable();
     };
     const updateTable = function(transformOnly) {
-      var w = 320, h = 320, margin = 10;
-      var styles = makeFigureStyles(w, h, margin, '#444');
-      var scale = rotationController.getScale();
+      const w = 320, h = 320, margin = 10;
+      const styles = makeFigureStyles(w, h, margin, '#444');
+      const scale = rotationController.getScale();
       styles.style.transform += ' scale(' + scale + ')';
       updateFigureTable('#colorDistTable', 'colorDist', updateAsync, styles, transformOnly);
     };
-    var toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#colorDist'), updateTable, toggleAnalysis, {
       onOpen: rotationController.resetZoom
     });
-    var rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
+    const rotationInputFilter = compareUtil.makeRotationInputFilter(rotationController);
     rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
       setDragStateClass('#colorDist', dragging, horizontal);
     });
@@ -3208,9 +3211,9 @@ $( function() {
       return rotationInputFilter.processKeyDown(e);
     };
     return {
-      updateFigure: updateFigure,
-      toggle: toggle,
-      processKeyDown: processKeyDown,
+      updateFigure,
+      toggle,
+      processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
   })();
