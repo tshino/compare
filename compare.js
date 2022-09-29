@@ -39,19 +39,7 @@ $( function() {
     }
   });
 
-  // Menus and dialogs
-  $('#infobtn').click(infoDialog.toggle);
-  $('#histogrambtn').click(histogramDialog.toggle);
-  $('#waveformbtn').click(waveformDialog.toggle);
-  $('#vectorscopebtn').click(vectorscopeDialog.toggle);
-  $('#colordistbtn').click(colorDistDialog.toggle);
-  $('#waveform3Dbtn').click(waveform3DDialog.toggle);
-  $('#colorfreqbtn').click(colorFreqDialog.toggle);
-  $('#metricsbtn').click(metricsDialog.toggle);
-  $('#tonecurvebtn').click(toneCurveDialog.toggle);
-  $('#opticalflowbtn').click(opticalFlowDialog.toggle);
-  $('#diffbtn').click(diffDialog.toggle);
-  $('.swapbtn').click(swapBaseAndTargetImage);
+  setupMenusAndDialogs();
 
   $(window).resize(viewManagement.onResize);
   const onKeyDownOnDialogs = function(e) {
@@ -257,11 +245,6 @@ $( function() {
     }
     //alert('keypress: '+e.which);
   });
-  
-  viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
-  figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
-  colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
-  waveform3DDialog.enableMouseAndTouch('#waveform3D', 'td.fig', 'td.fig > *');
 
   crossCursor.addObserver(
     null,
@@ -5204,4 +5187,24 @@ $( function() {
     viewManagement.resetLayoutState();
     updateDOM();
     nowLoadingDialog.update();
+  };
+
+  const setupMenusAndDialogs = function() {
+    $('#infobtn').click(infoDialog.toggle);
+    $('#histogrambtn').click(histogramDialog.toggle);
+    $('#waveformbtn').click(waveformDialog.toggle);
+    $('#vectorscopebtn').click(vectorscopeDialog.toggle);
+    $('#colordistbtn').click(colorDistDialog.toggle);
+    $('#waveform3Dbtn').click(waveform3DDialog.toggle);
+    $('#colorfreqbtn').click(colorFreqDialog.toggle);
+    $('#metricsbtn').click(metricsDialog.toggle);
+    $('#tonecurvebtn').click(toneCurveDialog.toggle);
+    $('#opticalflowbtn').click(opticalFlowDialog.toggle);
+    $('#diffbtn').click(diffDialog.toggle);
+    $('.swapbtn').click(swapBaseAndTargetImage);
+
+    viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
+    figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
+    colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
+    waveform3DDialog.enableMouseAndTouch('#waveform3D', 'td.fig', 'td.fig > *');
   };
