@@ -1,49 +1,5 @@
 ﻿const compareUtil = CompareUtil(window);
 
-$( function() {
-  // Drag & Drop and file selection
-  $(document.body).on('dragover', function(e) {
-    e.originalEvent.dataTransfer.dropEffect = 'copy';
-    return false;
-  });
-  $(document.body).on('drop', function(e) {
-    addFiles(e.originalEvent.dataTransfer.files);
-    return false;
-  });
-  $('#file').on('change', function(e) {
-    addFiles(e.target.files);
-    e.target.value = null;
-  });
-  $('#view .dropHere').click(function() {
-    $('#file').click();
-  });
-  // Paste clipboard image on the page (Ctrl+V)
-  $(document.body).on('paste', function(e) {
-    const data = e.originalEvent.clipboardData;
-    if (data && data.items) {
-      const files = [];
-      for (let i = 0, item; item = data.items[i]; i++) {
-        const file = item.getAsFile();
-        if (file) {
-          files.push(file);
-        }
-      }
-      if (0 < files.length) {
-        addFiles(files);
-        return false;
-      }
-    }
-  });
-
-  setupWindowLevelEventListeners();
-  setupMenusAndDialogs();
-
-  hud.initialize();
-  colorHUD.initialize();
-
-  updateDOM();
-});
-
   const entries = [];
   let images = [];
   const viewZoom = compareUtil.makeZoomController(updateTransform, {
@@ -4935,6 +4891,42 @@ $( function() {
     nowLoadingDialog.update();
   };
 
+  const setupDocumentLevelEventListeners = function() {
+    // Drag & Drop and file selection
+    $(document.body).on('dragover', function(e) {
+      e.originalEvent.dataTransfer.dropEffect = 'copy';
+      return false;
+    });
+    $(document.body).on('drop', function(e) {
+      addFiles(e.originalEvent.dataTransfer.files);
+      return false;
+    });
+    $('#file').on('change', function(e) {
+      addFiles(e.target.files);
+      e.target.value = null;
+    });
+    $('#view .dropHere').click(function() {
+      $('#file').click();
+    });
+    // Paste clipboard image on the page (Ctrl+V)
+    $(document.body).on('paste', function(e) {
+      const data = e.originalEvent.clipboardData;
+      if (data && data.items) {
+        const files = [];
+        for (let i = 0, item; item = data.items[i]; i++) {
+          const file = item.getAsFile();
+          if (file) {
+            files.push(file);
+          }
+        }
+        if (0 < files.length) {
+          addFiles(files);
+          return false;
+        }
+      }
+    });
+  };
+
   const setupMenusAndDialogs = function() {
     $('#infobtn').click(infoDialog.toggle);
     $('#histogrambtn').click(histogramDialog.toggle);
@@ -5206,3 +5198,14 @@ $( function() {
       //alert('keypress: '+e.which);
     });
   };
+
+$(function() {
+  setupDocumentLevelEventListeners();
+  setupWindowLevelEventListeners();
+  setupMenusAndDialogs();
+
+  hud.initialize();
+  colorHUD.initialize();
+
+  updateDOM();
+});
