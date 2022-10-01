@@ -1,10 +1,6 @@
 ﻿const compareUtil = CompareUtil(window);
 
 $( function() {
-  // Check for the various File API support.
-  if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
-    alert('The File APIs are not fully supported in this browser.');
-  }
   // Drag & Drop and file selection
   $(document.body).on('dragover', function(e) {
     e.originalEvent.dataTransfer.dropEffect = 'copy';
