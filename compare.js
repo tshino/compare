@@ -42,52 +42,6 @@ $( function() {
   setupWindowLevelEventListeners();
   setupMenusAndDialogs();
 
-  crossCursor.addObserver(
-    null,
-    function(pointChanged) {
-      const pos = crossCursor.getNormalizedPosition();
-      if (pos.isInView) {
-        viewZoom.setZoomOrigin(pos);
-      } else {
-        viewZoom.resetZoomOrigin();
-      }
-    },
-    function() {
-      viewZoom.resetZoomOrigin();
-    }
-  );
-  const updateNavBox = function() {
-    if (1 <= images.length && !dialog) {
-      $('#navBox').show();
-    } else {
-      $('#navBox').hide();
-    }
-  };
-  dialogUtil.addObserver(updateNavBox, updateNavBox);
-  viewZoom.setPointCallback(function(e) {
-    if (entries[e.index].ready()) {
-      crossCursor.enable();
-      crossCursor.processClick(e);
-    }
-  });
-  viewZoom.setDragStateCallback(function(dragging, horizontal) {
-    setDragStateClass('#view', dragging, horizontal);
-  });
-  $('#view').on('mousemove', 'div.imageBox .image', function(e) {
-    const selector = '#view > div.imageBox';
-    return crossCursor.processMouseMove(e, selector, this);
-  });
-  figureZoom.setPointCallback(function(e) {
-    if ($('#histogram').is(':visible')) {
-      histogramDialog.processClick(e);
-    } else if ($('#opticalFlow').is(':visible')) {
-      opticalFlowDialog.processClick(e);
-    }
-  });
-  figureZoom.setDragStateCallback(function(dragging, horizontal) {
-    setDragStateClass('div.dialog', dragging, horizontal);
-  });
-
   hud.initialize();
   colorHUD.initialize();
 
@@ -5003,6 +4957,52 @@ $( function() {
     figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
     colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
     waveform3DDialog.enableMouseAndTouch('#waveform3D', 'td.fig', 'td.fig > *');
+
+    crossCursor.addObserver(
+      null,
+      function(pointChanged) {
+        const pos = crossCursor.getNormalizedPosition();
+        if (pos.isInView) {
+          viewZoom.setZoomOrigin(pos);
+        } else {
+          viewZoom.resetZoomOrigin();
+        }
+      },
+      function() {
+        viewZoom.resetZoomOrigin();
+      }
+    );
+    const updateNavBox = function() {
+      if (1 <= images.length && !dialog) {
+        $('#navBox').show();
+      } else {
+        $('#navBox').hide();
+      }
+    };
+    dialogUtil.addObserver(updateNavBox, updateNavBox);
+    viewZoom.setPointCallback(function(e) {
+      if (entries[e.index].ready()) {
+        crossCursor.enable();
+        crossCursor.processClick(e);
+      }
+    });
+    viewZoom.setDragStateCallback(function(dragging, horizontal) {
+      setDragStateClass('#view', dragging, horizontal);
+    });
+    $('#view').on('mousemove', 'div.imageBox .image', function(e) {
+      const selector = '#view > div.imageBox';
+      return crossCursor.processMouseMove(e, selector, this);
+    });
+    figureZoom.setPointCallback(function(e) {
+      if ($('#histogram').is(':visible')) {
+        histogramDialog.processClick(e);
+      } else if ($('#opticalFlow').is(':visible')) {
+        opticalFlowDialog.processClick(e);
+      }
+    });
+    figureZoom.setDragStateCallback(function(dragging, horizontal) {
+        setDragStateClass('div.dialog', dragging, horizontal);
+    });
   };
 
   const setupWindowLevelEventListeners = function() {
