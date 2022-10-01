@@ -39,212 +39,8 @@ $( function() {
     }
   });
 
+  setupWindowLevelEventListeners();
   setupMenusAndDialogs();
-
-  $(window).resize(viewManagement.onResize);
-  const onKeyDownOnDialogs = function(e) {
-        if (e.ctrlKey || e.altKey || e.metaKey) {
-          return true;
-        }
-        // BS (8)
-        if (e.keyCode === 8 && !e.shiftKey) {
-          dialog.close();
-          return false;
-        }
-        // '1' - '9' (48-57 or 96-105 for numpad)
-        if ((49 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
-            (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
-          const num = e.keyCode % 48;
-          const sw = $(dialog.element).find('.mode-sw').eq(0).children('button:nth-child('+num+')');
-          if (sw.length === 1) {
-            sw.click();
-            return false;
-          }
-          const index = viewManagement.indexFromNumber(num);
-          if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
-              index !== null && changeTargetImage(index)) {
-            dialog.update();
-            return false;
-          }
-        }
-        if ($('#vectorscope').is(':visible')) {
-          if (false === vectorscopeDialog.processKeyDown(e)) {
-            return false;
-          }
-        }
-        if ($('#colorDist').is(':visible')) {
-          if (false === colorDistDialog.processKeyDown(e)) {
-            return false;
-          }
-        }
-        if ($('#waveform3D').is(':visible')) {
-          if (false === waveform3DDialog.processKeyDown(e)) {
-            return false;
-          }
-        }
-        // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
-        if (false === figureZoom.processKeyDown(e)) {
-          return false;
-        }
-        return true;
-  };
-  const onKeyDownOnViews = function(e) {
-      if (e.altKey || e.metaKey) {
-        return true;
-      }
-      const shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
-      // '0' - '9' (48-57 or 96-105 for numpad)
-      if ((48 <= e.keyCode && e.keyCode <= 57 && shift === '') ||
-          (96 <= e.keyCode && e.keyCode <= 105 && shift === '')) {
-        const number = e.keyCode % 48;
-        if (number === 0) {
-          viewManagement.toAllImageView();
-        } else {
-          const index = viewManagement.indexFromNumber(number);
-          if (index !== null) {
-            viewManagement.toggleSingleView(index);
-          }
-        }
-        return false;
-      }
-      // Cross cursor (cursor key)
-      if (false === crossCursor.processKeyDown(e)) {
-        return false;
-      }
-      // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
-      if (false === viewZoom.processKeyDown(e)) {
-        return false;
-      }
-      // View switching: Cursor keys
-      if ((37 <= e.keyCode || e.keyCode <= 40) &&
-          ((viewZoom.scale === 1 && shift === '') || shift === 'c')) {
-        if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
-          if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
-            return false;
-          }
-        } else if (e.keyCode === 38 && !viewManagement.isSingleView()) { // Up
-          viewManagement.toggleSingleView();
-          return false;
-        } else if (e.keyCode === 40 && viewManagement.isSingleView()) { // Down
-          viewManagement.toAllImageView();
-          return false;
-        }
-      }
-      // View switching: TAB (9)
-      if (e.keyCode === 9 && (shift === '' || shift === 's')) {
-        if (false === viewManagement.flipSingleView(shift === '')) {
-          return false;
-        }
-      }
-      // ESC (27)
-      if (e.keyCode === 27 && shift === '') {
-        if (crossCursor.isEnabled()) {
-          crossCursor.disable();
-        } else if (altView.active()) {
-          altView.reset();
-          updateDOM();
-        } else {
-          viewManagement.resetLayoutState();
-          resetMouseDrag();
-          updateLayout();
-        }
-        return false;
-      }
-      // Delete (46)
-      if (e.keyCode === 46 && shift === '' && 0 < images.length) {
-        const index = viewManagement.getCurrentIndexOr(images[0].index);
-        removeEntry(index);
-        return false;
-      }
-      //alert('keydown: '+e.keyCode);
-  };
-  $(window).keydown(function(e) {
-      if (e.altKey || e.metaKey) {
-        return true;
-      }
-      // ESC (27)
-      if (dialog && e.keyCode === 27 && !e.shiftKey && !e.ctrlKey) {
-        dialog.close();
-        return false;
-      }
-      if (e.target.localName === 'input') {
-        return true;
-      }
-      if (dialog) {
-        return onKeyDownOnDialogs(e);
-      } else {
-        return onKeyDownOnViews(e);
-      }
-  });
-  
-  const keypressMap = {
-    // '@' (64)
-    64 : { global: true, func: textUtil.toggleLang },
-    // '?' (63)
-    63 : { global: true, func: toggleHelp },
-    // 's' (115)
-    115 : { global: true, func: settings.toggle },
-    // 'f' (102)
-    102 : { global: true, func: toggleFullscreen },
-    // 'C' (67)
-    67 : { global: true, func: cameraDialog.toggle },
-    // 'a' (97)
-    97 : { global: true, func: toggleAnalysis },
-    // 'h' (104)
-    104 : { global: true, func: histogramDialog.toggle },
-    // 'w' (119)
-    119 : { global: true, func: waveformDialog.toggle },
-    // 'v' (118)
-    118 : { global: true, func: vectorscopeDialog.toggle },
-    // 'c' (99)
-    99 : { global: true, func: colorDistDialog.toggle },
-    // 'W' (87)
-    87 : { global: true, func: waveform3DDialog.toggle },
-    // 'm' (109)
-    109 : { global: true, func: metricsDialog.toggle },
-    // 't' (116)
-    116 : { global: true, func: toneCurveDialog.toggle },
-    // 'o' (111)
-    111 : { global: true, func: opticalFlowDialog.toggle },
-    // 'd' (100)
-    100 : { global: true, func: diffDialog.toggle },
-    // 'i' (105)
-    105 : { global: true, func: infoDialog.toggle },
-    // '/' (47)
-    47 : { global: false, func: viewManagement.arrangeLayout },
-    // 'O' (79)
-    79: { global: false, func: viewManagement.toggleOverlay },
-    // 'n' (110)
-    110 : { global: false, func: roiMap.toggle },
-    // 'g' (103)
-    103 : { global: true, func: grid.toggle },
-    // 'p' (112)
-    112 : { global: false, func: crossCursor.toggle },
-    // 'q' (113)
-    113 : { global: false, func: altView.changeMode },
-    // 'Q' (81)
-    81 : { global: false, func: altView.changeModeReverse },
-    // 'l' (108)
-    108 : { global: false, func: altView.toggleContour },
-    // 'b' (98)
-    98 : { global: false, func: settings.openBGColor },
-    // 'u'
-    117 : { global: true, func: colorFreqDialog.toggle }
-  };
-  $(window).keypress(function(e) {
-    if (e.altKey || e.metaKey || e.target.localName === 'input') {
-      return true;
-    }
-    const m = keypressMap[e.which];
-    if (dialog && (!m || !m.global)) {
-      return true;
-    }
-    if (m) {
-      m.func();
-      return false;
-    }
-    //alert('keypress: '+e.which);
-  });
 
   crossCursor.addObserver(
     null,
@@ -5207,4 +5003,210 @@ $( function() {
     figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
     colorDistDialog.enableMouseAndTouch('#colorDist', 'td.fig', 'td.fig > *');
     waveform3DDialog.enableMouseAndTouch('#waveform3D', 'td.fig', 'td.fig > *');
+  };
+
+  const setupWindowLevelEventListeners = function() {
+    $(window).resize(viewManagement.onResize);
+    const onKeyDownOnDialogs = function(e) {
+        if (e.ctrlKey || e.altKey || e.metaKey) {
+          return true;
+        }
+        // BS (8)
+        if (e.keyCode === 8 && !e.shiftKey) {
+          dialog.close();
+          return false;
+        }
+        // '1' - '9' (48-57 or 96-105 for numpad)
+        if ((49 <= e.keyCode && e.keyCode <= 57 && !e.shiftKey) ||
+            (97 <= e.keyCode && e.keyCode <= 105 && !e.shiftKey)) {
+          const num = e.keyCode % 48;
+          const sw = $(dialog.element).find('.mode-sw').eq(0).children('button:nth-child('+num+')');
+          if (sw.length === 1) {
+            sw.click();
+            return false;
+          }
+          const index = viewManagement.indexFromNumber(num);
+          if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
+              index !== null && changeTargetImage(index)) {
+            dialog.update();
+            return false;
+          }
+        }
+        if ($('#vectorscope').is(':visible')) {
+          if (false === vectorscopeDialog.processKeyDown(e)) {
+            return false;
+          }
+        }
+        if ($('#colorDist').is(':visible')) {
+          if (false === colorDistDialog.processKeyDown(e)) {
+            return false;
+          }
+        }
+        if ($('#waveform3D').is(':visible')) {
+          if (false === waveform3DDialog.processKeyDown(e)) {
+            return false;
+          }
+        }
+        // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
+        if (false === figureZoom.processKeyDown(e)) {
+          return false;
+        }
+        return true;
+    };
+    const onKeyDownOnViews = function(e) {
+      if (e.altKey || e.metaKey) {
+        return true;
+      }
+      const shift = (e.shiftKey ? 's' : '') + (e.ctrlKey ? 'c' : '');
+      // '0' - '9' (48-57 or 96-105 for numpad)
+      if ((48 <= e.keyCode && e.keyCode <= 57 && shift === '') ||
+          (96 <= e.keyCode && e.keyCode <= 105 && shift === '')) {
+        const number = e.keyCode % 48;
+        if (number === 0) {
+          viewManagement.toAllImageView();
+        } else {
+          const index = viewManagement.indexFromNumber(number);
+          if (index !== null) {
+            viewManagement.toggleSingleView(index);
+          }
+        }
+        return false;
+      }
+      // Cross cursor (cursor key)
+      if (false === crossCursor.processKeyDown(e)) {
+        return false;
+      }
+      // Zooming ('+'/PageUp/'-'/PageDown/cursor key)
+      if (false === viewZoom.processKeyDown(e)) {
+        return false;
+      }
+      // View switching: Cursor keys
+      if ((37 <= e.keyCode || e.keyCode <= 40) &&
+          ((viewZoom.scale === 1 && shift === '') || shift === 'c')) {
+        if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
+          if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
+            return false;
+          }
+        } else if (e.keyCode === 38 && !viewManagement.isSingleView()) { // Up
+          viewManagement.toggleSingleView();
+          return false;
+        } else if (e.keyCode === 40 && viewManagement.isSingleView()) { // Down
+          viewManagement.toAllImageView();
+          return false;
+        }
+      }
+      // View switching: TAB (9)
+      if (e.keyCode === 9 && (shift === '' || shift === 's')) {
+        if (false === viewManagement.flipSingleView(shift === '')) {
+          return false;
+        }
+      }
+      // ESC (27)
+      if (e.keyCode === 27 && shift === '') {
+        if (crossCursor.isEnabled()) {
+          crossCursor.disable();
+        } else if (altView.active()) {
+          altView.reset();
+          updateDOM();
+        } else {
+          viewManagement.resetLayoutState();
+          resetMouseDrag();
+          updateLayout();
+        }
+        return false;
+      }
+      // Delete (46)
+      if (e.keyCode === 46 && shift === '' && 0 < images.length) {
+        const index = viewManagement.getCurrentIndexOr(images[0].index);
+        removeEntry(index);
+        return false;
+      }
+      //alert('keydown: '+e.keyCode);
+    };
+    $(window).keydown(function(e) {
+      if (e.altKey || e.metaKey) {
+        return true;
+      }
+      // ESC (27)
+      if (dialog && e.keyCode === 27 && !e.shiftKey && !e.ctrlKey) {
+        dialog.close();
+        return false;
+      }
+      if (e.target.localName === 'input') {
+        return true;
+      }
+      if (dialog) {
+        return onKeyDownOnDialogs(e);
+      } else {
+        return onKeyDownOnViews(e);
+      }
+    });
+    const keypressMap = {
+      // '@' (64)
+      64 : { global: true, func: textUtil.toggleLang },
+      // '?' (63)
+      63 : { global: true, func: toggleHelp },
+      // 's' (115)
+      115 : { global: true, func: settings.toggle },
+      // 'f' (102)
+      102 : { global: true, func: toggleFullscreen },
+      // 'C' (67)
+      67 : { global: true, func: cameraDialog.toggle },
+      // 'a' (97)
+      97 : { global: true, func: toggleAnalysis },
+      // 'h' (104)
+      104 : { global: true, func: histogramDialog.toggle },
+      // 'w' (119)
+      119 : { global: true, func: waveformDialog.toggle },
+      // 'v' (118)
+      118 : { global: true, func: vectorscopeDialog.toggle },
+      // 'c' (99)
+      99 : { global: true, func: colorDistDialog.toggle },
+      // 'W' (87)
+      87 : { global: true, func: waveform3DDialog.toggle },
+      // 'm' (109)
+      109 : { global: true, func: metricsDialog.toggle },
+      // 't' (116)
+      116 : { global: true, func: toneCurveDialog.toggle },
+      // 'o' (111)
+      111 : { global: true, func: opticalFlowDialog.toggle },
+      // 'd' (100)
+      100 : { global: true, func: diffDialog.toggle },
+      // 'i' (105)
+      105 : { global: true, func: infoDialog.toggle },
+      // '/' (47)
+      47 : { global: false, func: viewManagement.arrangeLayout },
+      // 'O' (79)
+      79: { global: false, func: viewManagement.toggleOverlay },
+      // 'n' (110)
+      110 : { global: false, func: roiMap.toggle },
+      // 'g' (103)
+      103 : { global: true, func: grid.toggle },
+      // 'p' (112)
+      112 : { global: false, func: crossCursor.toggle },
+      // 'q' (113)
+      113 : { global: false, func: altView.changeMode },
+      // 'Q' (81)
+      81 : { global: false, func: altView.changeModeReverse },
+      // 'l' (108)
+      108 : { global: false, func: altView.toggleContour },
+      // 'b' (98)
+      98 : { global: false, func: settings.openBGColor },
+      // 'u'
+      117 : { global: true, func: colorFreqDialog.toggle }
+    };
+    $(window).keypress(function(e) {
+      if (e.altKey || e.metaKey || e.target.localName === 'input') {
+        return true;
+      }
+      const m = keypressMap[e.which];
+      if (dialog && (!m || !m.global)) {
+        return true;
+      }
+      if (m) {
+        m.func();
+        return false;
+      }
+      //alert('keypress: '+e.which);
+    });
   };
