@@ -2304,21 +2304,21 @@
     return bits;
   };
   // Vectorscope
-  var vectorscopeDialog = (function() {
+  const vectorscopeDialog = (function() {
     const repaint = function() {
       discardTasksOfCommand('calcVectorscope');
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.vectorscope = null;
       }
       updateTable();
     };
-    var vectorscopeType = makeModeSwitch('#vectorscopeType', 0, function() {
+    const vectorscopeType = makeModeSwitch('#vectorscopeType', 0, function() {
       repaint();
       updateAuxOption();
     });
-    var colorMode = makeToggleSwitch('#vectorscopeColor', false, repaint);
-    var vectorscopeAuxType = makeModeSwitch('#vectorscopeAuxType', 0, repaint);
-    var vectorscopeAuxType2 = makeModeSwitch('#vectorscopeAuxType2', 0, repaint);
+    const colorMode = makeToggleSwitch('#vectorscopeColor', false, repaint);
+    const vectorscopeAuxType = makeModeSwitch('#vectorscopeAuxType', 0, repaint);
+    const vectorscopeAuxType2 = makeModeSwitch('#vectorscopeAuxType2', 0, repaint);
     const updateAuxOption = function() {
       if (vectorscopeType.current() === 0) { // 0:Cb-Cr
         $('#vectorscopeAuxType').hide();
@@ -2344,32 +2344,33 @@
       }, attachImageDataToTask);
     };
     const makeFigure = function(type, auxType2, color, fig, w, h, result) {
-      var context = fig.context;
+      const context = fig.context;
+      let bits;
       if (color) { // with color
-        var bits = makeDistributionImageDataRGBA(context, 320, 320, result.dist, result.colorMap, w * h, 255);
+        bits = makeDistributionImageDataRGBA(context, 320, 320, result.dist, result.colorMap, w * h, 255);
       } else {
-        var bits = makeDistributionImageData(context, 320, 320, result.dist, w * h, 255, 1);
+        bits = makeDistributionImageData(context, 320, 320, result.dist, w * h, 255, 1);
       }
       context.putImageData(bits, 0, 0);
       const srgbToLinear = function(c) {
         return c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
       };
-      var mat = auxType2 === 0 ?
+      const mat = auxType2 === 0 ?
             compareUtil.colorMatrixBT601 :  // 0: bt601
             compareUtil.colorMatrixBT709;   // 1: bt709
       const calcxy = function(r, g, b) {
         if (type === 0) { // Cb-Cr
-          var cb = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
-          var cr = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
+          const cb = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
+          const cr = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
           return { x: 159.5 + cb, y: 159.5 - cr };
         } else if (type === 1) { // x-y
           r = srgbToLinear(r / 255);
           g = srgbToLinear(g / 255);
           b = srgbToLinear(b / 255);
-          var x = 0.412391 * r + 0.357584 * g + 0.180481 * b;
-          var y = 0.212639 * r + 0.715169 * g + 0.072192 * b;
-          var z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
-          var xyz = x + y + z;
+          const x = 0.412391 * r + 0.357584 * g + 0.180481 * b;
+          const y = 0.212639 * r + 0.715169 * g + 0.072192 * b;
+          const z = 0.019331 * r + 0.119195 * g + 0.950532 * b;
+          const xyz = x + y + z;
           return {
             x: 32 + (xyz === 0 ? 0 : x / xyz * 255 * 1.5),
             y: 287 - (xyz === 0 ? 0 : y / xyz * 255 * 1.5)
@@ -2382,7 +2383,7 @@
           return { x: 32 + b, y: 287 - r };
         }
       };
-      var points = [
+      const points = [
         { pos: calcxy(0,   0,   0  ) , color: '',     types: []        },
         { pos: calcxy(255, 0,   0  ) , color: color ? '#800' : '#f00', types: [0,1,3,4]   },
         { pos: calcxy(0,   255, 0  ) , color: color ? '#080' : '#0f0', types: [0,1,2,3]   },
@@ -2410,9 +2411,9 @@
         { pos: { x: 32,    y: -96   } , color: '',     types: [] },
         { pos: { x: 416,   y: 287   } , color: '',     types: [] }
       ];
-      var mainAxesColor = '#06c';
-      var auxAxesColor = color ? '#555' : '#024';
-      var lines = [
+      const mainAxesColor = '#06c';
+      const auxAxesColor = color ? '#555' : '#024';
+      const lines = [
         { indices: [20, 21, 22, 23], color: mainAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: auxAxesColor, types: [0] },
         { indices: [0, 1, 0, 2, 0, 3], color: mainAxesColor, types: [2,3,4] },
@@ -2426,7 +2427,7 @@
         { indices: [24, 25], color: auxAxesColor, types: [1] },
         { indices: [8, 9, 9, 10, 10, 11, 11, 8], color: auxAxesColor, types: [0] }
       ];
-      var labels = [
+      const labels = [
         { pos: { x: 320, y: 160 }, align: ['right', 'top'], color: '#08f', label: 'Cb', types: [0] },
         { pos: { x: 160, y: 0   }, align: ['left',  'top'], color: '#08f', label: 'Cr', types: [0] },
         { pos: calcxy(255, 0, 0), align: ['left',  'bottom'], color: '#f00', label: 'R', types: [3,4] },
@@ -2437,7 +2438,7 @@
       ];
       context.globalCompositeOperation = color ? 'destination-over' : 'lighter';
       context.lineWidth = 2;
-      for (var i = 0, p; p = points[i]; ++i) {
+      for (let i = 0, p; p = points[i]; ++i) {
         if (0 > p.types.indexOf(type)) {
           continue;
         }
@@ -2447,22 +2448,22 @@
         context.stroke();
       }
       context.lineWidth = 1;
-      for (var i = 0, l; l = lines[i]; ++i) {
+      for (let i = 0, l; l = lines[i]; ++i) {
         if (0 > l.types.indexOf(type)) {
           continue;
         }
         context.strokeStyle = l.color;
         context.beginPath();
-        for (var k = 0; k < l.indices.length; k += 2) {
-          var v0 = points[l.indices[k]];
-          var v1 = points[l.indices[k + 1]];
+        for (let k = 0; k < l.indices.length; k += 2) {
+          const v0 = points[l.indices[k]];
+          const v1 = points[l.indices[k + 1]];
           context.moveTo(v0.pos.x + 0.5, v0.pos.y + 0.5);
           context.lineTo(v1.pos.x + 0.5, v1.pos.y + 0.5);
         }
         context.stroke();
       }
       context.font = '16px sans-serif';
-      for (var i = 0, l; l = labels[i]; ++i) {
+      for (let i = 0, l; l = labels[i]; ++i) {
         if (0 > l.types.indexOf(type)) {
           continue;
         }
@@ -2479,15 +2480,15 @@
           auxTypes[1] !== vectorscopeAuxType2.current()) {
         return;
       }
-      var w = img.canvasWidth;
-      var h = img.canvasHeight;
-      var fig = figureUtil.makeBlankFigure(320, 320);
-      function notify() {
+      const w = img.canvasWidth;
+      const h = img.canvasHeight;
+      const fig = figureUtil.makeBlankFigure(320, 320);
+      const notify = function() {
         img.vectorscope = fig.canvas;
         updateTable();
       };
       if (type === 1) { // x-y
-        var bg = new Image;
+        const bg = new Image;
         bg.onload = function() {
           makeFigure(type, auxTypes[1], color, fig, w, h, result);
           fig.context.globalAlpha = color ? 0.7 : 0.3;
@@ -2502,11 +2503,11 @@
       }
     };
     const updateTable = function(transformOnly) {
-      var w = 320, h = 320, margin = 10;
-      var styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
+      const w = 320, h = 320, margin = 10;
+      const styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
       updateFigureTable('#vectorscopeTable', 'vectorscope', updateAsync, styles, transformOnly);
     };
-    var toggle = dialogUtil.defineDialog($('#vectorscope'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#vectorscope'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     const processKeyDown = function(e) {
@@ -2516,9 +2517,9 @@
       }
     };
     return {
-      updateFigure: updateFigure,
-      toggle: toggle,
-      processKeyDown: processKeyDown
+      updateFigure,
+      toggle,
+      processKeyDown
     };
   })();
   const makeAxesDesc = function(v, lines) {
