@@ -2530,7 +2530,7 @@
     }).join('');
   };
   const makeAxesSVG = function(vbox, labels, axesDesc, grayAxesDesc) {
-    var labelsSVG = labels.map(function(label) {
+    const labelsSVG = labels.map(function(label) {
       return '<text>' + label.text + '</text>';
     }).join('');
     return $(
@@ -2545,8 +2545,8 @@
   };
   const updateAxesLabels = function(svg, labels, rotation) {
     $(svg).find('g.labels text').each(function(i) {
-      var label = labels[i];
-      var xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
+      const label = labels[i];
+      const xy = rotation.pos3DTo2D(label.pos[0], label.pos[1], label.pos[2]);
       $(this).attr({
         fill : label.hidden ? 'transparent' : label.color,
         x : xy[0],
