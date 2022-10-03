@@ -528,9 +528,7 @@
             img.grid = null;
           }
         }
-        if (updateLayout) {
-          updateLayout();
-        }
+        updateLayout();
         if (onChangeCallback) {
           onChangeCallback();
         }
@@ -2248,19 +2246,19 @@
     };
   })();
   const makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
-    var bits = context.createImageData(w, h);
-    var i = 0, k = 0;
+    const bits = context.createImageData(w, h);
+    let i = 0, k = 0;
     if (mode === 0) { // RGB
-      var offsetG = w * h;
-      var offsetB = w * h * 2;
-      for (var y = 0; y < h; ++y) {
-        for (var x = 0; x < w; ++x, i++, k += 4) {
-          var aR = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-          var aG = 1 - Math.pow(1 - dist[i + offsetG] / max, 20000.0);
-          var aB = 1 - Math.pow(1 - dist[i + offsetB] / max, 20000.0);
-          var cR = Math.round(aR * scale);
-          var cG = Math.round(aG * scale);
-          var cB = Math.round(aB * scale);
+      const offsetG = w * h;
+      const offsetB = w * h * 2;
+      for (let y = 0; y < h; ++y) {
+        for (let x = 0; x < w; ++x, i++, k += 4) {
+          const aR = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          const aG = 1 - Math.pow(1 - dist[i + offsetG] / max, 20000.0);
+          const aB = 1 - Math.pow(1 - dist[i + offsetB] / max, 20000.0);
+          const cR = Math.round(aR * scale);
+          const cG = Math.round(aG * scale);
+          const cB = Math.round(aB * scale);
           bits.data[k + 0] = cR;
           bits.data[k + 1] = cG;
           bits.data[k + 2] = cB;
@@ -2268,10 +2266,10 @@
         }
       }
     } else { // Luminance
-      for (var y = 0; y < h; ++y) {
-        for (var x = 0; x < w; ++x, i++, k += 4) {
-          var a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
-          var c = Math.round(a * scale);
+      for (let y = 0; y < h; ++y) {
+        for (let x = 0; x < w; ++x, i++, k += 4) {
+          const a = 1 - Math.pow(1 - dist[i] / max, 20000.0);
+          const c = Math.round(a * scale);
           bits.data[k + 0] = c;
           bits.data[k + 1] = c;
           bits.data[k + 2] = c;
@@ -2282,19 +2280,19 @@
     return bits;
   };
   const makeDistributionImageDataRGBA = function(context, w, h, dist, colorMap, max, scale) {
-    var bits = context.createImageData(w, h);
-    var i = 0, k = 0;
-    var offsetG = w * h;
-    var offsetB = w * h * 2;
-    for (var y = 0; y < h; ++y) {
-      for (var x = 0; x < w; ++x, i++, k += 4) {
-        var d = dist[i];
-        var a = 1 - Math.pow(1 - d / max, 20000.0);
-        var cA = Math.round(a * scale);
-        var cScale = d === 0 ? scale : scale / (255 * d);
-        var cR = Math.round(colorMap[i] * cScale);
-        var cG = Math.round(colorMap[i + offsetG] * cScale);
-        var cB = Math.round(colorMap[i + offsetB] * cScale);
+    const bits = context.createImageData(w, h);
+    let i = 0, k = 0;
+    const offsetG = w * h;
+    const offsetB = w * h * 2;
+    for (let y = 0; y < h; ++y) {
+      for (let x = 0; x < w; ++x, i++, k += 4) {
+        const d = dist[i];
+        const a = 1 - Math.pow(1 - d / max, 20000.0);
+        const cA = Math.round(a * scale);
+        const cScale = d === 0 ? scale : scale / (255 * d);
+        const cR = Math.round(colorMap[i] * cScale);
+        const cG = Math.round(colorMap[i + offsetG] * cScale);
+        const cB = Math.round(colorMap[i + offsetB] * cScale);
         bits.data[k + 0] = cR;
         bits.data[k + 1] = cG;
         bits.data[k + 2] = cB;
