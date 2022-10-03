@@ -1351,11 +1351,11 @@
         loadConfig(e.key);
       });
     };
-    startup();
     var toggle = dialogUtil.defineDialog($('#settings'));
     return {
-      openBGColor: openBGColor,
-      toggle: toggle
+      startup,
+      openBGColor,
+      toggle
     };
   })();
   // Camera
@@ -5201,6 +5201,8 @@
   };
 
 $(function() {
+  settings.startup();
+
   setupDocumentLevelEventListeners();
   setupWindowLevelEventListeners();
   setupMenusAndDialogs();
