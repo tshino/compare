@@ -1865,23 +1865,23 @@
     return makeModeSwitch(parent, initialValue, onchange, true);
   };
   // Histogram
-  var histogramDialog = (function() {
-    var figW = 768 + 40;
-    var figH = 512 + 32;
-    var figIndices = [];
+  const histogramDialog = (function() {
+    const figW = 768 + 40;
+    const figH = 512 + 32;
+    let figIndices = [];
     $('#histogram').on('mousemove', 'td.fig > *', function(e) {
-      var point = figureZoom.positionFromMouseEvent(e, this, null);
+      const point = figureZoom.positionFromMouseEvent(e, this, null);
       onFigurePointed(point);
     });
     const onFigurePointed = function(point) {
-      var x = Math.floor(point.x * figW * 256 / 768);
+      const x = Math.floor(point.x * figW * 256 / 768);
       if (0 <= x && x <= 255) {
-        var infoRow = $('#histoTable tr.info');
+        const infoRow = $('#histoTable tr.info');
         infoRow.children().remove();
         const addInfo = function(target, label, color, hist, offset) {
-          var value = hist[offset + x];
-          var info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
-          var span = $('<span>').text(info).css({
+          const value = hist[offset + x];
+          const info = label + ' ' + String(x) + '(' + compareUtil.addComma(value) + ') ';
+          const span = $('<span>').text(info).css({
             'color': color,
             'display': 'inline-block',
             'width': '120px'
@@ -1891,10 +1891,10 @@
           }
           target.append(span);
         };
-        for (var k = 0; k < figIndices.length; k++) {
-          var index = figIndices[k];
-          var hist = entries[index].histogramData;
-          var td = $('<td>').css('font-size','14px');
+        for (let k = 0; k < figIndices.length; k++) {
+          const index = figIndices[k];
+          const hist = entries[index].histogramData;
+          const td = $('<td>').css('font-size','14px');
           if (histogramType.current() === 0) {
             addInfo(td, 'R', '#800', hist, 0);
             addInfo(td, 'G', '#080', hist, 256);
@@ -1915,17 +1915,17 @@
     };
     const repaint = function() {
       discardTasksOfCommand('calcHistogram');
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.histogram = null;
       }
       updateTable();
     };
-    var histogramType = makeModeSwitch('#histogramType', 0, function() {
+    const histogramType = makeModeSwitch('#histogramType', 0, function() {
       repaint();
       updateAuxOption();
     });
-    var histogramRowLayout = makeToggleSwitch('#histogramRowLayout', true, repaint);
-    var histogramAuxType2 = makeModeSwitch('#histogramAuxType2', 0, repaint);
+    const histogramRowLayout = makeToggleSwitch('#histogramRowLayout', true, repaint);
+    const histogramAuxType2 = makeModeSwitch('#histogramAuxType2', 0, repaint);
     const updateAuxOption = function() {
       if (histogramType.current() === 0) {
         $('#histogramRowLayout').show();
@@ -1948,14 +1948,14 @@
       }, attachImageDataToTask);
     };
     const makeFigure = function(type, auxType2, hist) {
-      var fig = figureUtil.makeBlankFigure(figW, figH);
-      var context = fig.context;
-      var max = 0;
-      for (var i = 0; i < hist.length; ++i) {
+      const fig = figureUtil.makeBlankFigure(figW, figH);
+      const context = fig.context;
+      let max = 0;
+      for (let i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
       const drawGrid = function() {
-        for (var k = 16; k < 255; k += 16) {
+        for (let k = 16; k < 255; k += 16) {
           context.strokeStyle = (k % 64 === 0) ? '#888' : '#444';
           context.lineWidth = 1;
           context.beginPath();
@@ -1969,41 +1969,42 @@
       context.fillStyle = '#000';
       context.fillRect(768,0,figW - 768,512);
       drawGrid();
+      let comp;
       if (type === 0) { // RGB
         if (histogramRowLayout.current()) {
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
-          var comp = [ '#f22', 168, 'R', '#2f2', 339, 'G', '#22f', 510, 'B' ];
+          comp = [ '#f22', 168, 'R', '#2f2', 339, 'G', '#22f', 510, 'B' ];
         } else {
           context.globalCompositeOperation = 'lighter';
           figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
-          var comp = [ '#f22', 446, 'R', '#2f2', 478, 'G', '#22f', 510, 'B' ];
+          comp = [ '#f22', 446, 'R', '#2f2', 478, 'G', '#22f', 510, 'B' ];
         }
       } else if (type === 1) { // Luminance
         figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
-        var comp = [ '#fff', 510, 'Y' ];
+        comp = [ '#fff', 510, 'Y' ];
       } else { // YCbCr
         if (histogramRowLayout.current()) {
           figureUtil.drawHistogram(context, '#ddd', hist, max, 0, 256, 0, 170, 170);
           figureUtil.drawHistogram(context, '#22f', hist, max, 256, 256, 0, 341, 170);
           figureUtil.drawHistogram(context, '#f22', hist, max, 512, 256, 0, 512, 170);
-          var comp = [ '#ddd', 168, 'Y', '#44f', 339, 'Cb', '#f44', 510, 'Cr' ];
+          comp = [ '#ddd', 168, 'Y', '#44f', 339, 'Cb', '#f44', 510, 'Cr' ];
         } else {
           context.globalCompositeOperation = 'lighter';
           figureUtil.drawHistogram(context, '#aaa', hist, max, 0, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 512, 512);
           figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 512);
-          var comp = [ '#ddd', 446, 'Y', '#44f', 478, 'Cb', '#f44', 510, 'Cr' ];
+          comp = [ '#ddd', 446, 'Y', '#44f', 478, 'Cb', '#f44', 510, 'Cr' ];
         }
       }
-      var axes = [
+      const axes = [
         { pos: (0.5 + 0  ) / 256, align: 'left',   label: '0' },
         { pos: (0.5 + 255) / 256, align: 'right',  label: '255' }
       ];
-      for (var i = 16; i < 256; i += 16) {
+      for (let i = 16; i < 256; i += 16) {
         axes.push({
           pos: (0.5 + i) / 256, align: 'center', label: (i%64 === 0) ? ''+i : ''
         });
@@ -2012,7 +2013,7 @@
       const drawAxesLabels = function(context, comp) {
         context.font = '30px sans-serif';
         context.textAlign = 'left';
-        for (var i = 0; i < comp.length; i += 3) {
+        for (let i = 0; i < comp.length; i += 3) {
           context.fillStyle = comp[i];
           context.fillText(comp[i + 2], 768 + 2, comp[i + 1]);
         }
@@ -2028,26 +2029,26 @@
       }
     };
     const updateTable = function(transformOnly) {
-      var w = figW / 2, h = figH / 2, margin = 8;
-      var styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
-      var indices = updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
+      const w = figW / 2, h = figH / 2, margin = 8;
+      const styles = makeFigureStyles(w, h, margin, '#bbb', figureZoom);
+      const indices = updateFigureTable('#histoTable', 'histogram', updateAsync, styles, transformOnly);
       if (indices) {
         figIndices = indices;
-        var infoRow = $('#histoTable tr.info');
+        const infoRow = $('#histoTable tr.info');
         infoRow.children().remove();
-        for (var i = 0; i < indices.length; i++) {
+        for (let i = 0; i < indices.length; i++) {
           infoRow.append($('<td>&nbsp;</td>').css('font-size','14px'));
         }
       }
     };
-    var toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#histogram'), updateTable, toggleAnalysis, {
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: figW / 2, h: figH / 2 }; }
     });
     return {
-      processClick: processClick,
-      updateFigure: updateFigure,
-      toggle: toggle
+      processClick,
+      updateFigure,
+      toggle
     };
   })();
   // Waveform
