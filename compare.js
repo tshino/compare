@@ -2051,22 +2051,22 @@
     };
   })();
   // Waveform
-  var waveformDialog = (function() {
-    var figH = 256 + 18;
+  const waveformDialog = (function() {
+    const figH = 256 + 18;
     const repaint = function() {
       discardTasksOfCommand('calcWaveform');
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.waveform = null;
       }
       updateTable();
     };
-    var waveformType = makeModeSwitch('#waveformType', 0, function(type) {
+    const waveformType = makeModeSwitch('#waveformType', 0, function(type) {
       repaint();
       updateAuxOption();
     });
-    var waveformAuxType = makeModeSwitch('#waveformAuxType', 0, repaint);
-    var waveformColumnLayout = makeToggleSwitch('#waveformColumnLayout', true, repaint);
-    var waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
+    const waveformAuxType = makeModeSwitch('#waveformAuxType', 0, repaint);
+    const waveformColumnLayout = makeToggleSwitch('#waveformColumnLayout', true, repaint);
+    const waveformAuxType2 = makeModeSwitch('#waveformAuxType2', 0, repaint);
     const updateAuxOption = function() {
       if (waveformType.current() === 0) {
         $('#waveformColumnLayout').show();
@@ -2095,37 +2095,37 @@
       }, attachImageDataToTask);
     };
     const makeFigure = function(type, w, h, histW, hist) {
-      var histN = new Uint32Array(histW);
-      for (var i = 0; i < w; ++i) {
-        var x = Math.round((i + 0.5) / w * histW - 0.5);
+      const histN = new Uint32Array(histW);
+      for (let i = 0; i < w; ++i) {
+        const x = Math.round((i + 0.5) / w * histW - 0.5);
         ++histN[x];
       }
       //
-      var columnLayout = (type === 0 || type === 2) && waveformColumnLayout.current();
-      var figW = columnLayout ? histW * 3 : histW;
-      var fig = figureUtil.makeBlankFigure(figW, figH);
-      var context = fig.context;
-      var bits = context.createImageData(figW, 256);
-      var s = -4 * figW;
-      for (var i = 0, n = figW * 256 * 4; i < n; i += 4) {
+      const columnLayout = (type === 0 || type === 2) && waveformColumnLayout.current();
+      const figW = columnLayout ? histW * 3 : histW;
+      const fig = figureUtil.makeBlankFigure(figW, figH);
+      const context = fig.context;
+      const bits = context.createImageData(figW, 256);
+      const s = -4 * figW;
+      for (let i = 0, n = figW * 256 * 4; i < n; i += 4) {
         bits.data[i + 0] = 0;
         bits.data[i + 1] = 0;
         bits.data[i + 2] = 0;
         bits.data[i + 3] = 255;
       }
-      for (var x = 0; x < histW; ++x) {
-        var invMax = 1 / (histN[x] * h);
-        var off0 = 4 * (255 * figW + x);
-        var h0 = 256 * x;
+      for (let x = 0; x < histW; ++x) {
+        const invMax = 1 / (histN[x] * h);
+        let off0 = 4 * (255 * figW + x);
+        const h0 = 256 * x;
         if (type === 0) { // RGB
-          var h1 = h0 + 256 * histW;
-          var h2 = h0 + 512 * histW;
-          var off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
-          var off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
-          for (var y = 0; y < 256; ++y) {
-            var cR = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
-            var cG = Math.round(255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0)));
-            var cB = Math.round(255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0)));
+          const h1 = h0 + 256 * histW;
+          const h2 = h0 + 512 * histW;
+          let off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
+          let off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
+          for (let y = 0; y < 256; ++y) {
+            const cR = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
+            const cG = Math.round(255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0)));
+            const cB = Math.round(255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0)));
             bits.data[off0] = cR;
             bits.data[off1] = cG;
             bits.data[off2] = cB;
@@ -2134,22 +2134,22 @@
             off2 += s;
           }
         } else if (type === 1) { // Luminance
-          for (var y = 0; y < 256; ++y) {
-            var c = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
+          for (let y = 0; y < 256; ++y) {
+            const c = Math.round(255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0)));
             bits.data[off0 + 0] = c;
             bits.data[off0 + 1] = c;
             bits.data[off0 + 2] = c;
             off0 += s;
           }
         } else { // YCbCr
-          var h1 = h0 + 256 * histW;
-          var h2 = h0 + 512 * histW;
-          var off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
-          var off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
-          for (var y = 0; y < 256; ++y) {
-            var my = 255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0));
-            var cb = 255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0));
-            var cr = 255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0));
+          const h1 = h0 + 256 * histW;
+          const h2 = h0 + 512 * histW;
+          let off1 = (columnLayout ? off0 + 4 * histW : off0) + 1;
+          let off2 = (columnLayout ? off0 + 8 * histW : off0) + 2;
+          for (let y = 0; y < 256; ++y) {
+            const my = 255 * (1 - Math.pow(1 - hist[h0 + y] * invMax, 200.0));
+            const cb = 255 * (1 - Math.pow(1 - hist[h1 + y] * invMax, 200.0));
+            const cr = 255 * (1 - Math.pow(1 - hist[h2 + y] * invMax, 200.0));
             if (columnLayout) {
               bits.data[off0] = Math.round(my);
               bits.data[off0 + 1] = Math.round(my);
@@ -2173,7 +2173,7 @@
         context.globalAlpha = alpha;
         context.lineWidth = 0.5;
         context.beginPath();
-        for (var k = 32; k < 255; k += 32) {
+        for (let k = 32; k < 255; k += 32) {
           context.moveTo(x, k + 0.5);
           context.lineTo(x + w, k + 0.5);
         }
@@ -2194,26 +2194,27 @@
       }
       context.fillStyle = '#222';
       context.fillRect(0,256,figW,figH - 256);
+      let comp;
       if (type === 0) { // RGB
         if (columnLayout) {
-          var comp = [ '#f22', 0, 'R', '#2f2', 100, 'G', '#22f', 200, 'B' ];
+          comp = [ '#f22', 0, 'R', '#2f2', 100, 'G', '#22f', 200, 'B' ];
         } else {
-          var comp = [ '#f22', 0, 'R', '#2f2', 18, 'G', '#22f', 36, 'B' ];
+          comp = [ '#f22', 0, 'R', '#2f2', 18, 'G', '#22f', 36, 'B' ];
         }
       } else if (type === 1) { // Luminance
-        var comp = [ '#fff', 0, 'Y' ];
+        comp = [ '#fff', 0, 'Y' ];
       } else { // YCbCr
         if (columnLayout) {
-          var comp = [ '#ddd', 0, 'Y', '#44f', 100, 'Cb', '#f44', 200, 'Cr' ];
+          comp = [ '#ddd', 0, 'Y', '#44f', 100, 'Cb', '#f44', 200, 'Cr' ];
         } else {
-          var comp = [ '#ddd', 0, 'Y', '#44f', 16, 'Cb', '#f44', 44, 'Cr' ];
+          comp = [ '#ddd', 0, 'Y', '#44f', 16, 'Cb', '#f44', 44, 'Cr' ];
         }
       }
       const drawAxesLabels = function(context, comp) {
         context.font = '16px sans-serif';
         context.scale(figW / 300, 1);
         context.textAlign = 'left';
-        for (var i = 0; i < comp.length; i += 3) {
+        for (let i = 0; i < comp.length; i += 3) {
           context.fillStyle = comp[i];
           context.fillText(comp[i + 2], comp[i + 1], figH - 2);
         }
@@ -2225,24 +2226,24 @@
       if (type === waveformType.current() &&
           auxTypes[0] === waveformAuxType.current() &&
           auxTypes[1] === waveformAuxType2.current()) {
-        var w = img.width;
-        var h = img.height;
+        const w = img.width;
+        const h = img.height;
         img.waveform = makeFigure(type, w, h, histW, hist);
         updateTable();
       }
     };
     const updateTable = function(transformOnly) {
-      var w = 320, h = figH, margin = 10;
-      var styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
+      const w = 320, h = figH, margin = 10;
+      const styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
       updateFigureTable('#waveTable', 'waveform', updateAsync, styles, transformOnly);
     };
-    var toggle = dialogUtil.defineDialog($('#waveform'), updateTable, toggleAnalysis, {
+    const toggle = dialogUtil.defineDialog($('#waveform'), updateTable, toggleAnalysis, {
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: figH }; }
     });
     return {
-      updateFigure: updateFigure,
-      toggle: toggle
+      updateFigure,
+      toggle
     };
   })();
   const makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
