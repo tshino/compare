@@ -1786,21 +1786,26 @@
       break;
     }
   };
-  const attachImageDataToTask = function(data) {
-    data.imageData = [];
-    for (var i = 0; i < data.index.length; ++i) {
-      data.imageData[i] = getImageData(entries[data.index[i]]);
-      if (!data.imageData[i]) {
-        alert('out of memory');
-        return false;
-      }
-    }
-  };
-  var taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js', processTaskResult);
-  const discardTasksOfCommand = function(cmd) {
+  const taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js', processTaskResult);
+  taskQueue.addTaskWithImageData = (function() {
+    const attachImageDataToTask = function(data) {
+        data.imageData = [];
+        for (let i = 0; i < data.index.length; ++i) {
+          data.imageData[i] = getImageData(entries[data.index[i]]);
+          if (!data.imageData[i]) {
+            alert('out of memory');
+            return false;
+          }
+        }
+    };
+    return function(data) {
+        taskQueue.addTask(data, attachImageDataToTask);
+    };
+  })();
+  taskQueue.discardTasksOfCommand = function(cmd) {
     taskQueue.discardTasksOf(function(task) { return task.cmd === cmd; });
   };
-  const discardTasksOfEntryByIndex = function(index) {
+  taskQueue.discardTasksOfEntryByIndex = function(index) {
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
 
@@ -1876,7 +1881,7 @@
       onFigurePointed(point);
     };
     const repaint = function() {
-      discardTasksOfCommand('calcHistogram');
+      taskQueue.discardTasksOfCommand('calcHistogram');
       for (let i = 0, img; img = images[i]; i++) {
         img.histogram = null;
       }
@@ -1902,12 +1907,12 @@
     };
     updateAuxOption();
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calcHistogram',
         type:     histogramType.current(),
         auxTypes: [histogramAuxType2.current()],
         index:    [img.index]
-      }, attachImageDataToTask);
+      });
     };
     const makeFigure = function(type, auxType2, hist) {
       const fig = figureUtil.makeBlankFigure(figW, figH);
@@ -2017,7 +2022,7 @@
   const waveformDialog = (function() {
     const figH = 256 + 18;
     const repaint = function() {
-      discardTasksOfCommand('calcWaveform');
+      taskQueue.discardTasksOfCommand('calcWaveform');
       for (let i = 0, img; img = images[i]; i++) {
         img.waveform = null;
       }
@@ -2047,7 +2052,7 @@
     };
     updateAuxOption();
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calcWaveform',
         type:     waveformType.current(),
         auxTypes: [waveformAuxType.current(), waveformAuxType2.current()],
@@ -2055,7 +2060,7 @@
         histW:    Math.min(img.width, 1024),
         transposed: img.transposed,
         flipped:  img.transposed ? img.flippedY : img.flippedX
-      }, attachImageDataToTask);
+      });
     };
     const makeFigure = function(type, w, h, histW, hist) {
       const histN = new Uint32Array(histW);
@@ -2268,7 +2273,7 @@
   // Vectorscope
   const vectorscopeDialog = (function() {
     const repaint = function() {
-      discardTasksOfCommand('calcVectorscope');
+      taskQueue.discardTasksOfCommand('calcVectorscope');
       for (let i = 0, img; img = images[i]; i++) {
         img.vectorscope = null;
       }
@@ -2297,13 +2302,13 @@
     };
     updateAuxOption();
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calcVectorscope',
         type:     vectorscopeType.current(),
         color:    colorMode.current(),
         auxTypes: [vectorscopeAuxType.current(), vectorscopeAuxType2.current()],
         index:    [img.index]
-      }, attachImageDataToTask);
+      });
     };
     const makeFigure = function(type, auxType2, color, fig, w, h, result) {
       const context = fig.context;
@@ -2558,10 +2563,10 @@
     };
     updateAuxOption();
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calcColorTable',
         index:    [img.index]
-      }, attachImageDataToTask);
+      });
     };
     const rotationController = compareUtil.makeRotationController(
       function() { redrawFigureAll(); },
@@ -2890,11 +2895,11 @@
     };
     updateAuxOption();
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calc3DWaveform',
         baseSize: 512,
         index:    [img.index]
-      }, attachImageDataToTask);
+      });
     };
     const rotationController = compareUtil.makeRotationController(
       function() { redrawFigureAll(); },
@@ -3160,10 +3165,10 @@
       return $(fig.canvas).width(256).height(380);
     };
     const updateAsync = function(img) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
         cmd:      'calcReducedColorTable',
         index:    [img.index]
-      }, attachImageDataToTask);
+      });
     };
     const updateFigure = function(img) {
       updateTable();
@@ -3227,7 +3232,7 @@
       updateAuxOption();
     });
     const metricsAuxType2 = makeModeSwitch('#metricsAuxType2', 0, function() {
-      discardTasksOfCommand('calcMetrics');
+      taskQueue.discardTasksOfCommand('calcMetrics');
       for (let i = 0, img; img = images[i]; i++) {
         img.metrics = [];
       }
@@ -3316,7 +3321,7 @@
         const message = { en: 'calculating...', ja: '計算中...' };
         a.metrics[b.index] = message;
         b.metrics[a.index] = message;
-        taskQueue.addTask({
+        taskQueue.addTaskWithImageData({
           cmd:      'calcMetrics',
           index:    [a.index, b.index],
           options:  {
@@ -3324,7 +3329,7 @@
             orientationB: entries[b.index].orientation
           },
           auxTypes: [metricsAuxType2.current()],
-        }, attachImageDataToTask);
+        });
       }
       $('#metricsTargetName').append(
         $('<td>').append(
@@ -3443,7 +3448,7 @@
   const toneCurveDialog = (function() {
     const toneCurveParam = {};
     const repaint = function() {
-      discardTasksOfCommand('calcToneCurve');
+      taskQueue.discardTasksOfCommand('calcToneCurve');
       for (let i = 0, img; img = images[i]; i++) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
@@ -3473,7 +3478,7 @@
       $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
     const updateAsync = function(baseImage, targetImage) {
-      taskQueue.addTask({
+      taskQueue.addTaskWithImageData({
           cmd:      'calcToneCurve',
           type:     toneCurveType.current(),
           auxTypes: [toneCurveAuxType2.current()],
@@ -3482,7 +3487,7 @@
             orientationA: baseImage.orientation,
             orientationB: targetImage.orientation
           }
-      }, attachImageDataToTask);
+      });
     };
     const makeToneMapFigure = function(toneMapData, type) {
       const fig = figureUtil.makeBlankFigure(320, 320);
@@ -3710,16 +3715,16 @@
       opticalFlowResult.target = targetImageIndex;
       opticalFlowResult.result  = null;
       pointedVector = null;
-      discardTasksOfCommand('calcOpticalFlow');
+      taskQueue.discardTasksOfCommand('calcOpticalFlow');
       if (baseImageIndex !== targetImageIndex) {
-        taskQueue.addTask({
+        taskQueue.addTaskWithImageData({
           cmd:      'calcOpticalFlow',
           index:    [baseImageIndex, targetImageIndex],
           options:  {
             orientationA: entries[baseImageIndex].orientation,
             orientationB: entries[targetImageIndex].orientation
           }
-        }, attachImageDataToTask);
+        });
       }
     };
     const makeFigure = function(styles) {
@@ -3982,9 +3987,9 @@
       diffResult.offsetX = diffOptions.offsetX;
       diffResult.offsetY = diffOptions.offsetY;
       diffResult.result  = null;
-      discardTasksOfCommand('calcDiff');
+      taskQueue.discardTasksOfCommand('calcDiff');
       if (baseImageIndex !== targetImageIndex) {
-        taskQueue.addTask({
+        taskQueue.addTaskWithImageData({
           cmd:      'calcDiff',
           index:    [baseImageIndex, targetImageIndex],
           options:  {
@@ -3998,7 +4003,7 @@
             orientationA: entries[baseImageIndex].orientation,
             orientationB: entries[targetImageIndex].orientation
           }
-        }, attachImageDataToTask);
+        });
       }
     };
     const makeHistogramFigure = function(hist, ignoreAE) {
@@ -4637,7 +4642,7 @@
       ent.reducedColorTable = null;
       ent.toneCurve = null;
       ent.toneCurveAxes = null;
-      discardTasksOfEntryByIndex(index);
+      taskQueue.discardTasksOfEntryByIndex(index);
       viewManagement.resetLayoutState();
       updateDOM();
     }
