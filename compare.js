@@ -351,44 +351,6 @@
       setImageScaling
     };
   })();
-  const removeEntry = function(index) {
-    const ent = entries[index];
-    if (ent && !ent.loading && ent.visible) {
-      ent.visible = false;
-      if (ent.element) {
-        $(ent.view).remove('.image');
-        ent.element = null;
-      }
-      if (baseImageIndex === index) {
-        baseImageIndex = null;
-      }
-      if (targetImageIndex === index) {
-        targetImageIndex = null;
-      }
-      crossCursor.onRemoveEntry(index);
-      toneCurveDialog.onRemoveEntry(index);
-      opticalFlowDialog.onRemoveEntry(index);
-      diffDialog.onRemoveEntry(index);
-      ent.mainImage = null;
-      ent.asCanvas = null;
-      ent.imageData = null;
-      ent.histogram = null;
-      ent.waveform = null;
-      ent.vectorscope = null;
-      ent.colorTable = null;
-      ent.colorDist = null;
-      ent.colorDistAxes = null;
-      ent.waveform3D = null;
-      ent.waveform3DFig = null;
-      ent.waveform3DFigAxes = null;
-      ent.reducedColorTable = null;
-      ent.toneCurve = null;
-      ent.toneCurveAxes = null;
-      discardTasksOfEntryByIndex(index);
-      viewManagement.resetLayoutState();
-      updateDOM();
-    }
-  };
   const findImageIndexOtherThan = function(index) {
     for (let i = 0, img; img = images[i]; ++i) {
       if (img.index !== index) {
@@ -1843,17 +1805,17 @@
   };
 
   const makeModeSwitch = function(parent, initialValue, onchange, toggle) {
-    var currentType = initialValue;
+    let currentType = initialValue;
     const set = function(type) {
       if (currentType !== type) {
         currentType = type;
-        var index = toggle ? [true, false].indexOf(type) : type;
+        const index = toggle ? [true, false].indexOf(type) : type;
         $(parent).children().removeClass('current').eq(index).addClass('current');
         onchange(type);
       }
     };
     $(parent).children().click(function() {
-      var type = toggle ? !currentType : $(parent).children().index(this);
+      const type = toggle ? !currentType : $(parent).children().index(this);
       set(type);
     });
     return {
@@ -4642,6 +4604,44 @@
       onUpdateLayout
     };
   })();
+  const removeEntry = function(index) {
+    const ent = entries[index];
+    if (ent && !ent.loading && ent.visible) {
+      ent.visible = false;
+      if (ent.element) {
+        $(ent.view).remove('.image');
+        ent.element = null;
+      }
+      if (baseImageIndex === index) {
+        baseImageIndex = null;
+      }
+      if (targetImageIndex === index) {
+        targetImageIndex = null;
+      }
+      crossCursor.onRemoveEntry(index);
+      toneCurveDialog.onRemoveEntry(index);
+      opticalFlowDialog.onRemoveEntry(index);
+      diffDialog.onRemoveEntry(index);
+      ent.mainImage = null;
+      ent.asCanvas = null;
+      ent.imageData = null;
+      ent.histogram = null;
+      ent.waveform = null;
+      ent.vectorscope = null;
+      ent.colorTable = null;
+      ent.colorDist = null;
+      ent.colorDistAxes = null;
+      ent.waveform3D = null;
+      ent.waveform3DFig = null;
+      ent.waveform3DFigAxes = null;
+      ent.reducedColorTable = null;
+      ent.toneCurve = null;
+      ent.toneCurveAxes = null;
+      discardTasksOfEntryByIndex(index);
+      viewManagement.resetLayoutState();
+      updateDOM();
+    }
+  };
   const updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
     if (images.length === 0) {
