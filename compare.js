@@ -1832,7 +1832,7 @@
     return makeModeSwitch(parent, initialValue, onchange, true);
   };
   // Histogram
-  const histogramDialog = (function() {
+  const HistogramDialog = function() {
     const figW = 768 + 40;
     const figH = 512 + 32;
     let figIndices = [];
@@ -2017,9 +2017,9 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   // Waveform
-  const waveformDialog = (function() {
+  const WaveformDialog = function() {
     const figH = 256 + 18;
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcWaveform');
@@ -2213,7 +2213,7 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   const makeDistributionImageData = function(context, w, h, dist, max, scale, mode) {
     const bits = context.createImageData(w, h);
     let i = 0, k = 0;
@@ -2271,7 +2271,7 @@
     return bits;
   };
   // Vectorscope
-  const vectorscopeDialog = (function() {
+  const VectorscopeDialog = function() {
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcVectorscope');
       for (let i = 0, img; img = images[i]; i++) {
@@ -2488,7 +2488,7 @@
       toggle,
       processKeyDown
     };
-  })();
+  };
   const makeAxesDesc = function(v, lines) {
     return lines.map(function(a) {
       return (
@@ -2523,7 +2523,7 @@
     });
   };
   // 3D Color Distribution
-  const colorDistDialog = (function() {
+  const ColorDistDialog = function() {
     const colorDistType = makeModeSwitch('#colorDistType', 0, function(type) {
       invalidateAssets();
       updateFigure();
@@ -2869,9 +2869,9 @@
       processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
-  })();
+  };
   // 3D Waveform
-  const waveform3DDialog = (function() {
+  const Waveform3DDialog = function() {
     const waveform3DType = makeModeSwitch('#waveform3DType', 0, function(type) {
       updateFigure();
       updateAuxOption();
@@ -3106,8 +3106,8 @@
       processKeyDown: rotationInputFilter.processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
     };
-  })();
-  const colorFreqDialog = (function() {
+  };
+  const ColorFreqDialog = function() {
     const drawFigure = function(reducedColorTable) {
       const colorList = reducedColorTable.colorList;
       const height = 480;
@@ -3205,7 +3205,7 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   const makeImageNameSelector = function(selectedIndex, onchange) {
     const select = $('<select>').on('change', function(e) {
       const index = parseInt(this.options[this.selectedIndex].value);
@@ -3226,7 +3226,7 @@
     );
   };
   // Image Quality Metrics
-  const metricsDialog = (function() {
+  const MetricsDialog = function() {
     const metricsMode = makeModeSwitch('#metricsMode', 0, function(type) {
       updateTable();
       updateAuxOption();
@@ -3371,7 +3371,7 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   const setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
     $(baseSelector).children().remove();
     $(targetSelector).children().remove();
@@ -3445,7 +3445,7 @@
     }
   };
   // Tone Curve Estimation
-  const toneCurveDialog = (function() {
+  const ToneCurveDialog = function() {
     const toneCurveParam = {};
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcToneCurve');
@@ -3583,9 +3583,9 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   // Optical Flow
-  const opticalFlowDialog = (function() {
+  const OpticalFlowDialog = function() {
     const opticalFlowResult = {};
     let pointedVector = null;
     $('#opticalFlowGridBtn').click(grid.toggle);
@@ -3870,9 +3870,9 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   // Image Diff
-  const diffDialog = (function() {
+  const DiffDialog = function() {
     const diffResult = {};
     const diffOptions = {
       ignoreAE: 0,
@@ -4185,7 +4185,7 @@
       updateFigure,
       toggle
     };
-  })();
+  };
   const resetMouseDrag = function() {
     viewZoom.resetDragState();
   };
@@ -4932,6 +4932,17 @@
       }
     });
   };
+
+  const histogramDialog = HistogramDialog();
+  const waveformDialog = WaveformDialog();
+  const vectorscopeDialog = VectorscopeDialog();
+  const colorDistDialog = ColorDistDialog();
+  const waveform3DDialog = Waveform3DDialog();
+  const colorFreqDialog = ColorFreqDialog();
+  const metricsDialog = MetricsDialog();
+  const toneCurveDialog = ToneCurveDialog();
+  const opticalFlowDialog = OpticalFlowDialog();
+  const diffDialog = DiffDialog();
 
   const setupMenusAndDialogs = function() {
     $('#infobtn').click(infoDialog.toggle);
