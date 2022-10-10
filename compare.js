@@ -1693,21 +1693,22 @@
       $(target).find('td.fig > *').css(styles.style);
       return null;
     }
-    var labelRow = $(target).find('tr.label');
-    var figureRow = $(target).find('tr.figure');
+    const labelRow = $(target).find('tr.label');
+    const figureRow = $(target).find('tr.figure');
     labelRow.find('td').remove();
     figureRow.find('td').remove();
-    var figIndices = [];
-    for (var k = 0, img; img = images[k]; k++) {
+    const figIndices = [];
+    let k = 0;
+    for (let img; img = images[k]; k++) {
       if (!img[propName]) {
         img[propName] = figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
-      var label = makeImageNameWithIndex('<td>', img);
+      const label = makeImageNameWithIndex('<td>', img);
       labelRow.append(label);
-      var figCell = $('<td class="fig">').css(styles.cellStyle);
+      const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
-      var axes = img[propName + 'Axes'];
+      const axes = img[propName + 'Axes'];
       if (axes) {
         figCell.append($(axes).css(styles.style));
       }
@@ -1715,13 +1716,13 @@
       figIndices[k] = img.index;
     }
     if (k === 0) {
-      var cell = $('<td rowspan="2">').text('no data');
+      const cell = $('<td rowspan="2">').text('no data');
       labelRow.append(cell);
     }
     return figIndices;
   };
   const makeFigureStyles = function(w, h, margin, background, zoomController) {
-    var styles = { figW: w, figH: h, figMargin: margin, baseW: w, baseH: h };
+    const styles = { figW: w, figH: h, figMargin: margin, baseW: w, baseH: h };
     styles.cellStyle = {
       minWidth: (w + margin * 2) + 'px',
       width: (w + margin * 2) + 'px',
@@ -1738,7 +1739,7 @@
     return styles;
   };
   const updateFigureStylesForActualSize = function(styles, w, h) {
-    var rect = compareUtil.calcInscribedRect(styles.figW, styles.figH, w, h);
+    const rect = compareUtil.calcInscribedRect(styles.figW, styles.figH, w, h);
     styles.baseW = rect.width;
     styles.baseH = rect.height;
     styles.style.width = rect.width + 'px';
@@ -1750,12 +1751,16 @@
   const processTaskResult = function(data) {
     switch (data.cmd) {
     case 'calcHistogram':
-      var img = entries[data.index[0]];
-      histogramDialog.updateFigure(data.type, data.auxTypes, img, data.result);
+      {
+        const img = entries[data.index[0]];
+        histogramDialog.updateFigure(data.type, data.auxTypes, img, data.result);
+      }
       break;
     case 'calcWaveform':
-      var img = entries[data.index[0]];
-      waveformDialog.updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
+      {
+        const img = entries[data.index[0]];
+        waveformDialog.updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
+      }
       break;
     case 'calcVectorscope':
       vectorscopeDialog.updateFigure(data.type, data.color, data.auxTypes, entries[data.index[0]], data.result);
@@ -2749,7 +2754,7 @@
         coef_g = rotation.vec3DTo2D(0, 1, 0);
         coef_b = rotation.vec3DTo2D(0, 0, 1);
       } else { // TYPE_YCbCr
-        var mat = colorDistAuxType2.current() === 0 ?
+        const mat = colorDistAuxType2.current() === 0 ?
             compareUtil.colorMatrixBT601 :
             compareUtil.colorMatrixBT709;
         coef_r = rotation.vec3DTo2D(mat[1][0], mat[2][0], mat[0][0]);
