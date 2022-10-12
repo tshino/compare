@@ -2182,6 +2182,68 @@ const CompareUtil = function(window) {
       discardTasksOf
     };
   };
+  const figureUtil = (function() {
+    const makeBlankFigure = function(w, h) {
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const context = canvas.getContext('2d');
+      return { canvas, context };
+    };
+    const canvasFromImage = function(image, w, h) {
+      const fig = makeBlankFigure(w, h);
+      fig.context.drawImage(image, 0, 0, w, h);
+      return fig.canvas;
+    };
+    const copyImageBits = function(src, dest) {
+      for (let i = 0, n = src.width * src.height * 4; i < n; ++i) {
+        dest.data[i] = src.data[i];
+      }
+    };
+    const makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
+      const grad = ctx.createLinearGradient(x0,y0,x1,y1);
+      for (let i = 0; i < stops.length; i++) {
+        grad.addColorStop(stops[i][0], stops[i][1]);
+      }
+      return grad;
+    };
+    const drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
+      context.fillStyle = color;
+      for (let i = 0; i < n; ++i) {
+        const v = h * Math.pow(hist[i + offset] / max, 0.5);
+        context.fillRect((x + i) * 3, y - v, 3, v);
+      }
+    };
+    const drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
+      const dLen = Math.sqrt(dx * dx + dy * dy);
+      const lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
+      ctx.font = '24px sans-serif';
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      for (let i = 0, label; label = labels[i]; ++i) {
+        const pos = { x: label.pos * dx, y: label.pos * dy };
+        const x1 = x + pos.x;
+        const y1 = y + pos.y;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x1 + lineDx, y1 + lineDy);
+        ctx.stroke();
+        ctx.textAlign = label.align;
+        ctx.fillText(label.label,
+          x + pos.x + lineDx,
+          y + pos.y + lineDy + 20);
+      }
+    };
+    return {
+      makeBlankFigure,
+      canvasFromImage,
+      copyImageBits,
+      makeLinearGradient,
+      drawHistogram,
+      drawAxes
+    };
+  })();
   return {
     browserNameOf,
     browserName,
@@ -2230,7 +2292,8 @@ const CompareUtil = function(window) {
     vertexUtil,
     rotationUtil,
     makeRotationCoefs,
-    makeTaskQueue
+    makeTaskQueue,
+    figureUtil
   };
 };
 

@@ -2289,4 +2289,36 @@ describe('CompareUtil', () => {
             assert.ok(mae2D(ret1.vertices3DTo2D(vertices), expected) <= 0.01);
         });
     });
+
+    describe('figureUtil', () => {
+        const figureUtil = compareUtil.figureUtil;
+        describe('copyImageBits', () => {
+            it('should copy image data', () => {
+                const src = {
+                    width: 3,
+                    height: 2,
+                    data: [
+                        1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255,
+                        4, 4, 4, 255, 5, 5, 5, 255, 6, 6, 6, 255
+                    ]
+                };
+                const dest = {
+                    width: 3,
+                    height: 2,
+                    data: [
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                    ]
+                };
+                figureUtil.copyImageBits(src, dest);
+                assert.deepStrictEqual(
+                    dest.data,
+                    [
+                        1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255,
+                        4, 4, 4, 255, 5, 5, 5, 255, 6, 6, 6, 255
+                    ]
+                );
+            })
+        });
+    });
 });

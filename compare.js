@@ -1330,7 +1330,7 @@
         error = false;
         onUpdate(); // retry
       } else if (!opening && stream) {
-        var canvas = figureUtil.canvasFromImage(video, video.videoWidth, video.videoHeight);
+        var canvas = compareUtil.figureUtil.canvasFromImage(video, video.videoWidth, video.videoHeight);
         addCapturedImage(canvas);
       }
     });
@@ -1626,68 +1626,6 @@
     }
     return img.imageData;
   };
-  const figureUtil = (function() {
-    const makeBlankFigure = function(w, h) {
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const context = canvas.getContext('2d');
-      return { canvas, context };
-    };
-    const canvasFromImage = function(image, w, h) {
-      const fig = makeBlankFigure(w, h);
-      fig.context.drawImage(image, 0, 0, w, h);
-      return fig.canvas;
-    };
-    const copyImageBits = function(src, dest) {
-      for (let i = 0, n = src.width * src.height * 4; i < n; ++i) {
-        dest.data[i] = src.data[i];
-      }
-    };
-    const makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
-      const grad = ctx.createLinearGradient(x0,y0,x1,y1);
-      for (let i = 0; i < stops.length; i++) {
-        grad.addColorStop(stops[i][0], stops[i][1]);
-      }
-      return grad;
-    };
-    const drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
-      context.fillStyle = color;
-      for (let i = 0; i < n; ++i) {
-        const v = h * Math.pow(hist[i + offset] / max, 0.5);
-        context.fillRect((x + i) * 3, y - v, 3, v);
-      }
-    };
-    const drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
-      const dLen = Math.sqrt(dx * dx + dy * dy);
-      const lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
-      ctx.font = '24px sans-serif';
-      ctx.fillStyle = color;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = lineWidth;
-      for (let i = 0, label; label = labels[i]; ++i) {
-        const pos = { x: label.pos * dx, y: label.pos * dy };
-        const x1 = x + pos.x;
-        const y1 = y + pos.y;
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x1 + lineDx, y1 + lineDy);
-        ctx.stroke();
-        ctx.textAlign = label.align;
-        ctx.fillText(label.label,
-          x + pos.x + lineDx,
-          y + pos.y + lineDy + 20);
-      }
-    };
-    return {
-      makeBlankFigure,
-      canvasFromImage,
-      copyImageBits,
-      makeLinearGradient,
-      drawHistogram,
-      drawAxes
-    };
-  })();
   const updateFigureTable = function(target, propName, update, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
@@ -1701,7 +1639,7 @@
     let k = 0;
     for (let img; img = images[k]; k++) {
       if (!img[propName]) {
-        img[propName] = figureUtil.makeBlankFigure(8, 8).canvas;
+        img[propName] = compareUtil.figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
       const label = makeImageNameWithIndex('<td>', img);
@@ -1920,7 +1858,7 @@
       });
     };
     const makeFigure = function(type, auxType2, hist) {
-      const fig = figureUtil.makeBlankFigure(figW, figH);
+      const fig = compareUtil.figureUtil.makeBlankFigure(figW, figH);
       const context = fig.context;
       let max = 0;
       for (let i = 0; i < hist.length; ++i) {
@@ -1944,31 +1882,31 @@
       let comp;
       if (type === 0) { // RGB
         if (histogramRowLayout.current()) {
-          figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
-          figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
-          figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 170, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 341, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 170);
           comp = [ '#f22', 168, 'R', '#2f2', 339, 'G', '#22f', 510, 'B' ];
         } else {
           context.globalCompositeOperation = 'lighter';
-          figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
-          figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
-          figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#f00', hist, max, 0, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#0f0', hist, max, 256, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#00f', hist, max, 512, 256, 0, 512, 512);
           comp = [ '#f22', 446, 'R', '#2f2', 478, 'G', '#22f', 510, 'B' ];
         }
       } else if (type === 1) { // Luminance
-        figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
+        compareUtil.figureUtil.drawHistogram(context, '#fff', hist, max, 0, 256, 0, 512, 512);
         comp = [ '#fff', 510, 'Y' ];
       } else { // YCbCr
         if (histogramRowLayout.current()) {
-          figureUtil.drawHistogram(context, '#ddd', hist, max, 0, 256, 0, 170, 170);
-          figureUtil.drawHistogram(context, '#22f', hist, max, 256, 256, 0, 341, 170);
-          figureUtil.drawHistogram(context, '#f22', hist, max, 512, 256, 0, 512, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#ddd', hist, max, 0, 256, 0, 170, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#22f', hist, max, 256, 256, 0, 341, 170);
+          compareUtil.figureUtil.drawHistogram(context, '#f22', hist, max, 512, 256, 0, 512, 170);
           comp = [ '#ddd', 168, 'Y', '#44f', 339, 'Cb', '#f44', 510, 'Cr' ];
         } else {
           context.globalCompositeOperation = 'lighter';
-          figureUtil.drawHistogram(context, '#aaa', hist, max, 0, 256, 0, 512, 512);
-          figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 512, 512);
-          figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#aaa', hist, max, 0, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#00f', hist, max, 256, 256, 0, 512, 512);
+          compareUtil.figureUtil.drawHistogram(context, '#f00', hist, max, 512, 256, 0, 512, 512);
           comp = [ '#ddd', 446, 'Y', '#44f', 478, 'Cb', '#f44', 510, 'Cr' ];
         }
       }
@@ -1981,7 +1919,7 @@
           pos: (0.5 + i) / 256, align: 'center', label: (i%64 === 0) ? ''+i : ''
         });
       }
-      figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
+      compareUtil.figureUtil.drawAxes(fig.context, 0, 512, 768, 0, 10, 3, '#000', axes);
       const drawAxesLabels = function(context, comp) {
         context.font = '30px sans-serif';
         context.textAlign = 'left';
@@ -2076,7 +2014,7 @@
       //
       const columnLayout = (type === 0 || type === 2) && waveformColumnLayout.current();
       const figW = columnLayout ? histW * 3 : histW;
-      const fig = figureUtil.makeBlankFigure(figW, figH);
+      const fig = compareUtil.figureUtil.makeBlankFigure(figW, figH);
       const context = fig.context;
       const bits = context.createImageData(figW, 256);
       const s = -4 * figW;
@@ -2454,7 +2392,7 @@
       }
       const w = img.canvasWidth;
       const h = img.canvasHeight;
-      const fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = compareUtil.figureUtil.makeBlankFigure(320, 320);
       const notify = function() {
         img.vectorscope = fig.canvas;
         updateTable();
@@ -2830,7 +2768,7 @@
       }
     };
     const createFigure = function(img) {
-      const fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = compareUtil.figureUtil.makeBlankFigure(320, 320);
       if (img.colorTable) {
         makeFigure(fig, img.colorTable);
       }
@@ -2950,7 +2888,7 @@
         }
         return [x - 12, y0, x - 1, y1];
       })();
-      ctx.fillStyle = figureUtil.makeLinearGradient(
+      ctx.fillStyle = compareUtil.figureUtil.makeLinearGradient(
         ctx, bar[0], bar[3], bar[0], bar[1], colorStops
       );
       ctx.fillRect(bar[0], bar[1], bar[2] - bar[0], bar[3] - bar[1]);
@@ -3074,7 +3012,7 @@
       }
     };
     const createFigure = function(img) {
-      const fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = compareUtil.figureUtil.makeBlankFigure(320, 320);
       if (img.waveform3D) {
         makeFigure(fig, img.waveform3D);
       }
@@ -3116,7 +3054,7 @@
     const drawFigure = function(reducedColorTable) {
       const colorList = reducedColorTable.colorList;
       const height = 480;
-      const fig = figureUtil.makeBlankFigure(256, height);
+      const fig = compareUtil.figureUtil.makeBlankFigure(256, height);
       const context = fig.context;
       context.fillStyle = '#444';
       context.fillRect(0, 0, 256, height);
@@ -3431,7 +3369,7 @@
       }
       count += 1;
       if (!img[propName]) {
-        img[propName] = figureUtil.makeBlankFigure(8,8).canvas;
+        img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
         update(entries[baseImageIndex], img);
       }
       const label = makeImageNameWithIndex('<span>', img);
@@ -3495,7 +3433,7 @@
       });
     };
     const makeToneMapFigure = function(toneMapData, type) {
-      const fig = figureUtil.makeBlankFigure(320, 320);
+      const fig = compareUtil.figureUtil.makeBlankFigure(320, 320);
       const dist = toneMapData.dist;
       const max = toneMapData.max;
       const bits = makeDistributionImageData(fig.context, 256, 256, dist, max, 96, type);
@@ -3735,9 +3673,9 @@
     const makeFigure = function(styles) {
       const w = opticalFlowResult.result.image.width;
       const h = opticalFlowResult.result.image.height;
-      const fig = figureUtil.makeBlankFigure(w, h);
+      const fig = compareUtil.figureUtil.makeBlankFigure(w, h);
       const bits = fig.context.createImageData(w, h);
-      figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
+      compareUtil.figureUtil.copyImageBits(opticalFlowResult.result.image, bits);
       const vectorPaths = [];
       const circles = [];
       fig.context.putImageData(bits, 0, 0);
@@ -3821,7 +3759,7 @@
       const figH = Math.max(320, Math.round($('#view').height() * 0.55)), figMargin = 8;
       const styles = makeFigureStyles(figW, figH, figMargin, '#000');
       if (opticalFlowResult.result === null) {
-        $('#opticalFlowResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+        $('#opticalFlowResult').append(compareUtil.figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
         $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
         textUtil.setText($('#opticalFlowSummary'), {
@@ -4013,7 +3951,7 @@
     };
     const makeHistogramFigure = function(hist, ignoreAE) {
       ignoreAE = compareUtil.clamp(ignoreAE, 0, 255);
-      const fig = figureUtil.makeBlankFigure(256 * 3, 320);
+      const fig = compareUtil.figureUtil.makeBlankFigure(256 * 3, 320);
       const context = fig.context;
       context.fillStyle = '#222';
       context.fillRect(0,0,256*3,320);
@@ -4023,8 +3961,8 @@
       for (let i = 0; i < hist.length; ++i) {
         max = Math.max(max, hist[i]);
       }
-      figureUtil.drawHistogram(context, '#ccc', hist, max, 0, ignoreAE + 1, 0, 320, 300);
-      figureUtil.drawHistogram(context, '#fff', hist, max, ignoreAE + 1, 255 - ignoreAE, ignoreAE + 1, 320, 300);
+      compareUtil.figureUtil.drawHistogram(context, '#ccc', hist, max, 0, ignoreAE + 1, 0, 320, 300);
+      compareUtil.figureUtil.drawHistogram(context, '#fff', hist, max, ignoreAE + 1, 255 - ignoreAE, ignoreAE + 1, 320, 300);
       return fig.canvas;
     };
     const updateReport = function(styles) {
@@ -4043,9 +3981,9 @@
       $('#diffAEHistogram').append($(histFig).css({ width: '320px', height: '160px' }));
       const w = diffResult.result.image.width;
       const h = diffResult.result.image.height;
-      const fig = figureUtil.makeBlankFigure(w, h);
+      const fig = compareUtil.figureUtil.makeBlankFigure(w, h);
       const bits = fig.context.createImageData(w, h);
-      figureUtil.copyImageBits(diffResult.result.image, bits);
+      compareUtil.figureUtil.copyImageBits(diffResult.result.image, bits);
       fig.context.putImageData(bits, 0, 0);
       styles = updateFigureStylesForActualSize(styles, w, h);
       diffResult.baseWidth = styles.baseW;
@@ -4133,8 +4071,8 @@
         updateAsync();
       }
       if (diffResult.result === null) {
-        $('#diffAEHistogram').append($(figureUtil.makeBlankFigure(8,8).canvas).css({width:'320px',height:'160px'}));
-        $('#diffResult').append(figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
+        $('#diffAEHistogram').append($(compareUtil.figureUtil.makeBlankFigure(8,8).canvas).css({width:'320px',height:'160px'}));
+        $('#diffResult').append(compareUtil.figureUtil.makeBlankFigure(8,8).canvas).css(styles.cellStyle);
         textUtil.setText($('#diffSummary'), {
           en: 'calculating...',
           ja: '計算中...'
@@ -4265,7 +4203,7 @@
     };
     const colorBars = {};
     const makeColorBar = function(colorMap) {
-      const fig = figureUtil.makeBlankFigure(512 + 2, 44);
+      const fig = compareUtil.figureUtil.makeBlankFigure(512 + 2, 44);
       for (let i = 0; i < 256; ++i) {
         const color = 'rgb(' + colorMap[i] + ',' +
                 colorMap[i + 256] + ',' + colorMap[i + 512] + ')';
@@ -4279,7 +4217,7 @@
         { pos: 192.5, align: 'center', label: '192' },
         { pos: 255.5, align: 'right',  label: '255' }
       ];
-      figureUtil.drawAxes(fig.context, 1, 0, 2, 0, 12, 1, '#fff', axes);
+      compareUtil.figureUtil.drawAxes(fig.context, 1, 0, 2, 0, 12, 1, '#fff', axes);
       return $(fig.canvas).width(256).addClass('colorbar');
     };
     $('#altViewMode .close').on('click', function(e) {
@@ -4461,7 +4399,7 @@
         return null;
       }
       const w = imageData.width, h = imageData.height;
-      const altView = figureUtil.makeBlankFigure(w, h);
+      const altView = compareUtil.figureUtil.makeBlankFigure(w, h);
       const altImageData = altView.context.createImageData(w, h);
       const coef = colorSpaces[colorSpace].coef[component - 1];
       const r = coef[0], g = coef[1], b = coef[2], a = coef[3], c = coef[4];
@@ -4729,7 +4667,7 @@
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
   const setEntryImage = function(entry, image, w, h) {
-    const canvas = image.nodeName === 'CANVAS' ? image : figureUtil.canvasFromImage(image, w, h);
+    const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
     entry.mainImage  = image;
     entry.element    = entry.mainImage;
@@ -4794,7 +4732,7 @@
           h = 150;
           entry.sizeUnknown = true;
         }
-        const mainImage = useCanvasToDisplay ? figureUtil.canvasFromImage(img, w, h) : img;
+        const mainImage = useCanvasToDisplay ? compareUtil.figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
       }).
       on('error', function() {
