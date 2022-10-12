@@ -1626,49 +1626,49 @@
     }
     return img.imageData;
   };
-  var figureUtil = (function() {
+  const figureUtil = (function() {
     const makeBlankFigure = function(w, h) {
-      var canvas = document.createElement('canvas');
+      const canvas = document.createElement('canvas');
       canvas.width = w;
       canvas.height = h;
-      var context = canvas.getContext('2d');
-      return { canvas: canvas, context: context };
+      const context = canvas.getContext('2d');
+      return { canvas, context };
     };
     const canvasFromImage = function(image, w, h) {
-      var fig = makeBlankFigure(w, h);
+      const fig = makeBlankFigure(w, h);
       fig.context.drawImage(image, 0, 0, w, h);
       return fig.canvas;
     };
     const copyImageBits = function(src, dest) {
-      for (var i = 0, n = src.width * src.height * 4; i < n; ++i) {
+      for (let i = 0, n = src.width * src.height * 4; i < n; ++i) {
         dest.data[i] = src.data[i];
       }
     };
     const makeLinearGradient = function(ctx, x0,y0,x1,y1,stops) {
-      var grad = ctx.createLinearGradient(x0,y0,x1,y1);
-      for (var i = 0; i < stops.length; i++) {
+      const grad = ctx.createLinearGradient(x0,y0,x1,y1);
+      for (let i = 0; i < stops.length; i++) {
         grad.addColorStop(stops[i][0], stops[i][1]);
       }
       return grad;
     };
     const drawHistogram = function(context, color, hist, max, offset, n, x, y, h) {
       context.fillStyle = color;
-      for (var i = 0; i < n; ++i) {
-        var v = h * Math.pow(hist[i + offset] / max, 0.5);
+      for (let i = 0; i < n; ++i) {
+        const v = h * Math.pow(hist[i + offset] / max, 0.5);
         context.fillRect((x + i) * 3, y - v, 3, v);
       }
     };
     const drawAxes = function(ctx, x, y, dx, dy, lineLen, lineWidth, color, labels) {
-      var dLen = Math.sqrt(dx * dx + dy * dy);
-      var lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
+      const dLen = Math.sqrt(dx * dx + dy * dy);
+      const lineDx = -dy / dLen * lineLen, lineDy = dx / dLen * lineLen;
       ctx.font = '24px sans-serif';
       ctx.fillStyle = color;
       ctx.strokeStyle = color;
       ctx.lineWidth = lineWidth;
-      for (var i = 0, label; label = labels[i]; ++i) {
-        var pos = { x: label.pos * dx, y: label.pos * dy };
-        var x1 = x + pos.x;
-        var y1 = y + pos.y;
+      for (let i = 0, label; label = labels[i]; ++i) {
+        const pos = { x: label.pos * dx, y: label.pos * dy };
+        const x1 = x + pos.x;
+        const y1 = y + pos.y;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x1 + lineDx, y1 + lineDy);
@@ -1680,12 +1680,12 @@
       }
     };
     return {
-      makeBlankFigure: makeBlankFigure,
-      canvasFromImage: canvasFromImage,
-      copyImageBits: copyImageBits,
-      makeLinearGradient: makeLinearGradient,
-      drawHistogram: drawHistogram,
-      drawAxes: drawAxes
+      makeBlankFigure,
+      canvasFromImage,
+      copyImageBits,
+      makeLinearGradient,
+      drawHistogram,
+      drawAxes
     };
   })();
   const updateFigureTable = function(target, propName, update, styles, transformOnly) {
