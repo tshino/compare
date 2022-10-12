@@ -1545,9 +1545,9 @@
       toggle: toggle
     };
   })();
-  var nowLoadingDialog = (function() {
-    var loading = [];
-    var toggleNowLoading = dialogUtil.defineDialog($('#loading'));
+  const nowLoadingDialog = (function() {
+    let loading = [];
+    const toggleNowLoading = dialogUtil.defineDialog($('#loading'));
     const add = function(entry) {
       loading.push(entry);
     };
@@ -1559,9 +1559,9 @@
       if (0 === loading.length) {
         return;
       }
-      var finished = true, errors = 0;
-      for (var i = 0, ent; ent = loading[i]; i++) {
-        var td = $('<td>').css({ minWidth: '400px' });
+      let finished = true, errors = 0;
+      for (let i = 0, ent; ent = loading[i]; i++) {
+        const td = $('<td>').css({ minWidth: '400px' });
         if (ent.loading) {
           td.addClass('loading').
             text('Loading...').
@@ -1604,17 +1604,17 @@
       }
     };
     return {
-      add: add,
-      update: update
+      add,
+      update
     };
   })();
   const getImageData = function(img) {
     if (!img.imageData) {
-      var w = img.canvasWidth;
-      var h = img.canvasHeight;
+      const w = img.canvasWidth;
+      const h = img.canvasHeight;
       try {
-        var context = img.asCanvas.getContext('2d');
-        var imageData = context.getImageData(0, 0, w, h);
+        const context = img.asCanvas.getContext('2d');
+        const imageData = context.getImageData(0, 0, w, h);
         // avoid huge memory consumption
         if (w * h <= 30 * 1024 * 1024) {
           img.imageData = imageData;
