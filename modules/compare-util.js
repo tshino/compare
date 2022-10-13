@@ -2150,31 +2150,54 @@ const CompareUtil = function(window) {
       vertices3DTo2D
     };
   };
+  const TaskQueue = function(processResult) {
+    let runningCount = 0;
+    let queue = [];
+    const pop = function() {
+      if (runningCount === 0 && 0 < queue.length) {
+        const task = queue.shift();
+        if (task.prepare && false === task.prepare(task.data)) {
+          return null;
+        }
+        ++runningCount;
+        return task.data;
+      }
+      return null;
+    };
+    const push = function(data, prepare) {
+      const task = { data, prepare };
+      queue.push(task);
+    };
+    const cancelIf = function(pred) {
+      queue = queue.filter(function(task,i,a) { return !pred(task); });
+    };
+    const processResponse = function(data) {
+      processResult(data);
+      --runningCount;
+    };
+    return {
+      pop,
+      push,
+      cancelIf,
+      processResponse
+    }
+  };
   const makeTaskQueue = function(workerPath, processResult) {
     const worker = newWorker(workerPath);
-    let taskCount = 0;
-    let taskQueue = [];
+    const taskQueue = TaskQueue(processResult);
     const kickNextTask = function() {
-      if (taskCount === 0 && 0 < taskQueue.length) {
-        const task = taskQueue.shift();
-        if (task.prepare && false === task.prepare(task.data)) {
-          return;
-        }
-        worker.postMessage(task.data);
-        ++taskCount;
+      const data = taskQueue.pop();
+      if (data) {
+        worker.postMessage(data);
       }
     };
     const addTask = function(data, prepare) {
-      const task = { data: data, prepare: prepare };
-      taskQueue.push(task);
+      taskQueue.push(data, prepare);
       window.setTimeout(kickNextTask, 0);
     };
-    const discardTasksOf = function(pred) {
-      taskQueue = taskQueue.filter(function(task,i,a) { return !pred(task); });
-    };
+    const discardTasksOf = taskQueue.cancelIf;
     worker.addEventListener('message', function(e) {
-      processResult(e.data);
-      --taskCount;
+      taskQueue.processResponse(e.data);
       window.setTimeout(kickNextTask, 0);
     }, false);
     return {
