@@ -2315,6 +2315,7 @@ const CompareUtil = function(window) {
     vertexUtil,
     rotationUtil,
     makeRotationCoefs,
+    TaskQueue,
     makeTaskQueue,
     figureUtil
   };

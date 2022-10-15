@@ -2290,6 +2290,52 @@ describe('CompareUtil', () => {
         });
     });
 
+    describe('TaskQueue', () => {
+        const TaskQueue = compareUtil.TaskQueue;
+        describe('pop', () => {
+            it('should return null if the queue is empty', () => {
+                const tq = TaskQueue(()=>{});
+                assert.strictEqual(tq.pop(), null);
+            });
+            it('should return enqueued task data', () => {
+                const tq = TaskQueue(()=>{});
+                const data = { number: 42 };
+                tq.push(data);
+                assert.strictEqual(tq.pop(), data);
+            });
+            it('should remove returned task data from the queue', () => {
+                const tq = TaskQueue(()=>{});
+                const data = { number: 42 };
+                tq.push(data);
+                tq.pop();
+                assert.strictEqual(tq.pop(), null);
+            });
+            it('should return null if any task is running', () => {
+                const tq = TaskQueue(()=>{});
+                const data1 = {};
+                const data2 = {};
+                tq.push(data1); // enqueue
+                tq.pop(); // start running
+                tq.push(data2); // enqueue
+                assert.strictEqual(tq.pop(), null);
+            });
+            it('should run prepare function when returning a task data', () => {
+                const log = [];
+                const tq = TaskQueue(()=>{});
+                const data = { number: 42 };
+                const prepare = (data) => { log.push(`data: ${data.number}`); };
+                tq.push(data, prepare);
+                assert.deepStrictEqual(log, []);
+                const returned = tq.pop();
+                assert.strictEqual(returned, data);
+                assert.deepStrictEqual(log, ['data: 42']);
+            });
+        });
+        // TODO: push
+        // TODO: cancelIf
+        // TODO: processResponse
+    });
+
     describe('figureUtil', () => {
         const figureUtil = compareUtil.figureUtil;
         describe('copyImageBits', () => {
