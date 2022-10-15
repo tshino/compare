@@ -2330,9 +2330,29 @@ describe('CompareUtil', () => {
                 assert.strictEqual(returned, data);
                 assert.deepStrictEqual(log, ['data: 42']);
             });
-            // TODO: if prepare returned false
+            it('should return null if prepare function returned false', () => {
+                const tq = TaskQueue(()=>{});
+                const data = { number: 42 };
+                const prepare = () => { return false; };
+                tq.push(data, prepare);
+                assert.strictEqual(tq.pop(), null);
+            })
         });
-        // TODO: push
+        describe('push', () => {
+            const countTasks = function(tq) {
+                let count = 0;
+                tq.cancelIf(() => { count++; return false; });
+                return count;
+            };
+            it('should add new task to internal queue', () => {
+                const tq = TaskQueue(()=>{});
+                assert.strictEqual(countTasks(tq), 0);
+                tq.push({});
+                assert.strictEqual(countTasks(tq), 1);
+                tq.push({});
+                assert.strictEqual(countTasks(tq), 2);
+            });
+        });
         describe('cancelIf', () => {
             it('should discard enqueued tasks that satisfy a condition', () => {
                 const tq = TaskQueue(()=>{});
@@ -2344,7 +2364,6 @@ describe('CompareUtil', () => {
                 tq.processResponse({ number: 42 });
                 assert.deepStrictEqual(tq.pop(), { number: 100 });
             });
-            // TODO: more case
         });
         // TODO: processResponse
     });
