@@ -2297,11 +2297,13 @@ describe('CompareUtil', () => {
                 const tq = TaskQueue(()=>{});
                 assert.strictEqual(tq.pop(), null);
             });
-            it('should return enqueued task data', () => {
+            it('should return a request message with enqueued task data', () => {
                 const tq = TaskQueue(()=>{});
                 const data = { number: 42 };
                 tq.push(data);
-                assert.strictEqual(tq.pop(), data);
+                const request = tq.pop();
+                assert.ok(request !== null);
+                assert.strictEqual(request.data, data);
             });
             it('should remove returned task data from the queue', () => {
                 const tq = TaskQueue(()=>{});
@@ -2327,7 +2329,8 @@ describe('CompareUtil', () => {
                 tq.push(data, prepare);
                 assert.deepStrictEqual(log, []);
                 const returned = tq.pop();
-                assert.strictEqual(returned, data);
+                assert.ok(returned !== null);
+                assert.strictEqual(returned.data, data);
                 assert.deepStrictEqual(log, ['data: 42']);
             });
             it('should return null if prepare function returned false', () => {
@@ -2336,7 +2339,7 @@ describe('CompareUtil', () => {
                 const prepare = () => { return false; };
                 tq.push(data, prepare);
                 assert.strictEqual(tq.pop(), null);
-            })
+            });
         });
         describe('push', () => {
             const countTasks = function(tq) {
@@ -2360,9 +2363,13 @@ describe('CompareUtil', () => {
                 tq.push({ number: 42 });
                 tq.push({ number: 100 });
                 tq.cancelIf(data => data.number === 7);
-                assert.deepStrictEqual(tq.pop(), { number: 42 });
-                tq.processResponse({ number: 42 });
-                assert.deepStrictEqual(tq.pop(), { number: 100 });
+                const request1 = tq.pop();
+                assert.ok(request1 !== null);
+                assert.deepStrictEqual(request1.data, { number: 42 });
+                tq.processResponse(request1.data);
+                const request2 = tq.pop();
+                assert.ok(request2 !== null);
+                assert.deepStrictEqual(request2.data, { number: 100 });
             });
         });
         // TODO: processResponse

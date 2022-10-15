@@ -2160,7 +2160,8 @@ const CompareUtil = function(window) {
           return null;
         }
         ++runningCount;
-        return task.data;
+        const request = { data: task.data };
+        return request;
       }
       return null;
     };
@@ -2171,8 +2172,8 @@ const CompareUtil = function(window) {
     const cancelIf = function(pred) {
       queue = queue.filter(function(task,i,a) { return !pred(task.data); });
     };
-    const processResponse = function(data) {
-      processResult(data);
+    const processResponse = function(response) {
+      processResult(response.data);
       --runningCount;
     };
     return {
@@ -2186,9 +2187,8 @@ const CompareUtil = function(window) {
     const worker = newWorker(workerPath);
     const taskQueue = TaskQueue(processResult);
     const kickNextTask = function() {
-      const data = taskQueue.pop();
-      if (data) {
-        const request = { data: data };
+      const request = taskQueue.pop();
+      if (request) {
         worker.postMessage(request);
       }
     };
@@ -2199,7 +2199,7 @@ const CompareUtil = function(window) {
     const discardTasksOf = taskQueue.cancelIf;
     worker.addEventListener('message', function(e) {
       const response = e.data;
-      taskQueue.processResponse(response.data);
+      taskQueue.processResponse(response);
       window.setTimeout(kickNextTask, 0);
     }, false);
     return {
