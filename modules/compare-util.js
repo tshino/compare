@@ -2188,7 +2188,8 @@ const CompareUtil = function(window) {
     const kickNextTask = function() {
       const data = taskQueue.pop();
       if (data) {
-        worker.postMessage(data);
+        const request = { data: data };
+        worker.postMessage(request);
       }
     };
     const addTask = function(data, prepare) {
@@ -2197,7 +2198,8 @@ const CompareUtil = function(window) {
     };
     const discardTasksOf = taskQueue.cancelIf;
     worker.addEventListener('message', function(e) {
-      taskQueue.processResponse(e.data);
+      const response = e.data;
+      taskQueue.processResponse(response.data);
       window.setTimeout(kickNextTask, 0);
     }, false);
     return {

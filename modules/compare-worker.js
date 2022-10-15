@@ -9,7 +9,8 @@ var importScript = function(relativePath) {
 importScript('compare-image-util.js');
 
 self.addEventListener('message', function(e) {
-  var data = e.data;
+  const request = e.data;
+  const data = request.data;
   var result = {};
   result.cmd    = data.cmd;
   result.index  = data.index;
@@ -59,7 +60,8 @@ self.addEventListener('message', function(e) {
     result.options = data.options;
     break;
   }
-  self.postMessage( result );
+  const response = { data: result, requestId: request.requestId }
+  self.postMessage( response );
 }, false);
 
 var srgb255ToLinear255 = (function() {
