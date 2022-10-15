@@ -2169,7 +2169,7 @@ const CompareUtil = function(window) {
       queue.push(task);
     };
     const cancelIf = function(pred) {
-      queue = queue.filter(function(task,i,a) { return !pred(task); });
+      queue = queue.filter(function(task,i,a) { return !pred(task.data); });
     };
     const processResponse = function(data) {
       processResult(data);

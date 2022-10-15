@@ -2330,9 +2330,22 @@ describe('CompareUtil', () => {
                 assert.strictEqual(returned, data);
                 assert.deepStrictEqual(log, ['data: 42']);
             });
+            // TODO: if prepare returned false
         });
         // TODO: push
-        // TODO: cancelIf
+        describe('cancelIf', () => {
+            it('should discard enqueued tasks that satisfy a condition', () => {
+                const tq = TaskQueue(()=>{});
+                tq.push({ number: 7 });
+                tq.push({ number: 42 });
+                tq.push({ number: 100 });
+                tq.cancelIf(data => data.number === 7);
+                assert.deepStrictEqual(tq.pop(), { number: 42 });
+                tq.processResponse({ number: 42 });
+                assert.deepStrictEqual(tq.pop(), { number: 100 });
+            });
+            // TODO: more case
+        });
         // TODO: processResponse
     });
 
