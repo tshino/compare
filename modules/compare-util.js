@@ -2151,6 +2151,7 @@ const CompareUtil = function(window) {
     };
   };
   const TaskQueue = function(processResult) {
+    let lastId = 0;
     let runningCount = 0;
     let queue = [];
     const pop = function() {
@@ -2160,13 +2161,14 @@ const CompareUtil = function(window) {
           return null;
         }
         ++runningCount;
-        const request = { data: task.data };
+        const request = { data: task.data, requestId: task.requestId };
         return request;
       }
       return null;
     };
     const push = function(data, prepare) {
-      const task = { data, prepare };
+      const requestId = ++lastId;
+      const task = { data, requestId, prepare };
       queue.push(task);
     };
     const cancelIf = function(pred) {

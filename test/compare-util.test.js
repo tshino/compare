@@ -2355,6 +2355,24 @@ describe('CompareUtil', () => {
                 tq.push({});
                 assert.strictEqual(countTasks(tq), 2);
             });
+            it('should assign unique requestId for each task', () => {
+                const tq = TaskQueue(()=>{});
+                tq.push({ number: 100 });
+                tq.push({ number: 200 });
+                tq.push({ number: 300 });
+                const request1 = tq.pop();
+                assert.ok(request1 && request1.requestId);
+                tq.processResponse(request1);
+                const request2 = tq.pop();
+                assert.ok(request2 && request2.requestId);
+                assert.ok(request2.requestId !== request1.requestId);
+                tq.processResponse(request2);
+                const request3 = tq.pop();
+                assert.ok(request3 && request3.requestId);
+                assert.ok(request3.requestId !== request1.requestId);
+                assert.ok(request3.requestId !== request2.requestId);
+                tq.processResponse(request3);
+            });
         });
         describe('cancelIf', () => {
             it('should discard enqueued tasks that satisfy a condition', () => {
