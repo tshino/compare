@@ -2390,7 +2390,27 @@ describe('CompareUtil', () => {
                 assert.deepStrictEqual(request2.data, { number: 100 });
             });
         });
-        // TODO: processResponse
+        describe('processResponse', () => {
+            it('should run accept function', () => {
+                const log = [];
+                const accept = (data) => { log.push(`data: ${data.number}`); };
+                const data1 = { number: 42 };
+                const data2 = { number: 123 };
+                const tq = TaskQueue(accept);
+                tq.push(data1);
+                tq.push(data2);
+                const request1 = tq.pop();
+                const response1 = request1;
+                assert.deepStrictEqual(log, []);
+                tq.processResponse(response1);
+                assert.deepStrictEqual(log, ['data: 42']);
+                const request2 = tq.pop();
+                const response2 = request2;
+                tq.processResponse(response2);
+                assert.deepStrictEqual(log, ['data: 42', 'data: 123']);
+            });
+            // TODO: more test
+        });
     });
 
     describe('figureUtil', () => {
