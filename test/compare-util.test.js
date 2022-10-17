@@ -2294,11 +2294,11 @@ describe('CompareUtil', () => {
         const TaskQueue = compareUtil.TaskQueue;
         describe('pop', () => {
             it('should return null if the queue is empty', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 assert.strictEqual(tq.pop(), null);
             });
             it('should return a request message with enqueued task data', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 const data = { number: 42 };
                 tq.push(data);
                 const request = tq.pop();
@@ -2306,14 +2306,14 @@ describe('CompareUtil', () => {
                 assert.strictEqual(request.data, data);
             });
             it('should remove returned task data from the queue', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 const data = { number: 42 };
                 tq.push(data);
                 tq.pop();
                 assert.strictEqual(tq.pop(), null);
             });
             it('should return null if any task is running', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 const data1 = {};
                 const data2 = {};
                 tq.push(data1); // enqueue
@@ -2323,7 +2323,7 @@ describe('CompareUtil', () => {
             });
             it('should run prepare function when returning a task data', () => {
                 const log = [];
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 const data = { number: 42 };
                 const prepare = (data) => { log.push(`data: ${data.number}`); };
                 tq.push(data, prepare);
@@ -2334,7 +2334,7 @@ describe('CompareUtil', () => {
                 assert.deepStrictEqual(log, ['data: 42']);
             });
             it('should return null if prepare function returned false', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 const data = { number: 42 };
                 const prepare = () => { return false; };
                 tq.push(data, prepare);
@@ -2348,7 +2348,7 @@ describe('CompareUtil', () => {
                 return count;
             };
             it('should add new task to internal queue', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 assert.strictEqual(countTasks(tq), 0);
                 tq.push({});
                 assert.strictEqual(countTasks(tq), 1);
@@ -2356,7 +2356,7 @@ describe('CompareUtil', () => {
                 assert.strictEqual(countTasks(tq), 2);
             });
             it('should assign unique requestId for each task', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 tq.push({ number: 100 });
                 tq.push({ number: 200 });
                 tq.push({ number: 300 });
@@ -2376,7 +2376,7 @@ describe('CompareUtil', () => {
         });
         describe('cancelIf', () => {
             it('should discard enqueued tasks that satisfy a condition', () => {
-                const tq = TaskQueue(()=>{});
+                const tq = TaskQueue();
                 tq.push({ number: 7 });
                 tq.push({ number: 42 });
                 tq.push({ number: 100 });
@@ -2397,7 +2397,7 @@ describe('CompareUtil', () => {
                 const accept1 = (data) => { log.push(`accept1: ${data.number}`); };
                 const data2 = { number: 123 };
                 const accept2 = (data) => { log.push(`accept2: ${data.number}`); };
-                const tq = TaskQueue(() => {});
+                const tq = TaskQueue();
                 tq.push(data1, null, accept1);
                 tq.push(data2, null, accept2);
                 const request1 = tq.pop();
@@ -2410,7 +2410,11 @@ describe('CompareUtil', () => {
                 tq.processResponse(response2);
                 assert.deepStrictEqual(log, ['accept1: 42', 'accept2: 123']);
             });
-            // TODO: more test
+            it('should ignore reponses with unknown requestId', () => {
+                const tq = TaskQueue();
+                const response = { requestId: 999 };
+                tq.processResponse(response);
+            });
         });
     });
 
