@@ -2384,30 +2384,31 @@ describe('CompareUtil', () => {
                 const request1 = tq.pop();
                 assert.ok(request1 !== null);
                 assert.deepStrictEqual(request1.data, { number: 42 });
-                tq.processResponse(request1.data);
+                tq.processResponse(request1);
                 const request2 = tq.pop();
                 assert.ok(request2 !== null);
                 assert.deepStrictEqual(request2.data, { number: 100 });
             });
         });
         describe('processResponse', () => {
-            it('should run accept function', () => {
+            it('should run dedicated accept function', () => {
                 const log = [];
-                const accept = (data) => { log.push(`data: ${data.number}`); };
                 const data1 = { number: 42 };
+                const accept1 = (data) => { log.push(`accept1: ${data.number}`); };
                 const data2 = { number: 123 };
-                const tq = TaskQueue(accept);
-                tq.push(data1);
-                tq.push(data2);
+                const accept2 = (data) => { log.push(`accept2: ${data.number}`); };
+                const tq = TaskQueue(() => {});
+                tq.push(data1, null, accept1);
+                tq.push(data2, null, accept2);
                 const request1 = tq.pop();
                 const response1 = request1;
                 assert.deepStrictEqual(log, []);
                 tq.processResponse(response1);
-                assert.deepStrictEqual(log, ['data: 42']);
+                assert.deepStrictEqual(log, ['accept1: 42']);
                 const request2 = tq.pop();
                 const response2 = request2;
                 tq.processResponse(response2);
-                assert.deepStrictEqual(log, ['data: 42', 'data: 123']);
+                assert.deepStrictEqual(log, ['accept1: 42', 'accept2: 123']);
             });
             // TODO: more test
         });

@@ -2150,33 +2150,41 @@ const CompareUtil = function(window) {
       vertices3DTo2D
     };
   };
-  const TaskQueue = function(processResult) {
+  const TaskQueue = function() {
     let lastId = 0;
-    let runningCount = 0;
     let queue = [];
+    const running = new Map();
     const pop = function() {
-      if (runningCount === 0 && 0 < queue.length) {
+      if (running.size === 0 && 0 < queue.length) {
         const task = queue.shift();
         if (task.prepare && false === task.prepare(task.data)) {
           return null;
         }
-        ++runningCount;
-        const request = { data: task.data, requestId: task.requestId };
+        const requestId = task.requestId;
+        running.set(requestId, { accept: task.accept });
+        const request = { data: task.data, requestId };
         return request;
       }
       return null;
     };
-    const push = function(data, prepare) {
+    const push = function(data, prepare, accept) {
       const requestId = ++lastId;
-      const task = { data, requestId, prepare };
+      const task = { data, requestId, prepare, accept };
       queue.push(task);
     };
     const cancelIf = function(pred) {
       queue = queue.filter(function(task,i,a) { return !pred(task.data); });
     };
     const processResponse = function(response) {
-      processResult(response.data);
-      --runningCount;
+      const requestId = response.requestId;
+      const task = running.get(requestId);
+      if (task) {
+        const accept = task.accept;
+        if (accept) {
+          accept(response.data);
+        }
+      }
+      running.delete(requestId);
     };
     return {
       pop,
@@ -2187,7 +2195,7 @@ const CompareUtil = function(window) {
   };
   const makeTaskQueue = function(workerPath, processResult) {
     const worker = newWorker(workerPath);
-    const taskQueue = TaskQueue(processResult);
+    const taskQueue = TaskQueue();
     const kickNextTask = function() {
       const request = taskQueue.pop();
       if (request) {
@@ -2195,7 +2203,7 @@ const CompareUtil = function(window) {
       }
     };
     const addTask = function(data, prepare) {
-      taskQueue.push(data, prepare);
+      taskQueue.push(data, prepare, processResult);
       window.setTimeout(kickNextTask, 0);
     };
     const discardTasksOf = taskQueue.cancelIf;
