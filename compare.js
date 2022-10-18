@@ -1688,9 +1688,6 @@
 
   const processTaskResult = function(data) {
     switch (data.cmd) {
-    case 'calcVectorscope':
-      vectorscopeDialog.updateFigure(data.type, data.color, data.auxTypes, entries[data.index[0]], data.result);
-      break;
     case 'calcColorTable':
       entries[data.index[0]].colorTable = data.result;
       colorDistDialog.updateFigure(entries[data.index[0]]);
@@ -2236,15 +2233,6 @@
       }
     };
     updateAuxOption();
-    const updateAsync = function(img) {
-      taskQueue.addTaskWithImageData({
-        cmd:      'calcVectorscope',
-        type:     vectorscopeType.current(),
-        color:    colorMode.current(),
-        auxTypes: [vectorscopeAuxType.current(), vectorscopeAuxType2.current()],
-        index:    [img.index]
-      });
-    };
     const makeFigure = function(type, auxType2, color, fig, w, h, result) {
       const context = fig.context;
       let bits;
@@ -2404,6 +2392,18 @@
         notify();
       }
     };
+    const updateAsync = function(img) {
+      taskQueue.addTaskWithImageData({
+        cmd:      'calcVectorscope',
+        type:     vectorscopeType.current(),
+        color:    colorMode.current(),
+        auxTypes: [vectorscopeAuxType.current(), vectorscopeAuxType2.current()],
+        index:    [img.index]
+      }, (data) => {
+        const img = entries[data.index[0]];
+        updateFigure(data.type, data.color, data.auxTypes, img, data.result);
+      });
+    };
     const updateTable = function(transformOnly) {
       const w = 320, h = 320, margin = 10;
       const styles = makeFigureStyles(w, h, margin, '#444', figureZoom);
@@ -2419,7 +2419,6 @@
       }
     };
     return {
-      updateFigure,
       toggle,
       processKeyDown
     };
