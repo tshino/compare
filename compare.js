@@ -1688,12 +1688,6 @@
 
   const processTaskResult = function(data) {
     switch (data.cmd) {
-    case 'calcWaveform':
-      {
-        const img = entries[data.index[0]];
-        waveformDialog.updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
-      }
-      break;
     case 'calcVectorscope':
       vectorscopeDialog.updateFigure(data.type, data.color, data.auxTypes, entries[data.index[0]], data.result);
       break;
@@ -1954,7 +1948,6 @@
     });
     return {
       processClick,
-      updateFigure,
       toggle
     };
   };
@@ -1991,17 +1984,6 @@
       }
     };
     updateAuxOption();
-    const updateAsync = function(img) {
-      taskQueue.addTaskWithImageData({
-        cmd:      'calcWaveform',
-        type:     waveformType.current(),
-        auxTypes: [waveformAuxType.current(), waveformAuxType2.current()],
-        index:    [img.index],
-        histW:    Math.min(img.width, 1024),
-        transposed: img.transposed,
-        flipped:  img.transposed ? img.flippedY : img.flippedX
-      });
-    };
     const makeFigure = function(type, w, h, histW, hist) {
       const histN = new Uint32Array(histW);
       for (let i = 0; i < w; ++i) {
@@ -2140,6 +2122,20 @@
         updateTable();
       }
     };
+    const updateAsync = function(img) {
+      taskQueue.addTaskWithImageData({
+        cmd:      'calcWaveform',
+        type:     waveformType.current(),
+        auxTypes: [waveformAuxType.current(), waveformAuxType2.current()],
+        index:    [img.index],
+        histW:    Math.min(img.width, 1024),
+        transposed: img.transposed,
+        flipped:  img.transposed ? img.flippedY : img.flippedX
+      }, (data) => {
+        const img = entries[data.index[0]];
+        updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
+      });
+    };
     const updateTable = function(transformOnly) {
       const w = 320, h = figH, margin = 10;
       const styles = makeFigureStyles(w, h, margin, '#666', figureZoom);
@@ -2150,7 +2146,6 @@
       getBaseSize: function() { return { w: 320, h: figH }; }
     });
     return {
-      updateFigure,
       toggle
     };
   };
