@@ -1688,12 +1688,6 @@
 
   const processTaskResult = function(data) {
     switch (data.cmd) {
-    case 'calcHistogram':
-      {
-        const img = entries[data.index[0]];
-        histogramDialog.updateFigure(data.type, data.auxTypes, img, data.result);
-      }
-      break;
     case 'calcWaveform':
       {
         const img = entries[data.index[0]];
@@ -1741,8 +1735,8 @@
           }
         }
     };
-    return function(data) {
-        taskQueue.addTask(data, attachImageDataToTask);
+    return function(data, callback) {
+        taskQueue.addTask(data, attachImageDataToTask, callback);
     };
   })();
   taskQueue.discardTasksOfCommand = function(cmd) {
@@ -1849,14 +1843,6 @@
       }
     };
     updateAuxOption();
-    const updateAsync = function(img) {
-      taskQueue.addTaskWithImageData({
-        cmd:      'calcHistogram',
-        type:     histogramType.current(),
-        auxTypes: [histogramAuxType2.current()],
-        index:    [img.index]
-      });
-    };
     const makeFigure = function(type, auxType2, hist) {
       const fig = compareUtil.figureUtil.makeBlankFigure(figW, figH);
       const context = fig.context;
@@ -1937,6 +1923,17 @@
         img.histogram = makeFigure(type, auxTypes[0], hist);
         updateTable();
       }
+    };
+    const updateAsync = function(img) {
+      taskQueue.addTaskWithImageData({
+        cmd:      'calcHistogram',
+        type:     histogramType.current(),
+        auxTypes: [histogramAuxType2.current()],
+        index:    [img.index]
+      }, (data) => {
+        const img = entries[data.index[0]];
+        updateFigure(data.type, data.auxTypes, img, data.result);
+      });
     };
     const updateTable = function(transformOnly) {
       const w = figW / 2, h = figH / 2, margin = 8;

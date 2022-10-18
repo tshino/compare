@@ -2202,8 +2202,8 @@ const CompareUtil = function(window) {
         worker.postMessage(request);
       }
     };
-    const addTask = function(data, prepare) {
-      taskQueue.push(data, prepare, processResult);
+    const addTask = function(data, prepare, accept) {
+      taskQueue.push(data, prepare, accept || processResult);
       window.setTimeout(kickNextTask, 0);
     };
     const discardTasksOf = taskQueue.cancelIf;
