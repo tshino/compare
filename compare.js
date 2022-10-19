@@ -1700,12 +1700,6 @@
       entries[data.index[0]].reducedColorTable = data.result;
       colorFreqDialog.updateFigure(entries[data.index[0]]);
       break;
-    case 'calcMetrics':
-      metricsDialog.updateFigure(data.index[0], data.index[1], data.auxTypes, data.result);
-      break;
-    case 'calcToneCurve':
-      toneCurveDialog.updateFigure(data.type, data.auxTypes, data.index[0], data.index[1], data.result);
-      break;
     case 'calcOpticalFlow':
       opticalFlowDialog.updateFigure(data.index[0], data.index[1], data.result);
       break;
@@ -3263,6 +3257,8 @@
             orientationB: entries[b.index].orientation
           },
           auxTypes: [metricsAuxType2.current()],
+        }, (data) => {
+            updateFigure(data.index[0], data.index[1], data.auxTypes, data.result);
         });
       }
       $('#metricsTargetName').append(
@@ -3302,7 +3298,6 @@
     const toggle = dialogUtil.defineDialog($('#metrics'), updateTable, toggleAnalysis);
     return {
       updateTable,
-      updateFigure,
       toggle
     };
   };
@@ -3421,6 +3416,8 @@
             orientationA: baseImage.orientation,
             orientationB: targetImage.orientation
           }
+      }, (data) => {
+        updateFigure(data.type, data.auxTypes, data.index[0], data.index[1], data.result);
       });
     };
     const makeToneMapFigure = function(toneMapData, type) {
@@ -3514,7 +3511,6 @@
     });
     return {
       onRemoveEntry,
-      updateFigure,
       toggle
     };
   };
