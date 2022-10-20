@@ -1700,9 +1700,6 @@
       entries[data.index[0]].reducedColorTable = data.result;
       colorFreqDialog.updateFigure(entries[data.index[0]]);
       break;
-    case 'calcOpticalFlow':
-      opticalFlowDialog.updateFigure(data.index[0], data.index[1], data.result);
-      break;
     case 'calcDiff':
       diffDialog.updateFigure(data.index[0], data.index[1], data.options, data.result);
       break;
@@ -3654,6 +3651,8 @@
             orientationA: entries[baseImageIndex].orientation,
             orientationB: entries[targetImageIndex].orientation
           }
+        }, (data) => {
+            updateFigure(data.index[0], data.index[1], data.result);
         });
       }
     };
@@ -3797,7 +3796,6 @@
       processClick,
       onRemoveEntry,
       updateTable,
-      updateFigure,
       toggle
     };
   };
