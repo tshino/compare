@@ -2,6 +2,7 @@
 
   const entries = [];
   let images = [];
+  const entriesOnRemoveEntry = [];
   const viewZoom = compareUtil.makeZoomController(updateTransform, {
     getBaseSize: function(index) {
       if (entries[index] && entries[index].ready()) {
@@ -656,6 +657,7 @@
         }
       }
     };
+    entriesOnRemoveEntry.push(onRemoveEntry);
     const makePathDesc = function(img, x, y) {
       var pos = img.interpretXY(x, y);
       var desc = '';
@@ -855,7 +857,6 @@
       getIndex: getIndex,
       getNormalizedPosition: getNormalizedPosition,
       isFixed: isFixed,
-      onRemoveEntry: onRemoveEntry,
       setPosition: setPosition,
       processKeyDown: processKeyDown,
       processClick: processClick,
@@ -3393,6 +3394,7 @@
       }
       $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
+    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateAsync = function(baseImage, targetImage) {
       taskQueue.addTaskWithImageData({
           cmd:      'calcToneCurve',
@@ -3497,7 +3499,6 @@
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
     return {
-      onRemoveEntry,
       toggle
     };
   };
@@ -3617,6 +3618,7 @@
         pointedVector = null;
       }
     };
+    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateOptionsDOM = function() {
       $('#opticalFlowResult > *').remove();
       $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
@@ -3784,7 +3786,6 @@
     });
     return {
       processClick,
-      onRemoveEntry,
       updateTable,
       toggle
     };
@@ -3863,6 +3864,7 @@
         diffResult.result = null;
       }
     };
+    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateOptionsDOM = function(styles) {
       $('.diffDimension').css({display:'none'});
       $('#diffDetectedMaxAE').text('');
@@ -4100,7 +4102,6 @@
       onClose: function() { grid.setOnChange(null); }
     });
     return {
-      onRemoveEntry,
       updateTable,
       toggle
     };
@@ -4542,10 +4543,9 @@
       if (targetImageIndex === index) {
         targetImageIndex = null;
       }
-      crossCursor.onRemoveEntry(index);
-      toneCurveDialog.onRemoveEntry(index);
-      opticalFlowDialog.onRemoveEntry(index);
-      diffDialog.onRemoveEntry(index);
+      for (const onRemoveEntry of entriesOnRemoveEntry) {
+        onRemoveEntry(index);
+      }
       ent.mainImage = null;
       ent.asCanvas = null;
       ent.imageData = null;
