@@ -1548,7 +1548,7 @@
       toggle
     };
   };
-  const nowLoadingDialog = (function() {
+  const NowLoadingDialog = function() {
     let loading = [];
     const toggleNowLoading = dialogUtil.defineDialog($('#loading'));
     const add = function(entry) {
@@ -1610,7 +1610,7 @@
       add,
       update
     };
-  })();
+  };
   const getImageData = function(img) {
     if (!img.imageData) {
       const w = img.canvasWidth;
@@ -4644,6 +4644,7 @@
     const ua = window.navigator.userAgent.toLowerCase();
     return 0 <= ua.indexOf('iphone') || 0 <= ua.indexOf('ipad') || 0 <= ua.indexOf('ipod');
   })();
+  const nowLoadingDialog = NowLoadingDialog();
   const setEntryImage = function(entry, image, w, h) {
     const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
