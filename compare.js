@@ -1686,26 +1686,7 @@
     return styles;
   };
 
-  const processTaskResult = function(data) {
-    switch (data.cmd) {
-    case 'calcColorTable':
-      entries[data.index[0]].colorTable = data.result;
-      colorDistDialog.updateFigure(entries[data.index[0]]);
-      break;
-    case 'calc3DWaveform':
-      entries[data.index[0]].waveform3D = data.result;
-      waveform3DDialog.updateFigure(entries[data.index[0]]);
-      break;
-    case 'calcReducedColorTable':
-      entries[data.index[0]].reducedColorTable = data.result;
-      colorFreqDialog.updateFigure(entries[data.index[0]]);
-      break;
-    case 'calcDiff':
-      diffDialog.updateFigure(data.index[0], data.index[1], data.options, data.result);
-      break;
-    }
-  };
-  const taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js', processTaskResult);
+  const taskQueue = compareUtil.makeTaskQueue('modules/compare-worker.js');
   taskQueue.addTaskWithImageData = (function() {
     const attachImageDataToTask = function(data) {
         data.imageData = [];
@@ -2491,6 +2472,10 @@
       taskQueue.addTaskWithImageData({
         cmd:      'calcColorTable',
         index:    [img.index]
+      }, (data) => {
+        const img = entries[data.index[0]];
+        img.colorTable = data.result;
+        updateFigure(img);
       });
     };
     const rotationController = compareUtil.makeRotationController(
@@ -2789,7 +2774,6 @@
       return rotationInputFilter.processKeyDown(e);
     };
     return {
-      updateFigure,
       toggle,
       processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
@@ -2824,6 +2808,10 @@
         cmd:      'calc3DWaveform',
         baseSize: 512,
         index:    [img.index]
+      }, (data) => {
+        const img = entries[data.index[0]];
+        img.waveform3D = data.result;
+        updateFigure(img);
       });
     };
     const rotationController = compareUtil.makeRotationController(
@@ -3026,7 +3014,6 @@
       setDragStateClass('#waveform3D', dragging, horizontal);
     });
     return {
-      updateFigure,
       toggle,
       processKeyDown: rotationInputFilter.processKeyDown,
       enableMouseAndTouch: rotationInputFilter.enableMouseAndTouch
@@ -3093,6 +3080,10 @@
       taskQueue.addTaskWithImageData({
         cmd:      'calcReducedColorTable',
         index:    [img.index]
+      }, (data) => {
+        const img = entries[data.index[0]];
+        img.reducedColorTable = data.result;
+        updateFigure(img);
       });
     };
     const updateFigure = function(img) {
@@ -3127,7 +3118,6 @@
     };
     const toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
     return {
-      updateFigure,
       toggle
     };
   };
@@ -3931,6 +3921,8 @@
             orientationA: entries[baseImageIndex].orientation,
             orientationB: entries[targetImageIndex].orientation
           }
+        }, (data) => {
+            updateFigure(data.index[0], data.index[1], data.options, data.result);
         });
       }
     };
@@ -4110,7 +4102,6 @@
     return {
       onRemoveEntry,
       updateTable,
-      updateFigure,
       toggle
     };
   };
