@@ -1413,7 +1413,7 @@
     };
   })();
   // Image Information
-  var infoDialog = (function() {
+  const InfoDialog = function() {
     const makeDescriptionWithApprox = function(exact, approx) {
       if (typeof exact === 'string') {
         exact = { en: exact, ja: exact };
@@ -1424,7 +1424,7 @@
       });
     };
     const makeCellValue = function(data) {
-      var value = data[0], desc = data[1], approx = data[2];
+      const value = data[0], desc = data[1], approx = data[2];
       if (approx !== undefined) {
         return [value, makeDescriptionWithApprox(desc, approx)];
       } else if (typeof desc === 'string') {
@@ -1434,8 +1434,8 @@
       }
     };
     const makeOrientationInfo = function(img) {
-      var orientation = compareUtil.orientationUtil.toString(img.orientationExif);
-      var desc = img.orientationExif ? $('<span>').append(
+      const orientation = compareUtil.orientationUtil.toString(img.orientationExif);
+      const desc = img.orientationExif ? $('<span>').append(
         $('<img src="res/orientation.svg" width="30">').css({
           verticalAlign: '-8px',
           transform: compareUtil.orientationUtil.getCSSTransform(img.orientationExif)
@@ -1444,8 +1444,8 @@
       ) : orientation;
       return [img.orientationExif ? orientation : null, desc];
     };
-    var nonUniform = { en: 'non-uniform', ja: '一様でない' };
-    var rows = [
+    const nonUniform = { en: 'non-uniform', ja: '一様でない' };
+    const rows = [
       $('#infoName'),
       $('#infoFormat'),
       $('#infoColor'),
@@ -1459,7 +1459,7 @@
       $('#infoFileSize'),
       $('#infoLastModified')
     ];
-    var unknown = [null, '‐'];
+    const unknown = [null, '‐'];
     const makeTableValue = function(img) {
       return [
         [null, makeImageNameWithIndex('<span>', img)],
@@ -1477,13 +1477,13 @@
       ];
     };
     const updateTableCell = function(val) {
-      for (var j = 0, v; v = val[j]; ++j) {
-        var desc = v[1], e = $('<td>').css('max-width', '300px');
+      for (let j = 0, v; v = val[j]; ++j) {
+        const desc = v[1], e = $('<td>').css('max-width', '300px');
         rows[j].append(typeof desc === 'string' ? e.text(desc) : e.append(desc));
       }
     };
     const updateTableCellForComparison = function(index, val, base, isBase) {
-      var name = rows[0].children().last();
+      const name = rows[0].children().last();
       if (isBase) {
         name.append($('<br>'), textUtil.setText($('<span>').css('font-size', '0.8em'), {
           en: ' (base image)',
@@ -1494,7 +1494,7 @@
           changeBaseImage(index);
           updateTable();
         });
-        for (var j = 0, v; v = val[j]; ++j) {
+        for (let j = 0, v; v = val[j]; ++j) {
           if (base[j][0] && v[0]) {
             rows[j].children().last().addClass(
               base[j][0] < v[0] ? 'sign lt' :
@@ -1509,9 +1509,10 @@
       if (images.length !== 0) {
         setBaseAndTargetImage(null, null);
       }
-      var val = [], hasAnimated = false, hasOrientation = false;
-      var indices = [];
-      for (var i = 0, img; img = images[i]; i++) {
+      const val = [];
+      let hasAnimated = false, hasOrientation = false;
+      const indices = [];
+      for (let i = 0, img; img = images[i]; i++) {
         val[i] = makeTableValue(img);
         indices[i] = img.index;
         if (img.numFrames) {
@@ -1521,12 +1522,13 @@
           hasOrientation = true;
         }
       }
-      var enableComparison = 2 <= val.length;
+      const enableComparison = 2 <= val.length;
+      let basePos, baseVal;
       if (enableComparison) {
-        var basePos = Math.max(0, indices.indexOf(baseImageIndex));
-        var baseVal = val[basePos] || null;
+        basePos = Math.max(0, indices.indexOf(baseImageIndex));
+        baseVal = val[basePos] || null;
       }
-      for (var i = 0; i < val.length; i++) {
+      for (let i = 0; i < val.length; i++) {
         updateTableCell(val[i]);
         if (enableComparison) {
           updateTableCellForComparison(indices[i], val[i], baseVal, i === basePos);
@@ -1541,11 +1543,11 @@
         rows[1].append($('<td>').attr('rowspan', rows.length - 1).text('no data'));
       }
     };
-    var toggle = dialogUtil.defineDialog($('#info'), updateTable, toggleAnalysis);
+    const toggle = dialogUtil.defineDialog($('#info'), updateTable, toggleAnalysis);
     return {
-      toggle: toggle
+      toggle
     };
-  })();
+  };
   const nowLoadingDialog = (function() {
     let loading = [];
     const toggleNowLoading = dialogUtil.defineDialog($('#loading'));
@@ -4852,6 +4854,7 @@
     });
   };
 
+  const infoDialog = InfoDialog();
   const histogramDialog = HistogramDialog();
   const waveformDialog = WaveformDialog();
   const vectorscopeDialog = VectorscopeDialog();
