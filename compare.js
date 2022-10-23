@@ -1177,8 +1177,8 @@
   var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
   var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
   // Settings
-  var settings = (function() {
-    var storage = null;
+  const Settings = function() {
+    let storage = null;
     if (compareUtil.storageAvailable('localStorage')) {
       storage = window.localStorage;
     }
@@ -1196,12 +1196,12 @@
         set(initialValue);
       };
       const load = function() {
-        var value = storage && storage.getItem(key);
+        const value = storage && storage.getItem(key);
         setter(value || initialValue);
       };
-      return { key: key, set: set, reset: reset, load: load };
+      return { key, set, reset, load };
     };
-    var bgColor = configItem('config-view-bg-color', '#444444', function(value) {
+    const bgColor = configItem('config-view-bg-color', '#444444', function(value) {
       if (!/^\#[0-9a-fA-F]{6}$/.test(value)) {
         value = '#000000';
       }
@@ -1210,7 +1210,7 @@
       $('#settingsBGColorText').prop('value', value);
       viewManagement.setBackgroundColor(value);
     });
-    var bgPattern = configItem('config-view-bg-pattern', '', function(value) {
+    const bgPattern = configItem('config-view-bg-pattern', '', function(value) {
       if (value === 'checker') {
         $('#settingsBGChecker').addClass('current');
       } else {
@@ -1218,7 +1218,7 @@
       }
       viewManagement.setCheckerPattern(value === 'checker');
     });
-    var imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
+    const imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
       $('#settingsImageScalingButtons button').removeClass('current').filter(
         value === 'pixel' ?
           '[data-value=pixel]' :
@@ -1227,16 +1227,16 @@
       viewManagement.setImageScaling(value);
     });
     const gridIntervalValues = function(value) {
-      var num = value.split('/');
-      var aux = compareUtil.clamp(parseInt(num[0]) || 4, 1, 256);
-      var main = compareUtil.clamp(parseInt(num[1]) || 16, 1, 256);
+      const num = value.split('/');
+      const aux = compareUtil.clamp(parseInt(num[0]) || 4, 1, 256);
+      const main = compareUtil.clamp(parseInt(num[1]) || 16, 1, 256);
       return [aux, main];
     };
-    var gridInterval = configItem('config-grid-interval', '10/100', function(value) {
-      var num = gridIntervalValues(value);
-      var radio = $('#settings input[name=settingsGridInterval]');
-      var other = true;
-      for (var i = 0; i < radio.length; i++) {
+    const gridInterval = configItem('config-grid-interval', '10/100', function(value) {
+      const num = gridIntervalValues(value);
+      const radio = $('#settings input[name=settingsGridInterval]');
+      let other = true;
+      for (let i = 0; i < radio.length; i++) {
         if (radio[i].value === value) {
           radio.val([value]);
           other = false;
@@ -1250,7 +1250,12 @@
       }
       grid.setInterval(num[1], num[0]);
     });
-    var configItems = [bgColor, bgPattern, imageScaling, gridInterval];
+    const configItems = [
+        bgColor,
+        bgPattern,
+        imageScaling,
+        gridInterval
+    ];
     const loadConfig = function(key) {
       configItems.forEach(function(item) {
         if (key === undefined || key === item.key) {
@@ -1259,7 +1264,7 @@
       });
     };
     const supportsCSSImageRenderingPixelated = function() {
-      var n = compareUtil.browserName;
+      const n = compareUtil.browserName;
       return 0 <= ['msie', 'chrome', 'safari', 'firefox', 'opera'].indexOf(n);
     };
     const startup = function() {
@@ -1312,13 +1317,14 @@
         loadConfig(e.key);
       });
     };
-    var toggle = dialogUtil.defineDialog($('#settings'));
+    const toggle = dialogUtil.defineDialog($('#settings'));
     return {
       startup,
       openBGColor,
       toggle
     };
-  })();
+  };
+  const settings = Settings();
   // Camera
   const CameraDialog = function() {
     let error = false;
