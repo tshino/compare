@@ -1320,18 +1320,18 @@
     };
   })();
   // Camera
-  var cameraDialog = (function() {
-    var error = false;
-    var opening = false;
-    var stream = null;
-    var hasCameraAPI = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    var video = document.getElementById('cameravideo');
+  const CameraDialog = function() {
+    let error = false;
+    let opening = false;
+    let stream = null;
+    const hasCameraAPI = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    const video = document.getElementById('cameravideo');
     $('#capture').on('click', function() {
       if (error) {
         error = false;
         onUpdate(); // retry
       } else if (!opening && stream) {
-        var canvas = compareUtil.figureUtil.canvasFromImage(video, video.videoWidth, video.videoHeight);
+        const canvas = compareUtil.figureUtil.canvasFromImage(video, video.videoWidth, video.videoHeight);
         addCapturedImage(canvas);
       }
     });
@@ -1353,7 +1353,7 @@
           ja: 'カメラにアクセスしています...'
         });
         opening = true;
-        var p = navigator.mediaDevices.getUserMedia({ video: true });
+        const p = navigator.mediaDevices.getUserMedia({ video: true });
         p.then(function(s) {
           stream = s;
           if (!opening) {
@@ -1401,17 +1401,18 @@
       opening = false;
       error = false;
     };
-    var toggle = dialogUtil.defineDialog(
+    const toggle = dialogUtil.defineDialog(
       $('#camera'),
       onUpdate,
       null,
-      { onClose: onClose }
+      { onClose }
     );
     return {
-      hasCameraAPI: hasCameraAPI,
-      toggle: toggle
+      hasCameraAPI,
+      toggle
     };
-  })();
+  };
+  const cameraDialog = CameraDialog();
   // Image Information
   const InfoDialog = function() {
     const makeDescriptionWithApprox = function(exact, approx) {
