@@ -1022,8 +1022,8 @@
       }
     }
   };
-  var dialogUtil = (function() {
-    var onShow = [], onHide = [];
+  const DialogUtil = function() {
+    const onShow = [], onHide = [];
     const addObserver = function(show, hide) {
       if (show) {
         onShow.push(show);
@@ -1062,8 +1062,8 @@
           getBaseSize: options.getBaseSize
         });
         figureZoom.setZoom(0);
-        var initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
-        var initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
+        const initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
+        const initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
         figureZoom.setOffset(initX, initY);
       } else {
         figureZoom.disable();
@@ -1071,24 +1071,24 @@
     };
     const adjustDialogPosition = function() {
       if (dialog) {
-        var target = dialog.element, dlg = dialog.element.children();
-        var offset = dlg.offset();
-        var border = 10;
-        var left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
-        var top  = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
+        const target = dialog.element, dlg = dialog.element.children();
+        const offset = dlg.offset();
+        const border = 10;
+        const left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
+        const top  = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
         if (left !== offset.left || top !== offset.top) {
-          dlg.offset({ left: left, top: top });
+          dlg.offset({ left, top });
         }
       }
     };
     const enableMouse = function(target) {
-      var dlg = target.children();
-      var draggingPoint = null;
+      const dlg = target.children();
+      let draggingPoint = null;
       const moveDialog = function(dx, dy) {
-        var offset = dlg.offset();
+        const offset = dlg.offset();
         dlg.offset({ left: offset.left + dx, top: offset.top + dy });
       };
-      var header = $(target).find('.header');
+      const header = $(target).find('.header');
       target.on('mousedown', '.header', function(e) {
         if (e.which === 1 && !$(e.target).is('a, select')) {
           draggingPoint = { x: e.clientX, y: e.clientY };
@@ -1102,8 +1102,8 @@
             setDragStateClass(header, false, false);
             return;
           }
-          var dx = e.clientX - draggingPoint.x;
-          var dy = e.clientY - draggingPoint.y;
+          const dx = e.clientX - draggingPoint.x;
+          const dy = e.clientY - draggingPoint.y;
           draggingPoint = { x: e.clientX, y: e.clientY };
           moveDialog(dx, dy);
           return false;
@@ -1143,15 +1143,16 @@
       };
     };
     return {
-      addObserver: addObserver,
-      hideDialog: hideDialog,
-      showDialog: showDialog,
-      initFigureZoom: initFigureZoom,
-      adjustDialogPosition: adjustDialogPosition,
-      initDialog: initDialog,
-      defineDialog: defineDialog
+      addObserver,
+      hideDialog,
+      showDialog,
+      initFigureZoom,
+      adjustDialogPosition,
+      initDialog,
+      defineDialog
     };
-  })();
+  };
+  const dialogUtil = DialogUtil();
   const openMessageBox = (function() {
     let serial = 0;
     return function(text) {
