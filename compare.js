@@ -1152,11 +1152,11 @@
       defineDialog: defineDialog
     };
   })();
-  var openMessageBox = (function() {
-    var serial = 0;
+  const openMessageBox = (function() {
+    let serial = 0;
     return function(text) {
       serial += 1;
-      var mySerial = serial;
+      const mySerial = serial;
       $('#messageBox').css('display', 'block');
       textUtil.setText($('#messageBoxBody'), text);
       const close = function(delay) {
@@ -1171,11 +1171,11 @@
           doClose();
         }
       };
-      return { close: close };
+      return { close };
     };
   })();
-  var toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
-  var toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
+  const toggleHelp = dialogUtil.defineDialog($('#shortcuts'));
+  const toggleAnalysis = dialogUtil.defineDialog($('#analysis'));
   // Settings
   const Settings = function() {
     let storage = null;
@@ -1324,7 +1324,6 @@
       toggle
     };
   };
-  const settings = Settings();
   // Camera
   const CameraDialog = function() {
     let error = false;
@@ -1418,7 +1417,6 @@
       toggle
     };
   };
-  const cameraDialog = CameraDialog();
   // Image Information
   const InfoDialog = function() {
     const makeDescriptionWithApprox = function(exact, approx) {
@@ -4123,7 +4121,7 @@
     compareUtil.toggleFullscreen($('#viewroot').get(0));
   };
   // Alt View
-  const altView = (function() {
+  const AltView = function() {
     let colorSpace = $('#altViewColorSpace').val();
     let mapping = $('.altViewMapping').val();
     let component = null;
@@ -4455,7 +4453,10 @@
       onUpdateTransform,
       currentMode
     };
-  })();
+  };
+  const altView = AltView();
+  const settings = Settings();
+  const cameraDialog = CameraDialog();
   // Side Bar
   const sideBar = (function() {
     $('#add').click(function() {
