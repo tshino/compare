@@ -925,22 +925,22 @@
     };
   })();
 
-  var colorHUD = (function() {
+  const ColorHUD = function() {
     const updateColorHUD = function(img) {
       if (!img.colorHUD) {
         return;
       }
-      var cursor = crossCursor.getPosition(img.index);
-      var x = cursor.x, y = cursor.y;
-      var pos = img.interpretXY(x, y);
+      const cursor = crossCursor.getPosition(img.index);
+      const x = cursor.x, y = cursor.y;
+      const pos = img.interpretXY(x, y);
       if (pos.x < 0 || pos.y < 0 || pos.x >= img.canvasWidth || pos.y >= img.canvasHeight) {
         img.colorHUD.find('.colorXY span, .colorCSS, .colorRGB span').text('');
         img.colorHUD.find('.colorSample, .colorBar').hide();
       } else {
-        var context = img.asCanvas.getContext('2d');
-        var imageData = context.getImageData(pos.x, pos.y, 1, 1);
-        var rgb = imageData.data;
-        var css = compareUtil.toHexTriplet(rgb[0], rgb[1], rgb[2]);
+        const context = img.asCanvas.getContext('2d');
+        const imageData = context.getImageData(pos.x, pos.y, 1, 1);
+        const rgb = imageData.data;
+        const css = compareUtil.toHexTriplet(rgb[0], rgb[1], rgb[2]);
         img.colorHUD.find('.colorSample').show().attr('fill', css);
         img.colorHUD.find('.colorBar').show().find('rect').each(function(index) {
           $(this).attr('width', (rgb[index]*127.5/255));
@@ -959,7 +959,7 @@
     };
     const updateHUD = function(pointChanged) {
       if (pointChanged) {
-        for (var i = 0, img; img = images[i]; i++) {
+        for (let i = 0, img; img = images[i]; i++) {
           updateColorHUD(img);
         }
       }
@@ -1011,9 +1011,9 @@
       hud.setObserver(onUpdateLayout);
     };
     return {
-      initialize: initialize
+      initialize
     };
-  })();
+  };
   const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
       setBaseAndTargetImage(targetImageIndex, baseImageIndex);
@@ -4875,6 +4875,8 @@
   const toneCurveDialog = ToneCurveDialog();
   const opticalFlowDialog = OpticalFlowDialog();
   const diffDialog = DiffDialog();
+
+  const colorHUD = ColorHUD();
 
   const setupMenusAndDialogs = function() {
     $('#infobtn').click(infoDialog.toggle);
