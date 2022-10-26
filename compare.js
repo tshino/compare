@@ -71,6 +71,7 @@
     let layoutMode = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
+    const onUpdateImageBoxListeners = [];
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
     const isSingleView = function() {
@@ -226,6 +227,9 @@
         boxH
       };
     };
+    const addListenerOnUpdateImageBox = function(listener) {
+      onUpdateImageBoxListeners.push(listener);
+    };
     const updateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
         img.boxW = boxW;
@@ -251,10 +255,9 @@
         const w = img.transposed ? rect.height : rect.width;
         const h = img.transposed ? rect.width : rect.height;
         $(img.element).css({ width: w+'px', height: h+'px' });
-        altView.onUpdateImageBox(img, w, h);
-        grid.onUpdateImageBox(img, w, h);
-        crossCursor.onUpdateImageBox(img, w, h);
-        hud.onUpdateImageBox(img);
+        for (const listener of onUpdateImageBoxListeners) {
+          listener(img, w, h);
+        }
       }
       const index = img.index;
       const isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
@@ -346,6 +349,7 @@
       update,
       getCurrentIndexOr,
       makeImageLayoutParam,
+      addListenerOnUpdateImageBox,
       onUpdateLayout,
       setBackgroundColor,
       setCheckerPattern,
@@ -911,7 +915,7 @@
         container.append(hud);
       }
     };
-    const onUpdateImageBox = function(img) {
+    const onUpdateImageBox = function(img, _w, _h) {
       if (onUpdateLayoutCallback) {
         onUpdateLayoutCallback(img);
       }
@@ -5160,6 +5164,11 @@ $(function() {
 
   hud.initialize();
   colorHUD.initialize();
+
+  viewManagement.addListenerOnUpdateImageBox(altView.onUpdateImageBox);
+  viewManagement.addListenerOnUpdateImageBox(grid.onUpdateImageBox);
+  viewManagement.addListenerOnUpdateImageBox(crossCursor.onUpdateImageBox);
+  viewManagement.addListenerOnUpdateImageBox(hud.onUpdateImageBox);
 
   updateDOM();
 });
