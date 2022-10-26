@@ -472,11 +472,11 @@
       };
   };
   // Grid
-  var grid = (function() {
-    var enableGrid = false;
-    var mainGridInterval = 100;
-    var auxGridInterval = 10;
-    var onChangeCallback = null;
+  const grid = (function() {
+    let enableGrid = false;
+    let mainGridInterval = 100;
+    let auxGridInterval = 10;
+    let onChangeCallback = null;
     const toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
@@ -489,7 +489,7 @@
       if (mainGridInterval !== main || auxGridInterval !== aux) {
         mainGridInterval = main;
         auxGridInterval = aux;
-        for (var i = 0, img; img = images[i]; i++) {
+        for (let i = 0, img; img = images[i]; i++) {
           if (img.grid) {
             $(img.grid).remove();
             img.grid = null;
@@ -505,23 +505,23 @@
       onChangeCallback = onchange;
     };
     const makePathDesc = function(size, step, skip) {
-      var desc = '';
-      for (var k = step; k < size.w; k += step) {
+      let desc = '';
+      for (let k = step; k < size.w; k += step) {
         if (skip && (k % skip) === 0) continue;
         desc += 'M ' + k + ',0 l 0,' + size.h + ' ';
       }
-      for (var k = step; k < size.h; k += step) {
+      for (let k = step; k < size.h; k += step) {
         if (skip && (k % skip) === 0) continue;
         desc += 'M 0,' + k + ' l ' + size.w + ',0 ';
       }
       return desc;
     };
     const makeGrid = function(w, h, color) {
-      var size = { w: w, h: h };
-      var vbox = '0 0 ' + w + ' ' + h;
+      const size = { w, h };
+      const vbox = '0 0 ' + w + ' ' + h;
       color = color || 'white';
-      var mainGrid = makePathDesc(size, mainGridInterval);
-      var auxGrid = makePathDesc(size, auxGridInterval, mainGridInterval);
+      const mainGrid = makePathDesc(size, mainGridInterval);
+      const auxGrid = makePathDesc(size, auxGridInterval, mainGridInterval);
       return $(
         '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
           '<path stroke="' + color + '" fill="none" stroke-width="0.5" opacity="0.6" d="' + mainGrid + '"></path>' +
@@ -529,16 +529,16 @@
         '</svg>'
       ).width(w).height(h);
     };
-    var onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
+    const onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
     const onUpdateImageBox = function(img, w, h) {
       onUpdateLayoutImpl(enableGrid, img, w, h);
     };
     const updateGridStyle = function(grid, width, baseWidth, scale, commonStyle) {
-      var base = 0.5 * width / (baseWidth * scale);
-      var strokeWidth = [
+      const base = 0.5 * width / (baseWidth * scale);
+      const strokeWidth = [
           (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
           (base > 0.5 ? 0 : 1) * base];
-      var opacity = [
+      const opacity = [
           0.6,
           base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
       $(grid).css(commonStyle || {}).find('path').each(function(index) {
@@ -553,14 +553,14 @@
       }
     };
     return {
-      toggle: toggle,
+      toggle,
       isEnabled: function() { return enableGrid; },
-      setInterval: setInterval,
-      setOnChange: setOnChange,
-      makeGrid: makeGrid,
-      updateGridStyle: updateGridStyle,
-      onUpdateImageBox: onUpdateImageBox,
-      onUpdateTransform: onUpdateTransform
+      setInterval,
+      setOnChange,
+      makeGrid,
+      updateGridStyle,
+      onUpdateImageBox,
+      onUpdateTransform
     };
   })();
 
