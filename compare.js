@@ -867,9 +867,9 @@
     };
   })();
 
-  var hud = (function() {
-    var hudPlacement = { right: true, bottom: true };
-    var onUpdateLayoutCallback = null;
+  const Hud = function() {
+    const hudPlacement = { right: true, bottom: true };
+    let onUpdateLayoutCallback = null;
     const initialize = function() {
       $('#view').on('mousedown', 'div.hudContainer', function(e) {
         e.stopPropagation();
@@ -879,8 +879,8 @@
       onUpdateLayoutCallback = onUpdateLayout;
     };
     const adjustHUDPlacementToAvoidPoint = function(position) {
-      var center = viewZoom.getCenter();
-      var relative = {
+      const center = viewZoom.getCenter();
+      const relative = {
           x: (position.x - (center.x + 0.5)) * viewZoom.scale,
           y: (position.y - (center.y + 0.5)) * viewZoom.scale
       };
@@ -889,13 +889,13 @@
       style = {};
       style['right'] = hudPlacement.right ? '0px' : 'auto';
       style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
-      for (var i = 0, img; img = images[i]; i++) {
+      for (let i = 0, img; img = images[i]; i++) {
         img.view.find('div.hudContainer').css(style);
       }
     };
     const adjustPlacement = function() {
-      var index = crossCursor.getIndex();
-      var pos = crossCursor.getPosition(index);
+      const index = crossCursor.getIndex();
+      const pos = crossCursor.getPosition(index);
       adjustHUDPlacementToAvoidPoint({
         x: pos.x / entries[index].width,
         y: pos.y / entries[index].height
@@ -903,7 +903,7 @@
     };
     const append = function(img, hud) {
       if (img && img.view) {
-        var container = img.view.find('div.hudContainer');
+        let container = img.view.find('div.hudContainer');
         if (0 === container.length) {
           container = $('<div class="hudContainer">');
           img.view.append(container);
@@ -917,13 +917,14 @@
       }
     };
     return {
-      initialize: initialize,
-      setObserver: setObserver,
-      adjustPlacement: adjustPlacement,
-      append: append,
-      onUpdateImageBox: onUpdateImageBox
+      initialize,
+      setObserver,
+      adjustPlacement,
+      append,
+      onUpdateImageBox
     };
-  })();
+  };
+  const hud = Hud();
 
   const ColorHUD = function() {
     const updateColorHUD = function(img) {
