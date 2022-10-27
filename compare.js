@@ -565,20 +565,20 @@
   })();
 
   // Cross Cursor
-  var crossCursor = (function() {
-    var enableCrossCursor = false;
-    var primaryIndex = null;
-    var fixedPosition = false;
-    var positions = [];
-    var onShowCallback = [];
-    var onUpdateCallback = [];
-    var onRemoveCallback = [];
+  const crossCursor = (function() {
+    let enableCrossCursor = false;
+    let primaryIndex = null;
+    let fixedPosition = false;
+    const positions = [];
+    const onShowCallback = [];
+    const onUpdateCallback = [];
+    const onRemoveCallback = [];
     const makeInitialPosition = function(index) {
-      var img = entries[index];
-      var center = viewZoom.getCenter();
-      var x = (0.5 + center.x) * img.width;
-      var y = (0.5 + center.y) * img.height;
-      return { x: x, y: y };
+      const img = entries[index];
+      const center = viewZoom.getCenter();
+      const x = (0.5 + center.x) * img.width;
+      const y = (0.5 + center.y) * img.height;
+      return { x, y };
     };
     const addObserver = function(onShow, onUpdate, onRemove) {
       if (onShow) {
@@ -592,13 +592,13 @@
       }
     };
     const enable = function() {
-      var index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
+      const index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
       if (!enableCrossCursor && 0 <= index) {
         enableCrossCursor = true;
         primaryIndex = index;
         fixedPosition = false;
         onShowCallback.forEach(function(val) { val(); });
-        var pos = makeInitialPosition(index);
+        const pos = makeInitialPosition(index);
         setPosition(index, pos.x, pos.y);
         updateLayout();
       }
@@ -649,7 +649,7 @@
     const onRemoveEntry = function(index) {
       if (enableCrossCursor && primaryIndex === index) {
         primaryIndex = null;
-        for (var i = 0; i < images.length; i++) {
+        for (let i = 0; i < images.length; i++) {
           if (index !== images[i].index) {
             primaryIndex = images[i].index;
             break;
@@ -663,8 +663,8 @@
     };
     entriesOnRemoveEntry.push(onRemoveEntry);
     const makePathDesc = function(img, x, y) {
-      var pos = img.interpretXY(x, y);
-      var desc = '';
+      const pos = img.interpretXY(x, y);
+      let desc = '';
       desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
       desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
       desc += 'M 0,' + pos.y + ' l ' + img.canvasWidth + ',0 ';
@@ -672,7 +672,7 @@
       return desc;
     };
     const makeLabelAttr = function(img, roi, x, y) {
-      var attr = makeLabelAttrOnTransform(img, roi, x, y);
+      const attr = makeLabelAttrOnTransform(img, roi, x, y);
       attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
       if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
         attr[0]['dy'] = '40%';
@@ -684,25 +684,25 @@
       return attr;
     };
     const makeLabelAttrOnTransform = function(ent, roi, x, y) {
-      var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
-      var sx = ent.flippedX ? -1 : 1;
-      var sy = ent.flippedY ? -1 : 1;
-      var pos = ent.interpretXY2(x, y);
-      var base = ent.interpretXY2(0, 0);
+      const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
+      const sx = ent.flippedX ? -1 : 1;
+      const sy = ent.flippedY ? -1 : 1;
+      const pos = ent.interpretXY2(x, y);
+      const base = ent.interpretXY2(0, 0);
       base.x += sx * (ent.transposed ? roi[1] : roi[0]);
       base.y += sy * (ent.transposed ? roi[0] : roi[1]);
-      var t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
-      var t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
-      var s = 'scale(' + baseScale * sx + ' ' + baseScale * sy + ')';
-      var m = ent.transposed ? ' matrix(0 1 1 0 0 0)' : '';
-      var a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
+      const t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
+      const t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
+      const s = 'scale(' + baseScale * sx + ' ' + baseScale * sy + ')';
+      const m = ent.transposed ? ' matrix(0 1 1 0 0 0)' : '';
+      const a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
       return ent.transposed ? [a1, a0] : [a0, a1];
     };
     const addCrossCursor = function(img, desc) {
-      var size = { w: img.canvasWidth, h: img.canvasHeight };
-      var vbox = '0 0 ' + size.w + ' ' + size.h;
-      var filter_id = 'drop-shadow' + img.index;
-      var textElem = '<text filter="url(#' + filter_id + ')"></text>';
+      const size = { w: img.canvasWidth, h: img.canvasHeight };
+      const vbox = '0 0 ' + size.w + ' ' + size.h;
+      const filter_id = 'drop-shadow' + img.index;
+      const textElem = '<text filter="url(#' + filter_id + ')"></text>';
       img.cursor = $(
         '<svg class="imageOverlay cursor" viewBox="' + vbox + '" style="overflow:visible">' +
           '<defs><filter id="' + filter_id + '">' +
@@ -731,10 +731,10 @@
       x = compareUtil.clamp(x, 0, img.width - 1);
       y = compareUtil.clamp(y, 0, img.height - 1);
       positions[img.index] = { x: x, y: y, fixed: fixedPosition };
-      var desc = makePathDesc(img, x, y);
-      var roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
+      const desc = makePathDesc(img, x, y);
+      const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
       positions[img.index].isInView = isInsideROI(roi, x, y);
-      var labelsAttr = makeLabelAttr(img, roi, x, y);
+      const labelsAttr = makeLabelAttr(img, roi, x, y);
       if (0 === img.view.find('.cursor').length) {
         addCrossCursor(img, desc);
       } else {
@@ -747,12 +747,12 @@
     };
     const setPosition = function(index, x, y, fixed) {
       fixed = fixed !== undefined ? fixed : fixedPosition;
-      var rx = (Math.floor(x) + 0.5) / entries[index].width;
-      var ry = (Math.floor(y) + 0.5) / entries[index].height;
+      const rx = (Math.floor(x) + 0.5) / entries[index].width;
+      const ry = (Math.floor(y) + 0.5) / entries[index].height;
       setIndex(index, fixed);
-      for (var i = 0, img; img = images[i]; i++) {
-        var ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
-        var iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
+      for (let i = 0, img; img = images[i]; i++) {
+        const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
+        const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
         updateCrossCursor(img, ix, iy);
       }
       onUpdateCallback.forEach(function(val) { val(true); });
