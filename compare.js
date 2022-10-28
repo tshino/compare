@@ -565,7 +565,7 @@
   })();
 
   // Cross Cursor
-  const crossCursor = (function() {
+  const CrossCursor = function() {
     let enableCrossCursor = false;
     let primaryIndex = null;
     let fixedPosition = false;
@@ -758,16 +758,16 @@
       onUpdateCallback.forEach(function(val) { val(true); });
     };
     const adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
-      var img = entries[primaryIndex];
-      var center = viewZoom.getCenter();
-      var rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
-      var ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
+      const img = entries[primaryIndex];
+      const center = viewZoom.getCenter();
+      const rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
+      const ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
       if (0.45 < Math.abs(rx) && 0 < dx * rx) {
-        var delta = Math.max(0.25, Math.abs(rx) - 0.45);
+        const delta = Math.max(0.25, Math.abs(rx) - 0.45);
         viewZoom.moveRelative(0 < rx ? delta : -delta, 0);
       }
       if (0.45 < Math.abs(ry) && 0 < dy * ry) {
-        var delta = Math.max(0.25, Math.abs(ry) - 0.45);
+        const delta = Math.max(0.25, Math.abs(ry) - 0.45);
         viewZoom.moveRelative(0, 0 < ry ? delta : -delta);
       }
     };
@@ -778,15 +778,15 @@
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
-          var index = viewManagement.getCurrentIndexOr(primaryIndex);
+          let index = viewManagement.getCurrentIndexOr(primaryIndex);
           if (index < 0 || !positions[index]) {
             index = primaryIndex;
           }
-          var step = e.shiftKey ? 10 : 1;
-          var pos = getPosition(index);
-          var d = compareUtil.cursorKeyCodeToXY(e.keyCode, step);
-          var x = pos.x + d.x;
-          var y = pos.y + d.y;
+          const step = e.shiftKey ? 10 : 1;
+          const pos = getPosition(index);
+          const d = compareUtil.cursorKeyCodeToXY(e.keyCode, step);
+          const x = pos.x + d.x;
+          const y = pos.y + d.y;
           setPosition(index, x, y);
           adjustViewOffsetToFollowCrossCursor(d.x, d.y, x, y);
           return false;
@@ -794,11 +794,11 @@
       }
     };
     const processClick = function(e) {
-      var pos = getPosition(e.index);
-      var ent = entries[e.index];
-      var x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
-      var y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
-      var fixed;
+      const pos = getPosition(e.index);
+      const ent = entries[e.index];
+      const x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
+      const y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
+      let fixed;
       if (pos && pos.x === x && pos.y === y) {
         fixed = !pos.fixed;
       } else {
@@ -808,21 +808,21 @@
     };
     const processMouseMove = function(e, selector, target) {
       if (enableCrossCursor && !fixedPosition) {
-        var index = selector ? $(selector).index($(target).parent()) : null;
-        var pos = viewZoom.positionFromMouseEvent(e, target, index);
+        const index = selector ? $(selector).index($(target).parent()) : null;
+        const pos = viewZoom.positionFromMouseEvent(e, target, index);
         if (index !== null && entries[index].ready() && pos) {
-          var ent = entries[index];
-          var x = pos.x * ent.width;
-          var y = pos.y * ent.height;
+          const ent = entries[index];
+          const x = pos.x * ent.width;
+          const y = pos.y * ent.height;
           setPosition(index, x, y);
         }
       }
     };
     const onUpdateImageBox = function(img, w, h) {
       if (enableCrossCursor) {
-        var pos = positions[img.index];
-        var x = pos ? (pos.x || 0) : 0;
-        var y = pos ? (pos.y || 0) : 0;
+        const pos = positions[img.index];
+        const x = pos ? (pos.x || 0) : 0;
+        const y = pos ? (pos.y || 0) : 0;
         updateCrossCursor(img, x, y);
       } else {
         removeCrossCursor(img);
@@ -833,14 +833,14 @@
     };
     const onUpdateTransformEach = function(ent, commonStyle) {
       if (ent.cursor) {
-        var baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
+        const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
           $(this).attr('stroke-width', baseScale * [2, 1][i]);
         });
-        var pos = positions[ent.index];
-        var roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
+        const pos = positions[ent.index];
+        const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
         positions[ent.index].isInView = isInsideROI(roi, pos.x, pos.y);
-        var attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
+        const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
         $(ent.cursor).find('g.labels text').each(function(i) {
           $(this).attr(attr[i]);
         });
@@ -852,24 +852,25 @@
       }
     };
     return {
-      addObserver: addObserver,
-      enable: enable,
-      disable: disable,
-      toggle: toggle,
+      addObserver,
+      enable,
+      disable,
+      toggle,
       isEnabled: function() { return enableCrossCursor; },
-      getPosition: getPosition,
-      getIndex: getIndex,
-      getNormalizedPosition: getNormalizedPosition,
-      isFixed: isFixed,
-      setPosition: setPosition,
-      processKeyDown: processKeyDown,
-      processClick: processClick,
-      processMouseMove: processMouseMove,
-      onUpdateImageBox: onUpdateImageBox,
-      onUpdateTransformEach: onUpdateTransformEach,
-      onUpdateTransform: onUpdateTransform
+      getPosition,
+      getIndex,
+      getNormalizedPosition,
+      isFixed,
+      setPosition,
+      processKeyDown,
+      processClick,
+      processMouseMove,
+      onUpdateImageBox,
+      onUpdateTransformEach,
+      onUpdateTransform
     };
-  })();
+  };
+  const crossCursor = CrossCursor();
 
   const Hud = function() {
     const hudPlacement = { right: true, bottom: true };
