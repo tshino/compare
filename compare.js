@@ -227,7 +227,7 @@
         boxH
       };
     };
-    const addListenerOnUpdateImageBox = function(listener) {
+    const addOnUpdateImageBox = function(listener) {
       onUpdateImageBoxListeners.push(listener);
     };
     const updateImageBox = function(box, img, boxW, boxH) {
@@ -349,7 +349,7 @@
       update,
       getCurrentIndexOr,
       makeImageLayoutParam,
-      addListenerOnUpdateImageBox,
+      addOnUpdateImageBox,
       onUpdateLayout,
       setBackgroundColor,
       setCheckerPattern,
@@ -552,6 +552,7 @@
         updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
       }
     };
+    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
     return {
       toggle,
       isEnabled: function() { return enableGrid; },
@@ -559,7 +560,6 @@
       setOnChange,
       makeGrid,
       updateGridStyle,
-      onUpdateImageBox,
       onUpdateTransform
     };
   };
@@ -852,6 +852,7 @@
         onUpdateCallback.forEach(function(val) { val(false); });
       }
     };
+    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
     return {
       addObserver,
       enable,
@@ -866,7 +867,6 @@
       processKeyDown,
       processClick,
       processMouseMove,
-      onUpdateImageBox,
       onUpdateTransformEach,
       onUpdateTransform
     };
@@ -880,6 +880,7 @@
       $('#view').on('mousedown', 'div.hudContainer', function(e) {
         e.stopPropagation();
       });
+      viewManagement.addOnUpdateImageBox(onUpdateImageBox);
     };
     const setObserver = function(onUpdateLayout) {
       onUpdateLayoutCallback = onUpdateLayout;
@@ -926,8 +927,7 @@
       initialize,
       setObserver,
       adjustPlacement,
-      append,
-      onUpdateImageBox
+      append
     };
   };
   const hud = Hud();
@@ -4448,6 +4448,7 @@
     const currentMode = function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
+    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
     return {
       reset,
       toggle,
@@ -4457,7 +4458,6 @@
       enableAlpha,
       getAltImage,
       active: function() { return null !== component; },
-      onUpdateImageBox,
       onUpdateTransform,
       currentMode
     };
@@ -5166,11 +5166,6 @@ $(function() {
 
   hud.initialize();
   colorHUD.initialize();
-
-  viewManagement.addListenerOnUpdateImageBox(altView.onUpdateImageBox);
-  viewManagement.addListenerOnUpdateImageBox(grid.onUpdateImageBox);
-  viewManagement.addListenerOnUpdateImageBox(crossCursor.onUpdateImageBox);
-  viewManagement.addListenerOnUpdateImageBox(hud.onUpdateImageBox);
 
   updateDOM();
 });
