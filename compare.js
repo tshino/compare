@@ -472,7 +472,7 @@
       };
   };
   // Grid
-  const grid = (function() {
+  const Grid = function() {
     let enableGrid = false;
     let mainGridInterval = 100;
     let auxGridInterval = 10;
@@ -562,7 +562,8 @@
       onUpdateImageBox,
       onUpdateTransform
     };
-  })();
+  };
+  const grid = Grid();
 
   // Cross Cursor
   const CrossCursor = function() {
