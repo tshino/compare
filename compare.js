@@ -410,7 +410,7 @@
   };
 
   // ROI map
-  const roiMap = (function() {
+  const RoiMap = function() {
     let enableMap = false;
     const toggle = function() {
       if (!enableMap) {
@@ -452,7 +452,7 @@
       onUpdateLayout,
       onUpdateTransform
     };
-  })();
+  };
   const makeImageOverlayOnUpdateLayout = function(key, make) {
       return function(enable, img, w, h) {
         if (enable) {
@@ -4462,6 +4462,7 @@
       currentMode
     };
   };
+  const roiMap = RoiMap();
   const altView = AltView();
   const settings = Settings();
   const cameraDialog = CameraDialog();
