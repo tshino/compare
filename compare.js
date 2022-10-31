@@ -894,7 +894,7 @@ const compareUI = CompareUI({ compareUtil });
       };
       hudPlacement.right = relative.x < (hudPlacement.right ? 0.3 : -0.3);
       hudPlacement.bottom = relative.y < (hudPlacement.bottom ? 0.4 : -0.4);
-      style = {};
+      const style = {};
       style['right'] = hudPlacement.right ? '0px' : 'auto';
       style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
       for (let i = 0, img; img = images[i]; i++) {
@@ -4552,7 +4552,7 @@ const compareUI = CompareUI({ compareUtil });
   function updateTransform() {
     for (let i = 0, ent; ent = entries[i]; i++) {
       if (ent.element) {
-        style = {
+        const style = {
           left        : '50%',
           top         : '50%',
           transform   : 'translate(-50%, -50%) ' +
