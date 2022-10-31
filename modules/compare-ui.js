@@ -1,5 +1,18 @@
 'use strict';
 const CompareUI = function({ compareUtil }) {
+    const setDragStateClass = function(target, dragging, horizontal) {
+        if (dragging) {
+            $(target).addClass('dragging');
+        } else {
+            $(target).removeClass('dragging');
+        }
+        if (horizontal) {
+            $(target).addClass('horizontal-dragging');
+        } else {
+            $(target).removeClass('horizontal-dragging');
+        }
+    };
+
     const Hud = function({ viewManagement, viewZoom, crossCursor }) {
         const hudPlacement = { right: true, bottom: true };
         let onUpdateLayoutCallback = null;
@@ -58,6 +71,7 @@ const CompareUI = function({ compareUtil }) {
             append
         };
     };
+
     const ColorHUD = function ({ crossCursor, hud }) {
         const updateColorHUD = function (img) {
             if (!img.colorHUD) {
@@ -147,8 +161,152 @@ const CompareUI = function({ compareUtil }) {
             initialize
         };
     };
+
+    const DialogUtil = function () {
+        let dialog = null;
+        const onShow = [], onHide = [];
+        const current = function () {
+            return dialog;
+        };
+        const figureZoom = compareUtil.makeZoomController(function () {
+            if (dialog && dialog.update) {
+                dialog.update(true /* transformOnly */);
+            }
+        }, {
+            cursorMoveDelta: 0.125
+        });
+        const addObserver = function (show, hide) {
+            if (show) {
+                onShow.push(show);
+            }
+            if (hide) {
+                onHide.push(hide);
+            }
+        };
+        const hideDialog = function () {
+            if (dialog) {
+                if (dialog.onclose) {
+                    dialog.onclose();
+                }
+                dialog.element.hide();
+                dialog = null;
+                figureZoom.disable();
+                onHide.forEach(function (val) { val(); });
+            }
+        };
+        const showDialog = function (target, parent, update, onclose, initialFocus) {
+            dialog = {
+                element: target,
+                close: parent || hideDialog,
+                update: update,
+                onclose: onclose
+            };
+            target.css({ display: 'block' });
+            initialFocus = initialFocus || target.children().find('.dummyFocusTarget');
+            initialFocus.focus();
+            onShow.forEach(function (val) { val(); });
+        };
+        const initFigureZoom = function (options) {
+            if (options.enableZoom) {
+                figureZoom.enable({
+                    zoomXOnly: options.zoomXOnly !== undefined ? options.zoomXOnly : false,
+                    getBaseSize: options.getBaseSize
+                });
+                figureZoom.setZoom(0);
+                const initX = options.zoomInitX !== undefined ? options.zoomInitX : 0.5;
+                const initY = options.zoomInitY !== undefined ? options.zoomInitY : 0.5;
+                figureZoom.setOffset(initX, initY);
+            } else {
+                figureZoom.disable();
+            }
+        };
+        const adjustDialogPosition = function () {
+            if (dialog) {
+                const target = dialog.element, dlg = dialog.element.children();
+                const offset = dlg.offset();
+                const border = 10;
+                const left = compareUtil.clamp(offset.left, 0, target.width() - dlg.width() - border);
+                const top = compareUtil.clamp(offset.top, 0, target.height() - dlg.height() - border);
+                if (left !== offset.left || top !== offset.top) {
+                    dlg.offset({ left, top });
+                }
+            }
+        };
+        const enableMouse = function (target) {
+            const dlg = target.children();
+            let draggingPoint = null;
+            const moveDialog = function (dx, dy) {
+                const offset = dlg.offset();
+                dlg.offset({ left: offset.left + dx, top: offset.top + dy });
+            };
+            const header = $(target).find('.header');
+            target.on('mousedown', '.header', function (e) {
+                if (e.which === 1 && !$(e.target).is('a, select')) {
+                    draggingPoint = { x: e.clientX, y: e.clientY };
+                    setDragStateClass(header, true, false);
+                    return false;
+                }
+            }).on('mousemove', function (e) {
+                if (draggingPoint) {
+                    if (e.buttons !== 1) {
+                        draggingPoint = null;
+                        setDragStateClass(header, false, false);
+                        return;
+                    }
+                    const dx = e.clientX - draggingPoint.x;
+                    const dy = e.clientY - draggingPoint.y;
+                    draggingPoint = { x: e.clientX, y: e.clientY };
+                    moveDialog(dx, dy);
+                    return false;
+                }
+            }).on('mouseup', function (e) {
+                if (draggingPoint) {
+                    draggingPoint = null;
+                    setDragStateClass(header, false, false);
+                }
+            });
+        };
+        const initDialog = function (target, parent) {
+            target.on('click', parent || hideDialog);
+            target.children().on('click', function (e) { e.stopPropagation(); return true; });
+            enableMouse(target);
+            target.children().prepend($('<div class="dummyFocusTarget" tabindex="-1">').
+                css({ display: 'inline', margin: '0px', padding: '0px', border: '0px' }));
+        };
+        const defineDialog = function (target, update, parent, options) {
+            options = options !== undefined ? options : {};
+            initDialog(target, parent);
+            return function () {
+                if (dialog && target.is(':visible')) {
+                    hideDialog();
+                } else {
+                    hideDialog();
+                    initFigureZoom(options);
+                    if (options.onOpen) {
+                        options.onOpen();
+                    }
+                    if (update) {
+                        update();
+                    }
+                    showDialog(target, parent, update, options.onClose, options.initialFocus);
+                    target.children().css({ position: '', left: '', top: '' });
+                }
+            };
+        };
+        return {
+            current,
+            figureZoom,
+            addObserver,
+            hideDialog,
+            adjustDialogPosition,
+            defineDialog
+        };
+    };
+
     return {
+        setDragStateClass,
         Hud,
-        ColorHUD
+        ColorHUD,
+        DialogUtil
     };
 };
