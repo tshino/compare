@@ -1,5 +1,63 @@
 'use strict';
 const CompareUI = function({ compareUtil }) {
+    const Hud = function({ viewManagement, viewZoom, crossCursor }) {
+        const hudPlacement = { right: true, bottom: true };
+        let onUpdateLayoutCallback = null;
+        const initialize = function () {
+            $('#view').on('mousedown', 'div.hudContainer', function (e) {
+                e.stopPropagation();
+            });
+            viewManagement.addOnUpdateImageBox(onUpdateImageBox);
+        };
+        const setObserver = function (onUpdateLayout) {
+            onUpdateLayoutCallback = onUpdateLayout;
+        };
+        const adjustHUDPlacementToAvoidPoint = function (position) {
+            const center = viewZoom.getCenter();
+            const relative = {
+                x: (position.x - (center.x + 0.5)) * viewZoom.scale,
+                y: (position.y - (center.y + 0.5)) * viewZoom.scale
+            };
+            hudPlacement.right = relative.x < (hudPlacement.right ? 0.3 : -0.3);
+            hudPlacement.bottom = relative.y < (hudPlacement.bottom ? 0.4 : -0.4);
+            const style = {};
+            style['right'] = hudPlacement.right ? '0px' : 'auto';
+            style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
+            for (const img of viewManagement.getImages()) {
+                img.view.find('div.hudContainer').css(style);
+            }
+        };
+        const adjustPlacement = function () {
+            const index = crossCursor.getIndex();
+            const pos = crossCursor.getPosition(index);
+            const entry = viewManagement.getEntry(index);
+            adjustHUDPlacementToAvoidPoint({
+                x: pos.x / entry.width,
+                y: pos.y / entry.height
+            });
+        };
+        const append = function (img, hud) {
+            if (img && img.view) {
+                let container = img.view.find('div.hudContainer');
+                if (0 === container.length) {
+                    container = $('<div class="hudContainer">');
+                    img.view.append(container);
+                }
+                container.append(hud);
+            }
+        };
+        const onUpdateImageBox = function (img, _w, _h) {
+            if (onUpdateLayoutCallback) {
+                onUpdateLayoutCallback(img);
+            }
+        };
+        return {
+            initialize,
+            setObserver,
+            adjustPlacement,
+            append
+        };
+    };
     const ColorHUD = function ({ crossCursor, hud }) {
         const updateColorHUD = function (img) {
             if (!img.colorHUD) {
@@ -90,6 +148,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
     return {
+        Hud,
         ColorHUD
     };
 };
