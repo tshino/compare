@@ -11,14 +11,6 @@ const compareUI = CompareUI({ compareUtil });
       }
     }
   });
-  let dialog = null;
-  const figureZoom = compareUtil.makeZoomController(function() {
-    if (dialog && dialog.update) {
-      dialog.update(true /* transformOnly */);
-    }
-  }, {
-    cursorMoveDelta: 0.125
-  });
   let baseImageIndex = null;
   let targetImageIndex = null;
   const setDragStateClass = function(target, dragging, horizontal) {
@@ -287,7 +279,7 @@ const compareUI = CompareUI({ compareUtil });
       const indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       $('#viewHud').css('width', param.viewW);
-      if (1 <= images.length && !dialog) {
+      if (1 <= images.length && !dialogUtil.current()) {
         $('#navBox').show();
       } else {
         $('#navBox').hide();
@@ -886,16 +878,19 @@ const compareUI = CompareUI({ compareUtil });
 
   const hud = compareUI.Hud({ viewManagement, viewZoom, crossCursor });
 
-  const swapBaseAndTargetImage = function() {
-    if (baseImageIndex !== null && targetImageIndex !== null) {
-      setBaseAndTargetImage(targetImageIndex, baseImageIndex);
-      if (dialog) {
-        dialog.update();
-      }
-    }
-  };
-  const DialogUtil = function({ figureZoom }) {
+  const DialogUtil = function() {
+    let dialog = null;
     const onShow = [], onHide = [];
+    const current = function() {
+        return dialog;
+    };
+    const figureZoom = compareUtil.makeZoomController(function() {
+      if (dialog && dialog.update) {
+        dialog.update(true /* transformOnly */);
+      }
+    }, {
+      cursorMoveDelta: 0.125
+    });
     const addObserver = function(show, hide) {
       if (show) {
         onShow.push(show);
@@ -1015,13 +1010,25 @@ const compareUI = CompareUI({ compareUtil });
       };
     };
     return {
+      current,
+      figureZoom,
       addObserver,
       hideDialog,
       adjustDialogPosition,
       defineDialog
     };
   };
-  const dialogUtil = DialogUtil({ figureZoom });
+  const dialogUtil = DialogUtil();
+  const figureZoom = dialogUtil.figureZoom;
+  const swapBaseAndTargetImage = function() {
+    if (baseImageIndex !== null && targetImageIndex !== null) {
+      setBaseAndTargetImage(targetImageIndex, baseImageIndex);
+      const dialog = dialogUtil.current();
+      if (dialog) {
+        dialog.update();
+      }
+    }
+  };
   const openMessageBox = (function() {
     let serial = 0;
     return function(text) {
@@ -4780,7 +4787,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     );
     const updateNavBox = function() {
-      if (1 <= images.length && !dialog) {
+      if (1 <= images.length && !dialogUtil.current()) {
         $('#navBox').show();
       } else {
         $('#navBox').hide();
@@ -4818,6 +4825,7 @@ const compareUI = CompareUI({ compareUtil });
         if (e.ctrlKey || e.altKey || e.metaKey) {
           return true;
         }
+        const dialog = dialogUtil.current();
         // BS (8)
         if (e.keyCode === 8 && !e.shiftKey) {
           dialog.close();
@@ -4935,6 +4943,7 @@ const compareUI = CompareUI({ compareUtil });
         return true;
       }
       // ESC (27)
+      const dialog = dialogUtil.current();
       if (dialog && e.keyCode === 27 && !e.shiftKey && !e.ctrlKey) {
         dialog.close();
         return false;
@@ -5007,7 +5016,7 @@ const compareUI = CompareUI({ compareUtil });
         return true;
       }
       const m = keypressMap[e.which];
-      if (dialog && (!m || !m.global)) {
+      if (dialogUtil.current() && (!m || !m.global)) {
         return true;
       }
       if (m) {
