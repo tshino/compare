@@ -894,7 +894,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     }
   };
-  const DialogUtil = function() {
+  const DialogUtil = function({ figureZoom }) {
     const onShow = [], onHide = [];
     const addObserver = function(show, hide) {
       if (show) {
@@ -1017,14 +1017,11 @@ const compareUI = CompareUI({ compareUtil });
     return {
       addObserver,
       hideDialog,
-      showDialog,
-      initFigureZoom,
       adjustDialogPosition,
-      initDialog,
       defineDialog
     };
   };
-  const dialogUtil = DialogUtil();
+  const dialogUtil = DialogUtil({ figureZoom });
   const openMessageBox = (function() {
     let serial = 0;
     return function(text) {
