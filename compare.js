@@ -73,6 +73,7 @@ const compareUI = CompareUI({ compareUtil });
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
+    const onUpdateLayoutListeners = [];
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
     const isSingleView = function() {
@@ -278,6 +279,9 @@ const compareUI = CompareUI({ compareUtil });
         $('#view .imageBox .image').removeClass('pixelated');
       }
     };
+    const addOnUpdateLayout = function(listener) {
+      onUpdateLayoutListeners.push(listener);
+    };
     const onUpdateLayout = function() {
       const param = makeImageLayoutParam();
       const indices = getSelectedImageIndices();
@@ -307,6 +311,9 @@ const compareUI = CompareUI({ compareUtil });
         $(this).css({ display : (hide ? 'none' : '') });
       });
       updateImageScaling();
+      for (const listener of onUpdateLayoutListeners) {
+        listener();
+      }
     };
     const updateEmptyBoxTextColor = function() {
       let textColor;
@@ -353,6 +360,7 @@ const compareUI = CompareUI({ compareUtil });
       getCurrentIndexOr,
       makeImageLayoutParam,
       addOnUpdateImageBox,
+      addOnUpdateLayout,
       onUpdateLayout,
       setBackgroundColor,
       setCheckerPattern,
@@ -450,9 +458,9 @@ const compareUI = CompareUI({ compareUtil });
         updateMap(img);
       }
     };
+    viewManagement.addOnUpdateLayout(onUpdateLayout);
     return {
       toggle,
-      onUpdateLayout,
       onUpdateTransform
     };
   };
@@ -4400,9 +4408,9 @@ const compareUI = CompareUI({ compareUtil });
       updateSelectorButtonState();
       updateOverlayModeIndicator();
     };
+    viewManagement.addOnUpdateLayout(onUpdateLayout);
     return {
-      updateSelectorButtons,
-      onUpdateLayout
+      updateSelectorButtons
     };
   })();
   const removeEntry = function(index) {
@@ -4488,8 +4496,6 @@ const compareUI = CompareUI({ compareUtil });
   const updateLayout = function() {
     viewManagement.update();
     viewManagement.onUpdateLayout();
-    sideBar.onUpdateLayout();
-    roiMap.onUpdateLayout();
     updateTransform();
     dialogUtil.adjustDialogPosition();
   };
