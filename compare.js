@@ -333,6 +333,8 @@ const compareUI = CompareUI({ compareUtil });
       updateImageScaling();
     };
     return {
+      getImages: () => { return images; },
+      getEntry: (index) => { return entries[index]; },
       isSingleView,
       isOverlayMode,
       numberFromIndex,
@@ -874,7 +876,7 @@ const compareUI = CompareUI({ compareUtil });
   };
   const crossCursor = CrossCursor();
 
-  const Hud = function() {
+  const Hud = function({ viewManagement, viewZoom, crossCursor }) {
     const hudPlacement = { right: true, bottom: true };
     let onUpdateLayoutCallback = null;
     const initialize = function() {
@@ -897,16 +899,17 @@ const compareUI = CompareUI({ compareUtil });
       const style = {};
       style['right'] = hudPlacement.right ? '0px' : 'auto';
       style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of viewManagement.getImages()) {
         img.view.find('div.hudContainer').css(style);
       }
     };
     const adjustPlacement = function() {
       const index = crossCursor.getIndex();
       const pos = crossCursor.getPosition(index);
+      const entry = viewManagement.getEntry(index);
       adjustHUDPlacementToAvoidPoint({
-        x: pos.x / entries[index].width,
-        y: pos.y / entries[index].height
+        x: pos.x / entry.width,
+        y: pos.y / entry.height
       });
     };
     const append = function(img, hud) {
@@ -931,7 +934,7 @@ const compareUI = CompareUI({ compareUtil });
       append
     };
   };
-  const hud = Hud();
+  const hud = Hud({ viewManagement, viewZoom, crossCursor });
 
   const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
