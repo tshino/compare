@@ -55,6 +55,7 @@ const compareUI = CompareUI({ compareUtil });
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
     const onUpdateLayoutListeners = [];
+    const onEntryUpdateTransformListeners = [];
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
     const isSingleView = function() {
@@ -296,6 +297,14 @@ const compareUI = CompareUI({ compareUtil });
         listener();
       }
     };
+    const addOnEntryUpdateTransform = function(listener) {
+      onEntryUpdateTransformListeners.push(listener);
+    };
+    const onEntryUpdateTransform = function(ent, style) {
+      for (const listener of onEntryUpdateTransformListeners) {
+        listener(ent, style);
+      }
+    };
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -343,6 +352,8 @@ const compareUI = CompareUI({ compareUtil });
       addOnUpdateImageBox,
       addOnUpdateLayout,
       onUpdateLayout,
+      addOnEntryUpdateTransform,
+      onEntryUpdateTransform,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling
@@ -464,7 +475,7 @@ const compareUI = CompareUI({ compareUtil });
       };
   };
   // Grid
-  const Grid = function() {
+  const Grid = function({ viewManagement }) {
     let enableGrid = false;
     let mainGridInterval = 100;
     let auxGridInterval = 10;
@@ -539,26 +550,26 @@ const compareUI = CompareUI({ compareUtil });
             attr('opacity', opacity[index]);
       });
     };
-    const onUpdateTransform = function(ent, commonStyle) {
+    const onEntryUpdateTransform = function(ent, commonStyle) {
       if (ent.grid) {
         updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
       }
     };
     viewManagement.addOnUpdateImageBox(onUpdateImageBox);
+    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
       toggle,
       isEnabled: function() { return enableGrid; },
       setInterval,
       setOnChange,
       makeGrid,
-      updateGridStyle,
-      onUpdateTransform
+      updateGridStyle
     };
   };
-  const grid = Grid();
+  const grid = Grid({ viewManagement });
 
   // Cross Cursor
-  const CrossCursor = function() {
+  const CrossCursor = function({ viewManagement }) {
     let enableCrossCursor = false;
     let primaryIndex = null;
     let fixedPosition = false;
@@ -824,7 +835,7 @@ const compareUI = CompareUI({ compareUtil });
         $(img.cursor).css({ width: w+'px', height: h+'px' });
       }
     };
-    const onUpdateTransformEach = function(ent, commonStyle) {
+    const onEntryUpdateTransform = function(ent, commonStyle) {
       if (ent.cursor) {
         const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
@@ -845,6 +856,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     viewManagement.addOnUpdateImageBox(onUpdateImageBox);
+    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
       addObserver,
       enable,
@@ -859,11 +871,10 @@ const compareUI = CompareUI({ compareUtil });
       processKeyDown,
       processClick,
       processMouseMove,
-      onUpdateTransformEach,
       onUpdateTransform
     };
   };
-  const crossCursor = CrossCursor();
+  const crossCursor = CrossCursor({ viewManagement });
 
   const hud = compareUI.Hud({ viewManagement, viewZoom, crossCursor });
 
@@ -4158,7 +4169,7 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
     };
-    const onUpdateTransform = function(ent, commonStyle) {
+    const onEntryUpdateTransform = function(ent, commonStyle) {
       if (ent.contour) {
         $(ent.contour).css(commonStyle);
       }
@@ -4167,6 +4178,7 @@ const compareUI = CompareUI({ compareUtil });
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
     viewManagement.addOnUpdateImageBox(onUpdateImageBox);
+    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
       reset,
       toggle,
@@ -4176,7 +4188,6 @@ const compareUI = CompareUI({ compareUtil });
       enableAlpha,
       getAltImage,
       active: function() { return null !== component; },
-      onUpdateTransform,
       currentMode
     };
   };
@@ -4364,9 +4375,7 @@ const compareUI = CompareUI({ compareUtil });
                         ent.orientationAsCSS
         };
         $(ent.element).css(style);
-        altView.onUpdateTransform(ent, style);
-        grid.onUpdateTransform(ent, style);
-        crossCursor.onUpdateTransformEach(ent, style);
+        viewManagement.onEntryUpdateTransform(ent, style);
       }
     }
     roiMap.onUpdateTransform();
