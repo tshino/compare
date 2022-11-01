@@ -56,6 +56,7 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateImageBoxListeners = [];
     const onUpdateLayoutListeners = [];
     const onEntryUpdateTransformListeners = [];
+    const onUpdateTransformListeners = [];
     $('#prev').click(function() { viewManagement.flipSingleView(false); });
     $('#next').click(function() { viewManagement.flipSingleView(true); });
     const isSingleView = function() {
@@ -305,6 +306,14 @@ const compareUI = CompareUI({ compareUtil });
         listener(ent, style);
       }
     };
+    const addOnUpdateTransform = function(listener) {
+      onUpdateTransformListeners.push(listener);
+    };
+    const onUpdateTransform = function() {
+      for (const listener of onUpdateTransformListeners) {
+        listener();
+      }
+    };
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -354,6 +363,8 @@ const compareUI = CompareUI({ compareUtil });
       onUpdateLayout,
       addOnEntryUpdateTransform,
       onEntryUpdateTransform,
+      addOnUpdateTransform,
+      onUpdateTransform,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling
@@ -451,9 +462,9 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     viewManagement.addOnUpdateLayout(onUpdateLayout);
+    viewManagement.addOnUpdateTransform(onUpdateTransform);
     return {
-      toggle,
-      onUpdateTransform
+      toggle
     };
   };
   const makeImageOverlayOnUpdateLayout = function(key, make) {
@@ -857,6 +868,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     viewManagement.addOnUpdateImageBox(onUpdateImageBox);
     viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    viewManagement.addOnUpdateTransform(onUpdateTransform);
     return {
       addObserver,
       enable,
@@ -870,8 +882,7 @@ const compareUI = CompareUI({ compareUtil });
       setPosition,
       processKeyDown,
       processClick,
-      processMouseMove,
-      onUpdateTransform
+      processMouseMove
     };
   };
   const crossCursor = CrossCursor({ viewManagement });
@@ -4378,8 +4389,7 @@ const compareUI = CompareUI({ compareUtil });
         viewManagement.onEntryUpdateTransform(ent, style);
       }
     }
-    roiMap.onUpdateTransform();
-    crossCursor.onUpdateTransform();
+    viewManagement.onUpdateTransform();
   }
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
