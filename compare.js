@@ -380,7 +380,6 @@ const compareUI = CompareUI({ compareUtil });
       addOnEntryUpdateTransform,
       onEntryUpdateTransform,
       addOnUpdateTransform,
-      onUpdateTransform,
       updateTransform,
       viewZoom,
       setBackgroundColor,
@@ -4621,7 +4620,7 @@ const compareUI = CompareUI({ compareUtil });
   const opticalFlowDialog = OpticalFlowDialog();
   const diffDialog = DiffDialog();
 
-  const colorHUD = compareUI.ColorHUD({ crossCursor, hud });
+  const colorHUD = compareUI.ColorHUD({ viewManagement, crossCursor, hud });
 
   const setupMenusAndDialogs = function() {
     $('#infobtn').click(infoDialog.toggle);

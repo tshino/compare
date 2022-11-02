@@ -72,7 +72,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const ColorHUD = function ({ crossCursor, hud }) {
+    const ColorHUD = function ({ viewManagement, crossCursor, hud }) {
         const updateColorHUD = function (img) {
             if (!img.colorHUD) {
                 return;
@@ -106,6 +106,7 @@ const CompareUI = function({ compareUtil }) {
         };
         const updateHUD = function (pointChanged) {
             if (pointChanged) {
+                const images = viewManagement.getImages();
                 for (let i = 0, img; img = images[i]; i++) {
                     updateColorHUD(img);
                 }
