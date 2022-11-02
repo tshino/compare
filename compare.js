@@ -72,6 +72,50 @@ const compareUI = CompareUI({ compareUtil });
       }
       return null;
     };
+    const findImageIndexOtherThan = function(index) {
+      for (let i = 0, img; img = images[i]; ++i) {
+        if (img.index !== index) {
+          return img.index;
+        }
+      }
+      return null;
+    };
+    const setBaseAndTargetImage = function(baseIndex, targetIndex) {
+      if (baseIndex === null && targetIndex === null) {
+        baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+        if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
+          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+        }
+      } else {
+        baseImageIndex = baseIndex !== null ? baseIndex : baseImageIndex;
+        targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
+        if (baseImageIndex === targetImageIndex) {
+          if (targetIndex === null) {
+            targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+          } else if (baseIndex === null) {
+            baseImageIndex = findImageIndexOtherThan(targetImageIndex);
+          }
+        }
+      }
+    };
+    const changeBaseImage = function(index) {
+      if (index < entries.length &&
+          entries[index].ready() &&
+          baseImageIndex !== null &&
+          baseImageIndex !== index) {
+        setBaseAndTargetImage(index, null);
+        return true;
+      }
+    };
+    const changeTargetImage = function(index) {
+      if (index < entries.length &&
+          entries[index].ready() &&
+          baseImageIndex !== null && targetImageIndex !== null &&
+          targetImageIndex !== index) {
+        setBaseAndTargetImage(targetImageIndex, index);
+        return true;
+      }
+    };
     const getSelectedImageIndices = function() {
       const indices = [];
       if (singleView) {
@@ -361,6 +405,9 @@ const compareUI = CompareUI({ compareUtil });
       isOverlayMode,
       numberFromIndex,
       indexFromNumber,
+      setBaseAndTargetImage,
+      changeBaseImage,
+      changeTargetImage,
       getSelectedImageIndices,
       getLayoutMode,
       resetLayoutState,
@@ -388,50 +435,6 @@ const compareUI = CompareUI({ compareUtil });
     };
   })();
   const viewZoom = viewManagement.viewZoom;
-  const findImageIndexOtherThan = function(index) {
-    for (let i = 0, img; img = images[i]; ++i) {
-      if (img.index !== index) {
-        return img.index;
-      }
-    }
-    return null;
-  };
-  const setBaseAndTargetImage = function(baseIndex, targetIndex) {
-    if (baseIndex === null && targetIndex === null) {
-      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-      if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
-        targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-      }
-    } else {
-      baseImageIndex = baseIndex !== null ? baseIndex : baseImageIndex;
-      targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
-      if (baseImageIndex === targetImageIndex) {
-        if (targetIndex === null) {
-          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-        } else if (baseIndex === null) {
-          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
-        }
-      }
-    }
-  };
-  const changeBaseImage = function(index) {
-    if (index < entries.length &&
-        entries[index].ready() &&
-        baseImageIndex !== null &&
-        baseImageIndex !== index) {
-      setBaseAndTargetImage(index, null);
-      return true;
-    }
-  };
-  const changeTargetImage = function(index) {
-    if (index < entries.length &&
-        entries[index].ready() &&
-        baseImageIndex !== null && targetImageIndex !== null &&
-        targetImageIndex !== index) {
-      setBaseAndTargetImage(targetImageIndex, index);
-      return true;
-    }
-  };
   const makeImageNameWithIndex = function(tag, img) {
     const number = viewManagement.numberFromIndex(img.index);
     const elem = $(tag).css({ wordBreak : 'break-all' });
@@ -911,7 +914,7 @@ const compareUI = CompareUI({ compareUtil });
   const figureZoom = dialogUtil.figureZoom;
   const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
-      setBaseAndTargetImage(targetImageIndex, baseImageIndex);
+      viewManagement.setBaseAndTargetImage(targetImageIndex, baseImageIndex);
       const dialog = dialogUtil.current();
       if (dialog) {
         dialog.update();
@@ -1262,7 +1265,7 @@ const compareUI = CompareUI({ compareUtil });
         }));
       } else {
         name.children().last().addClass('imageName').click(function(e) {
-          changeBaseImage(index);
+          viewManagement.changeBaseImage(index);
           updateTable();
         });
         for (let j = 0, v; v = val[j]; ++j) {
@@ -1278,7 +1281,7 @@ const compareUI = CompareUI({ compareUtil });
     const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
       if (images.length !== 0) {
-        setBaseAndTargetImage(null, null);
+        viewManagement.setBaseAndTargetImage(null, null);
       }
       const val = [];
       let hasAnimated = false, hasOrientation = false;
@@ -2982,11 +2985,11 @@ const compareUI = CompareUI({ compareUtil });
       if (images.length === 1) {
         $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
       }
-      setBaseAndTargetImage(null, null);
+      viewManagement.setBaseAndTargetImage(null, null);
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
           makeImageNameSelector(baseImageIndex, function(index) {
-            changeBaseImage(index);
+            viewManagement.changeBaseImage(index);
             updateTable();
           })
         )
@@ -3027,7 +3030,7 @@ const compareUI = CompareUI({ compareUtil });
           makeImageNameWithIndex('<span>', b),
           '&nbsp;',
           $('<button>').text('↑').click(function(e) {
-            changeBaseImage(b.index);
+            viewManagement.changeBaseImage(b.index);
             updateTable();
           })
         )
@@ -3070,16 +3073,16 @@ const compareUI = CompareUI({ compareUtil });
       $(targetSelector).append($('<span>').text('no data'));
       return false;
     }
-    setBaseAndTargetImage(null, null);
+    viewManagement.setBaseAndTargetImage(null, null);
     $(baseSelector).append(
       makeImageNameSelector(baseImageIndex, function(index) {
-        changeBaseImage(index);
+        viewManagement.changeBaseImage(index);
         onUpdate();
       })
     );
     $(targetSelector).append(
       makeImageNameSelector(targetImageIndex, function(index) {
-        setBaseAndTargetImage(null, index);
+        viewManagement.setBaseAndTargetImage(null, index);
         onUpdate();
       })
     );
@@ -3092,7 +3095,7 @@ const compareUI = CompareUI({ compareUtil });
     } else {
       baseCell.append(
         makeImageNameSelector(baseImageIndex, function(index) {
-          changeBaseImage(index);
+          viewManagement.changeBaseImage(index);
           repaint();
         })
       );
@@ -3247,7 +3250,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateTable = function(transformOnly) {
       if (images.length !== 0 && !transformOnly) {
-        setBaseAndTargetImage(null, null);
+        viewManagement.setBaseAndTargetImage(null, null);
         if (toneCurveParam.type !== toneCurveType.current() ||
             toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
             toneCurveParam.base !== baseImageIndex) {
@@ -4711,7 +4714,7 @@ const compareUI = CompareUI({ compareUtil });
           }
           const index = viewManagement.indexFromNumber(num);
           if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
-              index !== null && changeTargetImage(index)) {
+              index !== null && viewManagement.changeTargetImage(index)) {
             dialog.update();
             return false;
           }
