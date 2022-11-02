@@ -4,13 +4,6 @@ const compareUI = CompareUI({ compareUtil });
   const entries = [];
   let images = [];
   const entriesOnRemoveEntry = [];
-  const viewZoom = compareUtil.makeZoomController(updateTransform, {
-    getBaseSize: function(index) {
-      if (entries[index] && entries[index].ready()) {
-        return { w: entries[index].baseWidth, h: entries[index].baseHeight };
-      }
-    }
-  });
   let baseImageIndex = null;
   let targetImageIndex = null;
   const setDragStateClass = compareUI.setDragStateClass;
@@ -314,6 +307,29 @@ const compareUI = CompareUI({ compareUtil });
         listener();
       }
     };
+    const updateTransform = function(viewZoom) {
+      for (let i = 0, ent; ent = entries[i]; i++) {
+        if (ent.element) {
+          const style = {
+            left        : '50%',
+            top         : '50%',
+            transform   : 'translate(-50%, -50%) ' +
+                          viewZoom.makeTransform(i) +
+                          ent.orientationAsCSS
+          };
+          $(ent.element).css(style);
+          onEntryUpdateTransform(ent, style);
+        }
+      }
+      onUpdateTransform();
+    };
+    const viewZoom = compareUtil.makeZoomController(updateTransform, {
+      getBaseSize: function(index) {
+        if (entries[index] && entries[index].ready()) {
+          return { w: entries[index].baseWidth, h: entries[index].baseHeight };
+        }
+      }
+    });
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -365,11 +381,14 @@ const compareUI = CompareUI({ compareUtil });
       onEntryUpdateTransform,
       addOnUpdateTransform,
       onUpdateTransform,
+      updateTransform,
+      viewZoom,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling
     };
   })();
+  const viewZoom = viewManagement.viewZoom;
   const findImageIndexOtherThan = function(index) {
     for (let i = 0, img; img = images[i]; ++i) {
       if (img.index !== index) {
@@ -4371,26 +4390,9 @@ const compareUI = CompareUI({ compareUtil });
   const updateLayout = function() {
     viewManagement.update();
     viewManagement.onUpdateLayout();
-    updateTransform();
+    viewManagement.updateTransform(viewZoom);
     dialogUtil.adjustDialogPosition();
   };
-
-  function updateTransform() {
-    for (let i = 0, ent; ent = entries[i]; i++) {
-      if (ent.element) {
-        const style = {
-          left        : '50%',
-          top         : '50%',
-          transform   : 'translate(-50%, -50%) ' +
-                        viewZoom.makeTransform(i) +
-                        ent.orientationAsCSS
-        };
-        $(ent.element).css(style);
-        viewManagement.onEntryUpdateTransform(ent, style);
-      }
-    }
-    viewManagement.onUpdateTransform();
-  }
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
     const ua = window.navigator.userAgent.toLowerCase();

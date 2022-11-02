@@ -1604,7 +1604,7 @@ const CompareUtil = function(window) {
     const zoomRelative = function(delta) {
       if (enabled) {
         setZoom(clamp(o.zoom + delta, 0, MAX_ZOOM_LEVEL));
-        update();
+        update(o);
         return true;
       }
     };
@@ -1647,7 +1647,7 @@ const CompareUtil = function(window) {
     const moveRelative = function(dx, dy) {
       const result = moveRelativeWithoutUpdate(dx, dy);
       if (result) {
-        update();
+        update(o);
         return result;
       }
     };
@@ -1677,7 +1677,7 @@ const CompareUtil = function(window) {
           const o2y = c2y / (o.scale - 1) + 0.5;
           setOffset(o2x, o2y);
         }
-        update();
+        update(o);
         return true;
       }
     };
@@ -1688,7 +1688,7 @@ const CompareUtil = function(window) {
         zoomRelative(+ZOOM_STEP_DBLCLK);
       } else {
         setZoom(0);
-        update();
+        update(o);
       }
     };
     const processKeyDown = function(e) {

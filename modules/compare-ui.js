@@ -168,7 +168,7 @@ const CompareUI = function({ compareUtil }) {
         const current = function () {
             return dialog;
         };
-        const figureZoom = compareUtil.makeZoomController(function () {
+        const figureZoom = compareUtil.makeZoomController(function (_zoom) {
             if (dialog && dialog.update) {
                 dialog.update(true /* transformOnly */);
             }
