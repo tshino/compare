@@ -13,15 +13,15 @@ const CompareUI = function({ compareUtil }) {
         }
     };
 
-    const Hud = function({ viewManagement, crossCursor }) {
-        const viewZoom = viewManagement.viewZoom;
+    const Hud = function({ view, crossCursor }) {
+        const viewZoom = view.viewZoom;
         const hudPlacement = { right: true, bottom: true };
         let onUpdateLayoutCallback = null;
         const initialize = function () {
             $('#view').on('mousedown', 'div.hudContainer', function (e) {
                 e.stopPropagation();
             });
-            viewManagement.addOnUpdateImageBox(onUpdateImageBox);
+            view.addOnUpdateImageBox(onUpdateImageBox);
         };
         const setObserver = function (onUpdateLayout) {
             onUpdateLayoutCallback = onUpdateLayout;
@@ -37,14 +37,14 @@ const CompareUI = function({ compareUtil }) {
             const style = {};
             style['right'] = hudPlacement.right ? '0px' : 'auto';
             style['bottom'] = hudPlacement.bottom ? '0px' : 'auto';
-            for (const img of viewManagement.getImages()) {
+            for (const img of view.getImages()) {
                 img.view.find('div.hudContainer').css(style);
             }
         };
         const adjustPlacement = function () {
             const index = crossCursor.getIndex();
             const pos = crossCursor.getPosition(index);
-            const entry = viewManagement.getEntry(index);
+            const entry = view.getEntry(index);
             adjustHUDPlacementToAvoidPoint({
                 x: pos.x / entry.width,
                 y: pos.y / entry.height
@@ -73,7 +73,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const ColorHUD = function ({ viewManagement, crossCursor, hud }) {
+    const ColorHUD = function ({ view, crossCursor, hud }) {
         const updateColorHUD = function (img) {
             if (!img.colorHUD) {
                 return;
@@ -107,7 +107,7 @@ const CompareUI = function({ compareUtil }) {
         };
         const updateHUD = function (pointChanged) {
             if (pointChanged) {
-                const images = viewManagement.getImages();
+                const images = view.getImages();
                 for (let i = 0, img; img = images[i]; i++) {
                     updateColorHUD(img);
                 }
@@ -164,22 +164,22 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const RoiMap = function ({ viewManagement }) {
-        const viewZoom = viewManagement.viewZoom;
+    const RoiMap = function ({ view }) {
+        const viewZoom = view.viewZoom;
         let enableMap = false;
         const toggle = function () {
             if (!enableMap) {
-                if (0 < viewManagement.getImages().length) {
+                if (0 < view.getImages().length) {
                     enableMap = true;
-                    viewManagement.updateLayout();
+                    view.updateLayout();
                 }
             } else {
                 enableMap = false;
-                viewManagement.updateLayout();
+                view.updateLayout();
             }
         };
         const onUpdateLayout = function () {
-            const images = viewManagement.getImages();
+            const images = view.getImages();
             $('#map').css({ display: (enableMap && images.length) ? 'block' : '' });
         };
         const updateMap = function (img) {
@@ -198,17 +198,17 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateTransform = function () {
             if (enableMap) {
-                const images = viewManagement.getImages();
+                const images = view.getImages();
                 if (0 < images.length) {
-                    const index = viewManagement.getCurrentIndexOr(0);
-                    const entry = viewManagement.getEntry(index);
+                    const index = view.getCurrentIndexOr(0);
+                    const entry = view.getEntry(index);
                     const img = entry.ready() ? entry : images[0];
                     updateMap(img);
                 }
             }
         };
-        viewManagement.addOnUpdateLayout(onUpdateLayout);
-        viewManagement.addOnUpdateTransform(onUpdateTransform);
+        view.addOnUpdateLayout(onUpdateLayout);
+        view.addOnUpdateTransform(onUpdateTransform);
         return {
             toggle
         };

@@ -35,7 +35,7 @@ const compareUI = CompareUI({ compareUtil });
     };
   })();
   // View management functions
-  const viewManagement = (function() {
+  const view = (function() {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     let currentImageIndex = 0;
@@ -50,8 +50,8 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateLayoutListeners = [];
     const onEntryUpdateTransformListeners = [];
     const onUpdateTransformListeners = [];
-    $('#prev').click(function() { viewManagement.flipSingleView(false); });
-    $('#next').click(function() { viewManagement.flipSingleView(true); });
+    $('#prev').click(function() { view.flipSingleView(false); });
+    $('#next').click(function() { view.flipSingleView(true); });
     const isSingleView = function() {
       return singleView;
     };
@@ -446,7 +446,7 @@ const compareUI = CompareUI({ compareUtil });
       setImageScaling
     };
   })();
-  const viewZoom = viewManagement.viewZoom;
+  const viewZoom = view.viewZoom;
 
   const makeImageOverlayOnUpdateLayout = function(key, make) {
       return function(enable, img, w, h) {
@@ -467,7 +467,7 @@ const compareUI = CompareUI({ compareUtil });
       };
   };
   // Grid
-  const Grid = function({ viewManagement }) {
+  const Grid = function({ view }) {
     let enableGrid = false;
     let mainGridInterval = 100;
     let auxGridInterval = 10;
@@ -475,7 +475,7 @@ const compareUI = CompareUI({ compareUtil });
     const toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
-      viewManagement.updateLayout();
+      view.updateLayout();
       if (onChangeCallback) {
         onChangeCallback();
       }
@@ -490,7 +490,7 @@ const compareUI = CompareUI({ compareUtil });
             img.grid = null;
           }
         }
-        viewManagement.updateLayout();
+        view.updateLayout();
         if (onChangeCallback) {
           onChangeCallback();
         }
@@ -547,8 +547,8 @@ const compareUI = CompareUI({ compareUtil });
         updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
       }
     };
-    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
-    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    view.addOnUpdateImageBox(onUpdateImageBox);
+    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
       toggle,
       isEnabled: function() { return enableGrid; },
@@ -558,10 +558,10 @@ const compareUI = CompareUI({ compareUtil });
       updateGridStyle
     };
   };
-  const grid = Grid({ viewManagement });
+  const grid = Grid({ view });
 
   // Cross Cursor
-  const CrossCursor = function({ viewManagement }) {
+  const CrossCursor = function({ view }) {
     let enableCrossCursor = false;
     let primaryIndex = null;
     let fixedPosition = false;
@@ -588,7 +588,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const enable = function() {
-      const index = viewManagement.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
+      const index = view.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
       if (!enableCrossCursor && 0 <= index) {
         enableCrossCursor = true;
         primaryIndex = index;
@@ -596,7 +596,7 @@ const compareUI = CompareUI({ compareUtil });
         onShowCallback.forEach(function(val) { val(); });
         const pos = makeInitialPosition(index);
         setPosition(index, pos.x, pos.y);
-        viewManagement.updateLayout();
+        view.updateLayout();
       }
       return enableCrossCursor;
     };
@@ -605,7 +605,7 @@ const compareUI = CompareUI({ compareUtil });
         enableCrossCursor = false;
         onRemoveCallback.forEach(function(val) { val(); });
         primaryIndex = null;
-        viewManagement.updateLayout();
+        view.updateLayout();
       }
     };
     const toggle = function() {
@@ -774,7 +774,7 @@ const compareUI = CompareUI({ compareUtil });
       if (enableCrossCursor) {
         // cursor key
         if (37 <= e.keyCode && e.keyCode <= 40) {
-          let index = viewManagement.getCurrentIndexOr(primaryIndex);
+          let index = view.getCurrentIndexOr(primaryIndex);
           if (index < 0 || !positions[index]) {
             index = primaryIndex;
           }
@@ -847,9 +847,9 @@ const compareUI = CompareUI({ compareUtil });
         onUpdateCallback.forEach(function(val) { val(false); });
       }
     };
-    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
-    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
-    viewManagement.addOnUpdateTransform(onUpdateTransform);
+    view.addOnUpdateImageBox(onUpdateImageBox);
+    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    view.addOnUpdateTransform(onUpdateTransform);
     return {
       addObserver,
       enable,
@@ -866,16 +866,16 @@ const compareUI = CompareUI({ compareUtil });
       processMouseMove
     };
   };
-  const crossCursor = CrossCursor({ viewManagement });
+  const crossCursor = CrossCursor({ view });
 
-  const hud = compareUI.Hud({ viewManagement, crossCursor });
+  const hud = compareUI.Hud({ view, crossCursor });
 
   const dialogUtil = compareUI.DialogUtil();
-  viewManagement.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
+  view.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
   const figureZoom = dialogUtil.figureZoom;
   const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
-      viewManagement.setBaseAndTargetImage(targetImageIndex, baseImageIndex);
+      view.setBaseAndTargetImage(targetImageIndex, baseImageIndex);
       const dialog = dialogUtil.current();
       if (dialog) {
         dialog.update();
@@ -938,7 +938,7 @@ const compareUI = CompareUI({ compareUtil });
       $('#bgcolorbtn svg path').attr('fill', value);
       $('#settingsBGColor').prop('value', value);
       $('#settingsBGColorText').prop('value', value);
-      viewManagement.setBackgroundColor(value);
+      view.setBackgroundColor(value);
     });
     const bgPattern = configItem('config-view-bg-pattern', '', function(value) {
       if (value === 'checker') {
@@ -946,7 +946,7 @@ const compareUI = CompareUI({ compareUtil });
       } else {
         $('#settingsBGChecker').removeClass('current');
       }
-      viewManagement.setCheckerPattern(value === 'checker');
+      view.setCheckerPattern(value === 'checker');
     });
     const imageScaling = configItem('config-view-image-scaling-style', 'smooth', function(value) {
       $('#settingsImageScalingButtons button').removeClass('current').filter(
@@ -954,7 +954,7 @@ const compareUI = CompareUI({ compareUtil });
           '[data-value=pixel]' :
           '[data-value=smooth]'
       ).addClass('current');
-      viewManagement.setImageScaling(value);
+      view.setImageScaling(value);
     });
     const gridIntervalValues = function(value) {
       const num = value.split('/');
@@ -1197,7 +1197,7 @@ const compareUI = CompareUI({ compareUtil });
     const unknown = [null, '‐'];
     const makeTableValue = function(img) {
       return [
-        [null, viewManagement.makeImageNameWithNumber('<span>', img)],
+        [null, view.makeImageNameWithNumber('<span>', img)],
         img.format === '' ? unknown : [img.format, img.format],
         img.color === '' ? unknown : [img.color, img.color],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1226,7 +1226,7 @@ const compareUI = CompareUI({ compareUtil });
         }));
       } else {
         name.children().last().addClass('imageName').click(function(e) {
-          viewManagement.changeBaseImage(index);
+          view.changeBaseImage(index);
           updateTable();
         });
         for (let j = 0, v; v = val[j]; ++j) {
@@ -1242,7 +1242,7 @@ const compareUI = CompareUI({ compareUtil });
     const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
       if (images.length !== 0) {
-        viewManagement.setBaseAndTargetImage(null, null);
+        view.setBaseAndTargetImage(null, null);
       }
       const val = [];
       let hasAnimated = false, hasOrientation = false;
@@ -1315,7 +1315,7 @@ const compareUI = CompareUI({ compareUtil });
           td.addClass('ok').text('OK!');
         }
         $('#loadingList').append(
-          $('<tr>').append(viewManagement.makeImageNameWithNumber('<td class="b">', ent), td)
+          $('<tr>').append(view.makeImageNameWithNumber('<td class="b">', ent), td)
         );
       }
       if (finished) {
@@ -1380,7 +1380,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
-      const label = viewManagement.makeImageNameWithNumber('<td>', img);
+      const label = view.makeImageNameWithNumber('<td>', img);
       labelRow.append(label);
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -2831,7 +2831,7 @@ const compareUI = CompareUI({ compareUtil });
       const target = $('#colorFreqTable');
       target.find('td').remove();
       for (let i = 0, img; img = images[i]; i++) {
-        const label = viewManagement.makeImageNameWithNumber('<td>', img);
+        const label = view.makeImageNameWithNumber('<td>', img);
         target.find('tr').eq(0).append(label);
         const cell = $('<td>');
         target.find('tr').eq(1).append(cell);
@@ -2872,7 +2872,7 @@ const compareUI = CompareUI({ compareUtil });
         option.attr('selected','');
       }
     }
-    const number = viewManagement.numberFromIndex(selectedIndex);
+    const number = view.numberFromIndex(selectedIndex);
     return $('<span>').append(
       $('<span class="imageIndex"/>').text(number),
       select
@@ -2946,11 +2946,11 @@ const compareUI = CompareUI({ compareUtil });
       if (images.length === 1) {
         $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
       }
-      viewManagement.setBaseAndTargetImage(null, null);
+      view.setBaseAndTargetImage(null, null);
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
           makeImageNameSelector(baseImageIndex, function(index) {
-            viewManagement.changeBaseImage(index);
+            view.changeBaseImage(index);
             updateTable();
           })
         )
@@ -2988,10 +2988,10 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#metricsTargetName').append(
         $('<td>').append(
-          viewManagement.makeImageNameWithNumber('<span>', b),
+          view.makeImageNameWithNumber('<span>', b),
           '&nbsp;',
           $('<button>').text('↑').click(function(e) {
-            viewManagement.changeBaseImage(b.index);
+            view.changeBaseImage(b.index);
             updateTable();
           })
         )
@@ -3034,16 +3034,16 @@ const compareUI = CompareUI({ compareUtil });
       $(targetSelector).append($('<span>').text('no data'));
       return false;
     }
-    viewManagement.setBaseAndTargetImage(null, null);
+    view.setBaseAndTargetImage(null, null);
     $(baseSelector).append(
       makeImageNameSelector(baseImageIndex, function(index) {
-        viewManagement.changeBaseImage(index);
+        view.changeBaseImage(index);
         onUpdate();
       })
     );
     $(targetSelector).append(
       makeImageNameSelector(targetImageIndex, function(index) {
-        viewManagement.setBaseAndTargetImage(null, index);
+        view.setBaseAndTargetImage(null, index);
         onUpdate();
       })
     );
@@ -3056,7 +3056,7 @@ const compareUI = CompareUI({ compareUtil });
     } else {
       baseCell.append(
         makeImageNameSelector(baseImageIndex, function(index) {
-          viewManagement.changeBaseImage(index);
+          view.changeBaseImage(index);
           repaint();
         })
       );
@@ -3083,7 +3083,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
         update(entries[baseImageIndex], img);
       }
-      const label = viewManagement.makeImageNameWithNumber('<span>', img);
+      const label = view.makeImageNameWithNumber('<span>', img);
       labelRow.append($('<td>').append(label));
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -3211,7 +3211,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateTable = function(transformOnly) {
       if (images.length !== 0 && !transformOnly) {
-        viewManagement.setBaseAndTargetImage(null, null);
+        view.setBaseAndTargetImage(null, null);
         if (toneCurveParam.type !== toneCurveType.current() ||
             toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
             toneCurveParam.base !== baseImageIndex) {
@@ -4170,8 +4170,8 @@ const compareUI = CompareUI({ compareUtil });
     const currentMode = function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
-    viewManagement.addOnUpdateImageBox(onUpdateImageBox);
-    viewManagement.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    view.addOnUpdateImageBox(onUpdateImageBox);
+    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
       reset,
       toggle,
@@ -4184,7 +4184,7 @@ const compareUI = CompareUI({ compareUtil });
       currentMode
     };
   };
-  const roiMap = compareUI.RoiMap({ viewManagement });
+  const roiMap = compareUI.RoiMap({ view });
   const altView = AltView();
   const settings = Settings();
   const cameraDialog = CameraDialog();
@@ -4200,8 +4200,8 @@ const compareUI = CompareUI({ compareUtil });
     $('#analysisbtn').click(toggleAnalysis);
     $('#zoomIn').click(viewZoom.zoomIn);
     $('#zoomOut').click(viewZoom.zoomOut);
-    $('#arrange').click(viewManagement.arrangeLayout);
-    $('#overlay').click(viewManagement.toggleOverlay);
+    $('#arrange').click(view.arrangeLayout);
+    $('#overlay').click(view.toggleOverlay);
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
     $('#channelbtn').click(altView.toggle);
@@ -4209,10 +4209,10 @@ const compareUI = CompareUI({ compareUtil });
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
     const newSelectorButton = function(index) {
-      const number = viewManagement.numberFromIndex(index);
+      const number = view.numberFromIndex(index);
       const button = $('<button/>').addClass('selector').
         text(number).
-        click(function(e) { viewManagement.toSingleImageView(index); });
+        click(function(e) { view.toSingleImageView(index); });
       if (number <= 9) {
         button.find('span.tooltip span').addClass('keys flat').
             append($('<span/>').text(number));
@@ -4227,11 +4227,11 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const updateArrangeButton = function() {
-      const layoutMode = viewManagement.getLayoutMode();
+      const layoutMode = view.getLayoutMode();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     const updateSelectorButtonState = function() {
-      const indices = viewManagement.getSelectedImageIndices();
+      const indices = view.getSelectedImageIndices();
       const selectors = $('.selector');
       selectors.removeClass('current');
       for (const index of indices) {
@@ -4244,9 +4244,9 @@ const compareUI = CompareUI({ compareUtil });
       });
     };
     const updateOverlayModeIndicator = function() {
-      if (viewManagement.isOverlayMode()) {
-        const indices = viewManagement.getSelectedImageIndices();
-        const numbers = indices.map(function(i) { return viewManagement.numberFromIndex(i); });
+      if (view.isOverlayMode()) {
+        const indices = view.getSelectedImageIndices();
+        const numbers = indices.map(function(i) { return view.numberFromIndex(i); });
         numbers.sort();
         const modeDesc = numbers.join(' + ') + (numbers.length === 1 ? ' only' : '');
         textUtil.setText($('#mode h3'), {
@@ -4265,7 +4265,7 @@ const compareUI = CompareUI({ compareUtil });
       updateSelectorButtonState();
       updateOverlayModeIndicator();
     };
-    viewManagement.addOnUpdateLayout(onUpdateLayout);
+    view.addOnUpdateLayout(onUpdateLayout);
     return {
       updateSelectorButtons
     };
@@ -4303,7 +4303,7 @@ const compareUI = CompareUI({ compareUtil });
       ent.toneCurve = null;
       ent.toneCurveAxes = null;
       taskQueue.discardTasksOfEntryByIndex(index);
-      viewManagement.resetLayoutState();
+      view.resetLayoutState();
       updateDOM();
     }
   };
@@ -4321,9 +4321,9 @@ const compareUI = CompareUI({ compareUtil });
         }
         ent.view.find('.imageName').remove();
         ent.view.append(
-            viewManagement.makeImageNameWithNumber('<span class="imageName">', ent).
+            view.makeImageNameWithNumber('<span class="imageName">', ent).
               click({index : i}, function(e) {
-                viewManagement.toggleSingleView(e.data.index);
+                view.toggleSingleView(e.data.index);
               }).append(
                 $('<button>').addClass('remove').text('×').
                   click({index : i}, function(e) { removeEntry(e.data.index); }))
@@ -4348,7 +4348,7 @@ const compareUI = CompareUI({ compareUtil });
     }
     sideBar.updateSelectorButtons();
     resetMouseDrag();
-    viewManagement.updateLayout();
+    view.updateLayout();
   };
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
@@ -4489,7 +4489,7 @@ const compareUI = CompareUI({ compareUtil });
       const entry = newEntry(file);
       entry.index = entries.length;
       entries.push(entry);
-      viewManagement.resetLayoutState();
+      view.resetLayoutState();
       setupEntryWithCanvas(entry, canvas);
   };
   const addFile = function(file) {
@@ -4525,7 +4525,7 @@ const compareUI = CompareUI({ compareUtil });
     for (const f of sorted) {
       addFile(f);
     }
-    viewManagement.resetLayoutState();
+    view.resetLayoutState();
     updateDOM();
     nowLoadingDialog.update();
   };
@@ -4578,7 +4578,7 @@ const compareUI = CompareUI({ compareUtil });
   const opticalFlowDialog = OpticalFlowDialog();
   const diffDialog = DiffDialog();
 
-  const colorHUD = compareUI.ColorHUD({ viewManagement, crossCursor, hud });
+  const colorHUD = compareUI.ColorHUD({ view, crossCursor, hud });
 
   const setupMenusAndDialogs = function() {
     $('#infobtn').click(infoDialog.toggle);
@@ -4647,7 +4647,7 @@ const compareUI = CompareUI({ compareUtil });
   };
 
   const setupWindowLevelEventListeners = function() {
-    $(window).resize(viewManagement.onResize);
+    $(window).resize(view.onResize);
     const onKeyDownOnDialogs = function(e) {
         if (e.ctrlKey || e.altKey || e.metaKey) {
           return true;
@@ -4667,9 +4667,9 @@ const compareUI = CompareUI({ compareUtil });
             sw.click();
             return false;
           }
-          const index = viewManagement.indexFromNumber(num);
+          const index = view.indexFromNumber(num);
           if (($('#diff').is(':visible') || $('#opticalFlow').is(':visible') /*|| $('#toneCurve').is(':visible')*/) &&
-              index !== null && viewManagement.changeTargetImage(index)) {
+              index !== null && view.changeTargetImage(index)) {
             dialog.update();
             return false;
           }
@@ -4705,11 +4705,11 @@ const compareUI = CompareUI({ compareUtil });
           (96 <= e.keyCode && e.keyCode <= 105 && shift === '')) {
         const number = e.keyCode % 48;
         if (number === 0) {
-          viewManagement.toAllImageView();
+          view.toAllImageView();
         } else {
-          const index = viewManagement.indexFromNumber(number);
+          const index = view.indexFromNumber(number);
           if (index !== null) {
-            viewManagement.toggleSingleView(index);
+            view.toggleSingleView(index);
           }
         }
         return false;
@@ -4726,20 +4726,20 @@ const compareUI = CompareUI({ compareUtil });
       if ((37 <= e.keyCode || e.keyCode <= 40) &&
           ((viewZoom.scale === 1 && shift === '') || shift === 'c')) {
         if (e.keyCode === 37 || e.keyCode === 39) { // Left, Right
-          if (false === viewManagement.flipSingleView(e.keyCode === 39)) {
+          if (false === view.flipSingleView(e.keyCode === 39)) {
             return false;
           }
-        } else if (e.keyCode === 38 && !viewManagement.isSingleView()) { // Up
-          viewManagement.toggleSingleView();
+        } else if (e.keyCode === 38 && !view.isSingleView()) { // Up
+          view.toggleSingleView();
           return false;
-        } else if (e.keyCode === 40 && viewManagement.isSingleView()) { // Down
-          viewManagement.toAllImageView();
+        } else if (e.keyCode === 40 && view.isSingleView()) { // Down
+          view.toAllImageView();
           return false;
         }
       }
       // View switching: TAB (9)
       if (e.keyCode === 9 && (shift === '' || shift === 's')) {
-        if (false === viewManagement.flipSingleView(shift === '')) {
+        if (false === view.flipSingleView(shift === '')) {
           return false;
         }
       }
@@ -4751,15 +4751,15 @@ const compareUI = CompareUI({ compareUtil });
           altView.reset();
           updateDOM();
         } else {
-          viewManagement.resetLayoutState();
+          view.resetLayoutState();
           resetMouseDrag();
-          viewManagement.updateLayout();
+          view.updateLayout();
         }
         return false;
       }
       // Delete (46)
       if (e.keyCode === 46 && shift === '' && 0 < images.length) {
-        const index = viewManagement.getCurrentIndexOr(images[0].index);
+        const index = view.getCurrentIndexOr(images[0].index);
         removeEntry(index);
         return false;
       }
@@ -4818,9 +4818,9 @@ const compareUI = CompareUI({ compareUtil });
       // 'i' (105)
       105 : { global: true, func: infoDialog.toggle },
       // '/' (47)
-      47 : { global: false, func: viewManagement.arrangeLayout },
+      47 : { global: false, func: view.arrangeLayout },
       // 'O' (79)
-      79: { global: false, func: viewManagement.toggleOverlay },
+      79: { global: false, func: view.toggleOverlay },
       // 'n' (110)
       110 : { global: false, func: roiMap.toggle },
       // 'g' (103)
