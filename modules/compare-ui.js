@@ -13,7 +13,8 @@ const CompareUI = function({ compareUtil }) {
         }
     };
 
-    const Hud = function({ viewManagement, viewZoom, crossCursor }) {
+    const Hud = function({ viewManagement, crossCursor }) {
+        const viewZoom = viewManagement.viewZoom;
         const hudPlacement = { right: true, bottom: true };
         let onUpdateLayoutCallback = null;
         const initialize = function () {
@@ -163,6 +164,56 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
+    const RoiMap = function ({ viewManagement }) {
+        const viewZoom = viewManagement.viewZoom;
+        let enableMap = false;
+        const toggle = function () {
+            if (!enableMap) {
+                if (0 < viewManagement.getImages().length) {
+                    enableMap = true;
+                    viewManagement.updateLayout();
+                }
+            } else {
+                enableMap = false;
+                viewManagement.updateLayout();
+            }
+        };
+        const onUpdateLayout = function () {
+            const images = viewManagement.getImages();
+            $('#map').css({ display: (enableMap && images.length) ? 'block' : '' });
+        };
+        const updateMap = function (img) {
+            const roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
+            $('#mapROI').attr({
+                x: 100 * roi[0] + '%',
+                y: 100 * roi[1] + '%',
+                width: 100 * (roi[2] - roi[0]) + '%',
+                height: 100 * (roi[3] - roi[1]) + '%'
+            });
+            const s = 120 / Math.max(img.width, img.height);
+            const w = img.width * s;
+            const h = img.height * s;
+            $('#map svg').width(w).height(h);
+            $('#map').width(w).height(h);
+        };
+        const onUpdateTransform = function () {
+            if (enableMap) {
+                const images = viewManagement.getImages();
+                if (0 < images.length) {
+                    const index = viewManagement.getCurrentIndexOr(0);
+                    const entry = viewManagement.getEntry(index);
+                    const img = entry.ready() ? entry : images[0];
+                    updateMap(img);
+                }
+            }
+        };
+        viewManagement.addOnUpdateLayout(onUpdateLayout);
+        viewManagement.addOnUpdateTransform(onUpdateTransform);
+        return {
+            toggle
+        };
+    };
+
     const DialogUtil = function () {
         let dialog = null;
         const onShow = [], onHide = [];
@@ -308,6 +359,7 @@ const CompareUI = function({ compareUtil }) {
         setDragStateClass,
         Hud,
         ColorHUD,
+        RoiMap,
         DialogUtil
     };
 };

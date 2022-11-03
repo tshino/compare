@@ -448,54 +448,6 @@ const compareUI = CompareUI({ compareUtil });
   })();
   const viewZoom = viewManagement.viewZoom;
 
-  // ROI map
-  const RoiMap = function({ viewManagement }) {
-    let enableMap = false;
-    const toggle = function() {
-      if (!enableMap) {
-        if (0 < viewManagement.getImages().length) {
-          enableMap = true;
-          viewManagement.updateLayout();
-        }
-      } else {
-        enableMap = false;
-        viewManagement.updateLayout();
-      }
-    };
-    const onUpdateLayout = function() {
-      const images = viewManagement.getImages();
-      $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
-    };
-    const updateMap = function(img) {
-      const roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
-      $('#mapROI').attr({
-        x : 100 * roi[0] + '%',
-        y : 100 * roi[1] + '%',
-        width : 100 * (roi[2] - roi[0]) + '%',
-        height : 100 * (roi[3] - roi[1]) + '%'
-      });
-      const s = 120 / Math.max(img.width, img.height);
-      const w = img.width * s;
-      const h = img.height * s;
-      $('#map svg').width(w).height(h);
-      $('#map').width(w).height(h);
-    };
-    const onUpdateTransform = function() {
-      if (enableMap) {
-        const images = viewManagement.getImages();
-        if (0 < images.length) {
-          const index = viewManagement.getCurrentIndexOr(0);
-          const img = entries[index].ready() ? entries[index] : images[0];
-          updateMap(img);
-        }
-      }
-    };
-    viewManagement.addOnUpdateLayout(onUpdateLayout);
-    viewManagement.addOnUpdateTransform(onUpdateTransform);
-    return {
-      toggle
-    };
-  };
   const makeImageOverlayOnUpdateLayout = function(key, make) {
       return function(enable, img, w, h) {
         if (enable) {
@@ -916,7 +868,7 @@ const compareUI = CompareUI({ compareUtil });
   };
   const crossCursor = CrossCursor({ viewManagement });
 
-  const hud = compareUI.Hud({ viewManagement, viewZoom, crossCursor });
+  const hud = compareUI.Hud({ viewManagement, crossCursor });
 
   const dialogUtil = compareUI.DialogUtil();
   viewManagement.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
@@ -4232,7 +4184,7 @@ const compareUI = CompareUI({ compareUtil });
       currentMode
     };
   };
-  const roiMap = RoiMap({ viewManagement });
+  const roiMap = compareUI.RoiMap({ viewManagement });
   const altView = AltView();
   const settings = Settings();
   const cameraDialog = CameraDialog();
