@@ -35,7 +35,7 @@ const compareUI = CompareUI({ compareUtil });
     };
   })();
   // View management functions
-  const view = (function() {
+  const View = function() {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     let currentImageIndex = 0;
@@ -50,8 +50,6 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateLayoutListeners = [];
     const onEntryUpdateTransformListeners = [];
     const onUpdateTransformListeners = [];
-    $('#prev').click(function() { view.flipSingleView(false); });
-    $('#next').click(function() { view.flipSingleView(true); });
     const isSingleView = function() {
       return singleView;
     };
@@ -411,6 +409,15 @@ const compareUI = CompareUI({ compareUtil });
       imageScaling = type;
       updateImageScaling();
     };
+    const resetMouseDrag = function() {
+      viewZoom.resetDragState();
+    };
+    const toggleFullscreen = function() {
+      resetMouseDrag();
+      compareUtil.toggleFullscreen($('#viewroot').get(0));
+    };
+    $('#prev').click(function() { flipSingleView(false); });
+    $('#next').click(function() { flipSingleView(true); });
     return {
       getImages: () => { return images; },
       getEntry: (index) => { return entries[index]; },
@@ -443,9 +450,12 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout,
       setBackgroundColor,
       setCheckerPattern,
-      setImageScaling
+      setImageScaling,
+      resetMouseDrag,
+      toggleFullscreen
     };
-  })();
+  };
+  const view = View();
   const viewZoom = view.viewZoom;
 
   const makeImageOverlayOnUpdateLayout = function(key, make) {
@@ -867,8 +877,6 @@ const compareUI = CompareUI({ compareUtil });
     };
   };
   const crossCursor = CrossCursor({ view });
-
-  const hud = compareUI.Hud({ view, crossCursor });
 
   const dialogUtil = compareUI.DialogUtil();
   view.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
@@ -3843,13 +3851,6 @@ const compareUI = CompareUI({ compareUtil });
       toggle
     };
   };
-  const resetMouseDrag = function() {
-    viewZoom.resetDragState();
-  };
-  const toggleFullscreen = function() {
-    resetMouseDrag();
-    compareUtil.toggleFullscreen($('#viewroot').get(0));
-  };
   // Alt View
   const AltView = function() {
     let colorSpace = $('#altViewColorSpace').val();
@@ -4189,7 +4190,8 @@ const compareUI = CompareUI({ compareUtil });
   const settings = Settings();
   const cameraDialog = CameraDialog();
   // Side Bar
-  const sideBar = (function() {
+  const SideBar = function({ view }) {
+    const viewZoom = view.viewZoom;
     $('#add').click(function() {
       $('#file').click();
     });
@@ -4205,7 +4207,7 @@ const compareUI = CompareUI({ compareUtil });
     $('#gridbtn').click(grid.toggle);
     $('#pickerbtn').click(crossCursor.toggle);
     $('#channelbtn').click(altView.toggle);
-    $('#fullscreen').click(toggleFullscreen);
+    $('#fullscreen').click(view.toggleFullscreen);
     $('#settingsbtn').click(settings.toggle);
     $('#helpbtn').click(toggleHelp);
     const newSelectorButton = function(index) {
@@ -4269,7 +4271,8 @@ const compareUI = CompareUI({ compareUtil });
     return {
       updateSelectorButtons
     };
-  })();
+  };
+  const sideBar = SideBar({ view });
   const removeEntry = function(index) {
     const ent = entries[index];
     if (ent && !ent.loading && ent.visible) {
@@ -4347,7 +4350,7 @@ const compareUI = CompareUI({ compareUtil });
         }
     }
     sideBar.updateSelectorButtons();
-    resetMouseDrag();
+    view.resetMouseDrag();
     view.updateLayout();
   };
 
@@ -4578,6 +4581,7 @@ const compareUI = CompareUI({ compareUtil });
   const opticalFlowDialog = OpticalFlowDialog();
   const diffDialog = DiffDialog();
 
+  const hud = compareUI.Hud({ view, crossCursor });
   const colorHUD = compareUI.ColorHUD({ view, crossCursor, hud });
 
   const setupMenusAndDialogs = function() {
@@ -4752,7 +4756,7 @@ const compareUI = CompareUI({ compareUtil });
           updateDOM();
         } else {
           view.resetLayoutState();
-          resetMouseDrag();
+          view.resetMouseDrag();
           view.updateLayout();
         }
         return false;
@@ -4792,7 +4796,7 @@ const compareUI = CompareUI({ compareUtil });
       // 's' (115)
       115 : { global: true, func: settings.toggle },
       // 'f' (102)
-      102 : { global: true, func: toggleFullscreen },
+      102 : { global: true, func: view.toggleFullscreen },
       // 'C' (67)
       67 : { global: true, func: cameraDialog.toggle },
       // 'a' (97)
