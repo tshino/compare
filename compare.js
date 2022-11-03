@@ -66,6 +66,14 @@ const compareUI = CompareUI({ compareUtil });
       }
       return null;
     };
+    const makeImageNameWithNumber = function(tag, img) {
+      const number = numberFromIndex(img.index);
+      const elem = $(tag).css({ wordBreak : 'break-all' });
+      if (number !== null) {
+        elem.append($('<span class="imageIndex"/>').text(number));
+      }
+      return elem.append($('<span/>').text(img.name));
+    };
     const indexFromNumber = function(number) {
       if (1 <= number && number <= images.length) {
         return images[number - 1].index;
@@ -404,6 +412,7 @@ const compareUI = CompareUI({ compareUtil });
       isSingleView,
       isOverlayMode,
       numberFromIndex,
+      makeImageNameWithNumber,
       indexFromNumber,
       setBaseAndTargetImage,
       changeBaseImage,
@@ -435,21 +444,13 @@ const compareUI = CompareUI({ compareUtil });
     };
   })();
   const viewZoom = viewManagement.viewZoom;
-  const makeImageNameWithIndex = function(tag, img) {
-    const number = viewManagement.numberFromIndex(img.index);
-    const elem = $(tag).css({ wordBreak : 'break-all' });
-    if (number !== null) {
-      elem.append($('<span class="imageIndex"/>').text(number));
-    }
-    return elem.append($('<span/>').text(img.name));
-  };
 
   // ROI map
-  const RoiMap = function() {
+  const RoiMap = function({ viewManagement }) {
     let enableMap = false;
     const toggle = function() {
       if (!enableMap) {
-        if (0 < images.length) {
+        if (0 < viewManagement.getImages().length) {
           enableMap = true;
           updateLayout();
         }
@@ -459,6 +460,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const onUpdateLayout = function() {
+      const images = viewManagement.getImages();
       $('#map').css({ display : (enableMap && images.length) ? 'block' : '' });
     };
     const updateMap = function(img) {
@@ -476,10 +478,13 @@ const compareUI = CompareUI({ compareUtil });
       $('#map').width(w).height(h);
     };
     const onUpdateTransform = function() {
-      if (enableMap && images.length) {
-        const index = viewManagement.getCurrentIndexOr(0);
-        const img = entries[index].ready() ? entries[index] : images[0];
-        updateMap(img);
+      if (enableMap) {
+        const images = viewManagement.getImages();
+        if (0 < images.length) {
+          const index = viewManagement.getCurrentIndexOr(0);
+          const img = entries[index].ready() ? entries[index] : images[0];
+          updateMap(img);
+        }
       }
     };
     viewManagement.addOnUpdateLayout(onUpdateLayout);
@@ -911,6 +916,7 @@ const compareUI = CompareUI({ compareUtil });
   const hud = compareUI.Hud({ viewManagement, viewZoom, crossCursor });
 
   const dialogUtil = compareUI.DialogUtil();
+  viewManagement.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
   const figureZoom = dialogUtil.figureZoom;
   const swapBaseAndTargetImage = function() {
     if (baseImageIndex !== null && targetImageIndex !== null) {
@@ -1236,7 +1242,7 @@ const compareUI = CompareUI({ compareUtil });
     const unknown = [null, '‐'];
     const makeTableValue = function(img) {
       return [
-        [null, makeImageNameWithIndex('<span>', img)],
+        [null, viewManagement.makeImageNameWithNumber('<span>', img)],
         img.format === '' ? unknown : [img.format, img.format],
         img.color === '' ? unknown : [img.color, img.color],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1354,7 +1360,7 @@ const compareUI = CompareUI({ compareUtil });
           td.addClass('ok').text('OK!');
         }
         $('#loadingList').append(
-          $('<tr>').append(makeImageNameWithIndex('<td class="b">', ent), td)
+          $('<tr>').append(viewManagement.makeImageNameWithNumber('<td class="b">', ent), td)
         );
       }
       if (finished) {
@@ -1419,7 +1425,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
-      const label = makeImageNameWithIndex('<td>', img);
+      const label = viewManagement.makeImageNameWithNumber('<td>', img);
       labelRow.append(label);
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -2870,7 +2876,7 @@ const compareUI = CompareUI({ compareUtil });
       const target = $('#colorFreqTable');
       target.find('td').remove();
       for (let i = 0, img; img = images[i]; i++) {
-        const label = makeImageNameWithIndex('<td>', img);
+        const label = viewManagement.makeImageNameWithNumber('<td>', img);
         target.find('tr').eq(0).append(label);
         const cell = $('<td>');
         target.find('tr').eq(1).append(cell);
@@ -3027,7 +3033,7 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#metricsTargetName').append(
         $('<td>').append(
-          makeImageNameWithIndex('<span>', b),
+          viewManagement.makeImageNameWithNumber('<span>', b),
           '&nbsp;',
           $('<button>').text('↑').click(function(e) {
             viewManagement.changeBaseImage(b.index);
@@ -3122,7 +3128,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
         update(entries[baseImageIndex], img);
       }
-      const label = makeImageNameWithIndex('<span>', img);
+      const label = viewManagement.makeImageNameWithNumber('<span>', img);
       labelRow.append($('<td>').append(label));
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -4223,7 +4229,7 @@ const compareUI = CompareUI({ compareUtil });
       currentMode
     };
   };
-  const roiMap = RoiMap();
+  const roiMap = RoiMap({ viewManagement });
   const altView = AltView();
   const settings = Settings();
   const cameraDialog = CameraDialog();
@@ -4360,7 +4366,7 @@ const compareUI = CompareUI({ compareUtil });
         }
         ent.view.find('.imageName').remove();
         ent.view.append(
-            makeImageNameWithIndex('<span class="imageName">', ent).
+            viewManagement.makeImageNameWithNumber('<span class="imageName">', ent).
               click({index : i}, function(e) {
                 viewManagement.toggleSingleView(e.data.index);
               }).append(
@@ -4393,7 +4399,6 @@ const compareUI = CompareUI({ compareUtil });
     viewManagement.update();
     viewManagement.onUpdateLayout();
     viewManagement.updateTransform(viewZoom);
-    dialogUtil.adjustDialogPosition();
   };
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
