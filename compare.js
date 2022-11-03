@@ -476,9 +476,47 @@ const compareUI = CompareUI({ compareUtil });
         select
       );
     };
+    const setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
+      $(baseSelector).children().remove();
+      $(targetSelector).children().remove();
+      if (view.getImages().length < 2) {
+        $(baseSelector).append($('<span>').text('no data'));
+        $(targetSelector).append($('<span>').text('no data'));
+        return false;
+      }
+      view.setBaseAndTargetImage(null, null);
+      $(baseSelector).append(
+        makeImageNameSelector(baseImageIndex, function(index) {
+          view.changeBaseImage(index);
+          onUpdate();
+        })
+      );
+      $(targetSelector).append(
+        makeImageNameSelector(targetImageIndex, function(index) {
+          view.setBaseAndTargetImage(null, index);
+          onUpdate();
+        })
+      );
+    };
+    const updateBaseImageSelector = function(target, baseImageIndex, repaint) {
+      const baseCell = $(target).find('tr.basename td:not(.prop)');
+      baseCell.children().remove();
+      if (baseImageIndex === null || view.getImages().length === 0) {
+        baseCell.append($('<span>').text('no data'));
+      } else {
+        baseCell.append(
+          makeImageNameSelector(baseImageIndex, function(index) {
+            view.changeBaseImage(index);
+            repaint();
+          })
+        );
+      }
+    };
     return {
       makeImageNameWithNumber,
-      makeImageNameSelector
+      makeImageNameSelector,
+      setupBaseAndTargetSelector,
+      updateBaseImageSelector
     };
   };
   const viewUtil = ViewUtil({ view });
@@ -593,7 +631,6 @@ const compareUI = CompareUI({ compareUtil });
       updateGridStyle
     };
   };
-  const grid = Grid({ view });
 
   // Cross Cursor
   const CrossCursor = function({ view }) {
@@ -901,6 +938,7 @@ const compareUI = CompareUI({ compareUtil });
       processMouseMove
     };
   };
+  const grid = Grid({ view });
   const crossCursor = CrossCursor({ view });
 
   const dialogUtil = compareUI.DialogUtil();
@@ -3040,48 +3078,12 @@ const compareUI = CompareUI({ compareUtil });
       toggle
     };
   };
-  const setupBaseAndTargetSelector = function(baseSelector, targetSelector, onUpdate) {
-    $(baseSelector).children().remove();
-    $(targetSelector).children().remove();
-    if (images.length < 2) {
-      $(baseSelector).append($('<span>').text('no data'));
-      $(targetSelector).append($('<span>').text('no data'));
-      return false;
-    }
-    view.setBaseAndTargetImage(null, null);
-    $(baseSelector).append(
-      viewUtil.makeImageNameSelector(baseImageIndex, function(index) {
-        view.changeBaseImage(index);
-        onUpdate();
-      })
-    );
-    $(targetSelector).append(
-      viewUtil.makeImageNameSelector(targetImageIndex, function(index) {
-        view.setBaseAndTargetImage(null, index);
-        onUpdate();
-      })
-    );
-  };
-  const updateBaseImageSelector = function(target, baseImageIndex, repaint) {
-    const baseCell = $(target).find('tr.basename td:not(.prop)');
-    baseCell.children().remove();
-    if (baseImageIndex === null || images.length === 0) {
-      baseCell.append($('<span>').text('no data'));
-    } else {
-      baseCell.append(
-        viewUtil.makeImageNameSelector(baseImageIndex, function(index) {
-          view.changeBaseImage(index);
-          repaint();
-        })
-      );
-    }
-  };
   const updatePairwiseFigureTable = function(target, propName, update, repaint, styles, transformOnly) {
     if (transformOnly) {
       $(target).find('td.fig > *').css(styles.style);
       return;
     }
-    updateBaseImageSelector(target, baseImageIndex, repaint);
+    viewUtil.updateBaseImageSelector(target, baseImageIndex, repaint);
     const baseCell = $(target).find('tr.basename td:not(.prop)');
     const labelRow = $(target).find('tr.label');
     const figureRow = $(target).find('tr.figure');
@@ -3375,7 +3377,7 @@ const compareUI = CompareUI({ compareUtil });
       $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
       $('#opticalFlowSelectedDeltaX,#opticalFlowSelectedDeltaY').text('--');
       $('#opticalFlowSummary *').remove();
-      if (false === setupBaseAndTargetSelector('#opticalFlowBaseName', '#opticalFlowTargetName', updateTable)) {
+      if (false === viewUtil.setupBaseAndTargetSelector('#opticalFlowBaseName', '#opticalFlowTargetName', updateTable)) {
         return false;
       }
       return true;
@@ -3635,7 +3637,7 @@ const compareUI = CompareUI({ compareUtil });
       $('#diffOffsetX').val(diffOptions.offsetX);
       $('#diffOffsetY').val(diffOptions.offsetY);
       $('#diffIgnoreAE').val(diffOptions.ignoreAE);
-      if (false === setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
+      if (false === viewUtil.setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
         return false;
       }
       const a = entries[baseImageIndex];
