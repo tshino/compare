@@ -944,15 +944,6 @@ const compareUI = CompareUI({ compareUtil });
   const dialogUtil = compareUI.DialogUtil();
   view.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
   const figureZoom = dialogUtil.figureZoom;
-  const swapBaseAndTargetImage = function() {
-    if (baseImageIndex !== null && targetImageIndex !== null) {
-      view.setBaseAndTargetImage(targetImageIndex, baseImageIndex);
-      const dialog = dialogUtil.current();
-      if (dialog) {
-        dialog.update();
-      }
-    }
-  };
   const openMessageBox = (function() {
     let serial = 0;
     return function(text) {
@@ -4604,7 +4595,6 @@ const compareUI = CompareUI({ compareUtil });
     $('#tonecurvebtn').click(toneCurveDialog.toggle);
     $('#opticalflowbtn').click(opticalFlowDialog.toggle);
     $('#diffbtn').click(diffDialog.toggle);
-    $('.swapbtn').click(swapBaseAndTargetImage);
 
     viewZoom.enableMouseAndTouch('#view', 'div.imageBox', 'div.imageBox .image', '#view > div.imageBox', '.image');
     figureZoom.enableMouseAndTouch('#histogram,#waveform,#vectorscope,#opticalFlow,#diff,#toneCurve', 'td.fig', 'td.fig > *', 'div.dialog:visible td.fig', '.figMain');
