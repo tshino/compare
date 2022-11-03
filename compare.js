@@ -382,6 +382,11 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
     });
+    const updateLayout = function() {
+      update();
+      onUpdateLayout();
+      updateTransform(viewZoom);
+    };
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -427,17 +432,15 @@ const compareUI = CompareUI({ compareUtil });
       onResize,
       arrangeLayout,
       toggleOverlay,
-      update,
       getCurrentIndexOr,
       makeImageLayoutParam,
       addOnUpdateImageBox,
       addOnUpdateLayout,
-      onUpdateLayout,
       addOnEntryUpdateTransform,
       onEntryUpdateTransform,
       addOnUpdateTransform,
-      updateTransform,
       viewZoom,
+      updateLayout,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling
@@ -452,11 +455,11 @@ const compareUI = CompareUI({ compareUtil });
       if (!enableMap) {
         if (0 < viewManagement.getImages().length) {
           enableMap = true;
-          updateLayout();
+          viewManagement.updateLayout();
         }
       } else {
         enableMap = false;
-        updateLayout();
+        viewManagement.updateLayout();
       }
     };
     const onUpdateLayout = function() {
@@ -520,7 +523,7 @@ const compareUI = CompareUI({ compareUtil });
     const toggle = function() {
       enableGrid = !enableGrid;
       enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
-      updateLayout();
+      viewManagement.updateLayout();
       if (onChangeCallback) {
         onChangeCallback();
       }
@@ -535,7 +538,7 @@ const compareUI = CompareUI({ compareUtil });
             img.grid = null;
           }
         }
-        updateLayout();
+        viewManagement.updateLayout();
         if (onChangeCallback) {
           onChangeCallback();
         }
@@ -641,7 +644,7 @@ const compareUI = CompareUI({ compareUtil });
         onShowCallback.forEach(function(val) { val(); });
         const pos = makeInitialPosition(index);
         setPosition(index, pos.x, pos.y);
-        updateLayout();
+        viewManagement.updateLayout();
       }
       return enableCrossCursor;
     };
@@ -650,7 +653,7 @@ const compareUI = CompareUI({ compareUtil });
         enableCrossCursor = false;
         onRemoveCallback.forEach(function(val) { val(); });
         primaryIndex = null;
-        updateLayout();
+        viewManagement.updateLayout();
       }
     };
     const toggle = function() {
@@ -4393,12 +4396,7 @@ const compareUI = CompareUI({ compareUtil });
     }
     sideBar.updateSelectorButtons();
     resetMouseDrag();
-    updateLayout();
-  };
-  const updateLayout = function() {
-    viewManagement.update();
-    viewManagement.onUpdateLayout();
-    viewManagement.updateTransform(viewZoom);
+    viewManagement.updateLayout();
   };
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
@@ -4803,7 +4801,7 @@ const compareUI = CompareUI({ compareUtil });
         } else {
           viewManagement.resetLayoutState();
           resetMouseDrag();
-          updateLayout();
+          viewManagement.updateLayout();
         }
         return false;
       }
