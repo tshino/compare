@@ -12,29 +12,7 @@ const compareUI = CompareUI({ compareUtil });
     function(result) { drawImageAwareOfOrientation = result; }
   );
 
-  const TextUtil = function({ document, changeLang }) {
-    const toggleLang = function() {
-      const lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
-      $('#selectLang').val(lang);
-      changeLang(lang);
-    };
-    const setText = function(target, text) {
-      for (const lang of ['en', 'ja']) {
-        let e = target.find('.' + lang);
-        if (0 === e.length) {
-          e = $('<span>').addClass(lang);
-          target.append(e);
-        }
-        e.text(text[lang]);
-      }
-      return target;
-    };
-    return {
-      toggleLang,
-      setText
-    };
-  };
-  const textUtil = TextUtil({ document, changeLang });
+  const textUtil = compareUI.TextUtil({ document, changeLang });
 
   // View management functions
   const View = function() {

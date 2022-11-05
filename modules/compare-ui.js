@@ -13,6 +13,29 @@ const CompareUI = function({ compareUtil }) {
         }
     };
 
+    const TextUtil = function ({ document, changeLang }) {
+        const toggleLang = function () {
+            const lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
+            $('#selectLang').val(lang);
+            changeLang(lang);
+        };
+        const setText = function (target, text) {
+            for (const lang of ['en', 'ja']) {
+                let e = target.find('.' + lang);
+                if (0 === e.length) {
+                    e = $('<span>').addClass(lang);
+                    target.append(e);
+                }
+                e.text(text[lang]);
+            }
+            return target;
+        };
+        return {
+            toggleLang,
+            setText
+        };
+    };
+
     const Grid = function ({ view, viewUtil }) {
         let enableGrid = false;
         let mainGridInterval = 100;
@@ -449,6 +472,7 @@ const CompareUI = function({ compareUtil }) {
 
     return {
         setDragStateClass,
+        TextUtil,
         Grid,
         Hud,
         ColorHUD,
