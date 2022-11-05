@@ -12,14 +12,14 @@ const compareUI = CompareUI({ compareUtil });
     function(result) { drawImageAwareOfOrientation = result; }
   );
 
-  const textUtil = (function() {
+  const TextUtil = function({ document, changeLang }) {
     const toggleLang = function() {
       const lang = $(document.body).attr('class') === 'ja' ? 'en' : 'ja';
       $('#selectLang').val(lang);
       changeLang(lang);
     };
     const setText = function(target, text) {
-      for (let i = 0, lang; lang = ['en', 'ja'][i]; ++i) {
+      for (const lang of ['en', 'ja']) {
         let e = target.find('.' + lang);
         if (0 === e.length) {
           e = $('<span>').addClass(lang);
@@ -30,10 +30,12 @@ const compareUI = CompareUI({ compareUtil });
       return target;
     };
     return {
-      toggleLang: toggleLang,
-      setText: setText
+      toggleLang,
+      setText
     };
-  })();
+  };
+  const textUtil = TextUtil({ document, changeLang });
+
   // View management functions
   const View = function() {
     const IMAGEBOX_MIN_SIZE = 32;
