@@ -512,16 +512,7 @@ const compareUI = CompareUI({ compareUtil });
         );
       }
     };
-    return {
-      makeImageNameWithNumber,
-      makeImageNameSelector,
-      setupBaseAndTargetSelector,
-      updateBaseImageSelector
-    };
-  };
-  const viewUtil = ViewUtil({ view });
-
-  const makeImageOverlayOnUpdateLayout = function(key, make) {
+    const makeImageOverlayOnUpdateLayout = function(key, make) {
       return function(enable, img, w, h) {
         if (enable) {
           if (img.element && !img[key]) {
@@ -538,99 +529,16 @@ const compareUI = CompareUI({ compareUtil });
           }
         }
       };
-  };
-  // Grid
-  const Grid = function({ view }) {
-    let enableGrid = false;
-    let mainGridInterval = 100;
-    let auxGridInterval = 10;
-    let onChangeCallback = null;
-    const toggle = function() {
-      enableGrid = !enableGrid;
-      enableGrid ? $('#gridbtn').addClass('current') : $('#gridbtn').removeClass('current');
-      view.updateLayout();
-      if (onChangeCallback) {
-        onChangeCallback();
-      }
     };
-    const setInterval = function(main, aux) {
-      if (mainGridInterval !== main || auxGridInterval !== aux) {
-        mainGridInterval = main;
-        auxGridInterval = aux;
-        for (const img of view.getImages()) {
-          if (img.grid) {
-            $(img.grid).remove();
-            img.grid = null;
-          }
-        }
-        view.updateLayout();
-        if (onChangeCallback) {
-          onChangeCallback();
-        }
-      }
-    };
-    const setOnChange = function(onchange) {
-      onChangeCallback = onchange;
-    };
-    const makePathDesc = function(size, step, skip) {
-      let desc = '';
-      for (let k = step; k < size.w; k += step) {
-        if (skip && (k % skip) === 0) continue;
-        desc += 'M ' + k + ',0 l 0,' + size.h + ' ';
-      }
-      for (let k = step; k < size.h; k += step) {
-        if (skip && (k % skip) === 0) continue;
-        desc += 'M 0,' + k + ' l ' + size.w + ',0 ';
-      }
-      return desc;
-    };
-    const makeGrid = function(w, h, color) {
-      const size = { w, h };
-      const vbox = '0 0 ' + w + ' ' + h;
-      color = color || 'white';
-      const mainGrid = makePathDesc(size, mainGridInterval);
-      const auxGrid = makePathDesc(size, auxGridInterval, mainGridInterval);
-      return $(
-        '<svg class="imageOverlay grid" viewBox="' + vbox + '">' +
-          '<path stroke="' + color + '" fill="none" stroke-width="0.5" opacity="0.6" d="' + mainGrid + '"></path>' +
-          '<path stroke="' + color + '" fill="none" stroke-width="0.5" opacity="0.6" d="' + auxGrid + '"></path>' +
-        '</svg>'
-      ).width(w).height(h);
-    };
-    const onUpdateLayoutImpl = makeImageOverlayOnUpdateLayout('grid', makeGrid);
-    const onUpdateImageBox = function(img, w, h) {
-      onUpdateLayoutImpl(enableGrid, img, w, h);
-    };
-    const updateGridStyle = function(grid, width, baseWidth, scale, commonStyle) {
-      const base = 0.5 * width / (baseWidth * scale);
-      const strokeWidth = [
-          (base > 0.5 ? 1 : base > 0.1 ? 3.5 - base * 5 : 3) * base,
-          (base > 0.5 ? 0 : 1) * base];
-      const opacity = [
-          0.6,
-          base > 0.5 ? 0 : base > 0.1 ? (0.6 - base) / 0.5 : 1];
-      $(grid).css(commonStyle || {}).find('path').each(function(index) {
-        $(this).
-            attr('stroke-width', strokeWidth[index]).
-            attr('opacity', opacity[index]);
-      });
-    };
-    const onEntryUpdateTransform = function(ent, commonStyle) {
-      if (ent.grid) {
-        updateGridStyle(ent.grid, ent.width, ent.baseWidth, view.viewZoom.scale, commonStyle);
-      }
-    };
-    view.addOnUpdateImageBox(onUpdateImageBox);
-    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
     return {
-      toggle,
-      isEnabled: function() { return enableGrid; },
-      setInterval,
-      setOnChange,
-      makeGrid,
-      updateGridStyle
+      makeImageNameWithNumber,
+      makeImageNameSelector,
+      setupBaseAndTargetSelector,
+      updateBaseImageSelector,
+      makeImageOverlayOnUpdateLayout
     };
   };
+  const viewUtil = ViewUtil({ view });
 
   // Cross Cursor
   const CrossCursor = function({ view }) {
@@ -941,7 +849,7 @@ const compareUI = CompareUI({ compareUtil });
       processMouseMove
     };
   };
-  const grid = Grid({ view });
+  const grid = compareUI.Grid({ view, viewUtil });
   const crossCursor = CrossCursor({ view });
 
   const dialogUtil = compareUI.DialogUtil();
