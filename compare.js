@@ -557,7 +557,7 @@ const compareUI = CompareUI({ compareUtil });
       if (mainGridInterval !== main || auxGridInterval !== aux) {
         mainGridInterval = main;
         auxGridInterval = aux;
-        for (let i = 0, img; img = images[i]; i++) {
+        for (const img of view.getImages()) {
           if (img.grid) {
             $(img.grid).remove();
             img.grid = null;
@@ -617,7 +617,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const onEntryUpdateTransform = function(ent, commonStyle) {
       if (ent.grid) {
-        updateGridStyle(ent.grid, ent.width, ent.baseWidth, viewZoom.scale, commonStyle);
+        updateGridStyle(ent.grid, ent.width, ent.baseWidth, view.viewZoom.scale, commonStyle);
       }
     };
     view.addOnUpdateImageBox(onUpdateImageBox);
@@ -634,6 +634,7 @@ const compareUI = CompareUI({ compareUtil });
 
   // Cross Cursor
   const CrossCursor = function({ view }) {
+    const viewZoom = view.viewZoom;
     let enableCrossCursor = false;
     let primaryIndex = null;
     let fixedPosition = false;
@@ -642,7 +643,7 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateCallback = [];
     const onRemoveCallback = [];
     const makeInitialPosition = function(index) {
-      const img = entries[index];
+      const img = view.getEntry(index);
       const center = viewZoom.getCenter();
       const x = (0.5 + center.x) * img.width;
       const y = (0.5 + center.y) * img.height;
@@ -660,6 +661,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const enable = function() {
+      const images = view.getImages();
       const index = view.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
       if (!enableCrossCursor && 0 <= index) {
         enableCrossCursor = true;
@@ -699,9 +701,10 @@ const compareUI = CompareUI({ compareUtil });
       return primaryIndex;
     };
     const getNormalizedPosition = function() {
+      const entry = view.getEntry(primaryIndex);
       return {
-        x: (0.5 + positions[primaryIndex].x) / entries[primaryIndex].width,
-        y: (0.5 + positions[primaryIndex].y) / entries[primaryIndex].height,
+        x: (0.5 + positions[primaryIndex].x) / entry.width,
+        y: (0.5 + positions[primaryIndex].y) / entry.height,
         isInView: positions[primaryIndex].isInView
       };
     };
@@ -717,9 +720,9 @@ const compareUI = CompareUI({ compareUtil });
     const onRemoveEntry = function(index) {
       if (enableCrossCursor && primaryIndex === index) {
         primaryIndex = null;
-        for (let i = 0; i < images.length; i++) {
-          if (index !== images[i].index) {
-            primaryIndex = images[i].index;
+        for (const img of view.getImages()) {
+          if (index !== img.index) {
+            primaryIndex = img.index;
             break;
           }
         }
