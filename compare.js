@@ -51,7 +51,7 @@ const compareUI = CompareUI({ compareUtil });
       return null;
     };
     const findImageIndexOtherThan = function(index) {
-      for (let i = 0, img; img = images[i]; ++i) {
+      for (const img of images) {
         if (img.index !== index) {
           return img.index;
         }
@@ -397,6 +397,7 @@ const compareUI = CompareUI({ compareUtil });
       isOverlayMode,
       numberFromIndex,
       indexFromNumber,
+      findImageIndexOtherThan,
       setBaseAndTargetImage,
       changeBaseImage,
       changeTargetImage,
@@ -607,13 +608,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const onRemoveEntry = function(index) {
       if (enableCrossCursor && primaryIndex === index) {
-        primaryIndex = null;
-        for (const img of view.getImages()) {
-          if (index !== img.index) {
-            primaryIndex = img.index;
-            break;
-          }
-        }
+        primaryIndex = view.findImageIndexOtherThan(index);
         if (primaryIndex === null) {
           enableCrossCursor = false;
           onRemoveCallback.forEach(function(val) { val(); });
