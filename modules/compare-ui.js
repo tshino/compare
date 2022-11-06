@@ -20,21 +20,12 @@ const CompareUI = function({ compareUtil }) {
                 }
                 return false;
             };
-            const current = function () {
-                return currentIndex;
-            };
-            const last = function () {
-                return lastIndex;
-            };
-            const isActive = function () {
-                return currentIndex !== null;
-            };
             return {
                 start,
                 stop,
-                current,
-                last,
-                isActive
+                current: () => currentIndex,
+                last: () => lastIndex,
+                isActive: () => currentIndex !== null
             };
         })();
 
