@@ -114,14 +114,13 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout();
     };
     const toSingleImageView = function(index) {
-      let changed = false;
-      if (index === null ||
-          !entries[index].visible) {
-        changed = model.singleViewMode.stop();
+      const prev = model.singleViewMode.current();
+      if (index === null || !entries[index].visible) {
+        model.singleViewMode.stop();
       } else {
-        changed = model.singleViewMode.start(index);
+        model.singleViewMode.start(index);
       }
-      if (changed) {
+      if (prev !== model.singleViewMode.current()) {
         updateLayout();
       }
     };

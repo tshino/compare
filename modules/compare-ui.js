@@ -6,19 +6,11 @@ const CompareUI = function({ compareUtil }) {
             let lastIndex = null;
 
             const start = function (index) {
-                if (currentIndex !== index) {
-                    currentIndex = index;
-                    lastIndex = index;
-                    return true;
-                }
-                return false;
+                currentIndex = index;
+                lastIndex = index;
             };
             const stop = function () {
-                if (currentIndex !== null) {
-                    currentIndex = null;
-                    return true;
-                }
-                return false;
+                currentIndex = null;
             };
             return {
                 start,
