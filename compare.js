@@ -49,6 +49,33 @@ const compareUI = CompareUI({ compareUtil });
     const onEntryUpdateTransformListeners = [];
     const onUpdateTransformListeners = [];
 
+    const endSingleImageView = function() {
+      if (currentImageIndex !== 0) {
+        currentImageIndex = 0;
+        return true;
+      }
+    };
+    const startSingleImageView = function(index) {
+      if (currentImageIndex !== index + 1) {
+        currentImageIndex = index + 1;
+        lastSingleViewImageIndex = currentImageIndex;
+        return true;
+      }
+    };
+    const currentSingleImageIndex = function() {
+      if (currentImageIndex === 0) {
+        return null;
+      } else {
+        return currentImageIndex - 1;
+      }
+    };
+    const lastSingleImageIndex = function() {
+      if (lastSingleViewImageIndex === 0) {
+        return null;
+      } else {
+        return lastSingleViewImageIndex - 1;
+      }
+    };
     const isOverlayMode = function() {
       return overlayMode;
     };
@@ -112,9 +139,10 @@ const compareUI = CompareUI({ compareUtil });
     };
     const getSelectedImageIndices = function() {
       const indices = [];
-      if (model.isSingleView()) {
-        indices.push(currentImageIndex - 1);
-        if (overlayMode && overlayBaseIndex !== currentImageIndex - 1) {
+      const current = currentSingleImageIndex();
+      if (current !== null) {
+        indices.push(current);
+        if (overlayMode && overlayBaseIndex !== current) {
           indices.push(overlayBaseIndex);
         }
       }
@@ -124,38 +152,37 @@ const compareUI = CompareUI({ compareUtil });
       return layoutMode;
     };
     const resetLayoutState = function() {
-      currentImageIndex = 0;
+      endSingleImageView();
       viewZoom.setZoom(0);
       viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
       model.update({ currentImageIndex });
     };
     const toAllImageView = function() {
-      currentImageIndex = 0;
+      endSingleImageView();
       updateLayout();
     };
     const toSingleImageView = function(index) {
-      const prevImageIndex = currentImageIndex;
+      let changed = false;
       if (index === null ||
           !entries[index].visible) {
-        currentImageIndex = 0;
+        changed = endSingleImageView();
       } else {
-        currentImageIndex = index + 1;
-        lastSingleViewImageIndex = currentImageIndex;
+        changed = startSingleImageView(index);
       }
-      if (prevImageIndex !== currentImageIndex) {
+      if (changed) {
         updateLayout();
       }
     };
     const toggleSingleView = function(index) {
       if (index === null || index === undefined) {
-        if (0 === lastSingleViewImageIndex) {
+        index = lastSingleImageIndex();
+        if (index === null) {
           flipSingleView(true);
           return;
         }
-        index = lastSingleViewImageIndex - 1;
       }
-      if (index + 1 === currentImageIndex) {
+      if (index === currentSingleImageIndex()) {
         toAllImageView();
       } else {
         toSingleImageView(index);
@@ -163,17 +190,16 @@ const compareUI = CompareUI({ compareUtil });
     };
     const flipSingleView = function(forward) {
       if (0 < images.length) {
-        const number = numberFromIndex(currentImageIndex - 1);
+        const current = currentSingleImageIndex();
         let next;
-        if (number !== null) {
-          const current = number - 1;
-          next = forward ? current + 1 : current - 1;
+        if (current !== null) {
+          const order = numberFromIndex(current) - 1;
+          next = forward ? order + 1 : order - 1;
         } else {
           next = forward ? 0 : -1;
         }
         next = (next + images.length) % images.length;
-        currentImageIndex = 1 + images[next].index;
-        lastSingleViewImageIndex = currentImageIndex;
+        startSingleImageView(images[next].index);
         updateLayout();
         return false;
       }
@@ -184,7 +210,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const arrangeLayout = function() {
       if (model.isSingleView()) {
-        currentImageIndex = 0;
+        endSingleImageView();
       } else if (layoutMode === 'x') {
         layoutMode = 'y';
       } else {
@@ -194,16 +220,17 @@ const compareUI = CompareUI({ compareUtil });
     };
     const toggleOverlay = function() {
       if (!overlayMode && 2 <= images.length) {
-        if (currentImageIndex <= images[0].index + 1 || entries.length < currentImageIndex) {
-          currentImageIndex = images[1].index + 1;
-          lastSingleViewImageIndex = currentImageIndex;
+        const current = currentSingleImageIndex();
+        if (current === null ||
+            current === images[0].index ||
+            entries.length <= current) {
+          startSingleImageView(images[1].index);
         }
         overlayMode = true;
         overlayBaseIndex = images[0].index;
         updateLayout();
       } else if (overlayMode) {
-        currentImageIndex = overlayBaseIndex + 1;
-        lastSingleViewImageIndex = currentImageIndex;
+        startSingleImageView(overlayBaseIndex);
         overlayMode = false;
         updateLayout();
       }
@@ -218,7 +245,8 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const getCurrentIndexOr = function(defaultIndex) {
-      return model.isSingleView() ? currentImageIndex - 1 : defaultIndex;
+      const current = currentSingleImageIndex();
+      return current !== null ? current : defaultIndex;
     };
     const makeImageLayoutParam = function() {
       const numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
@@ -273,7 +301,11 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
       const index = img.index;
-      const isOverlay = overlayMode && index + 1 === currentImageIndex && index !== overlayBaseIndex;
+      const isOverlay = (
+        overlayMode &&
+        index === currentSingleImageIndex() &&
+        index !== overlayBaseIndex
+      );
       $(box).css({
         display : '',
         position : overlayMode ? 'absolute' : '',
