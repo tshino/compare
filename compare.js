@@ -14,50 +14,6 @@ const compareUI = CompareUI({ compareUtil });
 
   const textUtil = compareUI.TextUtil({ document, changeLang });
 
-  const ViewModel = function() {
-    let currentImageIndex = 0;
-    let lastSingleViewImageIndex = 0;
-
-    const startSingleImageView = function(index) {
-      if (currentImageIndex !== index + 1) {
-        currentImageIndex = index + 1;
-        lastSingleViewImageIndex = currentImageIndex;
-        return true;
-      }
-    };
-    const endSingleImageView = function() {
-      if (currentImageIndex !== 0) {
-        currentImageIndex = 0;
-        return true;
-      }
-    };
-    const currentSingleImageIndex = function() {
-      if (currentImageIndex === 0) {
-        return null;
-      } else {
-        return currentImageIndex - 1;
-      }
-    };
-    const lastSingleImageIndex = function() {
-      if (lastSingleViewImageIndex === 0) {
-        return null;
-      } else {
-        return lastSingleViewImageIndex - 1;
-      }
-    };
-    const isSingleView = function() {
-      return currentImageIndex !== 0;
-    };
-
-    return {
-      startSingleImageView,
-      endSingleImageView,
-      currentSingleImageIndex,
-      lastSingleImageIndex,
-      isSingleView
-    };
-  };
-
   // View management functions
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
@@ -464,7 +420,7 @@ const compareUI = CompareUI({ compareUtil });
       toggleFullscreen
     };
   };
-  const model = ViewModel();
+  const model = compareUI.ViewModel();
   const view = View({ model });
   const viewZoom = view.viewZoom;
 

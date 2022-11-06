@@ -1,5 +1,49 @@
 'use strict';
 const CompareUI = function({ compareUtil }) {
+    const ViewModel = function () {
+        let currentImageIndex = 0;
+        let lastSingleViewImageIndex = 0;
+
+        const startSingleImageView = function (index) {
+            if (currentImageIndex !== index + 1) {
+                currentImageIndex = index + 1;
+                lastSingleViewImageIndex = currentImageIndex;
+                return true;
+            }
+        };
+        const endSingleImageView = function () {
+            if (currentImageIndex !== 0) {
+                currentImageIndex = 0;
+                return true;
+            }
+        };
+        const currentSingleImageIndex = function () {
+            if (currentImageIndex === 0) {
+                return null;
+            } else {
+                return currentImageIndex - 1;
+            }
+        };
+        const lastSingleImageIndex = function () {
+            if (lastSingleViewImageIndex === 0) {
+                return null;
+            } else {
+                return lastSingleViewImageIndex - 1;
+            }
+        };
+        const isSingleView = function () {
+            return currentImageIndex !== 0;
+        };
+
+        return {
+            startSingleImageView,
+            endSingleImageView,
+            currentSingleImageIndex,
+            lastSingleImageIndex,
+            isSingleView
+        };
+    };
+
     const setDragStateClass = function(target, dragging, horizontal) {
         if (dragging) {
             $(target).addClass('dragging');
@@ -471,6 +515,7 @@ const CompareUI = function({ compareUtil }) {
     };
 
     return {
+        ViewModel,
         setDragStateClass,
         TextUtil,
         Grid,
