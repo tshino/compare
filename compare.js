@@ -146,18 +146,16 @@ const compareUI = CompareUI({ compareUtil });
     };
     const flipSingleView = function(forward) {
       if (0 < images.length) {
-        let k = forward ? 0 : images.length - 1;
-        for (let i = 0, img; img = images[i]; i++) {
-          if (currentImageIndex === 1 + img.index) {
-            if (forward) {
-              k = (i + 1) % images.length;
-            } else {
-              k = (i + images.length - 1) % images.length;
-            }
-            break;
-          }
+        const number = numberFromIndex(currentImageIndex - 1);
+        let next;
+        if (number !== null) {
+          const current = number - 1;
+          next = forward ? current + 1 : current - 1;
+        } else {
+          next = forward ? 0 : -1;
         }
-        currentImageIndex = 1 + images[k].index;
+        next = (next + images.length) % images.length;
+        currentImageIndex = 1 + images[next].index;
         lastSingleViewImageIndex = currentImageIndex;
         updateLayout();
         return false;
