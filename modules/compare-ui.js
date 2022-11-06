@@ -2,40 +2,32 @@
 const CompareUI = function({ compareUtil }) {
     const ViewModel = function () {
         const singleViewMode = (function() {
-            let currentImageIndex = 0;
-            let lastSingleViewImageIndex = 0;
+            let currentIndex = null;
+            let lastIndex = null;
 
             const start = function (index) {
-                if (currentImageIndex !== index + 1) {
-                    currentImageIndex = index + 1;
-                    lastSingleViewImageIndex = currentImageIndex;
+                if (currentIndex !== index) {
+                    currentIndex = index;
+                    lastIndex = index;
                     return true;
                 }
                 return false;
             };
             const stop = function () {
-                if (currentImageIndex !== 0) {
-                    currentImageIndex = 0;
+                if (currentIndex !== null) {
+                    currentIndex = null;
                     return true;
                 }
                 return false;
             };
             const current = function () {
-                if (currentImageIndex === 0) {
-                    return null;
-                } else {
-                    return currentImageIndex - 1;
-                }
+                return currentIndex;
             };
             const last = function () {
-                if (lastSingleViewImageIndex === 0) {
-                    return null;
-                } else {
-                    return lastSingleViewImageIndex - 1;
-                }
+                return lastIndex;
             };
             const isActive = function () {
-                return currentImageIndex !== 0;
+                return currentIndex !== null;
             };
             return {
                 start,
