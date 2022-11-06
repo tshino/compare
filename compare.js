@@ -15,50 +15,19 @@ const compareUI = CompareUI({ compareUtil });
   const textUtil = compareUI.TextUtil({ document, changeLang });
 
   const ViewModel = function() {
-    let singleView = false;
-
-    const isSingleView = function() {
-      return singleView;
-    };
-    const update = function({ currentImageIndex }) {
-      singleView = (
-        currentImageIndex !== 0 &&
-        currentImageIndex <= entries.length
-      );
-    };
-
-    return {
-      isSingleView,
-      update
-    };
-  };
-
-  // View management functions
-  const View = function({ model }) {
-    const IMAGEBOX_MIN_SIZE = 32;
-    const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     let currentImageIndex = 0;
     let lastSingleViewImageIndex = 0;
-    let overlayMode = false;
-    let overlayBaseIndex = null;
-    let layoutMode = null;
-    let backgroundColor = '#000000';
-    let imageScaling = 'smooth';
-    const onUpdateImageBoxListeners = [];
-    const onUpdateLayoutListeners = [];
-    const onEntryUpdateTransformListeners = [];
-    const onUpdateTransformListeners = [];
 
-    const endSingleImageView = function() {
-      if (currentImageIndex !== 0) {
-        currentImageIndex = 0;
-        return true;
-      }
-    };
     const startSingleImageView = function(index) {
       if (currentImageIndex !== index + 1) {
         currentImageIndex = index + 1;
         lastSingleViewImageIndex = currentImageIndex;
+        return true;
+      }
+    };
+    const endSingleImageView = function() {
+      if (currentImageIndex !== 0) {
+        currentImageIndex = 0;
         return true;
       }
     };
@@ -76,6 +45,33 @@ const compareUI = CompareUI({ compareUtil });
         return lastSingleViewImageIndex - 1;
       }
     };
+    const isSingleView = function() {
+      return currentImageIndex !== 0;
+    };
+
+    return {
+      startSingleImageView,
+      endSingleImageView,
+      currentSingleImageIndex,
+      lastSingleImageIndex,
+      isSingleView
+    };
+  };
+
+  // View management functions
+  const View = function({ model }) {
+    const IMAGEBOX_MIN_SIZE = 32;
+    const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
+    let overlayMode = false;
+    let overlayBaseIndex = null;
+    let layoutMode = null;
+    let backgroundColor = '#000000';
+    let imageScaling = 'smooth';
+    const onUpdateImageBoxListeners = [];
+    const onUpdateLayoutListeners = [];
+    const onEntryUpdateTransformListeners = [];
+    const onUpdateTransformListeners = [];
+
     const isOverlayMode = function() {
       return overlayMode;
     };
@@ -139,7 +135,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const getSelectedImageIndices = function() {
       const indices = [];
-      const current = currentSingleImageIndex();
+      const current = model.currentSingleImageIndex();
       if (current !== null) {
         indices.push(current);
         if (overlayMode && overlayBaseIndex !== current) {
@@ -152,23 +148,22 @@ const compareUI = CompareUI({ compareUtil });
       return layoutMode;
     };
     const resetLayoutState = function() {
-      endSingleImageView();
+      model.endSingleImageView();
       viewZoom.setZoom(0);
       viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
-      model.update({ currentImageIndex });
     };
     const toAllImageView = function() {
-      endSingleImageView();
+      model.endSingleImageView();
       updateLayout();
     };
     const toSingleImageView = function(index) {
       let changed = false;
       if (index === null ||
           !entries[index].visible) {
-        changed = endSingleImageView();
+        changed = model.endSingleImageView();
       } else {
-        changed = startSingleImageView(index);
+        changed = model.startSingleImageView(index);
       }
       if (changed) {
         updateLayout();
@@ -176,13 +171,13 @@ const compareUI = CompareUI({ compareUtil });
     };
     const toggleSingleView = function(index) {
       if (index === null || index === undefined) {
-        index = lastSingleImageIndex();
+        index = model.lastSingleImageIndex();
         if (index === null) {
           flipSingleView(true);
           return;
         }
       }
-      if (index === currentSingleImageIndex()) {
+      if (index === model.currentSingleImageIndex()) {
         toAllImageView();
       } else {
         toSingleImageView(index);
@@ -190,7 +185,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const flipSingleView = function(forward) {
       if (0 < images.length) {
-        const current = currentSingleImageIndex();
+        const current = model.currentSingleImageIndex();
         let next;
         if (current !== null) {
           const order = numberFromIndex(current) - 1;
@@ -199,7 +194,7 @@ const compareUI = CompareUI({ compareUtil });
           next = forward ? 0 : -1;
         }
         next = (next + images.length) % images.length;
-        startSingleImageView(images[next].index);
+        model.startSingleImageView(images[next].index);
         updateLayout();
         return false;
       }
@@ -210,7 +205,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const arrangeLayout = function() {
       if (model.isSingleView()) {
-        endSingleImageView();
+        model.endSingleImageView();
       } else if (layoutMode === 'x') {
         layoutMode = 'y';
       } else {
@@ -220,23 +215,22 @@ const compareUI = CompareUI({ compareUtil });
     };
     const toggleOverlay = function() {
       if (!overlayMode && 2 <= images.length) {
-        const current = currentSingleImageIndex();
+        const current = model.currentSingleImageIndex();
         if (current === null ||
             current === images[0].index ||
             entries.length <= current) {
-          startSingleImageView(images[1].index);
+          model.startSingleImageView(images[1].index);
         }
         overlayMode = true;
         overlayBaseIndex = images[0].index;
         updateLayout();
       } else if (overlayMode) {
-        startSingleImageView(overlayBaseIndex);
+        model.startSingleImageView(overlayBaseIndex);
         overlayMode = false;
         updateLayout();
       }
     };
     const update = function() {
-      model.update({ currentImageIndex });
       if (!model.isSingleView() && overlayMode) {
         overlayMode = false;
       }
@@ -245,7 +239,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const getCurrentIndexOr = function(defaultIndex) {
-      const current = currentSingleImageIndex();
+      const current = model.currentSingleImageIndex();
       return current !== null ? current : defaultIndex;
     };
     const makeImageLayoutParam = function() {
@@ -303,7 +297,7 @@ const compareUI = CompareUI({ compareUtil });
       const index = img.index;
       const isOverlay = (
         overlayMode &&
-        index === currentSingleImageIndex() &&
+        index === model.currentSingleImageIndex() &&
         index !== overlayBaseIndex
       );
       $(box).css({
