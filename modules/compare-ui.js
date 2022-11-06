@@ -525,3 +525,7 @@ const CompareUI = function({ compareUtil }) {
         DialogUtil
     };
 };
+
+if (typeof module !== 'undefined') {
+    module.exports = CompareUI;
+}
