@@ -21,8 +21,26 @@ const CompareUI = function({ compareUtil }) {
             };
         })();
 
+        const layoutDirection = (function() {
+            let mode = null;
+
+            const alternate = function() {
+                mode = mode === 'x' ? 'y' : 'x';
+            };
+            const determineByAspect = function(width, height) {
+                mode = width < height ? 'y' : 'x';
+            };
+            return {
+                current: () => mode,
+                reset: () => { mode = null; },
+                alternate,
+                determineByAspect
+            };
+        })();
+
         return {
-            singleViewMode
+            singleViewMode,
+            layoutDirection
         };
     };
 

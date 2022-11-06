@@ -20,7 +20,6 @@ const compareUI = CompareUI({ compareUtil });
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     let overlayMode = false;
     let overlayBaseIndex = null;
-    let layoutMode = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
@@ -100,9 +99,6 @@ const compareUI = CompareUI({ compareUtil });
       }
       return indices;
     };
-    const getLayoutMode = function() {
-      return layoutMode;
-    };
     const resetLayoutState = function() {
       model.singleViewMode.stop();
       viewZoom.setZoom(0);
@@ -155,16 +151,14 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const onResize = function() {
-      layoutMode = null;
+      model.layoutDirection.reset();
       updateLayout();
     };
     const arrangeLayout = function() {
       if (model.singleViewMode.isActive()) {
         model.singleViewMode.stop();
-      } else if (layoutMode === 'x') {
-        layoutMode = 'y';
       } else {
-        layoutMode = 'x';
+        model.layoutDirection.alternate();
       }
       updateLayout();
     };
@@ -189,8 +183,10 @@ const compareUI = CompareUI({ compareUtil });
       if (!model.singleViewMode.isActive() && overlayMode) {
         overlayMode = false;
       }
-      if (layoutMode === null) {
-        layoutMode = $('#view').width() < $('#view').height() ? 'y' : 'x';
+      if (model.layoutDirection.current() === null) {
+        const width = $('#view').width();
+        const height = $('#view').height();
+        model.layoutDirection.determineByAspect(width, height);
       }
     };
     const getCurrentIndexOr = function(defaultIndex) {
@@ -200,6 +196,7 @@ const compareUI = CompareUI({ compareUtil });
     const makeImageLayoutParam = function() {
       const numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
       const numSlots = model.singleViewMode.isActive() ? 1 : Math.max(numVisibleEntries, 2);
+      const layoutMode = model.layoutDirection.current();
       const numColumns = layoutMode === 'x' ? numSlots : 1;
       const numRows    = layoutMode !== 'x' ? numSlots : 1;
       const viewW = $('#view').width();
@@ -275,6 +272,7 @@ const compareUI = CompareUI({ compareUtil });
       onUpdateLayoutListeners.push(listener);
     };
     const onUpdateLayout = function() {
+      const layoutMode = model.layoutDirection.current();
       const param = makeImageLayoutParam();
       const indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
@@ -395,7 +393,6 @@ const compareUI = CompareUI({ compareUtil });
       changeBaseImage,
       changeTargetImage,
       getSelectedImageIndices,
-      getLayoutMode,
       resetLayoutState,
       toAllImageView,
       toSingleImageView,
@@ -4108,7 +4105,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const updateArrangeButton = function() {
-      const layoutMode = view.getLayoutMode();
+      const layoutMode = model.layoutDirection.current();
       $('#arrange img').attr('src', layoutMode === 'x' ? 'res/layout_x.svg' : 'res/layout_y.svg');
     };
     const updateSelectorButtonState = function() {
