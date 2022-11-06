@@ -1,46 +1,53 @@
 'use strict';
 const CompareUI = function({ compareUtil }) {
     const ViewModel = function () {
-        let currentImageIndex = 0;
-        let lastSingleViewImageIndex = 0;
+        const singleViewMode = (function() {
+            let currentImageIndex = 0;
+            let lastSingleViewImageIndex = 0;
 
-        const startSingleImageView = function (index) {
-            if (currentImageIndex !== index + 1) {
-                currentImageIndex = index + 1;
-                lastSingleViewImageIndex = currentImageIndex;
-                return true;
-            }
-        };
-        const endSingleImageView = function () {
-            if (currentImageIndex !== 0) {
-                currentImageIndex = 0;
-                return true;
-            }
-        };
-        const currentSingleImageIndex = function () {
-            if (currentImageIndex === 0) {
-                return null;
-            } else {
-                return currentImageIndex - 1;
-            }
-        };
-        const lastSingleImageIndex = function () {
-            if (lastSingleViewImageIndex === 0) {
-                return null;
-            } else {
-                return lastSingleViewImageIndex - 1;
-            }
-        };
-        const isSingleView = function () {
-            return currentImageIndex !== 0;
-        };
+            const start = function (index) {
+                if (currentImageIndex !== index + 1) {
+                    currentImageIndex = index + 1;
+                    lastSingleViewImageIndex = currentImageIndex;
+                    return true;
+                }
+                return false;
+            };
+            const stop = function () {
+                if (currentImageIndex !== 0) {
+                    currentImageIndex = 0;
+                    return true;
+                }
+                return false;
+            };
+            const current = function () {
+                if (currentImageIndex === 0) {
+                    return null;
+                } else {
+                    return currentImageIndex - 1;
+                }
+            };
+            const last = function () {
+                if (lastSingleViewImageIndex === 0) {
+                    return null;
+                } else {
+                    return lastSingleViewImageIndex - 1;
+                }
+            };
+            const isActive = function () {
+                return currentImageIndex !== 0;
+            };
+            return {
+                start,
+                stop,
+                current,
+                last,
+                isActive
+            };
+        })();
 
         return {
-            startSingleImageView,
-            endSingleImageView,
-            currentSingleImageIndex,
-            lastSingleImageIndex,
-            isSingleView
+            singleViewMode
         };
     };
 
