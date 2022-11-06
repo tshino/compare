@@ -14,13 +14,31 @@ const compareUI = CompareUI({ compareUtil });
 
   const textUtil = compareUI.TextUtil({ document, changeLang });
 
+  const ViewModel = function() {
+    let singleView = false;
+
+    const isSingleView = function() {
+      return singleView;
+    };
+    const update = function({ currentImageIndex }) {
+      singleView = (
+        currentImageIndex !== 0 &&
+        currentImageIndex <= entries.length
+      );
+    };
+
+    return {
+      isSingleView,
+      update
+    };
+  };
+
   // View management functions
-  const View = function() {
+  const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     let currentImageIndex = 0;
     let lastSingleViewImageIndex = 0;
-    let singleView = false;
     let overlayMode = false;
     let overlayBaseIndex = null;
     let layoutMode = null;
@@ -30,9 +48,7 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateLayoutListeners = [];
     const onEntryUpdateTransformListeners = [];
     const onUpdateTransformListeners = [];
-    const isSingleView = function() {
-      return singleView;
-    };
+
     const isOverlayMode = function() {
       return overlayMode;
     };
@@ -96,7 +112,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const getSelectedImageIndices = function() {
       const indices = [];
-      if (singleView) {
+      if (model.isSingleView()) {
         indices.push(currentImageIndex - 1);
         if (overlayMode && overlayBaseIndex !== currentImageIndex - 1) {
           indices.push(overlayBaseIndex);
@@ -112,6 +128,7 @@ const compareUI = CompareUI({ compareUtil });
       viewZoom.setZoom(0);
       viewZoom.setOffset(0.5, 0.5);
       overlayMode = false;
+      model.update({ currentImageIndex });
     };
     const toAllImageView = function() {
       currentImageIndex = 0;
@@ -166,7 +183,7 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout();
     };
     const arrangeLayout = function() {
-      if (singleView) {
+      if (model.isSingleView()) {
         currentImageIndex = 0;
       } else if (layoutMode === 'x') {
         layoutMode = 'y';
@@ -192,10 +209,8 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const update = function() {
-      singleView =
-              currentImageIndex !== 0 &&
-              currentImageIndex <= entries.length;
-      if (!singleView && overlayMode) {
+      model.update({ currentImageIndex });
+      if (!model.isSingleView() && overlayMode) {
         overlayMode = false;
       }
       if (layoutMode === null) {
@@ -203,11 +218,11 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const getCurrentIndexOr = function(defaultIndex) {
-      return singleView ? currentImageIndex - 1 : defaultIndex;
+      return model.isSingleView() ? currentImageIndex - 1 : defaultIndex;
     };
     const makeImageLayoutParam = function() {
       const numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
-      const numSlots = singleView ? 1 : Math.max(numVisibleEntries, 2);
+      const numSlots = model.isSingleView() ? 1 : Math.max(numVisibleEntries, 2);
       const numColumns = layoutMode === 'x' ? numSlots : 1;
       const numRows    = layoutMode !== 'x' ? numSlots : 1;
       const viewW = $('#view').width();
@@ -294,7 +309,7 @@ const compareUI = CompareUI({ compareUtil });
         $('#prev,#next').hide();
       }
       $('#view > div.imageBox').each(function(index) {
-        const hide = singleView && 0 > indices.indexOf(index);
+        const hide = model.isSingleView() && 0 > indices.indexOf(index);
         const img = entries[index];
         if (hide || !img || !img.visible) {
           $(this).css({ display : 'none' });
@@ -303,7 +318,7 @@ const compareUI = CompareUI({ compareUtil });
         }
       });
       $('#view > div.emptyBox').each(function(index) {
-        const hide = singleView || param.numVisibleEntries + index >= param.numSlots;
+        const hide = model.isSingleView() || param.numVisibleEntries + index >= param.numSlots;
         $(this).css({ display : (hide ? 'none' : '') });
       });
       updateImageScaling();
@@ -391,7 +406,6 @@ const compareUI = CompareUI({ compareUtil });
     return {
       getImages: () => { return images; },
       getEntry: (index) => { return entries[index]; },
-      isSingleView,
       isOverlayMode,
       numberFromIndex,
       indexFromNumber,
@@ -424,7 +438,8 @@ const compareUI = CompareUI({ compareUtil });
       toggleFullscreen
     };
   };
-  const view = View();
+  const model = ViewModel();
+  const view = View({ model });
   const viewZoom = view.viewZoom;
 
   const ViewUtil = function({ view }) {
@@ -4615,10 +4630,10 @@ const compareUI = CompareUI({ compareUtil });
           if (false === view.flipSingleView(e.keyCode === 39)) {
             return false;
           }
-        } else if (e.keyCode === 38 && !view.isSingleView()) { // Up
+        } else if (e.keyCode === 38 && !model.isSingleView()) { // Up
           view.toggleSingleView();
           return false;
-        } else if (e.keyCode === 40 && view.isSingleView()) { // Down
+        } else if (e.keyCode === 40 && model.isSingleView()) { // Down
           view.toAllImageView();
           return false;
         }
