@@ -63,5 +63,50 @@ describe('CompareUI', () => {
                 });
             });
         });
+
+        describe('layoutDirection', () => {
+            describe('current', () => {
+                it('should return null at initial state', () => {
+                    const model = compareUI.ViewModel();
+                    assert.strictEqual(model.layoutDirection.current(), null);
+                });
+                it('should return current state', () => {
+                    const model = compareUI.ViewModel();
+                    model.layoutDirection.alternate();
+                    assert.strictEqual(model.layoutDirection.current(), 'x');
+                });
+            });
+            describe('reset', () => {
+                it('should set null', () => {
+                    const model = compareUI.ViewModel();
+                    model.layoutDirection.alternate();
+                    model.layoutDirection.reset();
+                    assert.strictEqual(model.layoutDirection.current(), null);
+                });
+            });
+            describe('alternate', () => {
+                it('should set valid values in rotation', () => {
+                    const model = compareUI.ViewModel();
+                    model.layoutDirection.alternate();
+                    assert.strictEqual(model.layoutDirection.current(), 'x');
+                    model.layoutDirection.alternate();
+                    assert.strictEqual(model.layoutDirection.current(), 'y');
+                    model.layoutDirection.alternate();
+                    assert.strictEqual(model.layoutDirection.current(), 'x');
+                });
+            });
+            describe('determineByAspect', () => {
+                it('should set x if viewport is landscape-oriented', () => {
+                    const model = compareUI.ViewModel();
+                    model.layoutDirection.determineByAspect(1920, 1080);
+                    assert.strictEqual(model.layoutDirection.current(), 'x');
+                });
+                it('should set y if viewport is portrait-oriented', () => {
+                    const model = compareUI.ViewModel();
+                    model.layoutDirection.determineByAspect(1000, 1500);
+                    assert.strictEqual(model.layoutDirection.current(), 'y');
+                });
+            });
+        });
     });
 });
