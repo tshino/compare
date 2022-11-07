@@ -21,6 +21,25 @@ const CompareUI = function({ compareUtil }) {
             };
         })();
 
+        const overlayMode = (function() {
+            let overlayMode = false;
+            let baseIndex = null;
+
+            const start = function (index) {
+                overlayMode = true;
+                baseIndex = index;
+            };
+            const stop = function () {
+                overlayMode = false;
+            };
+            return {
+                start,
+                stop,
+                isActive: () => overlayMode,
+                base: () => baseIndex
+            };
+        })();
+
         const layoutDirection = (function() {
             let mode = null;
 
@@ -40,6 +59,7 @@ const CompareUI = function({ compareUtil }) {
 
         return {
             singleViewMode,
+            overlayMode,
             layoutDirection
         };
     };

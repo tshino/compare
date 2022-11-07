@@ -18,8 +18,6 @@ const compareUI = CompareUI({ compareUtil });
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
-    let overlayMode = false;
-    let overlayBaseIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
@@ -27,9 +25,6 @@ const compareUI = CompareUI({ compareUtil });
     const onEntryUpdateTransformListeners = [];
     const onUpdateTransformListeners = [];
 
-    const isOverlayMode = function() {
-      return overlayMode;
-    };
     const numberFromIndex = function(index) {
       for (let i = 0, img; img = images[i]; i++) {
         if (img.index === index) {
@@ -93,8 +88,9 @@ const compareUI = CompareUI({ compareUtil });
       const current = model.singleViewMode.current();
       if (current !== null) {
         indices.push(current);
-        if (overlayMode && overlayBaseIndex !== current) {
-          indices.push(overlayBaseIndex);
+        if (model.overlayMode.isActive() &&
+            model.overlayMode.base() !== current) {
+          indices.push(model.overlayMode.base());
         }
       }
       return indices;
@@ -103,7 +99,7 @@ const compareUI = CompareUI({ compareUtil });
       model.singleViewMode.stop();
       viewZoom.setZoom(0);
       viewZoom.setOffset(0.5, 0.5);
-      overlayMode = false;
+      model.overlayMode.stop();
     };
     const toAllImageView = function() {
       model.singleViewMode.stop();
@@ -163,25 +159,24 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout();
     };
     const toggleOverlay = function() {
-      if (!overlayMode && 2 <= images.length) {
+      if (!model.overlayMode.isActive() && 2 <= images.length) {
         const current = model.singleViewMode.current();
         if (current === null ||
             current === images[0].index ||
             entries.length <= current) {
           model.singleViewMode.start(images[1].index);
         }
-        overlayMode = true;
-        overlayBaseIndex = images[0].index;
+        model.overlayMode.start(images[0].index);
         updateLayout();
-      } else if (overlayMode) {
-        model.singleViewMode.start(overlayBaseIndex);
-        overlayMode = false;
+      } else if (model.overlayMode.isActive()) {
+        model.singleViewMode.start(model.overlayMode.base());
+        model.overlayMode.stop();
         updateLayout();
       }
     };
     const update = function() {
-      if (!model.singleViewMode.isActive() && overlayMode) {
-        overlayMode = false;
+      if (!model.singleViewMode.isActive()) {
+        model.overlayMode.stop();
       }
       if (model.layoutDirection.current() === null) {
         const width = $('#view').width();
@@ -248,10 +243,11 @@ const compareUI = CompareUI({ compareUtil });
       }
       const index = img.index;
       const isOverlay = (
-        overlayMode &&
+        model.overlayMode.isActive() &&
         index === model.singleViewMode.current() &&
-        index !== overlayBaseIndex
+        index !== model.overlayMode.base()
       );
+      const overlayMode = model.overlayMode.isActive();
       $(box).css({
         display : '',
         position : overlayMode ? 'absolute' : '',
@@ -385,7 +381,6 @@ const compareUI = CompareUI({ compareUtil });
     return {
       getImages: () => { return images; },
       getEntry: (index) => { return entries[index]; },
-      isOverlayMode,
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
@@ -4122,7 +4117,7 @@ const compareUI = CompareUI({ compareUtil });
       });
     };
     const updateOverlayModeIndicator = function() {
-      if (view.isOverlayMode()) {
+      if (model.overlayMode.isActive()) {
         const indices = view.getSelectedImageIndices();
         const numbers = indices.map(function(i) { return view.numberFromIndex(i); });
         numbers.sort();
