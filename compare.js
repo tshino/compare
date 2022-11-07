@@ -22,7 +22,7 @@ const compareUI = CompareUI({ compareUtil });
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
     const onUpdateLayoutListeners = [];
-    const onEntryUpdateTransformListeners = [];
+    const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
     const numberFromIndex = function(index) {
@@ -301,11 +301,11 @@ const compareUI = CompareUI({ compareUtil });
         listener();
       }
     };
-    const addOnEntryUpdateTransform = function(listener) {
-      onEntryUpdateTransformListeners.push(listener);
+    const addOnUpdateEntryTransform = function(listener) {
+      onUpdateEntryTransformListeners.push(listener);
     };
-    const onEntryUpdateTransform = function(ent, style) {
-      for (const listener of onEntryUpdateTransformListeners) {
+    const onUpdateEntryTransform = function(ent, style) {
+      for (const listener of onUpdateEntryTransformListeners) {
         listener(ent, style);
       }
     };
@@ -328,7 +328,7 @@ const compareUI = CompareUI({ compareUtil });
                           ent.orientationAsCSS
           };
           $(ent.element).css(style);
-          onEntryUpdateTransform(ent, style);
+          onUpdateEntryTransform(ent, style);
         }
       }
       onUpdateTransform();
@@ -399,8 +399,7 @@ const compareUI = CompareUI({ compareUtil });
       getCurrentIndexOr,
       addOnUpdateImageBox,
       addOnUpdateLayout,
-      addOnEntryUpdateTransform,
-      onEntryUpdateTransform,
+      addOnUpdateEntryTransform,
       addOnUpdateTransform,
       viewZoom,
       updateLayout,
@@ -771,7 +770,7 @@ const compareUI = CompareUI({ compareUtil });
         $(img.cursor).css({ width: w+'px', height: h+'px' });
       }
     };
-    const onEntryUpdateTransform = function(ent, commonStyle) {
+    const onUpdateEntryTransform = function(ent, commonStyle) {
       if (ent.cursor) {
         const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
         $(ent.cursor).css(commonStyle).find('path').each(function(i) {
@@ -792,7 +791,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     view.addOnUpdateImageBox(onUpdateImageBox);
-    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    view.addOnUpdateEntryTransform(onUpdateEntryTransform);
     view.addOnUpdateTransform(onUpdateTransform);
     return {
       addObserver,
@@ -4034,7 +4033,7 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
     };
-    const onEntryUpdateTransform = function(ent, commonStyle) {
+    const onUpdateEntryTransform = function(ent, commonStyle) {
       if (ent.contour) {
         $(ent.contour).css(commonStyle);
       }
@@ -4043,7 +4042,7 @@ const compareUI = CompareUI({ compareUtil });
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
     view.addOnUpdateImageBox(onUpdateImageBox);
-    view.addOnEntryUpdateTransform(onEntryUpdateTransform);
+    view.addOnUpdateEntryTransform(onUpdateEntryTransform);
     return {
       reset,
       toggle,

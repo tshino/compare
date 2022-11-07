@@ -175,13 +175,13 @@ const CompareUI = function({ compareUtil }) {
                     attr('opacity', opacity[index]);
             });
         };
-        const onEntryUpdateTransform = function (ent, commonStyle) {
+        const onUpdateEntryTransform = function (ent, commonStyle) {
             if (ent.grid) {
                 updateGridStyle(ent.grid, ent.width, ent.baseWidth, view.viewZoom.scale, commonStyle);
             }
         };
         view.addOnUpdateImageBox(onUpdateImageBox);
-        view.addOnEntryUpdateTransform(onEntryUpdateTransform);
+        view.addOnUpdateEntryTransform(onUpdateEntryTransform);
         return {
             toggle,
             isEnabled: function () { return enableGrid; },
