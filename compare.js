@@ -350,7 +350,7 @@ const compareUI = CompareUI({ compareUtil });
       if ($('#view').hasClass('useChecker')) {
         textColor = '#222';
       } else {
-        const rgb = parseInt(backgroundColor.substr(1), 16);
+        const rgb = parseInt(backgroundColor.substring(1), 16);
         const y = 0.299 * (rgb>>16) + 0.587 * ((rgb>>8)&255) + 0.114 * (rgb&255);
         textColor = (96 <= y) ? '#444' : '#888';
       }
