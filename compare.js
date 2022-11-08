@@ -689,7 +689,7 @@ const compareUI = CompareUI({ compareUtil });
       const rx = (Math.floor(x) + 0.5) / entries[index].width;
       const ry = (Math.floor(y) + 0.5) / entries[index].height;
       setIndex(index, fixed);
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
         const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
         updateCrossCursor(img, ix, iy);
@@ -1174,15 +1174,15 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
-      if (images.length !== 0) {
+      if (view.getImages().length !== 0) {
         view.setBaseAndTargetImage(null, null);
       }
       const val = [];
-      let hasAnimated = false, hasOrientation = false;
       const indices = [];
-      for (let i = 0, img; img = images[i]; i++) {
-        val[i] = makeTableValue(img);
-        indices[i] = img.index;
+      let hasAnimated = false, hasOrientation = false;
+      for (const img of view.getImages()) {
+        val.push(makeTableValue(img));
+        indices.push(img.index);
         if (img.numFrames) {
           hasAnimated = true;
         }
