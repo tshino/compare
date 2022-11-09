@@ -47,21 +47,20 @@ const compareUI = CompareUI({ compareUtil });
       }
       return null;
     };
+    const resetBaseAndTargetImage = function() {
+      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+      if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
+        targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+      }
+    };
     const setBaseAndTargetImage = function(baseIndex, targetIndex) {
-      if (baseIndex === null && targetIndex === null) {
-        baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
-        if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
+      baseImageIndex = baseIndex !== null ? baseIndex : baseImageIndex;
+      targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
+      if (baseImageIndex === targetImageIndex) {
+        if (targetIndex === null) {
           targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-        }
-      } else {
-        baseImageIndex = baseIndex !== null ? baseIndex : baseImageIndex;
-        targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
-        if (baseImageIndex === targetImageIndex) {
-          if (targetIndex === null) {
-            targetImageIndex = findImageIndexOtherThan(baseImageIndex);
-          } else if (baseIndex === null) {
-            baseImageIndex = findImageIndexOtherThan(targetImageIndex);
-          }
+        } else if (baseIndex === null) {
+          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
         }
       }
     };
@@ -81,6 +80,14 @@ const compareUI = CompareUI({ compareUtil });
           targetImageIndex !== index) {
         setBaseAndTargetImage(targetImageIndex, index);
         return true;
+      }
+    };
+    const onRemoveEntry = function(index) {
+      if (baseImageIndex === index) {
+        baseImageIndex = null;
+      }
+      if (targetImageIndex === index) {
+        targetImageIndex = null;
       }
     };
     const getSelectedImageIndices = function() {
@@ -378,12 +385,14 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
+    entriesOnRemoveEntry.push(onRemoveEntry);
     return {
       getImages: () => { return images; },
       getEntry: (index) => { return entries[index]; },
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
+      resetBaseAndTargetImage,
       setBaseAndTargetImage,
       changeBaseImage,
       changeTargetImage,
@@ -450,7 +459,7 @@ const compareUI = CompareUI({ compareUtil });
         $(targetSelector).append($('<span>').text('no data'));
         return false;
       }
-      view.setBaseAndTargetImage(null, null);
+      view.resetBaseAndTargetImage();
       $(baseSelector).append(
         makeImageNameSelector(baseImageIndex, function(index) {
           view.changeBaseImage(index);
@@ -1175,7 +1184,7 @@ const compareUI = CompareUI({ compareUtil });
     const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
       if (view.getImages().length !== 0) {
-        view.setBaseAndTargetImage(null, null);
+        view.resetBaseAndTargetImage();
       }
       const val = [];
       const indices = [];
@@ -2860,7 +2869,7 @@ const compareUI = CompareUI({ compareUtil });
       if (images.length === 1) {
         $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
       }
-      view.setBaseAndTargetImage(null, null);
+      view.resetBaseAndTargetImage();
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
           viewUtil.makeImageNameSelector(baseImageIndex, function(index) {
@@ -3089,7 +3098,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateTable = function(transformOnly) {
       if (images.length !== 0 && !transformOnly) {
-        view.setBaseAndTargetImage(null, null);
+        view.resetBaseAndTargetImage();
         if (toneCurveParam.type !== toneCurveType.current() ||
             toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
             toneCurveParam.base !== baseImageIndex) {
@@ -4150,12 +4159,6 @@ const compareUI = CompareUI({ compareUtil });
       if (ent.element) {
         $(ent.view).remove('.image');
         ent.element = null;
-      }
-      if (baseImageIndex === index) {
-        baseImageIndex = null;
-      }
-      if (targetImageIndex === index) {
-        targetImageIndex = null;
       }
       for (const onRemoveEntry of entriesOnRemoveEntry) {
         onRemoveEntry(index);
