@@ -4,8 +4,6 @@ const compareUI = CompareUI({ compareUtil });
   const entries = [];
   let images = [];
   const entriesOnRemoveEntry = [];
-  let baseImageIndex = null;
-  let targetImageIndex = null;
   const setDragStateClass = compareUI.setDragStateClass;
   let drawImageAwareOfOrientation = false;
   compareUtil.drawImageAwareOfOrientation().then(
@@ -18,6 +16,8 @@ const compareUI = CompareUI({ compareUtil });
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
+    let baseImageIndex = null;
+    let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
     const onUpdateImageBoxListeners = [];
@@ -81,6 +81,12 @@ const compareUI = CompareUI({ compareUtil });
         setBaseAndTargetImage(targetImageIndex, index);
         return true;
       }
+    };
+    const baseIndex = function() {
+      return baseImageIndex;
+    };
+    const targetIndex = function() {
+      return targetImageIndex;
     };
     const onRemoveEntry = function(index) {
       if (baseImageIndex === index) {
@@ -396,6 +402,8 @@ const compareUI = CompareUI({ compareUtil });
       setBaseAndTargetImage,
       changeBaseImage,
       changeTargetImage,
+      baseIndex,
+      targetIndex,
       getSelectedImageIndices,
       resetLayoutState,
       toAllImageView,
@@ -461,26 +469,26 @@ const compareUI = CompareUI({ compareUtil });
       }
       view.resetBaseAndTargetImage();
       $(baseSelector).append(
-        makeImageNameSelector(baseImageIndex, function(index) {
+        makeImageNameSelector(view.baseIndex(), function(index) {
           view.changeBaseImage(index);
           onUpdate();
         })
       );
       $(targetSelector).append(
-        makeImageNameSelector(targetImageIndex, function(index) {
+        makeImageNameSelector(view.targetIndex(), function(index) {
           view.setBaseAndTargetImage(null, index);
           onUpdate();
         })
       );
     };
-    const updateBaseImageSelector = function(target, baseImageIndex, repaint) {
+    const updateBaseImageSelector = function(target, baseIndex, repaint) {
       const baseCell = $(target).find('tr.basename td:not(.prop)');
       baseCell.children().remove();
-      if (baseImageIndex === null || view.getImages().length === 0) {
+      if (baseIndex === null || view.getImages().length === 0) {
         baseCell.append($('<span>').text('no data'));
       } else {
         baseCell.append(
-          makeImageNameSelector(baseImageIndex, function(index) {
+          makeImageNameSelector(baseIndex, function(index) {
             view.changeBaseImage(index);
             repaint();
           })
@@ -1202,7 +1210,7 @@ const compareUI = CompareUI({ compareUtil });
       const enableComparison = 2 <= val.length;
       let basePos, baseVal;
       if (enableComparison) {
-        basePos = Math.max(0, indices.indexOf(baseImageIndex));
+        basePos = Math.max(0, indices.indexOf(view.baseIndex()));
         baseVal = val[basePos] || null;
       }
       for (let i = 0; i < val.length; i++) {
@@ -2872,7 +2880,7 @@ const compareUI = CompareUI({ compareUtil });
       view.resetBaseAndTargetImage();
       $('#metricsBaseName').append(
         $('<td>').attr('colspan', images.length - 1).append(
-          viewUtil.makeImageNameSelector(baseImageIndex, function(index) {
+          viewUtil.makeImageNameSelector(view.baseIndex(), function(index) {
             view.changeBaseImage(index);
             updateTable();
           })
@@ -2883,10 +2891,10 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const updateTableCell = function(img) {
-      if (img.index === baseImageIndex) {
+      if (img.index === view.baseIndex()) {
         return;
       }
-      const a = entries[baseImageIndex];
+      const a = entries[view.baseIndex()];
       const b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
         const message = { en: '‐ (different size)', ja: '‐ (サイズが不一致)' };
@@ -2954,7 +2962,7 @@ const compareUI = CompareUI({ compareUtil });
       $(target).find('td.fig > *').css(styles.style);
       return;
     }
-    viewUtil.updateBaseImageSelector(target, baseImageIndex, repaint);
+    viewUtil.updateBaseImageSelector(target, view.baseIndex(), repaint);
     const baseCell = $(target).find('tr.basename td:not(.prop)');
     const labelRow = $(target).find('tr.label');
     const figureRow = $(target).find('tr.figure');
@@ -2962,13 +2970,13 @@ const compareUI = CompareUI({ compareUtil });
     figureRow.find('td:not(.prop)').remove();
     let count = 0;
     for (let k = 0, img; img = images[k]; k++) {
-      if (img.index === baseImageIndex) {
+      if (img.index === view.baseIndex()) {
         continue;
       }
       count += 1;
       if (!img[propName]) {
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
-        update(entries[baseImageIndex], img);
+        update(entries[view.baseIndex()], img);
       }
       const label = viewUtil.makeImageNameWithNumber('<span>', img);
       labelRow.append($('<td>').append(label));
@@ -2996,7 +3004,7 @@ const compareUI = CompareUI({ compareUtil });
       }
       toneCurveParam.type = toneCurveType.current();
       toneCurveParam.auxTypes = [toneCurveAuxType2.current()];
-      toneCurveParam.base = baseImageIndex;
+      toneCurveParam.base = view.baseIndex();
       updateTable();
     };
     const toneCurveType = makeModeSwitch('#toneCurveType', 1, function(type) {
@@ -3101,7 +3109,7 @@ const compareUI = CompareUI({ compareUtil });
         view.resetBaseAndTargetImage();
         if (toneCurveParam.type !== toneCurveType.current() ||
             toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
-            toneCurveParam.base !== baseImageIndex) {
+            toneCurveParam.base !== view.baseIndex()) {
           return repaint();
         }
       }
@@ -3254,18 +3262,18 @@ const compareUI = CompareUI({ compareUtil });
       return true;
     };
     const updateAsync = function() {
-      opticalFlowResult.base   = baseImageIndex;
-      opticalFlowResult.target = targetImageIndex;
+      opticalFlowResult.base   = view.baseIndex();
+      opticalFlowResult.target = view.targetIndex();
       opticalFlowResult.result  = null;
       pointedVector = null;
       taskQueue.discardTasksOfCommand('calcOpticalFlow');
-      if (baseImageIndex !== targetImageIndex) {
+      if (view.baseIndex() !== view.targetIndex()) {
         taskQueue.addTaskWithImageData({
           cmd:      'calcOpticalFlow',
-          index:    [baseImageIndex, targetImageIndex],
+          index:    [view.baseIndex(), view.targetIndex()],
           options:  {
-            orientationA: entries[baseImageIndex].orientation,
-            orientationB: entries[targetImageIndex].orientation
+            orientationA: entries[view.baseIndex()].orientation,
+            orientationB: entries[view.targetIndex()].orientation
           }
         }, (data) => {
             updateFigure(data.index[0], data.index[1], data.result);
@@ -3354,7 +3362,7 @@ const compareUI = CompareUI({ compareUtil });
       if (false === updateOptionsDOM()) {
         return;
       }
-      if (opticalFlowResult.base !== baseImageIndex || opticalFlowResult.target !== targetImageIndex) {
+      if (opticalFlowResult.base !== view.baseIndex() || opticalFlowResult.target !== view.targetIndex()) {
         updateAsync();
       }
       const figW = Math.max(600, Math.round($('#view').width() * 0.65));
@@ -3511,8 +3519,8 @@ const compareUI = CompareUI({ compareUtil });
       if (false === viewUtil.setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
         return false;
       }
-      const a = entries[baseImageIndex];
-      const b = entries[targetImageIndex];
+      const a = entries[view.baseIndex()];
+      const b = entries[view.targetIndex()];
       if (a.width === b.width && a.height === b.height) {
         $('.diffDimension').css({display:'none'});
       } else {
@@ -3521,8 +3529,8 @@ const compareUI = CompareUI({ compareUtil });
       return true;
     };
     const updateAsync = function() {
-      diffResult.base   = baseImageIndex;
-      diffResult.target = targetImageIndex;
+      diffResult.base   = view.baseIndex();
+      diffResult.target = view.targetIndex();
       diffResult.ignoreAE = diffOptions.ignoreAE;
       diffResult.imageType = diffOptions.imageType;
       diffResult.ignoreRemainder = diffOptions.ignoreRemainder;
@@ -3532,10 +3540,10 @@ const compareUI = CompareUI({ compareUtil });
       diffResult.offsetY = diffOptions.offsetY;
       diffResult.result  = null;
       taskQueue.discardTasksOfCommand('calcDiff');
-      if (baseImageIndex !== targetImageIndex) {
+      if (view.baseIndex() !== view.targetIndex()) {
         taskQueue.addTaskWithImageData({
           cmd:      'calcDiff',
-          index:    [baseImageIndex, targetImageIndex],
+          index:    [view.baseIndex(), view.targetIndex()],
           options:  {
             ignoreAE: diffOptions.ignoreAE,
             imageType: diffOptions.imageType,
@@ -3544,8 +3552,8 @@ const compareUI = CompareUI({ compareUtil });
             resizeMethod: diffOptions.resizeMethod,
             offsetX: diffOptions.offsetX,
             offsetY: diffOptions.offsetY,
-            orientationA: entries[baseImageIndex].orientation,
-            orientationB: entries[targetImageIndex].orientation
+            orientationA: entries[view.baseIndex()].orientation,
+            orientationB: entries[view.targetIndex()].orientation
           }
         }, (data) => {
             updateFigure(data.index[0], data.index[1], data.options, data.result);
@@ -3663,7 +3671,7 @@ const compareUI = CompareUI({ compareUtil });
       if (false === updateOptionsDOM(styles)) {
         return;
       }
-      if (diffResult.base !== baseImageIndex || diffResult.target !== targetImageIndex ||
+      if (diffResult.base !== view.baseIndex() || diffResult.target !== view.targetIndex() ||
           diffResult.ignoreAE !== diffOptions.ignoreAE ||
           diffResult.imageType !== diffOptions.imageType ||
           diffResult.ignoreRemainder !== diffOptions.ignoreRemainder ||
