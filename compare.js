@@ -393,7 +393,9 @@ const compareUI = CompareUI({ compareUtil });
     $('#next').click(function() { flipSingleView(true); });
     entriesOnRemoveEntry.push(onRemoveEntry);
     return {
+      empty: () => { return images.length === 0; },
       getImages: () => { return images; },
+      getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
       getEntry: (index) => { return entries[index]; },
       numberFromIndex,
       indexFromNumber,
@@ -552,9 +554,8 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const enable = function() {
-      const images = view.getImages();
-      const index = view.getCurrentIndexOr(0 < images.length ? images[0].index : -1);
-      if (!enableCrossCursor && 0 <= index) {
+      const index = view.getCurrentIndexOr(view.getFrontIndex());
+      if (!enableCrossCursor && index !== null) {
         enableCrossCursor = true;
         primaryIndex = index;
         fixedPosition = false;
@@ -3105,7 +3106,7 @@ const compareUI = CompareUI({ compareUtil });
       return fig;
     };
     const updateTable = function(transformOnly) {
-      if (images.length !== 0 && !transformOnly) {
+      if (!view.empty() && !transformOnly) {
         view.resetBaseAndTargetImage();
         if (toneCurveParam.type !== toneCurveType.current() ||
             toneCurveParam.auxTypes[0] !== toneCurveAuxType2.current() ||
@@ -4193,7 +4194,7 @@ const compareUI = CompareUI({ compareUtil });
   };
   const updateDOM = function() {
     images = entries.filter(function(ent,i,a) { return ent.ready(); });
-    if (images.length === 0) {
+    if (view.empty()) {
       viewZoom.disable();
     } else {
       viewZoom.enable();
@@ -4498,7 +4499,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     );
     const updateNavBox = function() {
-      if (1 <= images.length && !dialogUtil.current()) {
+      if (!view.empty() && !dialogUtil.current()) {
         $('#navBox').show();
       } else {
         $('#navBox').hide();
@@ -4642,8 +4643,8 @@ const compareUI = CompareUI({ compareUtil });
         return false;
       }
       // Delete (46)
-      if (e.keyCode === 46 && shift === '' && 0 < images.length) {
-        const index = view.getCurrentIndexOr(images[0].index);
+      if (e.keyCode === 46 && shift === '' && !view.empty()) {
+        const index = view.getCurrentIndexOr(view.getFrontIndex());
         removeEntry(index);
         return false;
       }
