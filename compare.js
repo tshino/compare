@@ -486,7 +486,7 @@ const compareUI = CompareUI({ compareUtil });
     const updateBaseImageSelector = function(target, baseIndex, repaint) {
       const baseCell = $(target).find('tr.basename td:not(.prop)');
       baseCell.children().remove();
-      if (baseIndex === null || view.getImages().length === 0) {
+      if (baseIndex === null || view.empty()) {
         baseCell.append($('<span>').text('no data'));
       } else {
         baseCell.append(
@@ -1192,7 +1192,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateTable = function() {
       $('#infoTable td:not(.prop)').remove();
-      if (view.getImages().length !== 0) {
+      if (!view.empty()) {
         view.resetBaseAndTargetImage();
       }
       const val = [];
@@ -1325,8 +1325,7 @@ const compareUI = CompareUI({ compareUtil });
     labelRow.find('td').remove();
     figureRow.find('td').remove();
     const figIndices = [];
-    let k = 0;
-    for (let img; img = images[k]; k++) {
+    for (const img of view.getImages()) {
       if (!img[propName]) {
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
@@ -1340,9 +1339,9 @@ const compareUI = CompareUI({ compareUtil });
         figCell.append($(axes).css(styles.style));
       }
       figureRow.append(figCell);
-      figIndices[k] = img.index;
+      figIndices.push(img.index);
     }
-    if (k === 0) {
+    if (view.empty()) {
       const cell = $('<td rowspan="2">').text('no data');
       labelRow.append(cell);
     }
@@ -1471,7 +1470,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcHistogram');
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.histogram = null;
       }
       updateTable();
@@ -1614,7 +1613,7 @@ const compareUI = CompareUI({ compareUtil });
     const figH = 256 + 18;
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcWaveform');
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.waveform = null;
       }
       updateTable();
@@ -1867,7 +1866,7 @@ const compareUI = CompareUI({ compareUtil });
   const VectorscopeDialog = function() {
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcVectorscope');
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.vectorscope = null;
       }
       updateTable();
@@ -2412,7 +2411,7 @@ const compareUI = CompareUI({ compareUtil });
       updateAxesLabels(fig.axes, assets.labels, rotation);
     };
     const redrawFigureAll = function() {
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         if (img.colorTable) {
           const fig = {
             canvas : img.colorDist,
@@ -2433,7 +2432,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateFigure = function(img) {
       if (img === undefined) {
-        for (let i = 0; img = images[i]; i++) {
+        for (const img of view.getImages()) {
           createFigure(img);
         }
       } else {
@@ -2659,7 +2658,7 @@ const compareUI = CompareUI({ compareUtil });
       updateAxesLabels(fig.axes, labels, rotation);
     };
     const redrawFigureAll = function() {
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         if (img.waveform3D) {
           const fig = {
             canvas : img.waveform3DFig,
@@ -2680,7 +2679,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateFigure = function(img) {
       if (img === undefined) {
-        for (let i = 0; img = images[i]; i++) {
+        for (const img of view.getImages()) {
           createFigure(img);
         }
       } else {
@@ -2781,7 +2780,7 @@ const compareUI = CompareUI({ compareUtil });
     const updateTable = function() {
       const target = $('#colorFreqTable');
       target.find('td').remove();
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         const label = viewUtil.makeImageNameWithNumber('<td>', img);
         target.find('tr').eq(0).append(label);
         const cell = $('<td>');
@@ -2799,7 +2798,7 @@ const compareUI = CompareUI({ compareUtil });
         const figure = drawFigure(img.reducedColorTable);
         cell.append(figure);
       }
-      if (images.length === 0) {
+      if (view.empty()) {
         target.find('tr').eq(0).append(
           $('<td>').text('no data')
         );
