@@ -2817,7 +2817,7 @@ const compareUI = CompareUI({ compareUtil });
     });
     const metricsAuxType2 = makeModeSwitch('#metricsAuxType2', 0, function() {
       taskQueue.discardTasksOfCommand('calcMetrics');
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.metrics = [];
       }
       updateTable();
@@ -2870,10 +2870,11 @@ const compareUI = CompareUI({ compareUtil });
         metricsMode.current() === 0 ? { en: 'RGB', ja: 'RGB' } : { en: 'Luminance', ja: '輝度' }
       );
       const rowCount = $('#metricsTable tr').length;
-      if (images.length === 0) {
+      if (view.empty()) {
         $('#metricsBaseName').append($('<td>').attr('rowspan', rowCount).text('no data'));
         return;
       }
+      const images = view.getImages();
       if (images.length === 1) {
         $('#metricsTargetName').append($('<td>').attr('rowspan', rowCount - 1).text('no data'));
       }
@@ -2886,7 +2887,7 @@ const compareUI = CompareUI({ compareUtil });
           })
         )
       );
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of images) {
         updateTableCell(img);
       }
     };
@@ -2969,7 +2970,7 @@ const compareUI = CompareUI({ compareUtil });
     labelRow.find('td:not(.prop)').remove();
     figureRow.find('td:not(.prop)').remove();
     let count = 0;
-    for (let k = 0, img; img = images[k]; k++) {
+    for (const img of view.getImages()) {
       if (img.index === view.baseIndex()) {
         continue;
       }
@@ -2998,7 +2999,7 @@ const compareUI = CompareUI({ compareUtil });
     const toneCurveParam = {};
     const repaint = function() {
       taskQueue.discardTasksOfCommand('calcToneCurve');
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
@@ -3020,7 +3021,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const onRemoveEntry = function(index) {
-      for (let i = 0, img; img = images[i]; i++) {
+      for (const img of view.getImages()) {
         img.toneCurve = null;
         img.toneCurveAxes = null;
       }
@@ -4198,7 +4199,7 @@ const compareUI = CompareUI({ compareUtil });
     } else {
       viewZoom.enable();
     }
-    for (let i = 0, ent; ent = entries[i]; i++) {
+    for (const ent of entries) {
         if (!ent.view) {
           ent.view = $('<div class="imageBox"/>');
           $('#drop').before(ent.view);
@@ -4206,11 +4207,12 @@ const compareUI = CompareUI({ compareUtil });
         ent.view.find('.imageName').remove();
         ent.view.append(
             viewUtil.makeImageNameWithNumber('<span class="imageName">', ent).
-              click({index : i}, function(e) {
-                view.toggleSingleView(e.data.index);
+              click(function() {
+                view.toggleSingleView(ent.index);
               }).append(
                 $('<button>').addClass('remove').text('×').
-                  click({index : i}, function(e) { removeEntry(e.data.index); }))
+                  click(function() { removeEntry(ent.index); })
+              )
         );
         if (ent.element) {
           if (ent.altViewMode !== altView.currentMode()) {
