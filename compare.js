@@ -3,6 +3,8 @@ const compareUI = CompareUI({ compareUtil });
 
   const entries = [];
   let images = [];
+  const onUpdateViewDOMListeners = [];
+  const entryViewModifiers = [];
   const entriesOnRemoveEntry = [];
   const setDragStateClass = compareUI.setDragStateClass;
   let drawImageAwareOfOrientation = false;
@@ -25,6 +27,9 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
+    const updateRegistry = function() {
+      images = entries.filter(function(ent,i,a) { return ent.ready(); });
+    };
     const numberFromIndex = function(index) {
       for (let i = 0, img; img = images[i]; i++) {
         if (img.index === index) {
@@ -358,6 +363,12 @@ const compareUI = CompareUI({ compareUtil });
       onUpdateLayout();
       updateTransform(viewZoom);
     };
+    const addOnUpdateViewDOM = function(listener) {
+      onUpdateViewDOMListeners.push(listener);
+    };
+    const addEntryViewModifier = function(modifier) {
+      entryViewModifiers.push(modifier);
+    };
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -397,6 +408,7 @@ const compareUI = CompareUI({ compareUtil });
       getImages: () => { return images; },
       getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
       getEntry: (index) => { return entries[index]; },
+      updateRegistry,
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
@@ -422,6 +434,8 @@ const compareUI = CompareUI({ compareUtil });
       addOnUpdateTransform,
       viewZoom,
       updateLayout,
+      addOnUpdateViewDOM,
+      addEntryViewModifier,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling,
@@ -4059,8 +4073,19 @@ const compareUI = CompareUI({ compareUtil });
     const currentMode = function() {
       return component === null ? null : colorSpace + '/' + component + '/' + mapping + '/' + enableContour;
     };
+    const modifyEntryView = function(ent) {
+      const mode = currentMode();
+      if (ent.altViewMode !== mode) {
+        const altImage = getAltImage(ent);
+        ent.element = altImage ? altImage.image : ent.mainImage;
+        ent.contour = altImage ? altImage.contour : null;
+        ent.altViewMode = altImage ? mode : null;
+        return true;
+      }
+    };
     view.addOnUpdateImageBox(onUpdateImageBox);
     view.addOnUpdateEntryTransform(onUpdateEntryTransform);
+    view.addEntryViewModifier(modifyEntryView);
     return {
       reset,
       toggle,
@@ -4068,9 +4093,7 @@ const compareUI = CompareUI({ compareUtil });
       changeMode,
       changeModeReverse,
       enableAlpha,
-      getAltImage,
-      active: function() { return null !== component; },
-      currentMode
+      active: function() { return null !== component; }
     };
   };
   const roiMap = compareUI.RoiMap({ view });
@@ -4156,9 +4179,8 @@ const compareUI = CompareUI({ compareUtil });
       updateOverlayModeIndicator();
     };
     view.addOnUpdateLayout(onUpdateLayout);
-    return {
-      updateSelectorButtons
-    };
+    view.addOnUpdateViewDOM(updateSelectorButtons);
+    return {};
   };
   const sideBar = SideBar({ view });
   const removeEntry = function(index) {
@@ -4193,7 +4215,7 @@ const compareUI = CompareUI({ compareUtil });
     }
   };
   const updateDOM = function() {
-    images = entries.filter(function(ent,i,a) { return ent.ready(); });
+    view.updateRegistry();
     if (view.empty()) {
       viewZoom.disable();
     } else {
@@ -4215,12 +4237,11 @@ const compareUI = CompareUI({ compareUtil });
               )
         );
         if (ent.element) {
-          if (ent.altViewMode !== altView.currentMode()) {
-            ent.view.find('.image').remove();
-            const altImage = altView.getAltImage(ent);
-            ent.element = altImage ? altImage.image : ent.mainImage;
-            ent.contour = altImage ? altImage.contour : null;
-            ent.altViewMode = altImage ? altView.currentMode() : null;
+          for (const modifier of entryViewModifiers) {
+            if (modifier(ent)) {
+              ent.view.find('.image').remove();
+              break;
+            }
           }
           if (0 === ent.view.find('.image').length) {
             $(ent.element).addClass('image');
@@ -4232,7 +4253,9 @@ const compareUI = CompareUI({ compareUtil });
           ent.visible = false;
         }
     }
-    sideBar.updateSelectorButtons();
+    for (const listener of onUpdateViewDOMListeners) {
+      listener();
+    }
     view.resetMouseDrag();
     view.updateLayout();
   };
