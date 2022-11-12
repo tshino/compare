@@ -286,8 +286,7 @@ const CompareUI = function({ compareUtil }) {
         };
         const updateHUD = function (pointChanged) {
             if (pointChanged) {
-                const images = view.getImages();
-                for (let i = 0, img; img = images[i]; i++) {
+                for (const img of view.getImages()) {
                     updateColorHUD(img);
                 }
             }
@@ -348,7 +347,7 @@ const CompareUI = function({ compareUtil }) {
         let enableMap = false;
         const toggle = function () {
             if (!enableMap) {
-                if (0 < view.getImages().length) {
+                if (!view.empty()) {
                     enableMap = true;
                     view.updateLayout();
                 }
@@ -358,8 +357,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const onUpdateLayout = function () {
-            const images = view.getImages();
-            $('#map').css({ display: (enableMap && images.length) ? 'block' : '' });
+            $('#map').css({ display: (enableMap && !view.empty()) ? 'block' : '' });
         };
         const updateMap = function (img) {
             const roi = img.calcNormalizedROI(viewZoom.scale, viewZoom.getCenter());
@@ -377,11 +375,10 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateTransform = function () {
             if (enableMap) {
-                const images = view.getImages();
-                if (0 < images.length) {
+                if (!view.empty()) {
                     const index = view.getCurrentIndexOr(0);
                     const entry = view.getEntry(index);
-                    const img = entry.ready() ? entry : images[0];
+                    const img = entry.ready() ? entry : view.getImages()[0];
                     updateMap(img);
                 }
             }
