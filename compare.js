@@ -2,7 +2,6 @@
 const compareUI = CompareUI({ compareUtil });
 
   const entries = [];
-  let images = [];
   const onUpdateViewDOMListeners = [];
   const entryViewModifiers = [];
   const entriesOnRemoveEntry = [];
@@ -18,6 +17,7 @@ const compareUI = CompareUI({ compareUtil });
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
+    let images = [];
     let baseImageIndex = null;
     let targetImageIndex = null;
     let backgroundColor = '#000000';
@@ -1410,6 +1410,7 @@ const compareUI = CompareUI({ compareUtil });
   taskQueue.discardTasksOfEntryByIndex = function(index) {
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
+  entriesOnRemoveEntry.push(taskQueue.discardTasksOfEntryByIndex);
 
   const makeModeSwitch = function(parent, initialValue, onchange, toggle) {
     let currentType = initialValue;
@@ -4209,7 +4210,6 @@ const compareUI = CompareUI({ compareUtil });
       ent.reducedColorTable = null;
       ent.toneCurve = null;
       ent.toneCurveAxes = null;
-      taskQueue.discardTasksOfEntryByIndex(index);
       view.resetLayoutState();
       updateDOM();
     }
