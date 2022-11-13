@@ -3284,12 +3284,14 @@ const compareUI = CompareUI({ compareUtil });
       pointedVector = null;
       taskQueue.discardTasksOfCommand('calcOpticalFlow');
       if (view.baseIndex() !== view.targetIndex()) {
+        const base = view.getEntry(view.baseIndex());
+        const target = view.getEntry(view.targetIndex());
         taskQueue.addTaskWithImageData({
           cmd:      'calcOpticalFlow',
-          index:    [view.baseIndex(), view.targetIndex()],
+          index:    [base.index, target.index],
           options:  {
-            orientationA: entries[view.baseIndex()].orientation,
-            orientationB: entries[view.targetIndex()].orientation
+            orientationA: base.orientation,
+            orientationB: target.orientation
           }
         }, (data) => {
             updateFigure(data.index[0], data.index[1], data.result);
@@ -3535,9 +3537,9 @@ const compareUI = CompareUI({ compareUtil });
       if (false === viewUtil.setupBaseAndTargetSelector('#diffBaseName', '#diffTargetName', updateTable)) {
         return false;
       }
-      const a = entries[view.baseIndex()];
-      const b = entries[view.targetIndex()];
-      if (a.width === b.width && a.height === b.height) {
+      const base = view.getEntry(view.baseIndex());
+      const target = view.getEntry(view.targetIndex());
+      if (base.width === target.width && base.height === target.height) {
         $('.diffDimension').css({display:'none'});
       } else {
         $('.diffDimension').css({display:''});
@@ -3557,9 +3559,11 @@ const compareUI = CompareUI({ compareUtil });
       diffResult.result  = null;
       taskQueue.discardTasksOfCommand('calcDiff');
       if (view.baseIndex() !== view.targetIndex()) {
+        const base = view.getEntry(view.baseIndex());
+        const target = view.getEntry(view.targetIndex());
         taskQueue.addTaskWithImageData({
           cmd:      'calcDiff',
-          index:    [view.baseIndex(), view.targetIndex()],
+          index:    [base.index, target.index],
           options:  {
             ignoreAE: diffOptions.ignoreAE,
             imageType: diffOptions.imageType,
@@ -3568,8 +3572,8 @@ const compareUI = CompareUI({ compareUtil });
             resizeMethod: diffOptions.resizeMethod,
             offsetX: diffOptions.offsetX,
             offsetY: diffOptions.offsetY,
-            orientationA: entries[view.baseIndex()].orientation,
-            orientationB: entries[view.targetIndex()].orientation
+            orientationA: base.orientation,
+            orientationB: target.orientation
           }
         }, (data) => {
             updateFigure(data.index[0], data.index[1], data.options, data.result);
@@ -4152,7 +4156,8 @@ const compareUI = CompareUI({ compareUtil });
         selectors.eq(index).addClass('current');
       }
       selectors.each(function(index) {
-        if (index < entries.length && !entries[index].visible) {
+        const ent = view.getEntry(index);
+        if (ent && !ent.visible) {
           $(this).css({ display : 'none' });
         }
       });
@@ -4185,7 +4190,7 @@ const compareUI = CompareUI({ compareUtil });
   };
   const sideBar = SideBar({ view });
   const removeEntry = function(index) {
-    const ent = entries[index];
+    const ent = view.getEntry(index);
     if (ent && !ent.loading && ent.visible) {
       ent.visible = false;
       if (ent.element) {
@@ -4531,7 +4536,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     dialogUtil.addObserver(updateNavBox, updateNavBox);
     viewZoom.setPointCallback(function(e) {
-      if (entries[e.index].ready()) {
+      if (view.getEntry(e.index).ready()) {
         crossCursor.enable();
         crossCursor.processClick(e);
       }
