@@ -1393,7 +1393,7 @@ const compareUI = CompareUI({ compareUtil });
     const attachImageDataToTask = function(data) {
         data.imageData = [];
         for (let i = 0; i < data.index.length; ++i) {
-          data.imageData[i] = getImageData(entries[data.index[i]]);
+          data.imageData[i] = getImageData(view.getEntry(data.index[i]));
           if (!data.imageData[i]) {
             alert('out of memory');
             return false;
@@ -1463,7 +1463,7 @@ const compareUI = CompareUI({ compareUtil });
         };
         for (let k = 0; k < figIndices.length; k++) {
           const index = figIndices[k];
-          const hist = entries[index].histogramData;
+          const hist = view.getEntry(index).histogramData;
           const td = $('<td>').css('font-size','14px');
           if (histogramType.current() === 0) {
             addInfo(td, 'R', '#800', hist, 0);
@@ -1597,7 +1597,6 @@ const compareUI = CompareUI({ compareUtil });
         auxTypes: [histogramAuxType2.current()],
         index:    [img.index]
       }, (data) => {
-        const img = entries[data.index[0]];
         updateFigure(data.type, data.auxTypes, img, data.result);
       });
     };
@@ -1804,7 +1803,6 @@ const compareUI = CompareUI({ compareUtil });
         transposed: img.transposed,
         flipped:  img.transposed ? img.flippedY : img.flippedX
       }, (data) => {
-        const img = entries[data.index[0]];
         updateFigure(data.type, data.auxTypes, img, data.histW, data.result);
       });
     };
