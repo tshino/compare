@@ -4126,19 +4126,16 @@ const compareUI = CompareUI({ compareUtil });
     const newSelectorButton = function(index) {
       const number = view.numberFromIndex(index);
       const button = $('<button/>').addClass('selector').
+        addClass(`number${number}`).
         text(number).
         click(function(e) { view.toSingleImageView(index); });
-      if (number <= 9) {
-        button.find('span.tooltip span').addClass('keys flat').
-            append($('<span/>').text(number));
-      }
       $('#next').before(button);
       return button;
     };
     const updateSelectorButtons = function() {
       $('.selector').remove();
-      for (const ent of entries) {
-        newSelectorButton(ent.index);
+      for (const img of view.getImages()) {
+        newSelectorButton(img.index);
       }
     };
     const updateArrangeButton = function() {
@@ -4150,14 +4147,9 @@ const compareUI = CompareUI({ compareUtil });
       const selectors = $('.selector');
       selectors.removeClass('current');
       for (const index of indices) {
-        selectors.eq(index).addClass('current');
+        const number = view.numberFromIndex(index);
+        selectors.filter(`.number${number}`).addClass('current');
       }
-      selectors.each(function(index) {
-        const ent = view.getEntry(index);
-        if (ent && !ent.visible) {
-          $(this).css({ display : 'none' });
-        }
-      });
     };
     const updateOverlayModeIndicator = function() {
       if (model.overlayMode.isActive()) {
