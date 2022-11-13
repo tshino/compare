@@ -2075,7 +2075,6 @@ const compareUI = CompareUI({ compareUtil });
         auxTypes: [vectorscopeAuxType.current(), vectorscopeAuxType2.current()],
         index:    [img.index]
       }, (data) => {
-        const img = entries[data.index[0]];
         updateFigure(data.type, data.color, data.auxTypes, img, data.result);
       });
     };
@@ -2176,7 +2175,6 @@ const compareUI = CompareUI({ compareUtil });
         cmd:      'calcColorTable',
         index:    [img.index]
       }, (data) => {
-        const img = entries[data.index[0]];
         img.colorTable = data.result;
         updateFigure(img);
       });
@@ -2512,7 +2510,6 @@ const compareUI = CompareUI({ compareUtil });
         baseSize: 512,
         index:    [img.index]
       }, (data) => {
-        const img = entries[data.index[0]];
         img.waveform3D = data.result;
         updateFigure(img);
       });
@@ -2784,7 +2781,6 @@ const compareUI = CompareUI({ compareUtil });
         cmd:      'calcReducedColorTable',
         index:    [img.index]
       }, (data) => {
-        const img = entries[data.index[0]];
         img.reducedColorTable = data.result;
         updateFigure(img);
       });
@@ -2910,7 +2906,7 @@ const compareUI = CompareUI({ compareUtil });
       if (img.index === view.baseIndex()) {
         return;
       }
-      const a = entries[view.baseIndex()];
+      const a = view.getEntry(view.baseIndex());
       const b = img;
       if (!a.metrics[b.index] && !(a.width === b.width && a.height === b.height)) {
         const message = { en: '‐ (different size)', ja: '‐ (サイズが不一致)' };
@@ -2925,8 +2921,8 @@ const compareUI = CompareUI({ compareUtil });
           cmd:      'calcMetrics',
           index:    [a.index, b.index],
           options:  {
-            orientationA: entries[a.index].orientation,
-            orientationB: entries[b.index].orientation
+            orientationA: a.orientation,
+            orientationB: b.orientation
           },
           auxTypes: [metricsAuxType2.current()],
         }, (data) => {
@@ -2962,8 +2958,8 @@ const compareUI = CompareUI({ compareUtil });
     };
     const updateFigure = function(baseIndex, targetIndex, auxTypes, result) {
       if (auxTypes[0] === metricsAuxType2.current()) {
-        entries[baseIndex].metrics[targetIndex] = result;
-        entries[targetIndex].metrics[baseIndex] = result;
+        view.getEntry(baseIndex).metrics[targetIndex] = result;
+        view.getEntry(targetIndex).metrics[baseIndex] = result;
       }
       updateTable();
     };
@@ -2992,7 +2988,7 @@ const compareUI = CompareUI({ compareUtil });
       count += 1;
       if (!img[propName]) {
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
-        update(entries[view.baseIndex()], img);
+        update(view.getEntry(view.baseIndex()), img);
       }
       const label = viewUtil.makeImageNameWithNumber('<span>', img);
       labelRow.append($('<td>').append(label));
@@ -3138,8 +3134,9 @@ const compareUI = CompareUI({ compareUtil });
           auxTypes[0] === toneCurveParam.auxTypes[0] &&
           baseIndex === toneCurveParam.base) {
         const figData = makeFigure(type, result);
-        entries[targetIndex].toneCurve = figData.canvas;
-        entries[targetIndex].toneCurveAxes = figData.axes;
+        const target = view.getEntry(targetIndex);
+        target.toneCurve = figData.canvas;
+        target.toneCurveAxes = figData.axes;
       }
       updateTable();
     };
