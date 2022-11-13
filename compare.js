@@ -27,6 +27,11 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
+    const register = function(ent) {
+      ent.index = entries.length;
+      entries.push(ent);
+      return ent;
+    };
     const updateRegistry = function() {
       images = entries.filter(function(ent,i,a) { return ent.ready(); });
     };
@@ -408,6 +413,7 @@ const compareUI = CompareUI({ compareUtil });
       getImages: () => { return images; },
       getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
       getEntry: (index) => { return entries[index]; },
+      register,
       updateRegistry,
       numberFromIndex,
       indexFromNumber,
@@ -4344,7 +4350,6 @@ const compareUI = CompareUI({ compareUtil });
   const newEntry = function(file) {
       const lastModified = file.lastModified || file.lastModifiedDate;
       const entry = {
-            index           : null,
             name            : file.name,
             size            : file.size,
             fileType        : file.type,
@@ -4381,6 +4386,7 @@ const compareUI = CompareUI({ compareUtil });
 
             ready   : function() { return null !== this.element; }
       };
+      view.register(entry);
       return entry;
   };
   const addCapturedImage = function(canvas) {
@@ -4389,15 +4395,11 @@ const compareUI = CompareUI({ compareUtil });
         lastModified: Date.now()
       };
       const entry = newEntry(file);
-      entry.index = entries.length;
-      entries.push(entry);
       view.resetLayoutState();
       setupEntryWithCanvas(entry, canvas);
   };
   const addFile = function(file) {
       const entry = newEntry(file);
-      entry.index = entries.length;
-      entries.push(entry);
       nowLoadingDialog.add(entry);
 
       const reader = new FileReader();
