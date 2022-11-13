@@ -718,8 +718,9 @@ const compareUI = CompareUI({ compareUtil });
     };
     const setPosition = function(index, x, y, fixed) {
       fixed = fixed !== undefined ? fixed : fixedPosition;
-      const rx = (Math.floor(x) + 0.5) / entries[index].width;
-      const ry = (Math.floor(y) + 0.5) / entries[index].height;
+      const ent = view.getEntry(index);
+      const rx = (Math.floor(x) + 0.5) / ent.width;
+      const ry = (Math.floor(y) + 0.5) / ent.height;
       setIndex(index, fixed);
       for (const img of view.getImages()) {
         const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
@@ -729,7 +730,7 @@ const compareUI = CompareUI({ compareUtil });
       onUpdateCallback.forEach(function(val) { val(true); });
     };
     const adjustViewOffsetToFollowCrossCursor = function(dx, dy, x, y) {
-      const img = entries[primaryIndex];
+      const img = view.getEntry(primaryIndex);
       const center = viewZoom.getCenter();
       const rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
       const ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
@@ -766,7 +767,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const processClick = function(e) {
       const pos = getPosition(e.index);
-      const ent = entries[e.index];
+      const ent = view.getEntry(e.index);
       const x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
       const y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
       let fixed;
@@ -781,8 +782,8 @@ const compareUI = CompareUI({ compareUtil });
       if (enableCrossCursor && !fixedPosition) {
         const index = selector ? $(selector).index($(target).parent()) : null;
         const pos = viewZoom.positionFromMouseEvent(e, target, index);
-        if (index !== null && entries[index].ready() && pos) {
-          const ent = entries[index];
+        if (index !== null && view.getEntry(index).ready() && pos) {
+          const ent = view.getEntry(index);
           const x = pos.x * ent.width;
           const y = pos.y * ent.height;
           setPosition(index, x, y);
