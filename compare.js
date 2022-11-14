@@ -232,6 +232,14 @@ const compareUI = CompareUI({ compareUtil });
         boxH
       };
     };
+    const makeImageNameWithNumber = function(tag, img) {
+      const number = numberFromIndex(img.index);
+      const elem = $(tag).css({ wordBreak : 'break-all' });
+      if (number !== null) {
+        elem.append($('<span class="imageIndex"/>').text(number));
+      }
+      return elem.append($('<span/>').text(img.name));
+    };
     const addOnUpdateImageBox = function(listener) {
       onUpdateImageBoxListeners.push(listener);
     };
@@ -434,6 +442,7 @@ const compareUI = CompareUI({ compareUtil });
       arrangeLayout,
       toggleOverlay,
       getCurrentIndexOr,
+      makeImageNameWithNumber,
       addOnUpdateImageBox,
       addOnUpdateLayout,
       addOnUpdateEntryTransform,
@@ -454,14 +463,6 @@ const compareUI = CompareUI({ compareUtil });
   const viewZoom = view.viewZoom;
 
   const ViewUtil = function({ view }) {
-    const makeImageNameWithNumber = function(tag, img) {
-      const number = view.numberFromIndex(img.index);
-      const elem = $(tag).css({ wordBreak : 'break-all' });
-      if (number !== null) {
-        elem.append($('<span class="imageIndex"/>').text(number));
-      }
-      return elem.append($('<span/>').text(img.name));
-    };
     const makeImageNameSelector = function(selectedIndex, onchange) {
       const select = $('<select>').on('change', function(e) {
         const index = parseInt(this.options[this.selectedIndex].value);
@@ -536,7 +537,6 @@ const compareUI = CompareUI({ compareUtil });
       };
     };
     return {
-      makeImageNameWithNumber,
       makeImageNameSelector,
       setupBaseAndTargetSelector,
       updateBaseImageSelector,
@@ -1169,7 +1169,7 @@ const compareUI = CompareUI({ compareUtil });
     const unknown = [null, '‐'];
     const makeTableValue = function(img) {
       return [
-        [null, viewUtil.makeImageNameWithNumber('<span>', img)],
+        [null, view.makeImageNameWithNumber('<span>', img)],
         img.format === '' ? unknown : [img.format, img.format],
         img.color === '' ? unknown : [img.color, img.color],
         img.sizeUnknown ? unknown : [img.width, compareUtil.addComma(img.width) ],
@@ -1287,7 +1287,7 @@ const compareUI = CompareUI({ compareUtil });
           td.addClass('ok').text('OK!');
         }
         $('#loadingList').append(
-          $('<tr>').append(viewUtil.makeImageNameWithNumber('<td class="b">', ent), td)
+          $('<tr>').append(view.makeImageNameWithNumber('<td class="b">', ent), td)
         );
       }
       if (finished) {
@@ -1351,7 +1351,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8, 8).canvas;
         update(img);
       }
-      const label = viewUtil.makeImageNameWithNumber('<td>', img);
+      const label = view.makeImageNameWithNumber('<td>', img);
       labelRow.append(label);
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -2797,7 +2797,7 @@ const compareUI = CompareUI({ compareUtil });
       const target = $('#colorFreqTable');
       target.find('td').remove();
       for (const img of view.getImages()) {
-        const label = viewUtil.makeImageNameWithNumber('<td>', img);
+        const label = view.makeImageNameWithNumber('<td>', img);
         target.find('tr').eq(0).append(label);
         const cell = $('<td>');
         target.find('tr').eq(1).append(cell);
@@ -2936,7 +2936,7 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#metricsTargetName').append(
         $('<td>').append(
-          viewUtil.makeImageNameWithNumber('<span>', b),
+          view.makeImageNameWithNumber('<span>', b),
           '&nbsp;',
           $('<button>').text('↑').click(function(e) {
             view.changeBaseImage(b.index);
@@ -2995,7 +2995,7 @@ const compareUI = CompareUI({ compareUtil });
         img[propName] = compareUtil.figureUtil.makeBlankFigure(8,8).canvas;
         update(view.getEntry(view.baseIndex()), img);
       }
-      const label = viewUtil.makeImageNameWithNumber('<span>', img);
+      const label = view.makeImageNameWithNumber('<span>', img);
       labelRow.append($('<td>').append(label));
       const figCell = $('<td class="fig">').css(styles.cellStyle);
       figCell.append($(img[propName]).css(styles.style).addClass('figMain'));
@@ -4227,7 +4227,7 @@ const compareUI = CompareUI({ compareUtil });
         }
         ent.view.find('.imageName').remove();
         ent.view.append(
-            viewUtil.makeImageNameWithNumber('<span class="imageName">', ent).
+            view.makeImageNameWithNumber('<span class="imageName">', ent).
               click(function() {
                 view.toggleSingleView(ent.index);
               }).append(
