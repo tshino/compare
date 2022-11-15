@@ -5,6 +5,7 @@ const compareUI = CompareUI({ compareUtil });
   const onUpdateViewDOMListeners = [];
   const entryViewModifiers = [];
   const entriesOnRemoveEntry = [];
+  const cacheProperties = [];
   const setDragStateClass = compareUI.setDragStateClass;
   let drawImageAwareOfOrientation = false;
   compareUtil.drawImageAwareOfOrientation().then(
@@ -1624,6 +1625,8 @@ const compareUI = CompareUI({ compareUtil });
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: figW / 2, h: figH / 2 }; }
     });
+    cacheProperties.push('histogramData');
+    cacheProperties.push('histogram');
     return {
       processClick,
       toggle
@@ -1822,6 +1825,7 @@ const compareUI = CompareUI({ compareUtil });
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: figH }; }
     });
+    cacheProperties.push('waveform');
     return {
       toggle
     };
@@ -2097,6 +2101,7 @@ const compareUI = CompareUI({ compareUtil });
         return false;
       }
     };
+    cacheProperties.push('vectorscope');
     return {
       toggle,
       processKeyDown
@@ -4194,12 +4199,12 @@ const compareUI = CompareUI({ compareUtil });
       for (const onRemoveEntry of entriesOnRemoveEntry) {
         onRemoveEntry(index);
       }
+      for (const propName of cacheProperties) {
+        ent[propName] = null;
+      }
       ent.mainImage = null;
       ent.asCanvas = null;
       ent.imageData = null;
-      ent.histogram = null;
-      ent.waveform = null;
-      ent.vectorscope = null;
       ent.colorTable = null;
       ent.colorDist = null;
       ent.colorDistAxes = null;
