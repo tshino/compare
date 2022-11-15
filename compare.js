@@ -2484,6 +2484,9 @@ const compareUI = CompareUI({ compareUtil });
       }
       return rotationInputFilter.processKeyDown(e);
     };
+    cacheProperties.push('colorTable');
+    cacheProperties.push('colorDist');
+    cacheProperties.push('colorDistAxes');
     return {
       toggle,
       processKeyDown,
@@ -2723,6 +2726,7 @@ const compareUI = CompareUI({ compareUtil });
     rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
       setDragStateClass('#waveform3D', dragging, horizontal);
     });
+    cacheProperties.push('waveform3D');
     return {
       toggle,
       processKeyDown: rotationInputFilter.processKeyDown,
@@ -4205,10 +4209,6 @@ const compareUI = CompareUI({ compareUtil });
       ent.mainImage = null;
       ent.asCanvas = null;
       ent.imageData = null;
-      ent.colorTable = null;
-      ent.colorDist = null;
-      ent.colorDistAxes = null;
-      ent.waveform3D = null;
       ent.waveform3DFig = null;
       ent.waveform3DFigAxes = null;
       ent.reducedColorTable = null;
