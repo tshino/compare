@@ -58,6 +58,27 @@ const compareUI = CompareUI({ compareUtil });
       }
       return null;
     };
+    const removeEntry = function(index) {
+      const ent = entries[index];
+      if (ent && !ent.loading && ent.visible) {
+        ent.visible = false;
+        if (ent.element) {
+          $(ent.view).remove('.image');
+          ent.element = null;
+        }
+        for (const onRemoveEntry of entriesOnRemoveEntry) {
+          onRemoveEntry(index);
+        }
+        for (const propName of cacheProperties) {
+          ent[propName] = null;
+        }
+        ent.mainImage = null;
+        ent.asCanvas = null;
+        ent.imageData = null;
+        resetLayoutState();
+        updateDOM(); // FIXME: global function
+      }
+    };
     const resetBaseAndTargetImage = function() {
       baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
       if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
@@ -427,6 +448,7 @@ const compareUI = CompareUI({ compareUtil });
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
+      removeEntry,
       resetBaseAndTargetImage,
       setBaseAndTargetImage,
       changeBaseImage,
@@ -2727,6 +2749,8 @@ const compareUI = CompareUI({ compareUtil });
       setDragStateClass('#waveform3D', dragging, horizontal);
     });
     cacheProperties.push('waveform3D');
+    cacheProperties.push('waveform3DFig');
+    cacheProperties.push('waveform3DFigAxes');
     return {
       toggle,
       processKeyDown: rotationInputFilter.processKeyDown,
@@ -2830,6 +2854,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
+    cacheProperties.push('reducedColorTable');
     return {
       toggle
     };
@@ -3157,6 +3182,8 @@ const compareUI = CompareUI({ compareUtil });
     const toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
+    cacheProperties.push('toneCurve');
+    cacheProperties.push('toneCurveAxes');
     return {
       toggle
     };
@@ -4192,32 +4219,6 @@ const compareUI = CompareUI({ compareUtil });
     return {};
   };
   const sideBar = SideBar({ view });
-  const removeEntry = function(index) {
-    const ent = view.getEntry(index);
-    if (ent && !ent.loading && ent.visible) {
-      ent.visible = false;
-      if (ent.element) {
-        $(ent.view).remove('.image');
-        ent.element = null;
-      }
-      for (const onRemoveEntry of entriesOnRemoveEntry) {
-        onRemoveEntry(index);
-      }
-      for (const propName of cacheProperties) {
-        ent[propName] = null;
-      }
-      ent.mainImage = null;
-      ent.asCanvas = null;
-      ent.imageData = null;
-      ent.waveform3DFig = null;
-      ent.waveform3DFigAxes = null;
-      ent.reducedColorTable = null;
-      ent.toneCurve = null;
-      ent.toneCurveAxes = null;
-      view.resetLayoutState();
-      updateDOM();
-    }
-  };
   const updateDOM = function() {
     view.updateRegistry();
     if (view.empty()) {
@@ -4237,7 +4238,7 @@ const compareUI = CompareUI({ compareUtil });
                 view.toggleSingleView(ent.index);
               }).append(
                 $('<button>').addClass('remove').text('×').
-                  click(function() { removeEntry(ent.index); })
+                  click(function() { view.removeEntry(ent.index); })
               )
         );
         if (ent.element) {
@@ -4669,7 +4670,7 @@ const compareUI = CompareUI({ compareUtil });
       // Delete (46)
       if (e.keyCode === 46 && shift === '' && !view.empty()) {
         const index = view.getCurrentIndexOr(view.getFrontIndex());
-        removeEntry(index);
+        view.removeEntry(index);
         return false;
       }
       //alert('keydown: '+e.keyCode);
