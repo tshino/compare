@@ -1,9 +1,6 @@
 ﻿const compareUtil = CompareUtil(window);
 const compareUI = CompareUI({ compareUtil });
 
-  const entries = [];
-  const onUpdateViewDOMListeners = [];
-  const entryViewModifiers = [];
   const entriesOnRemoveEntry = [];
   const cacheProperties = [];
   const setDragStateClass = compareUI.setDragStateClass;
@@ -18,11 +15,14 @@ const compareUI = CompareUI({ compareUtil });
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
+    const entries = [];
     let images = [];
     let baseImageIndex = null;
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
+    const entryViewModifiers = [];
+    const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
     const onUpdateLayoutListeners = [];
     const onUpdateEntryTransformListeners = [];
@@ -76,7 +76,7 @@ const compareUI = CompareUI({ compareUtil });
         ent.asCanvas = null;
         ent.imageData = null;
         resetLayoutState();
-        updateDOM(); // FIXME: global function
+        updateDOM();
       }
     };
     const resetBaseAndTargetImage = function() {
@@ -404,6 +404,51 @@ const compareUI = CompareUI({ compareUtil });
     const addEntryViewModifier = function(modifier) {
       entryViewModifiers.push(modifier);
     };
+    const updateDOM = function() {
+      updateRegistry();
+      if (images.length === 0) {
+        viewZoom.disable();
+      } else {
+        viewZoom.enable();
+      }
+      for (const ent of entries) {
+          if (!ent.view) {
+            ent.view = $('<div class="imageBox"/>');
+            $('#drop').before(ent.view);
+          }
+          ent.view.find('.imageName').remove();
+          ent.view.append(
+              makeImageNameWithNumber('<span class="imageName">', ent).
+                click(function() {
+                  toggleSingleView(ent.index);
+                }).append(
+                  $('<button>').addClass('remove').text('×').
+                    click(function() { removeEntry(ent.index); })
+                )
+          );
+          if (ent.element) {
+            for (const modifier of entryViewModifiers) {
+              if (modifier(ent)) {
+                ent.view.find('.image').remove();
+                break;
+              }
+            }
+            if (0 === ent.view.find('.image').length) {
+              $(ent.element).addClass('image');
+              ent.view.prepend(ent.element);
+            }
+          }
+          if (ent.error) {
+            ent.view.addClass('error');
+            ent.visible = false;
+          }
+      }
+      for (const listener of onUpdateViewDOMListeners) {
+        listener();
+      }
+      resetMouseDrag();
+      updateLayout();
+    };
     const updateEmptyBoxTextColor = function() {
       let textColor;
       if ($('#view').hasClass('useChecker')) {
@@ -474,6 +519,7 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout,
       addOnUpdateViewDOM,
       addEntryViewModifier,
+      updateDOM,
       setBackgroundColor,
       setCheckerPattern,
       setImageScaling,
@@ -3882,7 +3928,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#altViewMode .close').on('click', function(e) {
       reset();
-      updateDOM();
+      view.updateDOM();
     });
     const changeColorSpace = function(cs) {
       const lastComponent = (component === null || component === 0) ? null :
@@ -3896,7 +3942,7 @@ const compareUI = CompareUI({ compareUtil });
           component = 0;
         }
         updateModeIndicator();
-        updateDOM();
+        view.updateDOM();
       }
     };
     $('#altViewColorSpace').on('change', function(e) {
@@ -3906,12 +3952,12 @@ const compareUI = CompareUI({ compareUtil });
     $('#altViewMode .mode-sw button').on('click', function(e) {
       component = $(this).parent().children().index(this);
       updateModeIndicator();
-      updateDOM();
+      view.updateDOM();
     });
     $('.altViewMapping').on('change', function(e) {
       mapping = this.options[this.selectedIndex].value;
       updateModeIndicator();
-      updateDOM();
+      view.updateDOM();
       return false;
     });
     $('#altViewEnableAlpha').on('click', function() {
@@ -3920,7 +3966,7 @@ const compareUI = CompareUI({ compareUtil });
           colorSpaces[colorSpace].components[component - 1] === 'A') {
         component = 0;
         updateModeIndicator();
-        updateDOM();
+        view.updateDOM();
       } else {
         updateModeIndicator();
       }
@@ -3934,12 +3980,12 @@ const compareUI = CompareUI({ compareUtil });
     const toggle = function() {
       component = component === null ? 0 : null;
       updateModeIndicator();
-      updateDOM();
+      view.updateDOM();
     };
     const toggleContour = function() {
       enableContour = !enableContour;
       if (component !== null && component !== 0) {
-        updateDOM();
+        view.updateDOM();
       }
     };
     const changeMode = function(reverse) {
@@ -3951,7 +3997,7 @@ const compareUI = CompareUI({ compareUtil });
         component === null ? 0 :
         (reverse ? component + numOptions - 1 : component + 1) % numOptions;
       updateModeIndicator();
-      updateDOM();
+      view.updateDOM();
     };
     const changeModeReverse = function() {
       changeMode(/* reverse= */ true);
@@ -4219,51 +4265,6 @@ const compareUI = CompareUI({ compareUtil });
     return {};
   };
   const sideBar = SideBar({ view });
-  const updateDOM = function() {
-    view.updateRegistry();
-    if (view.empty()) {
-      viewZoom.disable();
-    } else {
-      viewZoom.enable();
-    }
-    for (const ent of entries) {
-        if (!ent.view) {
-          ent.view = $('<div class="imageBox"/>');
-          $('#drop').before(ent.view);
-        }
-        ent.view.find('.imageName').remove();
-        ent.view.append(
-            view.makeImageNameWithNumber('<span class="imageName">', ent).
-              click(function() {
-                view.toggleSingleView(ent.index);
-              }).append(
-                $('<button>').addClass('remove').text('×').
-                  click(function() { view.removeEntry(ent.index); })
-              )
-        );
-        if (ent.element) {
-          for (const modifier of entryViewModifiers) {
-            if (modifier(ent)) {
-              ent.view.find('.image').remove();
-              break;
-            }
-          }
-          if (0 === ent.view.find('.image').length) {
-            $(ent.element).addClass('image');
-            ent.view.prepend(ent.element);
-          }
-        }
-        if (ent.error) {
-          ent.view.addClass('error');
-          ent.visible = false;
-        }
-    }
-    for (const listener of onUpdateViewDOMListeners) {
-      listener();
-    }
-    view.resetMouseDrag();
-    view.updateLayout();
-  };
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
     const ua = window.navigator.userAgent.toLowerCase();
@@ -4294,13 +4295,13 @@ const compareUI = CompareUI({ compareUtil });
     entry.flippedX = leftTop.x !== 0;
     entry.flippedY = leftTop.y !== 0;
     //
-    updateDOM();
+    view.updateDOM();
     nowLoadingDialog.update();
   };
   const setEntryError = function(entry, message) {
     entry.loading = false;
     entry.error = message;
-    updateDOM();
+    view.updateDOM();
     nowLoadingDialog.update();
   };
   const setupEntryWithDataURI = function(entry, dataURI) {
@@ -4436,7 +4437,7 @@ const compareUI = CompareUI({ compareUtil });
       addFile(f);
     }
     view.resetLayoutState();
-    updateDOM();
+    view.updateDOM();
     nowLoadingDialog.update();
   };
 
@@ -4659,7 +4660,7 @@ const compareUI = CompareUI({ compareUtil });
           crossCursor.disable();
         } else if (altView.active()) {
           altView.reset();
-          updateDOM();
+          view.updateDOM();
         } else {
           view.resetLayoutState();
           view.resetMouseDrag();
@@ -4774,5 +4775,5 @@ $(function() {
   hud.initialize();
   colorHUD.initialize();
 
-  updateDOM();
+  view.updateDOM();
 });
