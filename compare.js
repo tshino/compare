@@ -1,7 +1,6 @@
 ﻿const compareUtil = CompareUtil(window);
 const compareUI = CompareUI({ compareUtil });
 
-  const entriesOnRemoveEntry = [];
   const cacheProperties = [];
   const setDragStateClass = compareUI.setDragStateClass;
   let drawImageAwareOfOrientation = false;
@@ -21,6 +20,7 @@ const compareUI = CompareUI({ compareUtil });
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
+    const entriesOnRemoveEntry = [];
     const entryViewModifiers = [];
     const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
@@ -57,6 +57,9 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
       return null;
+    };
+    const addOnRemoveEntry = function(listener) {
+      entriesOnRemoveEntry.push(listener);
     };
     const removeEntry = function(index) {
       const ent = entries[index];
@@ -482,7 +485,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
-    entriesOnRemoveEntry.push(onRemoveEntry);
+    addOnRemoveEntry(onRemoveEntry);
     return {
       empty: () => { return images.length === 0; },
       getImages: () => { return images; },
@@ -493,6 +496,7 @@ const compareUI = CompareUI({ compareUtil });
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
+      addOnRemoveEntry,
       removeEntry,
       resetBaseAndTargetImage,
       setBaseAndTargetImage,
@@ -707,7 +711,6 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
     };
-    entriesOnRemoveEntry.push(onRemoveEntry);
     const makePathDesc = function(img, x, y) {
       const pos = img.interpretXY(x, y);
       let desc = '';
@@ -898,6 +901,7 @@ const compareUI = CompareUI({ compareUtil });
         onUpdateCallback.forEach(function(val) { val(false); });
       }
     };
+    view.addOnRemoveEntry(onRemoveEntry);
     view.addOnUpdateImageBox(onUpdateImageBox);
     view.addOnUpdateEntryTransform(onUpdateEntryTransform);
     view.addOnUpdateTransform(onUpdateTransform);
@@ -1486,7 +1490,7 @@ const compareUI = CompareUI({ compareUtil });
   taskQueue.discardTasksOfEntryByIndex = function(index) {
     taskQueue.discardTasksOf(function(task) { return task.index.indexOf(index) !== -1; });
   };
-  entriesOnRemoveEntry.push(taskQueue.discardTasksOfEntryByIndex);
+  view.addOnRemoveEntry(taskQueue.discardTasksOfEntryByIndex);
 
   const makeModeSwitch = function(parent, initialValue, onchange, toggle) {
     let currentType = initialValue;
@@ -3123,7 +3127,6 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#toneCurveTable tr.figure td:not(.prop)').remove();
     };
-    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateAsync = function(baseImage, targetImage) {
       taskQueue.addTaskWithImageData({
           cmd:      'calcToneCurve',
@@ -3230,6 +3233,7 @@ const compareUI = CompareUI({ compareUtil });
     });
     cacheProperties.push('toneCurve');
     cacheProperties.push('toneCurveAxes');
+    view.addOnRemoveEntry(onRemoveEntry);
     return {
       toggle
     };
@@ -3350,7 +3354,6 @@ const compareUI = CompareUI({ compareUtil });
         pointedVector = null;
       }
     };
-    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateOptionsDOM = function() {
       $('#opticalFlowResult > *').remove();
       $('#opticalFlowDeltaX,#opticalFlowDeltaY').text('--');
@@ -3518,6 +3521,7 @@ const compareUI = CompareUI({ compareUtil });
       onOpen: function() { grid.setOnChange(updateTable); },
       onClose: function() { grid.setOnChange(null); }
     });
+    view.addOnRemoveEntry(onRemoveEntry);
     return {
       processClick,
       updateTable,
@@ -3598,7 +3602,6 @@ const compareUI = CompareUI({ compareUtil });
         diffResult.result = null;
       }
     };
-    entriesOnRemoveEntry.push(onRemoveEntry);
     const updateOptionsDOM = function(styles) {
       $('.diffDimension').css({display:'none'});
       $('#diffDetectedMaxAE').text('');
@@ -3837,6 +3840,7 @@ const compareUI = CompareUI({ compareUtil });
       onOpen: function() { grid.setOnChange(updateTable); },
       onClose: function() { grid.setOnChange(null); }
     });
+    view.addOnRemoveEntry(onRemoveEntry);
     return {
       updateTable,
       toggle
