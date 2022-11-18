@@ -67,21 +67,16 @@ const compareUI = CompareUI({ compareUtil });
     const removeEntry = function(index) {
       const ent = entries[index];
       if (ent && !ent.loading && ent.visible) {
-        ent.visible = false;
-        if (ent.element) {
-          $(ent.view).remove('.image');
-          ent.element = null;
-        }
         for (const onRemoveEntry of entriesOnRemoveEntry) {
           onRemoveEntry(index);
         }
         for (const propName of cacheProperties) {
           ent[propName] = null;
         }
+        ent.visible = false;
         ent.mainImage = null;
         ent.asCanvas = null;
         ent.imageData = null;
-        resetLayoutState();
         updateDOM();
       }
     };
@@ -127,12 +122,18 @@ const compareUI = CompareUI({ compareUtil });
       return targetImageIndex;
     };
     const onRemoveEntry = function(index) {
+      const ent = entries[index];
+      if (ent.element) {
+        $(ent.view).remove('.image');
+        ent.element = null;
+      }
       if (baseImageIndex === index) {
         baseImageIndex = null;
       }
       if (targetImageIndex === index) {
         targetImageIndex = null;
       }
+      resetLayoutState();
     };
     const getSelectedImageIndices = function() {
       const indices = [];
