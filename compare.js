@@ -1,7 +1,6 @@
 ﻿const compareUtil = CompareUtil(window);
 const compareUI = CompareUI({ compareUtil });
 
-  const cacheProperties = [];
   const setDragStateClass = compareUI.setDragStateClass;
   let drawImageAwareOfOrientation = false;
   compareUtil.drawImageAwareOfOrientation().then(
@@ -20,6 +19,7 @@ const compareUI = CompareUI({ compareUtil });
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
+    const cacheProperties = [];
     const entriesOnRemoveEntry = [];
     const entryViewModifiers = [];
     const onUpdateViewDOMListeners = [];
@@ -57,6 +57,9 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
       return null;
+    };
+    const addCacheProperty = function(propName) {
+      cacheProperties.push(propName);
     };
     const addOnRemoveEntry = function(listener) {
       entriesOnRemoveEntry.push(listener);
@@ -496,6 +499,7 @@ const compareUI = CompareUI({ compareUtil });
       numberFromIndex,
       indexFromNumber,
       findImageIndexOtherThan,
+      addCacheProperty,
       addOnRemoveEntry,
       removeEntry,
       resetBaseAndTargetImage,
@@ -1697,8 +1701,8 @@ const compareUI = CompareUI({ compareUtil });
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: figW / 2, h: figH / 2 }; }
     });
-    cacheProperties.push('histogramData');
-    cacheProperties.push('histogram');
+    view.addCacheProperty('histogramData');
+    view.addCacheProperty('histogram');
     return {
       processClick,
       toggle
@@ -1897,7 +1901,7 @@ const compareUI = CompareUI({ compareUtil });
       enableZoom: true, zoomXOnly: true, zoomInitX: 0,
       getBaseSize: function() { return { w: 320, h: figH }; }
     });
-    cacheProperties.push('waveform');
+    view.addCacheProperty('waveform');
     return {
       toggle
     };
@@ -2173,7 +2177,7 @@ const compareUI = CompareUI({ compareUtil });
         return false;
       }
     };
-    cacheProperties.push('vectorscope');
+    view.addCacheProperty('vectorscope');
     return {
       toggle,
       processKeyDown
@@ -2556,9 +2560,9 @@ const compareUI = CompareUI({ compareUtil });
       }
       return rotationInputFilter.processKeyDown(e);
     };
-    cacheProperties.push('colorTable');
-    cacheProperties.push('colorDist');
-    cacheProperties.push('colorDistAxes');
+    view.addCacheProperty('colorTable');
+    view.addCacheProperty('colorDist');
+    view.addCacheProperty('colorDistAxes');
     return {
       toggle,
       processKeyDown,
@@ -2798,9 +2802,9 @@ const compareUI = CompareUI({ compareUtil });
     rotationInputFilter.setDragStateCallback(function(dragging, horizontal) {
       setDragStateClass('#waveform3D', dragging, horizontal);
     });
-    cacheProperties.push('waveform3D');
-    cacheProperties.push('waveform3DFig');
-    cacheProperties.push('waveform3DFigAxes');
+    view.addCacheProperty('waveform3D');
+    view.addCacheProperty('waveform3DFig');
+    view.addCacheProperty('waveform3DFigAxes');
     return {
       toggle,
       processKeyDown: rotationInputFilter.processKeyDown,
@@ -2904,7 +2908,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const toggle = dialogUtil.defineDialog($('#colorFreq'), updateTable, toggleAnalysis);
-    cacheProperties.push('reducedColorTable');
+    view.addCacheProperty('reducedColorTable');
     return {
       toggle
     };
@@ -3231,8 +3235,8 @@ const compareUI = CompareUI({ compareUtil });
     const toggle = dialogUtil.defineDialog($('#toneCurve'), updateTable, toggleAnalysis, {
       enableZoom: true, getBaseSize: function() { return { w: 320, h: 320 }; }
     });
-    cacheProperties.push('toneCurve');
-    cacheProperties.push('toneCurveAxes');
+    view.addCacheProperty('toneCurve');
+    view.addCacheProperty('toneCurveAxes');
     view.addOnRemoveEntry(onRemoveEntry);
     return {
       toggle
