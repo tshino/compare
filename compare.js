@@ -14,7 +14,6 @@ const compareUI = CompareUI({ compareUtil });
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
     const entries = [];
-    let images = [];
     let baseImageIndex = null;
     let targetImageIndex = null;
     let backgroundColor = '#000000';
@@ -28,30 +27,45 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
-    const register = function(ent) {
-      ent.index = entries.length;
-      entries.push(ent);
-      return ent;
-    };
-    const updateRegistry = function() {
-      images = entries.filter(function(ent,i,a) { return ent.ready(); });
-    };
-    const numberFromIndex = function(index) {
-      for (let i = 0, img; img = images[i]; i++) {
-        if (img.index === index) {
-          return i + 1;
+    const registry = (function() {
+      let images = [];
+      const register = function(ent) {
+        ent.index = entries.length;
+        entries.push(ent);
+        return ent;
+      };
+      const updateRegistry = function() {
+        images = entries.filter(function(ent,i,a) { return ent.ready(); });
+      };
+      const numberFromIndex = function(index) {
+        for (let i = 0, img; img = images[i]; i++) {
+          if (img.index === index) {
+            return i + 1;
+          }
         }
-      }
-      return null;
-    };
-    const indexFromNumber = function(number) {
-      if (1 <= number && number <= images.length) {
-        return images[number - 1].index;
-      }
-      return null;
-    };
+        return null;
+      };
+      const indexFromNumber = function(number) {
+        if (1 <= number && number <= images.length) {
+          return images[number - 1].index;
+        }
+        return null;
+      };
+
+      return {
+        register,
+        updateRegistry,
+        getEntry: (index) => { return entries[index]; },
+        empty: () => { return images.length === 0; },
+        getImages: () => { return images; },
+        getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
+        numberFromIndex,
+        indexFromNumber
+      };
+    })();
+
     const findImageIndexOtherThan = function(index) {
-      for (const img of images) {
+      for (const img of registry.getImages()) {
         if (img.index !== index) {
           return img.index;
         }
@@ -81,7 +95,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const resetBaseAndTargetImage = function() {
-      baseImageIndex = baseImageIndex === null ? images[0].index : baseImageIndex;
+      baseImageIndex = baseImageIndex === null ? registry.getFrontIndex() : baseImageIndex;
       if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
         targetImageIndex = findImageIndexOtherThan(baseImageIndex);
       }
@@ -183,15 +197,16 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const flipSingleView = function(forward) {
-      if (0 < images.length) {
+      if (!registry.empty()) {
         const current = model.singleViewMode.current();
         let next;
         if (current !== null) {
-          const order = numberFromIndex(current) - 1;
+          const order = registry.numberFromIndex(current) - 1;
           next = forward ? order + 1 : order - 1;
         } else {
           next = forward ? 0 : -1;
         }
+        const images = registry.getImages();
         next = (next + images.length) % images.length;
         model.singleViewMode.start(images[next].index);
         updateLayout();
@@ -211,6 +226,7 @@ const compareUI = CompareUI({ compareUtil });
       updateLayout();
     };
     const toggleOverlay = function() {
+      const images = registry.getImages();
       if (!model.overlayMode.isActive() && 2 <= images.length) {
         const current = model.singleViewMode.current();
         if (current === null ||
@@ -262,7 +278,7 @@ const compareUI = CompareUI({ compareUtil });
       };
     };
     const makeImageNameWithNumber = function(tag, img) {
-      const number = numberFromIndex(img.index);
+      const number = registry.numberFromIndex(img.index);
       const elem = $(tag).css({ wordBreak : 'break-all' });
       if (number !== null) {
         elem.append($('<span class="imageIndex"/>').text(number));
@@ -333,6 +349,7 @@ const compareUI = CompareUI({ compareUtil });
       const indices = getSelectedImageIndices();
       $('#view').css({ flexDirection : layoutMode === 'x' ? 'row' : 'column' });
       $('#viewHud').css('width', param.viewW);
+      const images = registry.getImages();
       if (1 <= images.length && !dialogUtil.current()) {
         $('#navBox').show();
       } else {
@@ -412,8 +429,8 @@ const compareUI = CompareUI({ compareUtil });
       entryViewModifiers.push(modifier);
     };
     const updateDOM = function() {
-      updateRegistry();
-      if (images.length === 0) {
+      registry.updateRegistry();
+      if (registry.empty()) {
         viewZoom.disable();
       } else {
         viewZoom.enable();
@@ -491,14 +508,13 @@ const compareUI = CompareUI({ compareUtil });
     $('#next').click(function() { flipSingleView(true); });
     addOnRemoveEntry(onRemoveEntry);
     return {
-      empty: () => { return images.length === 0; },
-      getImages: () => { return images; },
-      getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
-      getEntry: (index) => { return entries[index]; },
-      register,
-      updateRegistry,
-      numberFromIndex,
-      indexFromNumber,
+      getEntry: registry.getEntry,
+      empty: registry.empty,
+      getImages: registry.getImages,
+      getFrontIndex: registry.getFrontIndex,
+      registry,
+      numberFromIndex: registry.numberFromIndex,
+      indexFromNumber: registry.indexFromNumber,
       findImageIndexOtherThan,
       addCacheProperty,
       addOnRemoveEntry,
@@ -4402,7 +4418,7 @@ const compareUI = CompareUI({ compareUtil });
 
             ready   : function() { return null !== this.element; }
       };
-      view.register(entry);
+      view.registry.register(entry);
       return entry;
   };
   const addCapturedImage = function(canvas) {
