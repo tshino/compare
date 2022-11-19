@@ -24,77 +24,7 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
-    const Registry = function() {
-      const entries = [];
-      let images = [];
-      const cacheProperties = [];
-      const onRemoveEntryListeners = [];
-      let onDidRemoveEntry = null;
-
-      const register = function(ent) {
-        ent.index = entries.length;
-        entries.push(ent);
-        return ent;
-      };
-      const update = function() {
-        images = entries.filter(function(ent,i,a) { return ent.ready(); });
-      };
-      const removeEntry = function(index) {
-        const ent = entries[index];
-        if (ent && !ent.loading && ent.visible) {
-          for (const listeners of onRemoveEntryListeners) {
-            listeners(index);
-          }
-          for (const propName of cacheProperties) {
-            ent[propName] = null;
-          }
-          ent.visible = false;
-          if (onDidRemoveEntry) {
-            onDidRemoveEntry();
-          }
-        }
-      };
-      const numberFromIndex = function(index) {
-        for (let i = 0, img; img = images[i]; i++) {
-          if (img.index === index) {
-            return i + 1;
-          }
-        }
-        return null;
-      };
-      const indexFromNumber = function(number) {
-        if (1 <= number && number <= images.length) {
-          return images[number - 1].index;
-        }
-        return null;
-      };
-      const addCacheProperty = function(propName) {
-        cacheProperties.push(propName);
-      };
-      const addOnRemoveEntry = function(listener) {
-        onRemoveEntryListeners.push(listener);
-      };
-      const setOnDidRemoveEntry = function(listener) {
-        onDidRemoveEntry = listener;
-      };
-
-      return {
-        register,
-        update,
-        removeEntry,
-        entries: () => entries,
-        getEntry: (index) => { return entries[index]; },
-        empty: () => { return images.length === 0; },
-        getImages: () => { return images; },
-        getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
-        numberFromIndex,
-        indexFromNumber,
-        addCacheProperty,
-        addOnRemoveEntry,
-        setOnDidRemoveEntry
-      };
-    };
-    const registry = Registry();
+    const registry = model.Registry();
 
     const findImageIndexOtherThan = function(index) {
       for (const img of registry.getImages()) {
