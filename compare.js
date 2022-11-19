@@ -18,8 +18,8 @@ const compareUI = CompareUI({ compareUtil });
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
-    const cacheProperties = [];
     const entriesOnRemoveEntry = [];
+    let onDidRemoveEntry = null;
     const entryViewModifiers = [];
     const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
@@ -29,13 +29,30 @@ const compareUI = CompareUI({ compareUtil });
 
     const registry = (function() {
       let images = [];
+      const cacheProperties = [];
+
       const register = function(ent) {
         ent.index = entries.length;
         entries.push(ent);
         return ent;
       };
-      const updateRegistry = function() {
+      const update = function() {
         images = entries.filter(function(ent,i,a) { return ent.ready(); });
+      };
+      const removeEntry = function(index) {
+        const ent = entries[index];
+        if (ent && !ent.loading && ent.visible) {
+          for (const onRemoveEntry of entriesOnRemoveEntry) {
+            onRemoveEntry(index);
+          }
+          for (const propName of cacheProperties) {
+            ent[propName] = null;
+          }
+          ent.visible = false;
+          if (onDidRemoveEntry) {
+            onDidRemoveEntry();
+          }
+        }
       };
       const numberFromIndex = function(index) {
         for (let i = 0, img; img = images[i]; i++) {
@@ -51,16 +68,21 @@ const compareUI = CompareUI({ compareUtil });
         }
         return null;
       };
+      const addCacheProperty = function(propName) {
+        cacheProperties.push(propName);
+      };
 
       return {
         register,
-        updateRegistry,
+        update,
+        removeEntry,
         getEntry: (index) => { return entries[index]; },
         empty: () => { return images.length === 0; },
         getImages: () => { return images; },
         getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
         numberFromIndex,
-        indexFromNumber
+        indexFromNumber,
+        addCacheProperty
       };
     })();
 
@@ -72,27 +94,11 @@ const compareUI = CompareUI({ compareUtil });
       }
       return null;
     };
-    const addCacheProperty = function(propName) {
-      cacheProperties.push(propName);
-    };
     const addOnRemoveEntry = function(listener) {
       entriesOnRemoveEntry.push(listener);
     };
-    const removeEntry = function(index) {
-      const ent = entries[index];
-      if (ent && !ent.loading && ent.visible) {
-        for (const onRemoveEntry of entriesOnRemoveEntry) {
-          onRemoveEntry(index);
-        }
-        for (const propName of cacheProperties) {
-          ent[propName] = null;
-        }
-        ent.visible = false;
-        ent.mainImage = null;
-        ent.asCanvas = null;
-        ent.imageData = null;
-        updateDOM();
-      }
+    const setOnDidRemoveEntry = function(listener) {
+      onDidRemoveEntry = listener;
     };
     const resetBaseAndTargetImage = function() {
       baseImageIndex = baseImageIndex === null ? registry.getFrontIndex() : baseImageIndex;
@@ -112,8 +118,9 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const changeBaseImage = function(index) {
-      if (index < entries.length &&
-          entries[index].ready() &&
+      const ent = registry.getEntry(index);
+      if (ent &&
+          ent.ready() &&
           baseImageIndex !== null &&
           baseImageIndex !== index) {
         setBaseAndTargetImage(index, null);
@@ -121,8 +128,9 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const changeTargetImage = function(index) {
-      if (index < entries.length &&
-          entries[index].ready() &&
+      const ent = registry.getEntry(index);
+      if (ent &&
+          ent.ready() &&
           baseImageIndex !== null && targetImageIndex !== null &&
           targetImageIndex !== index) {
         setBaseAndTargetImage(targetImageIndex, index);
@@ -136,7 +144,7 @@ const compareUI = CompareUI({ compareUtil });
       return targetImageIndex;
     };
     const onRemoveEntry = function(index) {
-      const ent = entries[index];
+      const ent = registry.getEntry(index);
       if (ent.element) {
         $(ent.view).remove('.image');
         ent.element = null;
@@ -173,7 +181,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const toSingleImageView = function(index) {
       const prev = model.singleViewMode.current();
-      if (index === null || !entries[index].visible) {
+      if (index === null || !registry.getEntry(index).visible) {
         model.singleViewMode.stop();
       } else {
         model.singleViewMode.start(index);
@@ -231,7 +239,7 @@ const compareUI = CompareUI({ compareUtil });
         const current = model.singleViewMode.current();
         if (current === null ||
             current === images[0].index ||
-            entries.length <= current) {
+            !registry.getEntry(current)) {
           model.singleViewMode.start(images[1].index);
         }
         model.overlayMode.start(images[0].index);
@@ -362,7 +370,7 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#view > div.imageBox').each(function(index) {
         const hide = model.singleViewMode.isActive() && 0 > indices.indexOf(index);
-        const img = entries[index];
+        const img = registry.getEntry(index);
         if (hide || !img || !img.visible) {
           $(this).css({ display : 'none' });
         } else {
@@ -412,8 +420,9 @@ const compareUI = CompareUI({ compareUtil });
     };
     const viewZoom = compareUtil.makeZoomController(updateTransform, {
       getBaseSize: function(index) {
-        if (entries[index] && entries[index].ready()) {
-          return { w: entries[index].baseWidth, h: entries[index].baseHeight };
+        const ent = registry.getEntry(index);
+        if (ent && ent.ready()) {
+          return { w: ent.baseWidth, h: ent.baseHeight };
         }
       }
     });
@@ -429,7 +438,7 @@ const compareUI = CompareUI({ compareUtil });
       entryViewModifiers.push(modifier);
     };
     const updateDOM = function() {
-      registry.updateRegistry();
+      registry.update();
       if (registry.empty()) {
         viewZoom.disable();
       } else {
@@ -447,7 +456,7 @@ const compareUI = CompareUI({ compareUtil });
                   toggleSingleView(ent.index);
                 }).append(
                   $('<button>').addClass('remove').text('×').
-                    click(function() { removeEntry(ent.index); })
+                    click(function() { registry.removeEntry(ent.index); })
                 )
           );
           if (ent.element) {
@@ -506,19 +515,23 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
+    setOnDidRemoveEntry(() => updateDOM());
     addOnRemoveEntry(onRemoveEntry);
+    registry.addCacheProperty('mainImage');
+    registry.addCacheProperty('asCanvas');
+    registry.addCacheProperty('imageData');
     return {
       getEntry: registry.getEntry,
       empty: registry.empty,
       getImages: registry.getImages,
       getFrontIndex: registry.getFrontIndex,
+      removeEntry: registry.removeEntry,
       registry,
       numberFromIndex: registry.numberFromIndex,
       indexFromNumber: registry.indexFromNumber,
       findImageIndexOtherThan,
-      addCacheProperty,
+      addCacheProperty: registry.addCacheProperty,
       addOnRemoveEntry,
-      removeEntry,
       resetBaseAndTargetImage,
       setBaseAndTargetImage,
       changeBaseImage,
