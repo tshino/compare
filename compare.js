@@ -18,8 +18,6 @@ const compareUI = CompareUI({ compareUtil });
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
-    const entriesOnRemoveEntry = [];
-    let onDidRemoveEntry = null;
     const entryViewModifiers = [];
     const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
@@ -30,6 +28,8 @@ const compareUI = CompareUI({ compareUtil });
     const registry = (function() {
       let images = [];
       const cacheProperties = [];
+      const onRemoveEntryListeners = [];
+      let onDidRemoveEntry = null;
 
       const register = function(ent) {
         ent.index = entries.length;
@@ -42,7 +42,7 @@ const compareUI = CompareUI({ compareUtil });
       const removeEntry = function(index) {
         const ent = entries[index];
         if (ent && !ent.loading && ent.visible) {
-          for (const onRemoveEntry of entriesOnRemoveEntry) {
+          for (const onRemoveEntry of onRemoveEntryListeners) {
             onRemoveEntry(index);
           }
           for (const propName of cacheProperties) {
@@ -71,6 +71,12 @@ const compareUI = CompareUI({ compareUtil });
       const addCacheProperty = function(propName) {
         cacheProperties.push(propName);
       };
+      const addOnRemoveEntry = function(listener) {
+        onRemoveEntryListeners.push(listener);
+      };
+      const setOnDidRemoveEntry = function(listener) {
+        onDidRemoveEntry = listener;
+      };
 
       return {
         register,
@@ -82,7 +88,9 @@ const compareUI = CompareUI({ compareUtil });
         getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
         numberFromIndex,
         indexFromNumber,
-        addCacheProperty
+        addCacheProperty,
+        addOnRemoveEntry,
+        setOnDidRemoveEntry
       };
     })();
 
@@ -93,12 +101,6 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
       return null;
-    };
-    const addOnRemoveEntry = function(listener) {
-      entriesOnRemoveEntry.push(listener);
-    };
-    const setOnDidRemoveEntry = function(listener) {
-      onDidRemoveEntry = listener;
     };
     const resetBaseAndTargetImage = function() {
       baseImageIndex = baseImageIndex === null ? registry.getFrontIndex() : baseImageIndex;
@@ -515,23 +517,24 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
-    setOnDidRemoveEntry(() => updateDOM());
-    addOnRemoveEntry(onRemoveEntry);
     registry.addCacheProperty('mainImage');
     registry.addCacheProperty('asCanvas');
     registry.addCacheProperty('imageData');
+    registry.addOnRemoveEntry(onRemoveEntry);
+    registry.setOnDidRemoveEntry(() => updateDOM());
+
     return {
       getEntry: registry.getEntry,
       empty: registry.empty,
       getImages: registry.getImages,
       getFrontIndex: registry.getFrontIndex,
       removeEntry: registry.removeEntry,
-      registry,
+      register: registry.register,
       numberFromIndex: registry.numberFromIndex,
       indexFromNumber: registry.indexFromNumber,
-      findImageIndexOtherThan,
       addCacheProperty: registry.addCacheProperty,
-      addOnRemoveEntry,
+      addOnRemoveEntry: registry.addOnRemoveEntry,
+      findImageIndexOtherThan,
       resetBaseAndTargetImage,
       setBaseAndTargetImage,
       changeBaseImage,
@@ -4431,7 +4434,7 @@ const compareUI = CompareUI({ compareUtil });
 
             ready   : function() { return null !== this.element; }
       };
-      view.registry.register(entry);
+      view.register(entry);
       return entry;
   };
   const addCapturedImage = function(canvas) {
