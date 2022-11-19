@@ -9,6 +9,66 @@ describe('CompareUI', () => {
     const compareUI = CompareUI({ compareUtil });
 
     describe('ViewModel', () => {
+        describe('Registry', () => {
+            describe('register', () => {
+                it('should append given new entry to internal array', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { hello: 'world' };
+                    assert.strictEqual(registry.getEntry(0), undefined);
+                    registry.register(ent0);
+
+                    assert.strictEqual(registry.getEntry(0), ent0);
+                });
+                it('should return given entry', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = {};
+                    const ret = registry.register(ent0);
+
+                    assert.strictEqual(ret, ent0);
+                });
+                it('should give index for each entry', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    const ent1 = { name: 'world' };
+                    registry.register(ent0);
+                    registry.register(ent1);
+
+                    assert.strictEqual(ent0.index, 0);
+                    assert.strictEqual(ent1.index, 1);
+                });
+            });
+            describe('update', () => {
+                it('should make active image list', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello', ready: () => false };
+                    const ent1 = { name: 'world', ready: () => true };
+                    registry.register(ent0);
+                    registry.register(ent1);
+                    registry.update();
+
+                    assert.strictEqual(registry.getImages().length, 1);
+                    assert.strictEqual(registry.getImages()[0], ent1);
+                });
+            });
+            describe('empty', () => {
+                it('should return true if there are no active images', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello', ready: () => false };
+                    const ent1 = { name: 'world', ready: () => true };
+                    registry.register(ent0);
+                    registry.register(ent1);
+                    registry.update();
+
+                    assert.strictEqual(registry.empty(), false);
+
+                    ent1.ready = () => false;
+                    registry.update();
+                    assert.strictEqual(registry.empty(), true);
+                });
+            });
+            // TODO: add more
+        });
+
         describe('singleViewMode', () => {
             it('should be inactive at initial state', () => {
                 const model = compareUI.ViewModel();
