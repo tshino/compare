@@ -13,7 +13,6 @@ const compareUI = CompareUI({ compareUtil });
   const View = function({ model }) {
     const IMAGEBOX_MIN_SIZE = 32;
     const IMAGEBOX_MARGIN_W = 6, IMAGEBOX_MARGIN_H = 76;
-    const entries = [];
     let baseImageIndex = null;
     let targetImageIndex = null;
     let backgroundColor = '#000000';
@@ -25,7 +24,8 @@ const compareUI = CompareUI({ compareUtil });
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
-    const registry = (function() {
+    const Registry = function() {
+      const entries = [];
       let images = [];
       const cacheProperties = [];
       const onRemoveEntryListeners = [];
@@ -42,8 +42,8 @@ const compareUI = CompareUI({ compareUtil });
       const removeEntry = function(index) {
         const ent = entries[index];
         if (ent && !ent.loading && ent.visible) {
-          for (const onRemoveEntry of onRemoveEntryListeners) {
-            onRemoveEntry(index);
+          for (const listeners of onRemoveEntryListeners) {
+            listeners(index);
           }
           for (const propName of cacheProperties) {
             ent[propName] = null;
@@ -82,6 +82,7 @@ const compareUI = CompareUI({ compareUtil });
         register,
         update,
         removeEntry,
+        entries: () => entries,
         getEntry: (index) => { return entries[index]; },
         empty: () => { return images.length === 0; },
         getImages: () => { return images; },
@@ -92,7 +93,8 @@ const compareUI = CompareUI({ compareUtil });
         addOnRemoveEntry,
         setOnDidRemoveEntry
       };
-    })();
+    };
+    const registry = Registry();
 
     const findImageIndexOtherThan = function(index) {
       for (const img of registry.getImages()) {
@@ -267,7 +269,7 @@ const compareUI = CompareUI({ compareUtil });
       return current !== null ? current : defaultIndex;
     };
     const makeImageLayoutParam = function() {
-      const numVisibleEntries = entries.filter(function(ent,i,a) { return ent.visible; }).length;
+      const numVisibleEntries = registry.entries().filter(function(ent,i,a) { return ent.visible; }).length;
       const numSlots = model.singleViewMode.isActive() ? 1 : Math.max(numVisibleEntries, 2);
       const layoutMode = model.layoutDirection.current();
       const numColumns = layoutMode === 'x' ? numSlots : 1;
@@ -405,13 +407,13 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const updateTransform = function(viewZoom) {
-      for (let i = 0, ent; ent = entries[i]; i++) {
+      for (const ent of registry.entries()) {
         if (ent.element) {
           const style = {
             left        : '50%',
             top         : '50%',
             transform   : 'translate(-50%, -50%) ' +
-                          viewZoom.makeTransform(i) +
+                          viewZoom.makeTransform(ent.index) +
                           ent.orientationAsCSS
           };
           $(ent.element).css(style);
@@ -446,7 +448,7 @@ const compareUI = CompareUI({ compareUtil });
       } else {
         viewZoom.enable();
       }
-      for (const ent of entries) {
+      for (const ent of registry.entries()) {
           if (!ent.view) {
             ent.view = $('<div class="imageBox"/>');
             $('#drop').before(ent.view);
