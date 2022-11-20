@@ -26,7 +26,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(ret, ent0);
                 });
-                it('should give index for each entry', () => {
+                it('should define index for each entry', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     const ent1 = { name: 'world' };
@@ -36,14 +36,24 @@ describe('CompareUI', () => {
                     assert.strictEqual(ent0.index, 0);
                     assert.strictEqual(ent1.index, 1);
                 });
+                it('should initialize some attributes', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+
+                    assert.strictEqual(ent0.element, null);
+                    assert.strictEqual(typeof(ent0.ready), 'function');
+                    assert.strictEqual(ent0.ready(), false);
+                });
             });
             describe('update', () => {
                 it('should make active image list', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'hello', ready: () => false };
-                    const ent1 = { name: 'world', ready: () => true };
+                    const ent0 = { name: 'hello' };
+                    const ent1 = { name: 'world' };
                     registry.register(ent0);
                     registry.register(ent1);
+                    ent1.element = {};
                     registry.update();
 
                     assert.strictEqual(registry.getImages().length, 1);
@@ -53,15 +63,16 @@ describe('CompareUI', () => {
             describe('empty', () => {
                 it('should return true if there are no active images', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'hello', ready: () => false };
-                    const ent1 = { name: 'world', ready: () => true };
+                    const ent0 = { name: 'hello' };
+                    const ent1 = { name: 'world' };
                     registry.register(ent0);
                     registry.register(ent1);
-                    registry.update();
 
+                    ent1.element = {};
+                    registry.update();
                     assert.strictEqual(registry.empty(), false);
 
-                    ent1.ready = () => false;
+                    ent1.element = null;
                     registry.update();
                     assert.strictEqual(registry.empty(), true);
                 });

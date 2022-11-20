@@ -4346,7 +4346,6 @@ const compareUI = CompareUI({ compareUtil });
             transposed      : false,
             orientationAsCSS    : '',
             view        : null,
-            element     : null,
             asCanvas    : null,
             imageData   : null,
             histogram   : null,
@@ -4362,9 +4361,7 @@ const compareUI = CompareUI({ compareUtil });
             loading     : true,
             progress    : 0,
             error       : null,
-            visible     : true,
-
-            ready   : function() { return null !== this.element; }
+            visible     : true
       };
       view.register(entry);
       return entry;

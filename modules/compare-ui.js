@@ -10,6 +10,8 @@ const CompareUI = function({ compareUtil }) {
 
             const register = function (ent) {
                 ent.index = entries.length;
+                ent.element = null;
+                ent.ready = function() { return null !== this.element; }
                 entries.push(ent);
                 return ent;
             };
