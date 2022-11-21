@@ -45,6 +45,14 @@ describe('CompareUI', () => {
                     assert.strictEqual(typeof(ent0.ready), 'function');
                     assert.strictEqual(ent0.ready(), false);
                 });
+                it('should retain some attributes with initial values', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'n', element: 'e' };
+                    registry.register(ent0);
+
+                    assert.strictEqual(ent0.name, 'n');
+                    assert.strictEqual(ent0.element, 'e');
+                });
             });
             describe('update', () => {
                 it('should make active image list', () => {
@@ -102,6 +110,45 @@ describe('CompareUI', () => {
                     ent1.element = null;
                     registry.update();
                     assert.strictEqual(registry.empty(), true);
+                });
+            });
+            describe('numberFromIndex', () => {
+                it('should lookup display number for an image', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello', element: {} }; // No.1
+                    const ent1 = { name: 'world', element: null };
+                    const ent2 = { name: 'bye', element: {} }; // No.2
+                    registry.register(ent0);
+                    registry.register(ent1);
+                    registry.register(ent2);
+                    registry.update();
+
+                    assert.strictEqual(registry.numberFromIndex(0), 1);
+                    assert.strictEqual(registry.numberFromIndex(1), null);
+                    assert.strictEqual(registry.numberFromIndex(2), 2);
+
+                    assert.strictEqual(registry.numberFromIndex(3), null);
+                    assert.strictEqual(registry.numberFromIndex(-1), null);
+                });
+            });
+            describe('indexFromNumber', () => {
+                it('should lookup image index by display number', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello', element: {} }; // No.1
+                    const ent1 = { name: 'world', element: null };
+                    const ent2 = { name: 'bye', element: {} }; // No.2
+                    registry.register(ent0);
+                    registry.register(ent1);
+                    registry.register(ent2);
+                    registry.update();
+
+                    // console.log(JSON.stringify(registry.getImages()));
+                    assert.strictEqual(registry.indexFromNumber(1), 0);
+                    assert.strictEqual(registry.indexFromNumber(2), 2);
+
+                    assert.strictEqual(registry.indexFromNumber(0), null);
+                    assert.strictEqual(registry.indexFromNumber(3), null);
+                    assert.strictEqual(registry.indexFromNumber(-1), null);
                 });
             });
             // TODO: add more
