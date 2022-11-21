@@ -77,6 +77,15 @@ describe('CompareUI', () => {
                     assert.strictEqual(ent0.element, null);
                     assert.strictEqual(ent0.visible, false);
                 });
+                it('should call onDidRemoveEntry callback', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const log = [];
+                    registry.setOnDidRemoveEntry(() => { log.push('called'); });
+                    const ent0 = { name: 'hello', element: {}, visible: true };
+                    registry.register(ent0);
+                    registry.removeEntry(ent0.index);
+                    assert.deepStrictEqual(log, ['called']);
+                });
             });
             describe('empty', () => {
                 it('should return true if there are no active images', () => {
