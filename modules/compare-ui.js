@@ -28,6 +28,7 @@ const CompareUI = function({ compareUtil }) {
                         ent[propName] = null;
                     }
                     ent.visible = false;
+                    ent.element = null;
                     if (onDidRemoveEntry) {
                         onDidRemoveEntry();
                     }

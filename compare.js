@@ -79,9 +79,8 @@ const compareUI = CompareUI({ compareUtil });
     };
     const onRemoveEntry = function(index) {
       const ent = registry.getEntry(index);
-      if (ent.element) {
+      if (ent.view) {
         $(ent.view).remove('.image');
-        ent.element = null;
       }
       if (baseImageIndex === index) {
         baseImageIndex = null;

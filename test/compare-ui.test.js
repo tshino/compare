@@ -26,7 +26,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(ret, ent0);
                 });
-                it('should define index for each entry', () => {
+                it('should assign ascending index for each entry', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     const ent1 = { name: 'world' };
@@ -58,6 +58,24 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(registry.getImages().length, 1);
                     assert.strictEqual(registry.getImages()[0], ent1);
+                });
+            });
+            describe('removeEntry', () => {
+                it('should deactivate an active image', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    ent0.visible = true; // FIXME:
+                    ent0.element = {};
+                    registry.update();
+
+                    assert.strictEqual(registry.getImages().length, 1);
+                    registry.removeEntry(ent0.index);
+                    registry.update();
+
+                    assert.strictEqual(registry.getImages().length, 0);
+                    assert.strictEqual(ent0.element, null);
+                    assert.strictEqual(ent0.visible, false);
                 });
             });
             describe('empty', () => {
