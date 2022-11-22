@@ -4359,8 +4359,7 @@ const compareUI = CompareUI({ compareUtil });
             toneCurve   : null,
             loading     : true,
             progress    : 0,
-            error       : null,
-            visible     : true
+            error       : null
       };
       view.register(entry);
       return entry;

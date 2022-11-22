@@ -41,6 +41,7 @@ describe('CompareUI', () => {
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
 
+                    assert.strictEqual(ent0.visible, true);
                     assert.strictEqual(ent0.element, null);
                     assert.strictEqual(typeof(ent0.ready), 'function');
                     assert.strictEqual(ent0.ready(), false);
@@ -73,7 +74,6 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    ent0.visible = true; // FIXME:
                     ent0.element = {};
                     registry.update();
 
@@ -89,7 +89,7 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const log = [];
                     registry.setOnDidRemoveEntry(() => { log.push('called'); });
-                    const ent0 = { name: 'hello', element: {}, visible: true };
+                    const ent0 = { name: 'hello', element: {} };
                     registry.register(ent0);
                     registry.removeEntry(ent0.index);
                     assert.deepStrictEqual(log, ['called']);
@@ -142,7 +142,6 @@ describe('CompareUI', () => {
                     registry.register(ent2);
                     registry.update();
 
-                    // console.log(JSON.stringify(registry.getImages()));
                     assert.strictEqual(registry.indexFromNumber(1), 0);
                     assert.strictEqual(registry.indexFromNumber(2), 2);
 

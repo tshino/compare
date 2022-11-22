@@ -13,6 +13,7 @@ const CompareUI = function({ compareUtil }) {
                 if (ent.element === undefined) {
                     ent.element = null;
                 }
+                ent.visible = true;
                 ent.ready = function() { return null !== this.element; }
                 entries.push(ent);
                 return ent;
