@@ -52,9 +52,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const changeBaseImage = function(index) {
-      const ent = registry.getEntry(index);
-      if (ent &&
-          ent.ready() &&
+      if (registry.ready(index) &&
           baseImageIndex !== null &&
           baseImageIndex !== index) {
         setBaseAndTargetImage(index, null);
@@ -62,9 +60,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const changeTargetImage = function(index) {
-      const ent = registry.getEntry(index);
-      if (ent &&
-          ent.ready() &&
+      if (registry.ready(index) &&
           baseImageIndex !== null && targetImageIndex !== null &&
           targetImageIndex !== index) {
         setBaseAndTargetImage(targetImageIndex, index);
@@ -353,8 +349,8 @@ const compareUI = CompareUI({ compareUtil });
     };
     const viewZoom = compareUtil.makeZoomController(updateTransform, {
       getBaseSize: function(index) {
-        const ent = registry.getEntry(index);
-        if (ent && ent.ready()) {
+        if (registry.ready(index)) {
+          const ent = registry.getEntry(index);
           return { w: ent.baseWidth, h: ent.baseHeight };
         }
       }
@@ -459,6 +455,7 @@ const compareUI = CompareUI({ compareUtil });
       getImages: registry.getImages,
       getFrontIndex: registry.getFrontIndex,
       register: registry.register,
+      ready: registry.ready,
       setError: registry.setError,
       removeEntry: registry.removeEntry,
       numberFromIndex: registry.numberFromIndex,
@@ -828,7 +825,7 @@ const compareUI = CompareUI({ compareUtil });
       if (enableCrossCursor && !fixedPosition) {
         const index = selector ? $(selector).index($(target).parent()) : null;
         const pos = viewZoom.positionFromMouseEvent(e, target, index);
-        if (index !== null && view.getEntry(index).ready() && pos) {
+        if (view.ready(index) && pos) {
           const ent = view.getEntry(index);
           const x = pos.x * ent.width;
           const y = pos.y * ent.height;
@@ -4500,7 +4497,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     dialogUtil.addObserver(updateNavBox, updateNavBox);
     viewZoom.setPointCallback(function(e) {
-      if (view.getEntry(e.index).ready()) {
+      if (view.ready(e.index)) {
         crossCursor.enable();
         crossCursor.processClick(e);
       }

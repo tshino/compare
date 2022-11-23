@@ -10,13 +10,15 @@ const CompareUI = function({ compareUtil }) {
 
             const register = function (ent) {
                 ent.index = entries.length;
-                if (ent.element === undefined) {
-                    ent.element = null;
-                }
+                ent.element = ent.element || null;
                 ent.visible = true;
                 ent.ready = function() { return null !== this.element; }
                 entries.push(ent);
                 return ent;
+            };
+            const ready = function(index) {
+                const ent = entries[index];
+                return (ent && ent.ready()) || false;
             };
             const setError = function(index, message) {
                 const ent = entries[index];
@@ -69,6 +71,7 @@ const CompareUI = function({ compareUtil }) {
 
             return {
                 register,
+                ready,
                 setError,
                 update,
                 removeEntry,
@@ -462,8 +465,9 @@ const CompareUI = function({ compareUtil }) {
             if (enableMap) {
                 if (!view.empty()) {
                     const index = view.getCurrentIndexOr(0);
-                    const entry = view.getEntry(index);
-                    const img = entry.ready() ? entry : view.getImages()[0];
+                    const img = view.getEntry(
+                        view.ready(index) ? index : view.getFrontIndex()
+                    );
                     updateMap(img);
                 }
             }

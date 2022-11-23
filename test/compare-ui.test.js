@@ -43,8 +43,6 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(ent0.visible, true);
                     assert.strictEqual(ent0.element, null);
-                    assert.strictEqual(typeof(ent0.ready), 'function');
-                    assert.strictEqual(ent0.ready(), false);
                 });
                 it('should retain some attributes with initial values', () => {
                     const registry = compareUI.ViewModel().Registry();
@@ -53,6 +51,17 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(ent0.name, 'n');
                     assert.strictEqual(ent0.element, 'e');
+                });
+            });
+            describe('ready', () => {
+                it('should return true if specified image is active', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.register({ name: 'hello', element: {} });
+                    registry.register({ name: 'world' });
+
+                    assert.strictEqual(registry.ready(0), true);
+                    assert.strictEqual(registry.ready(1), false);
+                    assert.strictEqual(registry.ready(null), false);
                 });
             });
             describe('setError', () => {
