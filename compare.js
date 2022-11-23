@@ -406,7 +406,6 @@ const compareUI = CompareUI({ compareUtil });
           }
           if (ent.error) {
             ent.view.addClass('error');
-            ent.visible = false;
           }
       }
       for (const listener of onUpdateViewDOMListeners) {
@@ -459,8 +458,9 @@ const compareUI = CompareUI({ compareUtil });
       empty: registry.empty,
       getImages: registry.getImages,
       getFrontIndex: registry.getFrontIndex,
-      removeEntry: registry.removeEntry,
       register: registry.register,
+      setError: registry.setError,
+      removeEntry: registry.removeEntry,
       numberFromIndex: registry.numberFromIndex,
       indexFromNumber: registry.indexFromNumber,
       addCacheProperty: registry.addCacheProperty,
@@ -4271,8 +4271,7 @@ const compareUI = CompareUI({ compareUtil });
     nowLoadingDialog.update();
   };
   const setEntryError = function(entry, message) {
-    entry.loading = false;
-    entry.error = message;
+    view.setError(entry.index, message);
     view.updateDOM();
     nowLoadingDialog.update();
   };

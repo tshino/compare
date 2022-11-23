@@ -18,6 +18,12 @@ const CompareUI = function({ compareUtil }) {
                 entries.push(ent);
                 return ent;
             };
+            const setError = function(index, message) {
+                const ent = entries[index];
+                ent.error = message;
+                ent.loading = false;
+                ent.visible = false;
+            };
             const update = function () {
                 images = entries.filter(function (ent, i, a) { return ent.ready(); });
             };
@@ -63,6 +69,7 @@ const CompareUI = function({ compareUtil }) {
 
             return {
                 register,
+                setError,
                 update,
                 removeEntry,
                 entries: () => entries,

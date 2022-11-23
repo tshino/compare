@@ -55,6 +55,18 @@ describe('CompareUI', () => {
                     assert.strictEqual(ent0.element, 'e');
                 });
             });
+            describe('setError', () => {
+                it('should set flag on image with error', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello', element: {} };
+                    registry.register(ent0);
+                    registry.setError(ent0.index, 'error!');
+
+                    assert.strictEqual(ent0.error, 'error!');
+                    assert.strictEqual(ent0.loading, false);
+                    assert.strictEqual(ent0.visible, false);
+                });
+            });
             describe('update', () => {
                 it('should make active image list', () => {
                     const registry = compareUI.ViewModel().Registry();
