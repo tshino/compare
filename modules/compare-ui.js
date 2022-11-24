@@ -24,6 +24,9 @@ const CompareUI = function({ compareUtil }) {
                 const ent = entries[index];
                 return (ent && ent.visible) || false;
             };
+            const numVisibleEntries = function() {
+                return entries.filter(ent => ent.visible).length;
+            };
             const setError = function(index, message) {
                 const ent = entries[index];
                 ent.error = message;
@@ -77,6 +80,7 @@ const CompareUI = function({ compareUtil }) {
                 register,
                 ready,
                 visible,
+                numVisibleEntries,
                 setError,
                 update,
                 removeEntry,

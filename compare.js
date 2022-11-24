@@ -194,7 +194,7 @@ const compareUI = CompareUI({ compareUtil });
       return current !== null ? current : defaultIndex;
     };
     const makeImageLayoutParam = function() {
-      const numVisibleEntries = registry.entries().filter(function(ent,i,a) { return ent.visible; }).length;
+      const numVisibleEntries = registry.numVisibleEntries();
       const numSlots = model.singleViewMode.isActive() ? 1 : Math.max(numVisibleEntries, 2);
       const layoutMode = model.layoutDirection.current();
       const numColumns = layoutMode === 'x' ? numSlots : 1;

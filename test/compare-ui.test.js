@@ -56,11 +56,17 @@ describe('CompareUI', () => {
             describe('ready', () => {
                 it('should return true if specified image is active', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    registry.register({ name: 'hello', element: {} });
-                    registry.register({ name: 'world' });
+                    registry.register({ name: 'loading' });
+                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'error' });
+                    registry.register({ name: 'removed', element: {} });
+                    registry.setError(2, 'error!')
+                    registry.removeEntry(3);
 
-                    assert.strictEqual(registry.ready(0), true);
-                    assert.strictEqual(registry.ready(1), false);
+                    assert.strictEqual(registry.ready(0), false);
+                    assert.strictEqual(registry.ready(1), true);
+                    assert.strictEqual(registry.ready(2), false);
+                    assert.strictEqual(registry.ready(3), false);
                     assert.strictEqual(registry.ready(null), false);
                 });
             });
@@ -79,6 +85,19 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.visible(2), false);
                     assert.strictEqual(registry.visible(3), false);
                     assert.strictEqual(registry.visible(null), false);
+                });
+            });
+            describe('numVisibleEntries', () => {
+                it('should return the number of visible entries', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.register({ name: 'loading' });
+                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'error' });
+                    registry.register({ name: 'removed', element: {} });
+                    registry.setError(2, 'error!')
+                    registry.removeEntry(3);
+
+                    assert.strictEqual(registry.numVisibleEntries(), 2);
                 });
             });
             describe('setError', () => {
