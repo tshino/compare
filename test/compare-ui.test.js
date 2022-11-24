@@ -64,6 +64,23 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.ready(null), false);
                 });
             });
+            describe('visible', () => {
+                it('should return true if specified image is visible', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.register({ name: 'loading' });
+                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'error' });
+                    registry.register({ name: 'removed', element: {} });
+                    registry.setError(2, 'error!')
+                    registry.removeEntry(3);
+
+                    assert.strictEqual(registry.visible(0), true);
+                    assert.strictEqual(registry.visible(1), true);
+                    assert.strictEqual(registry.visible(2), false);
+                    assert.strictEqual(registry.visible(3), false);
+                    assert.strictEqual(registry.visible(null), false);
+                });
+            });
             describe('setError', () => {
                 it('should set flag on image with error', () => {
                     const registry = compareUI.ViewModel().Registry();

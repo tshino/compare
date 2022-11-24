@@ -110,7 +110,7 @@ const compareUI = CompareUI({ compareUtil });
     };
     const toSingleImageView = function(index) {
       const prev = model.singleViewMode.current();
-      if (index === null || !registry.getEntry(index).visible) {
+      if (!registry.visible(index)) {
         model.singleViewMode.stop();
       } else {
         model.singleViewMode.start(index);
@@ -299,10 +299,10 @@ const compareUI = CompareUI({ compareUtil });
       }
       $('#view > div.imageBox').each(function(index) {
         const hide = model.singleViewMode.isActive() && 0 > indices.indexOf(index);
-        const img = registry.getEntry(index);
-        if (hide || !img || !img.visible) {
+        if (hide || !registry.visible(index)) {
           $(this).css({ display : 'none' });
         } else {
+          const img = registry.getEntry(index);
           updateImageBox(this, img, param.boxW, param.boxH);
         }
       });

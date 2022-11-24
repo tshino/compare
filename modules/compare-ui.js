@@ -20,6 +20,10 @@ const CompareUI = function({ compareUtil }) {
                 const ent = entries[index];
                 return (ent && ent.ready()) || false;
             };
+            const visible = function(index) {
+                const ent = entries[index];
+                return (ent && ent.visible) || false;
+            };
             const setError = function(index, message) {
                 const ent = entries[index];
                 ent.error = message;
@@ -72,6 +76,7 @@ const CompareUI = function({ compareUtil }) {
             return {
                 register,
                 ready,
+                visible,
                 setError,
                 update,
                 removeEntry,
