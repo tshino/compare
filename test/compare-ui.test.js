@@ -100,15 +100,29 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.numVisibleEntries(), 2);
                 });
             });
+            describe('setImage', () => {
+                it('should set given image element', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    registry.setImage(ent0.index, 'dummy-image');
+
+                    assert.strictEqual(ent0.loading, false);
+                    assert.strictEqual(ent0.element, 'dummy-image');
+                    assert.strictEqual(registry.ready(ent0.index), true);
+                    assert.strictEqual(registry.visible(ent0.index), true);
+                });
+            });
             describe('setError', () => {
                 it('should set flag on image with error', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'hello', element: {} };
+                    const ent0 = { name: 'hello' };
                     registry.register(ent0);
                     registry.setError(ent0.index, 'error!');
 
-                    assert.strictEqual(ent0.error, 'error!');
                     assert.strictEqual(ent0.loading, false);
+                    assert.strictEqual(ent0.error, 'error!');
+                    assert.strictEqual(registry.ready(ent0.index), false);
                     assert.strictEqual(registry.visible(ent0.index), false);
                 });
             });

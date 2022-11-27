@@ -27,6 +27,12 @@ const CompareUI = function({ compareUtil }) {
             const numVisibleEntries = function() {
                 return entries.filter(ent => ent._visible).length;
             };
+            const setImage = function(index, image) {
+                const ent = entries[index];
+                ent.loading = false;
+                ent.mainImage = image;
+                ent.element = image;
+            };
             const setError = function(index, message) {
                 const ent = entries[index];
                 ent.error = message;
@@ -46,6 +52,7 @@ const CompareUI = function({ compareUtil }) {
                         ent[propName] = null;
                     }
                     ent._visible = false;
+                    ent.mainImage = null;
                     ent.element = null;
                     if (onDidRemoveEntry) {
                         onDidRemoveEntry();
@@ -81,6 +88,7 @@ const CompareUI = function({ compareUtil }) {
                 ready,
                 visible,
                 numVisibleEntries,
+                setImage,
                 setError,
                 update,
                 removeEntry,

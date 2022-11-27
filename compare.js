@@ -443,7 +443,6 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
-    registry.addCacheProperty('mainImage');
     registry.addCacheProperty('asCanvas');
     registry.addCacheProperty('imageData');
     registry.addOnRemoveEntry(onRemoveEntry);
@@ -456,6 +455,7 @@ const compareUI = CompareUI({ compareUtil });
       getFrontIndex: registry.getFrontIndex,
       register: registry.register,
       ready: registry.ready,
+      setImage: registry.setImage,
       setError: registry.setError,
       removeEntry: registry.removeEntry,
       numberFromIndex: registry.numberFromIndex,
@@ -4241,10 +4241,9 @@ const compareUI = CompareUI({ compareUtil });
   })();
   const nowLoadingDialog = NowLoadingDialog();
   const setEntryImage = function(entry, image, w, h) {
+    view.setImage(entry.index, image);
     const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
     entry.altViewMode = null;
-    entry.mainImage  = image;
-    entry.element    = entry.mainImage;
     entry.asCanvas   = canvas;
     entry.canvasWidth   = w;
     entry.canvasHeight  = h;
@@ -4252,7 +4251,6 @@ const compareUI = CompareUI({ compareUtil });
     entry.transposed = compareUtil.orientationUtil.isTransposed(entry.orientation);
     entry.width = entry.transposed ? h : w;
     entry.height = entry.transposed ? w : h;
-    entry.loading    = false;
     entry.progress   = 100;
     entry.interpretXY = function(x, y) {
       return compareUtil.orientationUtil.interpretXY(entry.orientation, w, h, x, y);
