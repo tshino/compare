@@ -41,7 +41,7 @@ describe('CompareUI', () => {
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
 
-                    assert.strictEqual(ent0.visible, true);
+                    assert.strictEqual(registry.visible(ent0.index), true);
                     assert.strictEqual(ent0.element, null);
                 });
                 it('should retain some attributes with initial values', () => {
@@ -109,7 +109,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(ent0.error, 'error!');
                     assert.strictEqual(ent0.loading, false);
-                    assert.strictEqual(ent0.visible, false);
+                    assert.strictEqual(registry.visible(ent0.index), false);
                 });
             });
             describe('update', () => {
@@ -140,7 +140,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(registry.getImages().length, 0);
                     assert.strictEqual(ent0.element, null);
-                    assert.strictEqual(ent0.visible, false);
+                    assert.strictEqual(registry.visible(ent0.index), false);
                 });
                 it('should call onDidRemoveEntry callback', () => {
                     const registry = compareUI.ViewModel().Registry();

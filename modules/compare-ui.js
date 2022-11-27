@@ -11,7 +11,7 @@ const CompareUI = function({ compareUtil }) {
             const register = function (ent) {
                 ent.index = entries.length;
                 ent.element = ent.element || null;
-                ent.visible = true;
+                ent._visible = true;
                 ent.ready = function() { return null !== this.element; }
                 entries.push(ent);
                 return ent;
@@ -22,30 +22,30 @@ const CompareUI = function({ compareUtil }) {
             };
             const visible = function(index) {
                 const ent = entries[index];
-                return (ent && ent.visible) || false;
+                return (ent && ent._visible) || false;
             };
             const numVisibleEntries = function() {
-                return entries.filter(ent => ent.visible).length;
+                return entries.filter(ent => ent._visible).length;
             };
             const setError = function(index, message) {
                 const ent = entries[index];
                 ent.error = message;
                 ent.loading = false;
-                ent.visible = false;
+                ent._visible = false;
             };
             const update = function () {
                 images = entries.filter(function (ent, i, a) { return ent.ready(); });
             };
             const removeEntry = function (index) {
                 const ent = entries[index];
-                if (ent && !ent.loading && ent.visible) {
+                if (ent && !ent.loading && ent._visible) {
                     for (const listeners of onRemoveEntryListeners) {
                         listeners(index);
                     }
                     for (const propName of cacheProperties) {
                         ent[propName] = null;
                     }
-                    ent.visible = false;
+                    ent._visible = false;
                     ent.element = null;
                     if (onDidRemoveEntry) {
                         onDidRemoveEntry();
