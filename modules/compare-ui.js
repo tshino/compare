@@ -33,6 +33,10 @@ const CompareUI = function({ compareUtil }) {
                 ent.mainImage = image;
                 ent.element = image;
             };
+            const setAltImage = function(index, image) {
+                const ent = entries[index];
+                ent.element = image || ent.mainImage;
+            };
             const setError = function(index, message) {
                 const ent = entries[index];
                 ent.error = message;
@@ -89,6 +93,7 @@ const CompareUI = function({ compareUtil }) {
                 visible,
                 numVisibleEntries,
                 setImage,
+                setAltImage,
                 setError,
                 update,
                 removeEntry,

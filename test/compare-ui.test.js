@@ -101,16 +101,37 @@ describe('CompareUI', () => {
                 });
             });
             describe('setImage', () => {
-                it('should set given image element', () => {
+                it('should set given element as main image', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    registry.setImage(ent0.index, 'dummy-image');
+                    registry.setImage(ent0.index, 'main-image');
 
                     assert.strictEqual(ent0.loading, false);
-                    assert.strictEqual(ent0.element, 'dummy-image');
+                    assert.strictEqual(ent0.element, 'main-image');
                     assert.strictEqual(registry.ready(ent0.index), true);
                     assert.strictEqual(registry.visible(ent0.index), true);
+                });
+            });
+            describe('setAltImage', () => {
+                it('should set given element as alternative image', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    registry.setImage(ent0.index, 'main-image');
+                    registry.setAltImage(ent0.index, 'alt-image');
+
+                    assert.strictEqual(ent0.element, 'alt-image');
+                });
+                it('should restore main image if null is given', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    registry.setImage(ent0.index, 'main-image');
+                    registry.setAltImage(ent0.index, 'alt-image');
+                    registry.setAltImage(ent0.index, null);
+
+                    assert.strictEqual(ent0.element, 'main-image');
                 });
             });
             describe('setError', () => {

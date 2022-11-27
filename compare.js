@@ -456,6 +456,7 @@ const compareUI = CompareUI({ compareUtil });
       register: registry.register,
       ready: registry.ready,
       setImage: registry.setImage,
+      setAltImage: registry.setAltImage,
       setError: registry.setError,
       removeEntry: registry.removeEntry,
       numberFromIndex: registry.numberFromIndex,
@@ -4135,7 +4136,7 @@ const compareUI = CompareUI({ compareUtil });
       const mode = currentMode();
       if (ent.altViewMode !== mode) {
         const altImage = getAltImage(ent);
-        ent.element = altImage ? altImage.image : ent.mainImage;
+        view.setAltImage(ent.index, altImage ? altImage.image : null);
         ent.contour = altImage ? altImage.contour : null;
         ent.altViewMode = altImage ? mode : null;
         return true;
