@@ -44,23 +44,17 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.visible(ent0.index), true);
                     assert.strictEqual(ent0.element, null);
                 });
-                it('should retain some attributes with initial values', () => {
-                    const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'n', element: 'e' };
-                    registry.register(ent0);
-
-                    assert.strictEqual(ent0.name, 'n');
-                    assert.strictEqual(ent0.element, 'e');
-                });
             });
             describe('ready', () => {
                 it('should return true if specified image is active', () => {
                     const registry = compareUI.ViewModel().Registry();
                     registry.register({ name: 'loading' });
-                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'ready' });
                     registry.register({ name: 'error' });
-                    registry.register({ name: 'removed', element: {} });
-                    registry.setError(2, 'error!')
+                    registry.register({ name: 'removed' });
+                    registry.setImage(1, {});
+                    registry.setError(2, 'error!');
+                    registry.setImage(3, {});
                     registry.removeEntry(3);
 
                     assert.strictEqual(registry.ready(0), false);
@@ -74,10 +68,12 @@ describe('CompareUI', () => {
                 it('should return true if specified image is visible', () => {
                     const registry = compareUI.ViewModel().Registry();
                     registry.register({ name: 'loading' });
-                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'ready' });
                     registry.register({ name: 'error' });
-                    registry.register({ name: 'removed', element: {} });
-                    registry.setError(2, 'error!')
+                    registry.register({ name: 'removed' });
+                    registry.setImage(1, {});
+                    registry.setError(2, 'error!');
+                    registry.setImage(3, {});
                     registry.removeEntry(3);
 
                     assert.strictEqual(registry.visible(0), true);
@@ -91,10 +87,12 @@ describe('CompareUI', () => {
                 it('should return the number of visible entries', () => {
                     const registry = compareUI.ViewModel().Registry();
                     registry.register({ name: 'loading' });
-                    registry.register({ name: 'ready', element: {} });
+                    registry.register({ name: 'ready' });
                     registry.register({ name: 'error' });
-                    registry.register({ name: 'removed', element: {} });
-                    registry.setError(2, 'error!')
+                    registry.register({ name: 'removed' });
+                    registry.setImage(1, {});
+                    registry.setError(2, 'error!');
+                    registry.setImage(3, {});
                     registry.removeEntry(3);
 
                     assert.strictEqual(registry.numVisibleEntries(), 2);
@@ -154,7 +152,7 @@ describe('CompareUI', () => {
                     const ent1 = { name: 'world' };
                     registry.register(ent0);
                     registry.register(ent1);
-                    ent1.element = {};
+                    registry.setImage(ent1.index, {});
                     registry.update();
 
                     assert.strictEqual(registry.getImages().length, 1);
@@ -166,7 +164,7 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    ent0.element = {};
+                    registry.setImage(ent0.index, {});
                     registry.update();
 
                     assert.strictEqual(registry.getImages().length, 1);
@@ -181,8 +179,9 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const log = [];
                     registry.setOnDidRemoveEntry(() => { log.push('called'); });
-                    const ent0 = { name: 'hello', element: {} };
+                    const ent0 = { name: 'hello' };
                     registry.register(ent0);
+                    registry.setImage(ent0.index, {});
                     registry.removeEntry(ent0.index);
                     assert.deepStrictEqual(log, ['called']);
                 });
@@ -195,11 +194,11 @@ describe('CompareUI', () => {
                     registry.register(ent0);
                     registry.register(ent1);
 
-                    ent1.element = {};
+                    registry.setImage(ent1.index, {});
                     registry.update();
                     assert.strictEqual(registry.empty(), false);
 
-                    ent1.element = null;
+                    registry.removeEntry(ent1.index);
                     registry.update();
                     assert.strictEqual(registry.empty(), true);
                 });
@@ -207,12 +206,14 @@ describe('CompareUI', () => {
             describe('numberFromIndex', () => {
                 it('should lookup display number for an image', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'hello', element: {} }; // No.1
-                    const ent1 = { name: 'world', element: null };
-                    const ent2 = { name: 'bye', element: {} }; // No.2
+                    const ent0 = { name: 'hello' };
+                    const ent1 = { name: 'world' };
+                    const ent2 = { name: 'bye' };
                     registry.register(ent0);
                     registry.register(ent1);
                     registry.register(ent2);
+                    registry.setImage(ent0.index, {}); // No.1
+                    registry.setImage(ent2.index, {}); // No.2
                     registry.update();
 
                     assert.strictEqual(registry.numberFromIndex(0), 1);
@@ -226,12 +227,14 @@ describe('CompareUI', () => {
             describe('indexFromNumber', () => {
                 it('should lookup image index by display number', () => {
                     const registry = compareUI.ViewModel().Registry();
-                    const ent0 = { name: 'hello', element: {} }; // No.1
-                    const ent1 = { name: 'world', element: null };
-                    const ent2 = { name: 'bye', element: {} }; // No.2
+                    const ent0 = { name: 'hello' };
+                    const ent1 = { name: 'world' };
+                    const ent2 = { name: 'bye' };
                     registry.register(ent0);
                     registry.register(ent1);
                     registry.register(ent2);
+                    registry.setImage(ent0.index, {}); // No.1
+                    registry.setImage(ent2.index, {}); // No.2
                     registry.update();
 
                     assert.strictEqual(registry.indexFromNumber(1), 0);

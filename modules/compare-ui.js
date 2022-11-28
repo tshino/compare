@@ -10,7 +10,7 @@ const CompareUI = function({ compareUtil }) {
 
             const register = function (ent) {
                 ent.index = entries.length;
-                ent.element = ent.element || null;
+                ent.element = null;
                 ent._visible = true;
                 ent.ready = function() { return null !== this.element; }
                 entries.push(ent);
@@ -30,12 +30,12 @@ const CompareUI = function({ compareUtil }) {
             const setImage = function(index, image) {
                 const ent = entries[index];
                 ent.loading = false;
-                ent.mainImage = image;
+                ent._mainImage = image;
                 ent.element = image;
             };
             const setAltImage = function(index, image) {
                 const ent = entries[index];
-                ent.element = image || ent.mainImage;
+                ent.element = image || ent._mainImage;
             };
             const setError = function(index, message) {
                 const ent = entries[index];
@@ -56,7 +56,7 @@ const CompareUI = function({ compareUtil }) {
                         ent[propName] = null;
                     }
                     ent._visible = false;
-                    ent.mainImage = null;
+                    ent._mainImage = null;
                     ent.element = null;
                     if (onDidRemoveEntry) {
                         onDidRemoveEntry();
