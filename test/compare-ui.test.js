@@ -187,6 +187,16 @@ describe('CompareUI', () => {
                     registry.removeEntry(ent0.index);
                     assert.deepStrictEqual(log, ['called']);
                 });
+                it('should clear cache properties', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.addCacheProperty('cacheData');
+                    const ent = registry.register({ name: 'hello' });
+                    registry.setImage(ent.index, {});
+                    ent.cacheData = 'some-data';
+                    registry.removeEntry(ent.index);
+
+                    assert.strictEqual(ent.cacheData, null);
+                });
             });
             describe('empty', () => {
                 it('should return true if there are no active images', () => {
