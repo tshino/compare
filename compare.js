@@ -4352,9 +4352,7 @@ const compareUI = CompareUI({ compareUtil });
             reducedColorTable: null,
             metrics     : [],
             toneCurve   : null,
-            loading     : true,
-            progress    : 0,
-            error       : null
+            progress    : 0
       };
       view.register(entry);
       return entry;

@@ -43,6 +43,8 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(registry.visible(ent0.index), true);
                     assert.strictEqual(ent0.element, null);
+                    assert.strictEqual(ent0.loading, true);
+                    assert.strictEqual(ent0.error, null);
                 });
             });
             describe('ready', () => {
