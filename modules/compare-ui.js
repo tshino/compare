@@ -11,6 +11,7 @@ const CompareUI = function({ compareUtil }) {
             const register = function (ent) {
                 ent.index = entries.length;
                 ent.element = null;
+                ent.asCanvas = null;
                 ent.loading = true;
                 ent.error = null;
                 ent._visible = true;
@@ -29,10 +30,11 @@ const CompareUI = function({ compareUtil }) {
             const numVisibleEntries = function() {
                 return entries.filter(ent => ent._visible).length;
             };
-            const setImage = function(index, image) {
+            const setImage = function(index, { image, canvas }) {
                 const ent = entries[index];
                 ent.loading = false;
                 ent._mainImage = image;
+                ent.asCanvas = canvas;
                 ent.element = image;
             };
             const setAltImage = function(index, image) {
@@ -60,6 +62,7 @@ const CompareUI = function({ compareUtil }) {
                     ent._visible = false;
                     ent._mainImage = null;
                     ent.element = null;
+                    ent.asCanvas = null;
                     if (onDidRemoveEntry) {
                         onDidRemoveEntry();
                     }

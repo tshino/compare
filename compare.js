@@ -443,7 +443,6 @@ const compareUI = CompareUI({ compareUtil });
     };
     $('#prev').click(function() { flipSingleView(false); });
     $('#next').click(function() { flipSingleView(true); });
-    registry.addCacheProperty('asCanvas');
     registry.addCacheProperty('imageData');
     registry.addOnRemoveEntry(onRemoveEntry);
     registry.setOnDidRemoveEntry(() => updateDOM());
@@ -4242,10 +4241,9 @@ const compareUI = CompareUI({ compareUtil });
   })();
   const nowLoadingDialog = NowLoadingDialog();
   const setEntryImage = function(entry, image, w, h) {
-    view.setImage(entry.index, image);
     const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
+    view.setImage(entry.index, { image, canvas });
     entry.altViewMode = null;
-    entry.asCanvas   = canvas;
     entry.canvasWidth   = w;
     entry.canvasHeight  = h;
     entry.orientationAsCSS = compareUtil.orientationUtil.getCSSTransform(entry.orientation);
@@ -4340,7 +4338,6 @@ const compareUI = CompareUI({ compareUtil });
             transposed      : false,
             orientationAsCSS    : '',
             view        : null,
-            asCanvas    : null,
             imageData   : null,
             histogram   : null,
             waveform    : null,

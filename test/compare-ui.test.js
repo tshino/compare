@@ -43,6 +43,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(registry.visible(ent0.index), true);
                     assert.strictEqual(ent0.element, null);
+                    assert.strictEqual(ent0.asCanvas, null);
                     assert.strictEqual(ent0.loading, true);
                     assert.strictEqual(ent0.error, null);
                 });
@@ -101,14 +102,15 @@ describe('CompareUI', () => {
                 });
             });
             describe('setImage', () => {
-                it('should set given element as main image', () => {
+                it('should set given image element and canvas as main image', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    registry.setImage(ent0.index, 'main-image');
+                    registry.setImage(ent0.index, { image: 'main-image', canvas: 'as-canvas' });
 
                     assert.strictEqual(ent0.loading, false);
                     assert.strictEqual(ent0.element, 'main-image');
+                    assert.strictEqual(ent0.asCanvas, 'as-canvas');
                     assert.strictEqual(registry.ready(ent0.index), true);
                     assert.strictEqual(registry.visible(ent0.index), true);
                 });
@@ -118,7 +120,7 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    registry.setImage(ent0.index, 'main-image');
+                    registry.setImage(ent0.index, { image: 'main-image' });
                     registry.setAltImage(ent0.index, 'alt-image');
 
                     assert.strictEqual(ent0.element, 'alt-image');
@@ -127,7 +129,7 @@ describe('CompareUI', () => {
                     const registry = compareUI.ViewModel().Registry();
                     const ent0 = { name: 'hello' };
                     registry.register(ent0);
-                    registry.setImage(ent0.index, 'main-image');
+                    registry.setImage(ent0.index, { image: 'main-image' });
                     registry.setAltImage(ent0.index, 'alt-image');
                     registry.setAltImage(ent0.index, null);
 
@@ -175,6 +177,7 @@ describe('CompareUI', () => {
 
                     assert.strictEqual(registry.getImages().length, 0);
                     assert.strictEqual(ent0.element, null);
+                    assert.strictEqual(ent0.asCanvas, null);
                     assert.strictEqual(registry.visible(ent0.index), false);
                 });
                 it('should call onDidRemoveEntry callback', () => {
