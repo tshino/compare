@@ -526,7 +526,7 @@ const CompareUtil = function(window) {
   };
 
   const calcMinMaxMean = function(list) {
-    if (list.length == 0) {
+    if (list.length === 0) {
       return null;
     }
     let min = list[0], max = min, sum = min;
@@ -1187,7 +1187,7 @@ const CompareUtil = function(window) {
       let desc = null;
       if (major === 0x61766966 /* 'avif' */) {
         desc = 'AVIF';
-      } else if (major == 0x6d696631 /* 'mif1'*/) {
+      } else if (major === 0x6d696631 /* 'mif1'*/) {
         for (let i = 0, n = magic - 16; i + 4 <= n; i += 4) {
           const compatible = binary.big32(16 + i);
           if (compatible === 0x61766966 /* 'avif' */) {
