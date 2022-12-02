@@ -12,6 +12,8 @@ const CompareUI = function({ compareUtil }) {
                 ent.index = entries.length;
                 ent.element = null;
                 ent.asCanvas = null;
+                ent.canvasWidth = 0;
+                ent.canvasHeight = 0;
                 ent.loading = true;
                 ent.error = null;
                 ent._visible = true;
@@ -30,11 +32,13 @@ const CompareUI = function({ compareUtil }) {
             const numVisibleEntries = function() {
                 return entries.filter(ent => ent._visible).length;
             };
-            const setImage = function(index, { image, canvas }) {
+            const setImage = function(index, { image, canvas, width, height }) {
                 const ent = entries[index];
                 ent.loading = false;
                 ent._mainImage = image;
                 ent.asCanvas = canvas;
+                ent.canvasWidth = width;
+                ent.canvasHeight = height;
                 ent.element = image;
             };
             const setAltImage = function(index, image) {

@@ -4242,10 +4242,8 @@ const compareUI = CompareUI({ compareUtil });
   const nowLoadingDialog = NowLoadingDialog();
   const setEntryImage = function(entry, image, w, h) {
     const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
-    view.setImage(entry.index, { image, canvas });
+    view.setImage(entry.index, { image, canvas, width: w, height: h });
     entry.altViewMode = null;
-    entry.canvasWidth   = w;
-    entry.canvasHeight  = h;
     entry.orientationAsCSS = compareUtil.orientationUtil.getCSSTransform(entry.orientation);
     entry.transposed = compareUtil.orientationUtil.isTransposed(entry.orientation);
     entry.width = entry.transposed ? h : w;
@@ -4331,8 +4329,6 @@ const compareUI = CompareUI({ compareUtil });
             color           : '',
             width           : 0,
             height          : 0,
-            canvasWidth     : 0,
-            canvasHeight    : 0,
             orientationExif : null,
             orientation     : null,
             transposed      : false,
