@@ -269,6 +269,18 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.indexFromNumber(-1), null);
                 });
             });
+            describe('addCacheProperty', () => {
+                it('should add new name to cache property list', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.addCacheProperty('myCache');
+                    const ent = registry.register({});
+                    registry.setImage(ent.index, {});
+                    ent.myCache = 'my-data';
+                    registry.removeEntry(ent.index);
+
+                    assert.strictEqual(ent.myCache, null);
+                });
+            });
             // TODO: add more
         });
 
