@@ -1357,7 +1357,9 @@ const compareUI = CompareUI({ compareUtil });
     };
   };
   const getImageData = function(img) {
-    if (!img.imageData) {
+    if (img.imageData) {
+      return img.imageData;
+    } else {
       const w = img.canvasWidth;
       const h = img.canvasHeight;
       try {
@@ -1372,7 +1374,6 @@ const compareUI = CompareUI({ compareUtil });
         return null;
       }
     }
-    return img.imageData;
   };
   const updateFigureTable = function(target, propName, update, styles, transformOnly) {
     if (transformOnly) {
@@ -4334,9 +4335,7 @@ const compareUI = CompareUI({ compareUtil });
             transposed      : false,
             orientationAsCSS    : '',
             view        : null,
-            imageData   : null,
             metrics     : [],
-            toneCurve   : null,
             progress    : 0
       };
       view.register(entry);
