@@ -384,4 +384,28 @@ describe('CompareUI', () => {
             });
         });
     });
+
+    describe('CrossCursorModel', () => {
+        describe('isEnabled', () => {
+            it('should have initial value false', () => {
+                const model = compareUI.CrossCursorModel();
+                assert.strictEqual(model.isEnabled(), false);
+            });
+        });
+        describe('enable', () => {
+            it('should enable cross cursor', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable();
+                assert.strictEqual(model.isEnabled(), true);
+            });
+        });
+        describe('disable', () => {
+            it('should disable cross cursor', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable();
+                model.disable();
+                assert.strictEqual(model.isEnabled(), false);
+            });
+        });
+    });
 });

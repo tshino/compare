@@ -311,9 +311,26 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
+    const CrossCursorModel = function() {
+        let enableCrossCursor = false;
+
+        const enable = function() {
+            enableCrossCursor = true;
+        };
+        const disable = function() {
+            enableCrossCursor = false;
+        };
+
+        return {
+            enable,
+            disable,
+            isEnabled: function () { return enableCrossCursor; },
+        };
+    };
+
     const CrossCursor = function ({ view }) {
         const viewZoom = view.viewZoom;
-        let enableCrossCursor = false;
+        const model = CrossCursorModel();
         let primaryIndex = null;
         let fixedPosition = false;
         const positions = [];
@@ -341,8 +358,8 @@ const CompareUI = function({ compareUtil }) {
         };
         const enable = function () {
             const index = view.getCurrentIndexOr(view.getFrontIndex());
-            if (!enableCrossCursor && index !== null) {
-                enableCrossCursor = true;
+            if (!model.isEnabled() && index !== null) {
+                model.enable();
                 primaryIndex = index;
                 fixedPosition = false;
                 onShowCallback.forEach(function (val) { val(); });
@@ -350,18 +367,18 @@ const CompareUI = function({ compareUtil }) {
                 setPosition(index, pos.x, pos.y);
                 view.updateLayout();
             }
-            return enableCrossCursor;
+            return model.isEnabled();
         };
         const disable = function () {
-            if (enableCrossCursor) {
-                enableCrossCursor = false;
+            if (model.isEnabled()) {
+                model.disable();
                 onRemoveCallback.forEach(function (val) { val(); });
                 primaryIndex = null;
                 view.updateLayout();
             }
         };
         const toggle = function () {
-            if (!enableCrossCursor) {
+            if (!model.isEnabled()) {
                 enable();
             } else {
                 disable();
@@ -396,10 +413,10 @@ const CompareUI = function({ compareUtil }) {
             );
         };
         const onRemoveEntry = function (index) {
-            if (enableCrossCursor && primaryIndex === index) {
+            if (model.isEnabled() && primaryIndex === index) {
                 primaryIndex = view.findImageIndexOtherThan(index);
                 if (primaryIndex === null) {
-                    enableCrossCursor = false;
+                    model.disable();
                     onRemoveCallback.forEach(function (val) { val(); });
                 }
             }
@@ -518,7 +535,7 @@ const CompareUI = function({ compareUtil }) {
             if (e.ctrlKey || e.altKey || e.metaKey) {
                 return true;
             }
-            if (enableCrossCursor) {
+            if (model.isEnabled()) {
                 // cursor key
                 if (37 <= e.keyCode && e.keyCode <= 40) {
                     let index = view.getCurrentIndexOr(primaryIndex);
@@ -550,7 +567,7 @@ const CompareUI = function({ compareUtil }) {
             setPosition(e.index, x, y, fixed);
         };
         const processMouseMove = function (e, selector, target) {
-            if (enableCrossCursor && !fixedPosition) {
+            if (model.isEnabled() && !fixedPosition) {
                 const index = selector ? $(selector).index($(target).parent()) : null;
                 const pos = viewZoom.positionFromMouseEvent(e, target, index);
                 if (view.ready(index) && pos) {
@@ -562,7 +579,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const onUpdateImageBox = function (img, w, h) {
-            if (enableCrossCursor) {
+            if (model.isEnabled()) {
                 const pos = positions[img.index];
                 const x = pos ? (pos.x || 0) : 0;
                 const y = pos ? (pos.y || 0) : 0;
@@ -590,7 +607,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const onUpdateTransform = function () {
-            if (enableCrossCursor) {
+            if (model.isEnabled()) {
                 onUpdateCallback.forEach(function (val) { val(false); });
             }
         };
@@ -604,12 +621,11 @@ const CompareUI = function({ compareUtil }) {
             enable,
             disable,
             toggle,
-            isEnabled: function () { return enableCrossCursor; },
+            isEnabled: model.isEnabled,
             getPosition,
             getIndex,
             getNormalizedPosition,
             isFixed,
-            setPosition,
             processKeyDown,
             processClick,
             processMouseMove
@@ -961,6 +977,7 @@ const CompareUI = function({ compareUtil }) {
         setDragStateClass,
         TextUtil,
         Grid,
+        CrossCursorModel,
         CrossCursor,
         Hud,
         ColorHUD,
