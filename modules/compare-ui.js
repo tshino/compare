@@ -313,25 +313,32 @@ const CompareUI = function({ compareUtil }) {
 
     const CrossCursorModel = function() {
         let enableCrossCursor = false;
+        let primaryIndex = null;
 
-        const enable = function() {
+        const enable = function(index) {
             enableCrossCursor = true;
+            primaryIndex = index;
         };
         const disable = function() {
             enableCrossCursor = false;
+            primaryIndex = null;
+        };
+        const changeIndex = function(index) {
+            primaryIndex = index;
         };
 
         return {
             enable,
             disable,
             isEnabled: function () { return enableCrossCursor; },
+            changeIndex,
+            primaryIndex: function () { return primaryIndex; },
         };
     };
 
     const CrossCursor = function ({ view }) {
         const viewZoom = view.viewZoom;
         const model = CrossCursorModel();
-        let primaryIndex = null;
         let fixedPosition = false;
         const positions = [];
         const onShowCallback = [];
@@ -359,8 +366,7 @@ const CompareUI = function({ compareUtil }) {
         const enable = function () {
             const index = view.getCurrentIndexOr(view.getFrontIndex());
             if (!model.isEnabled() && index !== null) {
-                model.enable();
-                primaryIndex = index;
+                model.enable(index);
                 fixedPosition = false;
                 onShowCallback.forEach(function (val) { val(); });
                 const pos = makeInitialPosition(index);
@@ -373,7 +379,6 @@ const CompareUI = function({ compareUtil }) {
             if (model.isEnabled()) {
                 model.disable();
                 onRemoveCallback.forEach(function (val) { val(); });
-                primaryIndex = null;
                 view.updateLayout();
             }
         };
@@ -385,17 +390,18 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const getPosition = function (index) {
-            index = index !== undefined ? index : primaryIndex;
+            index = index !== undefined ? index : model.primaryIndex();
             return positions[index];
         };
         const setIndex = function (index, fixed) {
-            primaryIndex = index;
+            model.changeIndex(index);
             fixedPosition = fixed;
         };
         const getIndex = function () {
-            return primaryIndex;
+            return model.primaryIndex();
         };
         const getNormalizedPosition = function () {
+            const primaryIndex = model.primaryIndex();
             const entry = view.getEntry(primaryIndex);
             return {
                 x: (0.5 + positions[primaryIndex].x) / entry.width,
@@ -413,9 +419,11 @@ const CompareUI = function({ compareUtil }) {
             );
         };
         const onRemoveEntry = function (index) {
-            if (model.isEnabled() && primaryIndex === index) {
-                primaryIndex = view.findImageIndexOtherThan(index);
-                if (primaryIndex === null) {
+            if (model.isEnabled() && model.primaryIndex() === index) {
+                const newIndex = view.findImageIndexOtherThan(index);
+                if (newIndex !== null) {
+                    model.changeIndex(newIndex);
+                } else {
                     model.disable();
                     onRemoveCallback.forEach(function (val) { val(); });
                 }
@@ -518,7 +526,7 @@ const CompareUI = function({ compareUtil }) {
             onUpdateCallback.forEach(function (val) { val(true); });
         };
         const adjustViewOffsetToFollowCrossCursor = function (dx, dy, x, y) {
-            const img = view.getEntry(primaryIndex);
+            const img = view.getEntry(model.primaryIndex());
             const center = viewZoom.getCenter();
             const rx = (x - (0.5 + center.x) * img.width) / (img.width / viewZoom.scale);
             const ry = (y - (0.5 + center.y) * img.height) / (img.height / viewZoom.scale);
@@ -538,9 +546,9 @@ const CompareUI = function({ compareUtil }) {
             if (model.isEnabled()) {
                 // cursor key
                 if (37 <= e.keyCode && e.keyCode <= 40) {
-                    let index = view.getCurrentIndexOr(primaryIndex);
+                    let index = view.getCurrentIndexOr(model.primaryIndex());
                     if (index < 0 || !positions[index]) {
-                        index = primaryIndex;
+                        index = model.primaryIndex();
                     }
                     const step = e.shiftKey ? 10 : 1;
                     const pos = getPosition(index);

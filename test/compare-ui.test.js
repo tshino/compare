@@ -395,8 +395,13 @@ describe('CompareUI', () => {
         describe('enable', () => {
             it('should enable cross cursor', () => {
                 const model = compareUI.CrossCursorModel();
-                model.enable();
+                model.enable(5);
                 assert.strictEqual(model.isEnabled(), true);
+            });
+            it('should initialize primary index', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(5);
+                assert.strictEqual(model.primaryIndex(), 5);
             });
         });
         describe('disable', () => {
@@ -405,6 +410,26 @@ describe('CompareUI', () => {
                 model.enable();
                 model.disable();
                 assert.strictEqual(model.isEnabled(), false);
+            });
+            it('should reset primary index to null', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable();
+                model.disable();
+                assert.strictEqual(model.primaryIndex(), null);
+            });
+        });
+        describe('primaryIndex', () => {
+            it('should have initial value null', () => {
+                const model = compareUI.CrossCursorModel();
+                assert.strictEqual(model.primaryIndex(), null);
+            });
+        });
+        describe('changeIndex', () => {
+            it('should modify primary index', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(5);
+                model.changeIndex(3);
+                assert.strictEqual(model.primaryIndex(), 3);
             });
         });
     });
