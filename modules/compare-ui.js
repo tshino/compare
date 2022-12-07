@@ -395,7 +395,9 @@ const CompareUI = function({ compareUtil }) {
         };
         const setIndex = function (index, fixed) {
             model.changeIndex(index);
-            fixedPosition = fixed;
+            if (fixed !== undefined) {
+                fixedPosition = fixed;
+            }
         };
         const getIndex = function () {
             return model.primaryIndex();
@@ -408,9 +410,6 @@ const CompareUI = function({ compareUtil }) {
                 y: (0.5 + positions[primaryIndex].y) / entry.height,
                 isInView: positions[primaryIndex].isInView
             };
-        };
-        const isFixed = function () {
-            return fixedPosition;
         };
         const isInsideROI = function (roi, x, y) {
             return (
@@ -513,7 +512,6 @@ const CompareUI = function({ compareUtil }) {
             });
         };
         const setPosition = function (index, x, y, fixed) {
-            fixed = fixed !== undefined ? fixed : fixedPosition;
             const ent = view.getEntry(index);
             const rx = (Math.floor(x) + 0.5) / ent.width;
             const ry = (Math.floor(y) + 0.5) / ent.height;
@@ -633,7 +631,6 @@ const CompareUI = function({ compareUtil }) {
             getPosition,
             getIndex,
             getNormalizedPosition,
-            isFixed,
             processKeyDown,
             processClick,
             processMouseMove
