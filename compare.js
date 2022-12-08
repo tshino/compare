@@ -26,18 +26,10 @@ const compareUI = CompareUI({ compareUtil });
 
     const registry = model.Registry();
 
-    const findImageIndexOtherThan = function(index) {
-      for (const img of registry.getImages()) {
-        if (img.index !== index) {
-          return img.index;
-        }
-      }
-      return null;
-    };
     const resetBaseAndTargetImage = function() {
       baseImageIndex = baseImageIndex === null ? registry.getFrontIndex() : baseImageIndex;
       if (targetImageIndex === null || baseImageIndex === targetImageIndex) {
-        targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+        targetImageIndex = registry.findImageIndexOtherThan(baseImageIndex);
       }
     };
     const setBaseAndTargetImage = function(baseIndex, targetIndex) {
@@ -45,9 +37,9 @@ const compareUI = CompareUI({ compareUtil });
       targetImageIndex = targetIndex !== null ? targetIndex : targetImageIndex;
       if (baseImageIndex === targetImageIndex) {
         if (targetIndex === null) {
-          targetImageIndex = findImageIndexOtherThan(baseImageIndex);
+          targetImageIndex = registry.findImageIndexOtherThan(baseImageIndex);
         } else if (baseIndex === null) {
-          baseImageIndex = findImageIndexOtherThan(targetImageIndex);
+          baseImageIndex = registry.findImageIndexOtherThan(targetImageIndex);
         }
       }
     };
@@ -462,7 +454,7 @@ const compareUI = CompareUI({ compareUtil });
       indexFromNumber: registry.indexFromNumber,
       addCacheProperty: registry.addCacheProperty,
       addOnRemoveEntry: registry.addOnRemoveEntry,
-      findImageIndexOtherThan,
+      findImageIndexOtherThan: registry.findImageIndexOtherThan,
       resetBaseAndTargetImage,
       setBaseAndTargetImage,
       changeBaseImage,

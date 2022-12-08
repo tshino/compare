@@ -86,6 +86,14 @@ const CompareUI = function({ compareUtil }) {
                 }
                 return null;
             };
+            const findImageIndexOtherThan = function(index) {
+                for (const img of images) {
+                    if (img.index !== index) {
+                        return img.index;
+                    }
+                }
+                return null;
+            };
             const addCacheProperty = function (propName) {
                 cacheProperties.push(propName);
             };
@@ -113,6 +121,7 @@ const CompareUI = function({ compareUtil }) {
                 getFrontIndex: () => { return 0 < images.length ? images[0].index : null; },
                 numberFromIndex,
                 indexFromNumber,
+                findImageIndexOtherThan,
                 addCacheProperty,
                 addOnRemoveEntry,
                 setOnDidRemoveEntry

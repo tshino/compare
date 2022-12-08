@@ -269,6 +269,35 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.indexFromNumber(-1), null);
                 });
             });
+            describe('findImageIndexOtherThan', () => {
+                it('should find valid image index other than specified one', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.register({ name: 'hello' });
+                    registry.register({ name: 'world' });
+                    registry.register({ name: 'bye' });
+                    registry.setImage(0, {});
+                    registry.setImage(2, {});
+                    registry.update();
+
+                    assert.strictEqual(registry.findImageIndexOtherThan(0), 2);
+                    assert.strictEqual(registry.findImageIndexOtherThan(2), 0);
+                    assert.strictEqual(registry.findImageIndexOtherThan(1), 0);
+                });
+                it('should return null if no valid image found other than specified one', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.register({ name: 'hello' });
+                    registry.setImage(0, {});
+                    registry.update();
+
+                    assert.strictEqual(registry.findImageIndexOtherThan(0), null);
+                });
+                it('should return null if no image', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    registry.update();
+
+                    assert.strictEqual(registry.findImageIndexOtherThan(0), null);
+                });
+            });
             describe('addCacheProperty', () => {
                 it('should add new name to cache property list', () => {
                     const registry = compareUI.ViewModel().Registry();
