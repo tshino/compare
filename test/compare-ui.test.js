@@ -460,6 +460,33 @@ describe('CompareUI', () => {
                 model.changeIndex(3);
                 assert.strictEqual(model.primaryIndex(), 3);
             });
+            it('should modify "fixed" property if specified', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(5);
+                model.changeIndex(3, true);
+                assert.strictEqual(model.fixed(), true);
+            });
+            it('should not modify "fixed" property if not specified', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(5);
+                model.changeIndex(3, true);
+                model.changeIndex(2);
+                assert.strictEqual(model.fixed(), true);
+            });
+        });
+        describe('fixed', () => {
+            it('should have initial value false', () => {
+                const model = compareUI.CrossCursorModel();
+                assert.strictEqual(model.fixed(), false);
+            });
+            it('should be false after enabled', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(0);
+                model.changeIndex(5, true);
+                model.disable();
+                model.enable(5);
+                assert.strictEqual(model.fixed(), false);
+            });
         });
     });
 });

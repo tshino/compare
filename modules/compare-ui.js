@@ -323,17 +323,22 @@ const CompareUI = function({ compareUtil }) {
     const CrossCursorModel = function() {
         let enableCrossCursor = false;
         let primaryIndex = null;
+        let fixedPosition = false;
 
         const enable = function(index) {
             enableCrossCursor = true;
             primaryIndex = index;
+            fixedPosition = false;
         };
         const disable = function() {
             enableCrossCursor = false;
             primaryIndex = null;
         };
-        const changeIndex = function(index) {
+        const changeIndex = function(index, fixed) {
             primaryIndex = index;
+            if (fixed !== undefined) {
+                fixedPosition = fixed;
+            }
         };
 
         return {
@@ -342,13 +347,13 @@ const CompareUI = function({ compareUtil }) {
             isEnabled: function () { return enableCrossCursor; },
             changeIndex,
             primaryIndex: function () { return primaryIndex; },
+            fixed: function() { return fixedPosition; },
         };
     };
 
     const CrossCursor = function ({ view }) {
         const viewZoom = view.viewZoom;
         const model = CrossCursorModel();
-        let fixedPosition = false;
         const positions = [];
         const onShowCallback = [];
         const onUpdateCallback = [];
@@ -376,7 +381,6 @@ const CompareUI = function({ compareUtil }) {
             const index = view.getCurrentIndexOr(view.getFrontIndex());
             if (!model.isEnabled() && index !== null) {
                 model.enable(index);
-                fixedPosition = false;
                 onShowCallback.forEach(function (val) { val(); });
                 const pos = makeInitialPosition(index);
                 setPosition(index, pos.x, pos.y);
@@ -403,10 +407,7 @@ const CompareUI = function({ compareUtil }) {
             return positions[index];
         };
         const setIndex = function (index, fixed) {
-            model.changeIndex(index);
-            if (fixed !== undefined) {
-                fixedPosition = fixed;
-            }
+            model.changeIndex(index, fixed);
         };
         const getIndex = function () {
             return model.primaryIndex();
@@ -505,7 +506,7 @@ const CompareUI = function({ compareUtil }) {
             }
             x = compareUtil.clamp(x, 0, img.width - 1);
             y = compareUtil.clamp(y, 0, img.height - 1);
-            positions[img.index] = { x: x, y: y, fixed: fixedPosition };
+            positions[img.index] = { x: x, y: y, fixed: model.fixed() };
             const desc = makePathDesc(img, x, y);
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
             positions[img.index].isInView = isInsideROI(roi, x, y);
@@ -515,7 +516,7 @@ const CompareUI = function({ compareUtil }) {
             } else {
                 img.cursor.find('path').attr('d', desc);
             }
-            img.cursor.find('path').attr('stroke-dasharray', fixedPosition ? 'none' : '4,1');
+            img.cursor.find('path').attr('stroke-dasharray', model.fixed() ? 'none' : '4,1');
             img.cursor.find('g.labels text').each(function (i) {
                 $(this).attr(labelsAttr[i]).text(i === 0 ? x : y);
             });
@@ -582,7 +583,7 @@ const CompareUI = function({ compareUtil }) {
             setPosition(e.index, x, y, fixed);
         };
         const processMouseMove = function (e, selector, target) {
-            if (model.isEnabled() && !fixedPosition) {
+            if (model.isEnabled() && !model.fixed()) {
                 const index = selector ? $(selector).index($(target).parent()) : null;
                 const pos = viewZoom.positionFromMouseEvent(e, target, index);
                 if (view.ready(index) && pos) {
