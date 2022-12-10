@@ -488,5 +488,22 @@ describe('CompareUI', () => {
                 assert.strictEqual(model.fixed(), false);
             });
         });
+        describe('addObserver', () => {
+            it('should add a set of callbacks', () => {
+                const model = compareUI.CrossCursorModel();
+                const log = [];
+                model.addObserver(
+                    () => { log.push('onShow'); },
+                    (moved) => { log.push(`onUpdate(${moved})`); },
+                    () => { log.push(`onRemove`); }
+                );
+                model.enable(5);
+                assert.deepStrictEqual(log, ['onShow']);
+                model.notifyUpdate(true);
+                assert.deepStrictEqual(log, ['onShow', 'onUpdate(true)']);
+                model.disable();
+                assert.deepStrictEqual(log, ['onShow', 'onUpdate(true)', 'onRemove']);
+            });
+        });
     });
 });
