@@ -186,18 +186,30 @@ const CompareUI = function({ compareUtil }) {
 
         const Events = function() {
             const onUpdateViewDOMListeners = [];
+            const onUpdateLayoutListeners = [];
 
             const addOnUpdateViewDOM = function(listener) {
                 onUpdateViewDOMListeners.push(listener);
+            };
+            const addOnUpdateLayout = function(listener) {
+                onUpdateLayoutListeners.push(listener);
             };
             const notifyUpdateViewDOM = function() {
                 for (const listener of onUpdateViewDOMListeners) {
                     listener();
                 }
             };
+            const notifyUpdateLayout = function() {
+                for (const listener of onUpdateLayoutListeners) {
+                    listener();
+                }
+            };
+
             return {
                 addOnUpdateViewDOM,
+                addOnUpdateLayout,
                 notifyUpdateViewDOM,
+                notifyUpdateLayout,
             };
         };
 
@@ -821,7 +833,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const RoiMap = function ({ view }) {
+    const RoiMap = function ({ view, model }) {
         const viewZoom = view.viewZoom;
         let enableMap = false;
         const toggle = function () {
@@ -863,7 +875,7 @@ const CompareUI = function({ compareUtil }) {
                 }
             }
         };
-        view.addOnUpdateLayout(onUpdateLayout);
+        model.events.addOnUpdateLayout(onUpdateLayout);
         view.addOnUpdateTransform(onUpdateTransform);
         return {
             toggle

@@ -414,12 +414,20 @@ describe('CompareUI', () => {
         });
 
         describe('events', () => {
-            it('should provide view events lister registry', () => {
+            it('should provide listener registry for onUpdateViewDOM event', () => {
                 const model = compareUI.ViewModel();
                 const log = [];
                 const l1 = () => { log.push('l1'); };
                 model.events.addOnUpdateViewDOM(l1);
                 model.events.notifyUpdateViewDOM();
+                assert.deepStrictEqual(log, ['l1']);
+            });
+            it('should provide listener registry for onUpdateLayout event', () => {
+                const model = compareUI.ViewModel();
+                const log = [];
+                const l1 = () => { log.push('l1'); };
+                model.events.addOnUpdateLayout(l1);
+                model.events.notifyUpdateLayout();
                 assert.deepStrictEqual(log, ['l1']);
             });
         });

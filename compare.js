@@ -22,7 +22,6 @@ const compareUI = CompareUI({ compareUtil });
     let dirtyDOM = false;
     const entryViewModifiers = [];
     const onUpdateImageBoxListeners = [];
-    const onUpdateLayoutListeners = [];
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
@@ -271,9 +270,6 @@ const compareUI = CompareUI({ compareUtil });
         $('#view .imageBox .image').removeClass('pixelated');
       }
     };
-    const addOnUpdateLayout = function(listener) {
-      onUpdateLayoutListeners.push(listener);
-    };
     const doUpdateLayout = function() {
       const layoutMode = model.layoutDirection.current();
       const param = makeImageLayoutParam();
@@ -305,9 +301,7 @@ const compareUI = CompareUI({ compareUtil });
         $(this).css({ display : (hide ? 'none' : '') });
       });
       updateImageScaling();
-      for (const listener of onUpdateLayoutListeners) {
-        listener();
-      }
+      model.events.notifyUpdateLayout();
     };
     const addOnUpdateEntryTransform = function(listener) {
       onUpdateEntryTransformListeners.push(listener);
@@ -486,7 +480,6 @@ const compareUI = CompareUI({ compareUtil });
       getCurrentIndexOr,
       makeImageNameWithNumber,
       addOnUpdateImageBox,
-      addOnUpdateLayout,
       addOnUpdateEntryTransform,
       addOnUpdateTransform,
       viewZoom,
@@ -591,7 +584,7 @@ const compareUI = CompareUI({ compareUtil });
   const crossCursor = compareUI.CrossCursor({ view });
 
   const dialogUtil = compareUI.DialogUtil();
-  view.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
+  model.events.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
   const figureZoom = dialogUtil.figureZoom;
   const openMessageBox = (function() {
     let serial = 0;
@@ -3856,7 +3849,7 @@ const compareUI = CompareUI({ compareUtil });
       active: function() { return null !== component; }
     };
   };
-  const roiMap = compareUI.RoiMap({ view });
+  const roiMap = compareUI.RoiMap({ view, model });
   const altView = AltView();
   const settings = Settings();
   const cameraDialog = CameraDialog();
@@ -3931,7 +3924,7 @@ const compareUI = CompareUI({ compareUtil });
       updateSelectorButtonState();
       updateOverlayModeIndicator();
     };
-    view.addOnUpdateLayout(onUpdateLayout);
+    model.events.addOnUpdateLayout(onUpdateLayout);
     model.events.addOnUpdateViewDOM(updateSelectorButtons);
     return {};
   };
