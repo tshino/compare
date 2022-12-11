@@ -412,6 +412,17 @@ describe('CompareUI', () => {
                 });
             });
         });
+
+        describe('events', () => {
+            it('should provide view events lister registry', () => {
+                const model = compareUI.ViewModel();
+                const log = [];
+                const l1 = () => { log.push('l1'); };
+                model.events.addOnUpdateViewDOM(l1);
+                model.events.notifyUpdateViewDOM();
+                assert.deepStrictEqual(log, ['l1']);
+            });
+        });
     });
 
     describe('CrossCursorModel', () => {

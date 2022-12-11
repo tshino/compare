@@ -184,11 +184,29 @@ const CompareUI = function({ compareUtil }) {
             };
         })();
 
+        const Events = function() {
+            const onUpdateViewDOMListeners = [];
+
+            const addOnUpdateViewDOM = function(listener) {
+                onUpdateViewDOMListeners.push(listener);
+            };
+            const notifyUpdateViewDOM = function() {
+                for (const listener of onUpdateViewDOMListeners) {
+                    listener();
+                }
+            };
+            return {
+                addOnUpdateViewDOM,
+                notifyUpdateViewDOM,
+            };
+        };
+
         return {
             Registry,
             singleViewMode,
             overlayMode,
-            layoutDirection
+            layoutDirection,
+            events: Events()
         };
     };
 

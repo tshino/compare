@@ -21,7 +21,6 @@ const compareUI = CompareUI({ compareUtil });
     let dirtyLayout = false;
     let dirtyDOM = false;
     const entryViewModifiers = [];
-    const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
     const onUpdateLayoutListeners = [];
     const onUpdateEntryTransformListeners = [];
@@ -351,9 +350,6 @@ const compareUI = CompareUI({ compareUtil });
       dirtyLayout = true;
       update();
     };
-    const addOnUpdateViewDOM = function(listener) {
-      onUpdateViewDOMListeners.push(listener);
-    };
     const addEntryViewModifier = function(modifier) {
       entryViewModifiers.push(modifier);
     };
@@ -396,9 +392,7 @@ const compareUI = CompareUI({ compareUtil });
           }
       }
       resetMouseDrag();
-      for (const listener of onUpdateViewDOMListeners) {
-        listener();
-      }
+      model.events.notifyUpdateViewDOM();
     };
     const updateDOM = function() {
       dirtyDOM = true;
@@ -497,7 +491,6 @@ const compareUI = CompareUI({ compareUtil });
       addOnUpdateTransform,
       viewZoom,
       updateLayout,
-      addOnUpdateViewDOM,
       addEntryViewModifier,
       updateDOM,
       setBackgroundColor,
@@ -3868,7 +3861,7 @@ const compareUI = CompareUI({ compareUtil });
   const settings = Settings();
   const cameraDialog = CameraDialog();
   // Side Bar
-  const SideBar = function({ view }) {
+  const SideBar = function({ view, model }) {
     const viewZoom = view.viewZoom;
     $('#add').click(function() {
       $('#file').click();
@@ -3939,10 +3932,10 @@ const compareUI = CompareUI({ compareUtil });
       updateOverlayModeIndicator();
     };
     view.addOnUpdateLayout(onUpdateLayout);
-    view.addOnUpdateViewDOM(updateSelectorButtons);
+    model.events.addOnUpdateViewDOM(updateSelectorButtons);
     return {};
   };
-  const sideBar = SideBar({ view });
+  const sideBar = SideBar({ view, model });
 
   const NEEDS_IOS_EXIF_WORKAROUND = (function() {
     const ua = window.navigator.userAgent.toLowerCase();
