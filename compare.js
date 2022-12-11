@@ -17,6 +17,9 @@ const compareUI = CompareUI({ compareUtil });
     let targetImageIndex = null;
     let backgroundColor = '#000000';
     let imageScaling = 'smooth';
+    let dirtyTransform = false;
+    let dirtyLayout = false;
+    let dirtyDOM = false;
     const entryViewModifiers = [];
     const onUpdateViewDOMListeners = [];
     const onUpdateImageBoxListeners = [];
@@ -333,7 +336,10 @@ const compareUI = CompareUI({ compareUtil });
         listener();
       }
     };
-    const viewZoom = compareUtil.makeZoomController(doUpdateTransform, {
+    const viewZoom = compareUtil.makeZoomController((_viewZoom) => {
+      dirtyTransform = true;
+      update();
+    }, {
       getBaseSize: function(index) {
         if (registry.ready(index)) {
           const ent = registry.getEntry(index);
@@ -342,9 +348,8 @@ const compareUI = CompareUI({ compareUtil });
       }
     });
     const updateLayout = function() {
-      updateLayoutMode();
-      doUpdateLayout();
-      doUpdateTransform(viewZoom);
+      dirtyLayout = true;
+      update();
     };
     const addOnUpdateViewDOM = function(listener) {
       onUpdateViewDOMListeners.push(listener);
@@ -396,8 +401,25 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     const updateDOM = function() {
-      doUpdateDOM();
-      updateLayout();
+      dirtyDOM = true;
+      update();
+    };
+    const update = function() {
+      if (dirtyDOM) {
+        dirtyDOM = false;
+        doUpdateDOM();
+        dirtyLayout = true;
+      }
+      if (dirtyLayout) {
+        dirtyLayout = false;
+        updateLayoutMode();
+        doUpdateLayout();
+        dirtyTransform = true;
+      }
+      if (dirtyTransform) {
+        dirtyTransform = false;
+        doUpdateTransform(viewZoom);
+      }
     };
     const updateEmptyBoxTextColor = function() {
       let textColor;
