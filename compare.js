@@ -171,7 +171,7 @@ const compareUI = CompareUI({ compareUtil });
         updateLayout();
       }
     };
-    const update = function() {
+    const updateLayoutMode = function() {
       if (!model.singleViewMode.isActive()) {
         model.overlayMode.stop();
       }
@@ -217,7 +217,7 @@ const compareUI = CompareUI({ compareUtil });
     const addOnUpdateImageBox = function(listener) {
       onUpdateImageBoxListeners.push(listener);
     };
-    const updateImageBox = function(box, img, boxW, boxH) {
+    const doUpdateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
         img.boxW = boxW;
         img.boxH = boxH;
@@ -272,7 +272,7 @@ const compareUI = CompareUI({ compareUtil });
     const addOnUpdateLayout = function(listener) {
       onUpdateLayoutListeners.push(listener);
     };
-    const onUpdateLayout = function() {
+    const doUpdateLayout = function() {
       const layoutMode = model.layoutDirection.current();
       const param = makeImageLayoutParam();
       const indices = getSelectedImageIndices();
@@ -295,7 +295,7 @@ const compareUI = CompareUI({ compareUtil });
           $(this).css({ display : 'none' });
         } else {
           const img = registry.getEntry(index);
-          updateImageBox(this, img, param.boxW, param.boxH);
+          doUpdateImageBox(this, img, param.boxW, param.boxH);
         }
       });
       $('#view > div.emptyBox').each(function(index) {
@@ -310,20 +310,10 @@ const compareUI = CompareUI({ compareUtil });
     const addOnUpdateEntryTransform = function(listener) {
       onUpdateEntryTransformListeners.push(listener);
     };
-    const onUpdateEntryTransform = function(ent, style) {
-      for (const listener of onUpdateEntryTransformListeners) {
-        listener(ent, style);
-      }
-    };
     const addOnUpdateTransform = function(listener) {
       onUpdateTransformListeners.push(listener);
     };
-    const onUpdateTransform = function() {
-      for (const listener of onUpdateTransformListeners) {
-        listener();
-      }
-    };
-    const updateTransform = function(viewZoom) {
+    const doUpdateTransform = function(viewZoom) {
       for (const ent of registry.entries()) {
         if (ent.element) {
           const style = {
@@ -334,12 +324,16 @@ const compareUI = CompareUI({ compareUtil });
                           ent.orientationAsCSS
           };
           $(ent.element).css(style);
-          onUpdateEntryTransform(ent, style);
+          for (const listener of onUpdateEntryTransformListeners) {
+            listener(ent, style);
+          }
         }
       }
-      onUpdateTransform();
+      for (const listener of onUpdateTransformListeners) {
+        listener();
+      }
     };
-    const viewZoom = compareUtil.makeZoomController(updateTransform, {
+    const viewZoom = compareUtil.makeZoomController(doUpdateTransform, {
       getBaseSize: function(index) {
         if (registry.ready(index)) {
           const ent = registry.getEntry(index);
@@ -348,9 +342,9 @@ const compareUI = CompareUI({ compareUtil });
       }
     });
     const updateLayout = function() {
-      update();
-      onUpdateLayout();
-      updateTransform(viewZoom);
+      updateLayoutMode();
+      doUpdateLayout();
+      doUpdateTransform(viewZoom);
     };
     const addOnUpdateViewDOM = function(listener) {
       onUpdateViewDOMListeners.push(listener);
@@ -358,7 +352,7 @@ const compareUI = CompareUI({ compareUtil });
     const addEntryViewModifier = function(modifier) {
       entryViewModifiers.push(modifier);
     };
-    const updateDOM = function() {
+    const doUpdateDOM = function() {
       registry.update();
       if (registry.empty()) {
         viewZoom.disable();
@@ -396,10 +390,13 @@ const compareUI = CompareUI({ compareUtil });
             ent.view.addClass('error');
           }
       }
+      resetMouseDrag();
       for (const listener of onUpdateViewDOMListeners) {
         listener();
       }
-      resetMouseDrag();
+    };
+    const updateDOM = function() {
+      doUpdateDOM();
       updateLayout();
     };
     const updateEmptyBoxTextColor = function() {
