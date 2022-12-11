@@ -438,6 +438,14 @@ describe('CompareUI', () => {
                 model.events.notifyUpdateImageBox({index:5}, 1000, 800);
                 assert.deepStrictEqual(log, ['l1 5 1000x800']);
             });
+            it('should provide listener registry for onUpdateTransform event', () => {
+                const model = compareUI.ViewModel();
+                const log = [];
+                const l1 = () => { log.push(`l1`); };
+                model.events.addOnUpdateTransform(l1);
+                model.events.notifyUpdateTransform();
+                assert.deepStrictEqual(log, ['l1']);
+            });
         });
     });
 

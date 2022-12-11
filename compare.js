@@ -22,7 +22,6 @@ const compareUI = CompareUI({ compareUtil });
     let dirtyDOM = false;
     const entryViewModifiers = [];
     const onUpdateEntryTransformListeners = [];
-    const onUpdateTransformListeners = [];
 
     const registry = model.Registry();
 
@@ -300,9 +299,6 @@ const compareUI = CompareUI({ compareUtil });
     const addOnUpdateEntryTransform = function(listener) {
       onUpdateEntryTransformListeners.push(listener);
     };
-    const addOnUpdateTransform = function(listener) {
-      onUpdateTransformListeners.push(listener);
-    };
     const doUpdateTransform = function(viewZoom) {
       for (const ent of registry.entries()) {
         if (ent.element) {
@@ -319,9 +315,7 @@ const compareUI = CompareUI({ compareUtil });
           }
         }
       }
-      for (const listener of onUpdateTransformListeners) {
-        listener();
-      }
+      model.events.notifyUpdateTransform();
     };
     const viewZoom = compareUtil.makeZoomController((_viewZoom) => {
       dirtyTransform = true;
@@ -474,7 +468,6 @@ const compareUI = CompareUI({ compareUtil });
       getCurrentIndexOr,
       makeImageNameWithNumber,
       addOnUpdateEntryTransform,
-      addOnUpdateTransform,
       viewZoom,
       updateLayout,
       addEntryViewModifier,

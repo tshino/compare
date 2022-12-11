@@ -188,6 +188,7 @@ const CompareUI = function({ compareUtil }) {
             const onUpdateViewDOMListeners = [];
             const onUpdateLayoutListeners = [];
             const onUpdateImageBoxListeners = [];
+            const onUpdateTransformListeners = [];
 
             const addOnUpdateViewDOM = function(listener) {
                 onUpdateViewDOMListeners.push(listener);
@@ -197,6 +198,9 @@ const CompareUI = function({ compareUtil }) {
             };
             const addOnUpdateImageBox = function(listener) {
                 onUpdateImageBoxListeners.push(listener);
+            };
+            const addOnUpdateTransform = function(listener) {
+                onUpdateTransformListeners.push(listener);
             };
             const notifyUpdateViewDOM = function() {
                 for (const listener of onUpdateViewDOMListeners) {
@@ -213,14 +217,21 @@ const CompareUI = function({ compareUtil }) {
                     listener(img, w, h);
                 }
             };
+            const notifyUpdateTransform = function() {
+                for (const listener of onUpdateTransformListeners) {
+                    listener();
+                }
+            };
 
             return {
                 addOnUpdateViewDOM,
                 addOnUpdateLayout,
                 addOnUpdateImageBox,
+                addOnUpdateTransform,
                 notifyUpdateViewDOM,
                 notifyUpdateLayout,
                 notifyUpdateImageBox,
+                notifyUpdateTransform,
             };
         };
 
@@ -677,7 +688,7 @@ const CompareUI = function({ compareUtil }) {
         view.addOnRemoveEntry(onRemoveEntry);
         viewModel.events.addOnUpdateImageBox(onUpdateImageBox);
         view.addOnUpdateEntryTransform(onUpdateEntryTransform);
-        view.addOnUpdateTransform(onUpdateTransform);
+        viewModel.events.addOnUpdateTransform(onUpdateTransform);
 
         return {
             addObserver: model.addObserver,
@@ -887,7 +898,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         model.events.addOnUpdateLayout(onUpdateLayout);
-        view.addOnUpdateTransform(onUpdateTransform);
+        model.events.addOnUpdateTransform(onUpdateTransform);
         return {
             toggle
         };
