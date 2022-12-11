@@ -21,7 +21,6 @@ const compareUI = CompareUI({ compareUtil });
     let dirtyLayout = false;
     let dirtyDOM = false;
     const entryViewModifiers = [];
-    const onUpdateImageBoxListeners = [];
     const onUpdateEntryTransformListeners = [];
     const onUpdateTransformListeners = [];
 
@@ -215,9 +214,6 @@ const compareUI = CompareUI({ compareUtil });
       }
       return elem.append($('<span/>').text(img.name));
     };
-    const addOnUpdateImageBox = function(listener) {
-      onUpdateImageBoxListeners.push(listener);
-    };
     const doUpdateImageBox = function(box, img, boxW, boxH) {
       if (img.element) {
         img.boxW = boxW;
@@ -243,9 +239,7 @@ const compareUI = CompareUI({ compareUtil });
         const w = img.transposed ? rect.height : rect.width;
         const h = img.transposed ? rect.width : rect.height;
         $(img.element).css({ width: w+'px', height: h+'px' });
-        for (const listener of onUpdateImageBoxListeners) {
-          listener(img, w, h);
-        }
+        model.events.notifyUpdateImageBox(img, w, h);
       }
       const index = img.index;
       const isOverlay = (
@@ -479,7 +473,6 @@ const compareUI = CompareUI({ compareUtil });
       toggleOverlay,
       getCurrentIndexOr,
       makeImageNameWithNumber,
-      addOnUpdateImageBox,
       addOnUpdateEntryTransform,
       addOnUpdateTransform,
       viewZoom,
@@ -580,8 +573,8 @@ const compareUI = CompareUI({ compareUtil });
   };
   const viewUtil = ViewUtil({ view });
 
-  const grid = compareUI.Grid({ view, viewUtil });
-  const crossCursor = compareUI.CrossCursor({ view });
+  const grid = compareUI.Grid({ view, viewUtil, model });
+  const crossCursor = compareUI.CrossCursor({ view, viewModel: model });
 
   const dialogUtil = compareUI.DialogUtil();
   model.events.addOnUpdateLayout(dialogUtil.adjustDialogPosition);
@@ -3507,7 +3500,7 @@ const compareUI = CompareUI({ compareUtil });
     };
   };
   // Alt View
-  const AltView = function() {
+  const AltView = function({ view, model }) {
     let colorSpace = $('#altViewColorSpace').val();
     let mapping = $('.altViewMapping').val();
     let component = null;
@@ -3836,7 +3829,7 @@ const compareUI = CompareUI({ compareUtil });
         return true;
       }
     };
-    view.addOnUpdateImageBox(onUpdateImageBox);
+    model.events.addOnUpdateImageBox(onUpdateImageBox);
     view.addOnUpdateEntryTransform(onUpdateEntryTransform);
     view.addEntryViewModifier(modifyEntryView);
     return {
@@ -3850,7 +3843,7 @@ const compareUI = CompareUI({ compareUtil });
     };
   };
   const roiMap = compareUI.RoiMap({ view, model });
-  const altView = AltView();
+  const altView = AltView({ view, model });
   const settings = Settings();
   const cameraDialog = CameraDialog();
   // Side Bar
@@ -4128,7 +4121,7 @@ const compareUI = CompareUI({ compareUtil });
   const opticalFlowDialog = OpticalFlowDialog();
   const diffDialog = DiffDialog();
 
-  const hud = compareUI.Hud({ view, crossCursor });
+  const hud = compareUI.Hud({ view, model, crossCursor });
   const colorHUD = compareUI.ColorHUD({ view, crossCursor, hud });
 
   const setupMenusAndDialogs = function() {

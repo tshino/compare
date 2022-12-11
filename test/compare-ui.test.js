@@ -430,6 +430,14 @@ describe('CompareUI', () => {
                 model.events.notifyUpdateLayout();
                 assert.deepStrictEqual(log, ['l1']);
             });
+            it('should provide listener registry for onUpdateImageBox event', () => {
+                const model = compareUI.ViewModel();
+                const log = [];
+                const l1 = (img, w, h) => { log.push(`l1 ${img.index} ${w}x${h}`); };
+                model.events.addOnUpdateImageBox(l1);
+                model.events.notifyUpdateImageBox({index:5}, 1000, 800);
+                assert.deepStrictEqual(log, ['l1 5 1000x800']);
+            });
         });
     });
 

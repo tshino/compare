@@ -187,12 +187,16 @@ const CompareUI = function({ compareUtil }) {
         const Events = function() {
             const onUpdateViewDOMListeners = [];
             const onUpdateLayoutListeners = [];
+            const onUpdateImageBoxListeners = [];
 
             const addOnUpdateViewDOM = function(listener) {
                 onUpdateViewDOMListeners.push(listener);
             };
             const addOnUpdateLayout = function(listener) {
                 onUpdateLayoutListeners.push(listener);
+            };
+            const addOnUpdateImageBox = function(listener) {
+                onUpdateImageBoxListeners.push(listener);
             };
             const notifyUpdateViewDOM = function() {
                 for (const listener of onUpdateViewDOMListeners) {
@@ -204,12 +208,19 @@ const CompareUI = function({ compareUtil }) {
                     listener();
                 }
             };
+            const notifyUpdateImageBox = function(img, w, h) {
+                for (const listener of onUpdateImageBoxListeners) {
+                    listener(img, w, h);
+                }
+            };
 
             return {
                 addOnUpdateViewDOM,
                 addOnUpdateLayout,
+                addOnUpdateImageBox,
                 notifyUpdateViewDOM,
                 notifyUpdateLayout,
+                notifyUpdateImageBox,
             };
         };
 
@@ -258,7 +269,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const Grid = function ({ view, viewUtil }) {
+    const Grid = function ({ view, viewUtil, model }) {
         let enableGrid = false;
         let mainGridInterval = 100;
         let auxGridInterval = 10;
@@ -338,7 +349,7 @@ const CompareUI = function({ compareUtil }) {
                 updateGridStyle(ent.grid, ent.width, ent.baseWidth, view.viewZoom.scale, commonStyle);
             }
         };
-        view.addOnUpdateImageBox(onUpdateImageBox);
+        model.events.addOnUpdateImageBox(onUpdateImageBox);
         view.addOnUpdateEntryTransform(onUpdateEntryTransform);
         return {
             toggle,
@@ -404,7 +415,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const CrossCursor = function ({ view }) {
+    const CrossCursor = function ({ view, viewModel }) {
         const viewZoom = view.viewZoom;
         const model = CrossCursorModel();
         const positions = [];
@@ -664,7 +675,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         view.addOnRemoveEntry(onRemoveEntry);
-        view.addOnUpdateImageBox(onUpdateImageBox);
+        viewModel.events.addOnUpdateImageBox(onUpdateImageBox);
         view.addOnUpdateEntryTransform(onUpdateEntryTransform);
         view.addOnUpdateTransform(onUpdateTransform);
 
@@ -683,7 +694,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const Hud = function({ view, crossCursor }) {
+    const Hud = function({ view, model, crossCursor }) {
         const viewZoom = view.viewZoom;
         const hudPlacement = { right: true, bottom: true };
         let onUpdateLayoutCallback = null;
@@ -691,7 +702,7 @@ const CompareUI = function({ compareUtil }) {
             $('#view').on('mousedown', 'div.hudContainer', function (e) {
                 e.stopPropagation();
             });
-            view.addOnUpdateImageBox(onUpdateImageBox);
+            model.events.addOnUpdateImageBox(onUpdateImageBox);
         };
         const setObserver = function (onUpdateLayout) {
             onUpdateLayoutCallback = onUpdateLayout;
