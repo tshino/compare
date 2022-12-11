@@ -446,6 +446,14 @@ describe('CompareUI', () => {
                 model.events.notifyUpdateTransform();
                 assert.deepStrictEqual(log, ['l1']);
             });
+            it('should provide listener registry for onUpdateEntryTransform event', () => {
+                const model = compareUI.ViewModel();
+                const log = [];
+                const l1 = (ent, style) => { log.push(`l1 ${ent.index} ${JSON.stringify(style)}`); };
+                model.events.addOnUpdateEntryTransform(l1);
+                model.events.notifyUpdateEntryTransform({index:5}, {style:'style'});
+                assert.deepStrictEqual(log, ['l1 5 {"style":"style"}']);
+            });
         });
     });
 

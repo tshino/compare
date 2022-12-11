@@ -21,7 +21,6 @@ const compareUI = CompareUI({ compareUtil });
     let dirtyLayout = false;
     let dirtyDOM = false;
     const entryViewModifiers = [];
-    const onUpdateEntryTransformListeners = [];
 
     const registry = model.Registry();
 
@@ -296,9 +295,6 @@ const compareUI = CompareUI({ compareUtil });
       updateImageScaling();
       model.events.notifyUpdateLayout();
     };
-    const addOnUpdateEntryTransform = function(listener) {
-      onUpdateEntryTransformListeners.push(listener);
-    };
     const doUpdateTransform = function(viewZoom) {
       for (const ent of registry.entries()) {
         if (ent.element) {
@@ -310,9 +306,7 @@ const compareUI = CompareUI({ compareUtil });
                           ent.orientationAsCSS
           };
           $(ent.element).css(style);
-          for (const listener of onUpdateEntryTransformListeners) {
-            listener(ent, style);
-          }
+          model.events.notifyUpdateEntryTransform(ent, style);
         }
       }
       model.events.notifyUpdateTransform();
@@ -467,7 +461,6 @@ const compareUI = CompareUI({ compareUtil });
       toggleOverlay,
       getCurrentIndexOr,
       makeImageNameWithNumber,
-      addOnUpdateEntryTransform,
       viewZoom,
       updateLayout,
       addEntryViewModifier,
@@ -3823,7 +3816,7 @@ const compareUI = CompareUI({ compareUtil });
       }
     };
     model.events.addOnUpdateImageBox(onUpdateImageBox);
-    view.addOnUpdateEntryTransform(onUpdateEntryTransform);
+    model.events.addOnUpdateEntryTransform(onUpdateEntryTransform);
     view.addEntryViewModifier(modifyEntryView);
     return {
       reset,

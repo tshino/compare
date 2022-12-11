@@ -189,6 +189,7 @@ const CompareUI = function({ compareUtil }) {
             const onUpdateLayoutListeners = [];
             const onUpdateImageBoxListeners = [];
             const onUpdateTransformListeners = [];
+            const onUpdateEntryTransformListeners = [];
 
             const addOnUpdateViewDOM = function(listener) {
                 onUpdateViewDOMListeners.push(listener);
@@ -201,6 +202,9 @@ const CompareUI = function({ compareUtil }) {
             };
             const addOnUpdateTransform = function(listener) {
                 onUpdateTransformListeners.push(listener);
+            };
+            const addOnUpdateEntryTransform = function(listener) {
+                onUpdateEntryTransformListeners.push(listener);
             };
             const notifyUpdateViewDOM = function() {
                 for (const listener of onUpdateViewDOMListeners) {
@@ -222,16 +226,23 @@ const CompareUI = function({ compareUtil }) {
                     listener();
                 }
             };
+            const notifyUpdateEntryTransform = function(ent, style) {
+                for (const listener of onUpdateEntryTransformListeners) {
+                    listener(ent, style);
+                }
+            };
 
             return {
                 addOnUpdateViewDOM,
                 addOnUpdateLayout,
                 addOnUpdateImageBox,
                 addOnUpdateTransform,
+                addOnUpdateEntryTransform,
                 notifyUpdateViewDOM,
                 notifyUpdateLayout,
                 notifyUpdateImageBox,
                 notifyUpdateTransform,
+                notifyUpdateEntryTransform,
             };
         };
 
@@ -361,7 +372,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         model.events.addOnUpdateImageBox(onUpdateImageBox);
-        view.addOnUpdateEntryTransform(onUpdateEntryTransform);
+        model.events.addOnUpdateEntryTransform(onUpdateEntryTransform);
         return {
             toggle,
             isEnabled: function () { return enableGrid; },
@@ -687,7 +698,7 @@ const CompareUI = function({ compareUtil }) {
         };
         view.addOnRemoveEntry(onRemoveEntry);
         viewModel.events.addOnUpdateImageBox(onUpdateImageBox);
-        view.addOnUpdateEntryTransform(onUpdateEntryTransform);
+        viewModel.events.addOnUpdateEntryTransform(onUpdateEntryTransform);
         viewModel.events.addOnUpdateTransform(onUpdateTransform);
 
         return {
