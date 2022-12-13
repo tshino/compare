@@ -476,12 +476,6 @@ const CompareUI = function({ compareUtil }) {
             index = index !== undefined ? index : model.primaryIndex();
             return positions[index];
         };
-        const setIndex = function (index, fixed) {
-            model.changeIndex(index, fixed);
-        };
-        const getIndex = function () {
-            return model.primaryIndex();
-        };
         const getNormalizedPosition = function () {
             const primaryIndex = model.primaryIndex();
             const entry = view.getEntry(primaryIndex);
@@ -594,7 +588,7 @@ const CompareUI = function({ compareUtil }) {
             const ent = view.getEntry(index);
             const rx = (Math.floor(x) + 0.5) / ent.width;
             const ry = (Math.floor(y) + 0.5) / ent.height;
-            setIndex(index, fixed);
+            model.changeIndex(index, fixed);
             for (const img of view.getImages()) {
                 const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
                 const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
@@ -708,7 +702,7 @@ const CompareUI = function({ compareUtil }) {
             toggle,
             isEnabled: model.isEnabled,
             getPosition,
-            getIndex,
+            getIndex: model.primaryIndex,
             getNormalizedPosition,
             processKeyDown,
             processClick,
