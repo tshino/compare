@@ -569,7 +569,7 @@ const CompareUI = function({ compareUtil }) {
             }
             x = compareUtil.clamp(x, 0, img.width - 1);
             y = compareUtil.clamp(y, 0, img.height - 1);
-            positions[img.index] = { x: x, y: y, fixed: state.fixed() };
+            positions[img.index] = { x: x, y: y };
             const desc = makePathDesc(img, x, y);
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
             positions[img.index].isInView = isInsideROI(roi, x, y);
@@ -639,7 +639,7 @@ const CompareUI = function({ compareUtil }) {
             const y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
             let fixed;
             if (pos && pos.x === x && pos.y === y) {
-                fixed = !pos.fixed;
+                fixed = !state.fixed();
             } else {
                 fixed = true;
             }
