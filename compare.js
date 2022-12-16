@@ -560,7 +560,7 @@ const compareUI = CompareUI({ compareUtil });
   const viewUtil = ViewUtil({ view });
 
   const grid = compareUI.Grid({ view, viewUtil, model });
-  const crossCursor = compareUI.CrossCursor({ view, viewModel: model });
+  const crossCursor = compareUI.CrossCursor({ view, model });
 
   const dialogUtil = compareUI.DialogUtil();
   model.events.addOnUpdateLayout(dialogUtil.adjustDialogPosition);

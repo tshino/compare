@@ -437,7 +437,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const CrossCursor = function ({ view, viewModel }) {
+    const CrossCursor = function ({ view, model }) {
         const viewZoom = view.viewZoom;
         const state = CrossCursorModel();
         const positions = [];
@@ -691,9 +691,9 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         view.addOnRemoveEntry(onRemoveEntry);
-        viewModel.events.addOnUpdateImageBox(onUpdateImageBox);
-        viewModel.events.addOnUpdateEntryTransform(onUpdateEntryTransform);
-        viewModel.events.addOnUpdateTransform(onUpdateTransform);
+        model.events.addOnUpdateImageBox(onUpdateImageBox);
+        model.events.addOnUpdateEntryTransform(onUpdateEntryTransform);
+        model.events.addOnUpdateTransform(onUpdateTransform);
 
         return {
             addObserver: state.addObserver,
