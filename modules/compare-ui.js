@@ -473,17 +473,19 @@ const CompareUI = function({ compareUtil }) {
                 disable();
             }
         };
-        const getPosition = function (index) {
+        state.position = function (index) {
             index = index !== undefined ? index : state.primaryIndex();
             return positions[index];
         };
+        const getPosition = state.position;
         const getNormalizedPosition = function () {
             const primaryIndex = state.primaryIndex();
             const entry = view.getEntry(primaryIndex);
+            const pos = state.position(primaryIndex);
             return {
-                x: (0.5 + positions[primaryIndex].x) / entry.width,
-                y: (0.5 + positions[primaryIndex].y) / entry.height,
-                isInView: positions[primaryIndex].isInView
+                x: (0.5 + pos.x) / entry.width,
+                y: (0.5 + pos.y) / entry.height,
+                isInView: pos.isInView
             };
         };
         const isInsideROI = function (roi, x, y) {
@@ -619,11 +621,11 @@ const CompareUI = function({ compareUtil }) {
                 // cursor key
                 if (37 <= e.keyCode && e.keyCode <= 40) {
                     let index = view.getCurrentIndexOr(state.primaryIndex());
-                    if (index < 0 || !positions[index]) {
+                    if (index < 0 || !state.position(index)) {
                         index = state.primaryIndex();
                     }
                     const step = e.shiftKey ? 10 : 1;
-                    const pos = getPosition(index);
+                    const pos = state.position(index);
                     const d = compareUtil.cursorKeyCodeToXY(e.keyCode, step);
                     const x = pos.x + d.x;
                     const y = pos.y + d.y;
@@ -634,7 +636,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const processClick = function (e) {
-            const pos = getPosition(e.index);
+            const pos = state.position(e.index);
             const ent = view.getEntry(e.index);
             const x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
             const y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
@@ -659,7 +661,7 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateImageBox = function (img, w, h) {
             if (state.isEnabled()) {
-                const pos = positions[img.index];
+                const pos = state.position(img.index);
                 const x = pos ? (pos.x || 0) : 0;
                 const y = pos ? (pos.y || 0) : 0;
                 updateCrossCursor(img, x, y);
@@ -676,7 +678,7 @@ const CompareUI = function({ compareUtil }) {
                 $(ent.cursor).css(commonStyle).find('path').each(function (i) {
                     $(this).attr('stroke-width', baseScale * [2, 1][i]);
                 });
-                const pos = positions[ent.index];
+                const pos = state.position(ent.index);
                 const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
                 positions[ent.index].isInView = isInsideROI(roi, pos.x, pos.y);
                 const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
