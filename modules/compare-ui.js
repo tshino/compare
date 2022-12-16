@@ -402,11 +402,11 @@ const CompareUI = function({ compareUtil }) {
             primaryIndex = null;
             onRemoveCallback.forEach(function (val) { val(); });
         };
-        const changeIndex = function(index, fixed) {
+        const changeIndex = function(index) {
             primaryIndex = index;
-            if (fixed !== undefined) {
-                fixedPosition = fixed;
-            }
+        };
+        const setFixed = function(fixed) {
+            fixedPosition = fixed;
         };
         const addObserver = function (onShow, onUpdate, onRemove) {
             if (onShow) {
@@ -431,6 +431,7 @@ const CompareUI = function({ compareUtil }) {
             isEnabled: function () { return enableCrossCursor; },
             changeIndex,
             primaryIndex: function () { return primaryIndex; },
+            setFixed,
             fixed: function() { return fixedPosition; },
             addObserver,
             notifyUpdate,
@@ -584,11 +585,11 @@ const CompareUI = function({ compareUtil }) {
                 $(this).attr(labelsAttr[i]).text(i === 0 ? x : y);
             });
         };
-        const setPosition = function (index, x, y, fixed) {
+        const setPosition = function (index, x, y) {
             const ent = view.getEntry(index);
             const rx = (Math.floor(x) + 0.5) / ent.width;
             const ry = (Math.floor(y) + 0.5) / ent.height;
-            state.changeIndex(index, fixed);
+            state.changeIndex(index);
             for (const img of view.getImages()) {
                 const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
                 const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
@@ -637,13 +638,12 @@ const CompareUI = function({ compareUtil }) {
             const ent = view.getEntry(e.index);
             const x = compareUtil.clamp(Math.floor(e.x * ent.width), 0, ent.width - 1);
             const y = compareUtil.clamp(Math.floor(e.y * ent.height), 0, ent.height - 1);
-            let fixed;
             if (pos && pos.x === x && pos.y === y) {
-                fixed = !state.fixed();
+                state.setFixed(!state.fixed());
             } else {
-                fixed = true;
+                state.setFixed(true);
             }
-            setPosition(e.index, x, y, fixed);
+            setPosition(e.index, x, y);
         };
         const processMouseMove = function (e, selector, target) {
             if (state.isEnabled() && !state.fixed()) {
