@@ -525,6 +525,28 @@ describe('CompareUI', () => {
                 assert.strictEqual(model.fixed(), false);
             });
         });
+        describe('position', () => {
+            it('should have default value undefined', () => {
+                const model = compareUI.CrossCursorModel();
+                assert.strictEqual(model.position(0), undefined);
+            });
+            it('should use primaryIndex if index is not specified', () => {
+                const model = compareUI.CrossCursorModel();
+                model.enable(2);
+                model.setPosition(2, { x: 2, y: 2 });
+                model.setPosition(3, { x: 3, y: 3 });
+                assert.deepStrictEqual(model.position(), { x: 2, y: 2 });
+            });
+        });
+        describe('setPosition', () => {
+            it('should set position information of specified index', () => {
+                const model = compareUI.CrossCursorModel();
+                model.setPosition(3, { x: 1, y: 1 });
+                model.setPosition(4, { x: 2, y: 2 });
+                assert.deepStrictEqual(model.position(3), { x: 1, y: 1 });
+                assert.deepStrictEqual(model.position(4), { x: 2, y: 2 });
+            });
+        });
         describe('addObserver', () => {
             it('should add a set of callbacks', () => {
                 const model = compareUI.CrossCursorModel();

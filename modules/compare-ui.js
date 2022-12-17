@@ -387,6 +387,7 @@ const CompareUI = function({ compareUtil }) {
         let enableCrossCursor = false;
         let primaryIndex = null;
         let fixedPosition = false;
+        const positions = [];
         const onShowCallback = [];
         const onUpdateCallback = [];
         const onRemoveCallback = [];
@@ -407,6 +408,13 @@ const CompareUI = function({ compareUtil }) {
         };
         const setFixed = function(fixed) {
             fixedPosition = fixed;
+        };
+        const setPosition = function(index, pos) {
+            positions[index] = pos;
+        };
+        const position = function (index) {
+            index = index !== undefined ? index : primaryIndex;
+            return positions[index];
         };
         const addObserver = function (onShow, onUpdate, onRemove) {
             if (onShow) {
@@ -433,6 +441,8 @@ const CompareUI = function({ compareUtil }) {
             primaryIndex: function () { return primaryIndex; },
             setFixed,
             fixed: function() { return fixedPosition; },
+            setPosition,
+            position,
             addObserver,
             notifyUpdate,
         };
@@ -441,7 +451,6 @@ const CompareUI = function({ compareUtil }) {
     const CrossCursor = function ({ view, model }) {
         const viewZoom = view.viewZoom;
         const state = CrossCursorModel();
-        const positions = [];
 
         const makeInitialPosition = function (index) {
             const img = view.getEntry(index);
@@ -473,11 +482,6 @@ const CompareUI = function({ compareUtil }) {
                 disable();
             }
         };
-        state.position = function (index) {
-            index = index !== undefined ? index : state.primaryIndex();
-            return positions[index];
-        };
-        const getPosition = state.position;
         const getNormalizedPosition = function () {
             const primaryIndex = state.primaryIndex();
             const entry = view.getEntry(primaryIndex);
@@ -572,10 +576,10 @@ const CompareUI = function({ compareUtil }) {
             }
             x = compareUtil.clamp(x, 0, img.width - 1);
             y = compareUtil.clamp(y, 0, img.height - 1);
-            positions[img.index] = { x: x, y: y };
             const desc = makePathDesc(img, x, y);
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-            positions[img.index].isInView = isInsideROI(roi, x, y);
+            const isInView = isInsideROI(roi, x, y);
+            state.setPosition(img.index, { x, y, isInView });
             const labelsAttr = makeLabelAttr(img, roi, x, y);
             if (0 === img.view.find('.cursor').length) {
                 addCrossCursor(img, desc);
@@ -680,7 +684,8 @@ const CompareUI = function({ compareUtil }) {
                 });
                 const pos = state.position(ent.index);
                 const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
-                positions[ent.index].isInView = isInsideROI(roi, pos.x, pos.y);
+                pos.isInView = isInsideROI(roi, pos.x, pos.y);
+                state.setPosition(ent.index, pos);
                 const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
                 $(ent.cursor).find('g.labels text').each(function (i) {
                     $(this).attr(attr[i]);
@@ -703,7 +708,7 @@ const CompareUI = function({ compareUtil }) {
             disable,
             toggle,
             isEnabled: state.isEnabled,
-            getPosition,
+            getPosition: state.position,
             getIndex: state.primaryIndex,
             getNormalizedPosition,
             processKeyDown,
