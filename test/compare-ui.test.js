@@ -457,110 +457,110 @@ describe('CompareUI', () => {
         });
     });
 
-    describe('CrossCursorModel', () => {
+    describe('CrossCursorState', () => {
         describe('isEnabled', () => {
             it('should have initial value false', () => {
-                const model = compareUI.CrossCursorModel();
-                assert.strictEqual(model.isEnabled(), false);
+                const state = compareUI.CrossCursorState();
+                assert.strictEqual(state.isEnabled(), false);
             });
         });
         describe('enable', () => {
             it('should enable cross cursor', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable(5);
-                assert.strictEqual(model.isEnabled(), true);
+                const state = compareUI.CrossCursorState();
+                state.enable(5);
+                assert.strictEqual(state.isEnabled(), true);
             });
             it('should initialize primary index', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable(5);
-                assert.strictEqual(model.primaryIndex(), 5);
+                const state = compareUI.CrossCursorState();
+                state.enable(5);
+                assert.strictEqual(state.primaryIndex(), 5);
             });
         });
         describe('disable', () => {
             it('should disable cross cursor', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable();
-                model.disable();
-                assert.strictEqual(model.isEnabled(), false);
+                const state = compareUI.CrossCursorState();
+                state.enable();
+                state.disable();
+                assert.strictEqual(state.isEnabled(), false);
             });
             it('should reset primary index to null', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable();
-                model.disable();
-                assert.strictEqual(model.primaryIndex(), null);
+                const state = compareUI.CrossCursorState();
+                state.enable();
+                state.disable();
+                assert.strictEqual(state.primaryIndex(), null);
             });
         });
         describe('primaryIndex', () => {
             it('should have initial value null', () => {
-                const model = compareUI.CrossCursorModel();
-                assert.strictEqual(model.primaryIndex(), null);
+                const state = compareUI.CrossCursorState();
+                assert.strictEqual(state.primaryIndex(), null);
             });
         });
         describe('changeIndex', () => {
             it('should modify primary index', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable(5);
-                model.changeIndex(3);
-                assert.strictEqual(model.primaryIndex(), 3);
+                const state = compareUI.CrossCursorState();
+                state.enable(5);
+                state.changeIndex(3);
+                assert.strictEqual(state.primaryIndex(), 3);
             });
         });
         describe('fixed', () => {
             it('should have initial value false', () => {
-                const model = compareUI.CrossCursorModel();
-                assert.strictEqual(model.fixed(), false);
+                const state = compareUI.CrossCursorState();
+                assert.strictEqual(state.fixed(), false);
             });
             it('should be false when enabled', () => {
-                const model = compareUI.CrossCursorModel();
-                model.setFixed(true);
-                model.enable(5);
-                assert.strictEqual(model.fixed(), false);
+                const state = compareUI.CrossCursorState();
+                state.setFixed(true);
+                state.enable(5);
+                assert.strictEqual(state.fixed(), false);
             });
         });
         describe('setFixed', () => {
             it('should turn on/off fixed mode', () => {
-                const model = compareUI.CrossCursorModel();
-                model.setFixed(true);
-                assert.strictEqual(model.fixed(), true);
-                model.setFixed(false);
-                assert.strictEqual(model.fixed(), false);
+                const state = compareUI.CrossCursorState();
+                state.setFixed(true);
+                assert.strictEqual(state.fixed(), true);
+                state.setFixed(false);
+                assert.strictEqual(state.fixed(), false);
             });
         });
         describe('position', () => {
             it('should have default value undefined', () => {
-                const model = compareUI.CrossCursorModel();
-                assert.strictEqual(model.position(0), undefined);
+                const state = compareUI.CrossCursorState();
+                assert.strictEqual(state.position(0), undefined);
             });
             it('should use primaryIndex if index is not specified', () => {
-                const model = compareUI.CrossCursorModel();
-                model.enable(2);
-                model.setPosition(2, { x: 2, y: 2 });
-                model.setPosition(3, { x: 3, y: 3 });
-                assert.deepStrictEqual(model.position(), { x: 2, y: 2 });
+                const state = compareUI.CrossCursorState();
+                state.enable(2);
+                state.setPosition(2, { x: 2, y: 2 });
+                state.setPosition(3, { x: 3, y: 3 });
+                assert.deepStrictEqual(state.position(), { x: 2, y: 2 });
             });
         });
         describe('setPosition', () => {
             it('should set position information of specified index', () => {
-                const model = compareUI.CrossCursorModel();
-                model.setPosition(3, { x: 1, y: 1 });
-                model.setPosition(4, { x: 2, y: 2 });
-                assert.deepStrictEqual(model.position(3), { x: 1, y: 1 });
-                assert.deepStrictEqual(model.position(4), { x: 2, y: 2 });
+                const state = compareUI.CrossCursorState();
+                state.setPosition(3, { x: 1, y: 1 });
+                state.setPosition(4, { x: 2, y: 2 });
+                assert.deepStrictEqual(state.position(3), { x: 1, y: 1 });
+                assert.deepStrictEqual(state.position(4), { x: 2, y: 2 });
             });
         });
         describe('addObserver', () => {
             it('should add a set of callbacks', () => {
-                const model = compareUI.CrossCursorModel();
+                const state = compareUI.CrossCursorState();
                 const log = [];
-                model.addObserver(
+                state.addObserver(
                     () => { log.push('onShow'); },
                     (moved) => { log.push(`onUpdate(${moved})`); },
                     () => { log.push(`onRemove`); }
                 );
-                model.enable(5);
+                state.enable(5);
                 assert.deepStrictEqual(log, ['onShow']);
-                model.notifyUpdate(true);
+                state.notifyUpdate(true);
                 assert.deepStrictEqual(log, ['onShow', 'onUpdate(true)']);
-                model.disable();
+                state.disable();
                 assert.deepStrictEqual(log, ['onShow', 'onUpdate(true)', 'onRemove']);
             });
         });

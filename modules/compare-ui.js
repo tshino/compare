@@ -383,7 +383,7 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const CrossCursorModel = function() {
+    const CrossCursorState = function() {
         let enableCrossCursor = false;
         let primaryIndex = null;
         let fixedPosition = false;
@@ -450,7 +450,7 @@ const CompareUI = function({ compareUtil }) {
 
     const CrossCursor = function ({ view, model }) {
         const viewZoom = view.viewZoom;
-        const state = CrossCursorModel();
+        const state = CrossCursorState();
 
         const makeInitialPosition = function (index) {
             const img = view.getEntry(index);
@@ -1062,7 +1062,7 @@ const CompareUI = function({ compareUtil }) {
         setDragStateClass,
         TextUtil,
         Grid,
-        CrossCursorModel,
+        CrossCursorState,
         CrossCursor,
         Hud,
         ColorHUD,
