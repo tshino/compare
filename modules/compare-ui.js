@@ -505,6 +505,12 @@ const CompareUI = function({ compareUtil }) {
                 roi[1] <= y && y <= roi[3]
             );
         };
+        const updateIsInView = function(img) {
+            const pos = state.position(img.index);
+            const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
+            const isInView = isInsideROI(roi, pos.x, pos.y);
+            state.setIsInView(img.index, isInView);
+        };
         const onRemoveEntry = function (index) {
             if (state.isEnabled() && state.primaryIndex() === index) {
                 const newIndex = view.findImageIndexOtherThan(index);
@@ -578,13 +584,8 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const updateCrossCursor = function (img) {
-            if (!img.element) {
-                return;
-            }
-            const pos = state.position(img.index) || { x: 0, y: 0 };
+            const pos = state.position(img.index);
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-            const isInView = isInsideROI(roi, pos.x, pos.y);
-            state.setIsInView(img.index, isInView);
             const desc = makePathDesc(img, pos.x, pos.y);
             const labelsAttr = makeLabelAttr(img, roi, pos.x, pos.y);
             if (0 === img.view.find('.cursor').length) {
@@ -606,6 +607,7 @@ const CompareUI = function({ compareUtil }) {
                 const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
                 const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
                 state.setPosition(img.index, { x: ix, y: iy });
+                updateIsInView(img);
                 updateCrossCursor(img);
             }
             state.notifyUpdate(true);
@@ -671,7 +673,12 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const onUpdateImageBox = function (img, w, h) {
-            if (state.isEnabled()) {
+            if (state.isEnabled() && img.element) {
+                const pos = state.position(img.index);
+                if (!pos) {
+                    state.setPosition(img.index, { x: 0, y: 0 });
+                    updateIsInView(img);
+                }
                 updateCrossCursor(img);
             } else {
                 removeCrossCursor(img);
@@ -682,14 +689,13 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateEntryTransform = function (ent, commonStyle) {
             if (ent.cursor) {
+                updateIsInView(ent);
                 const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
                 $(ent.cursor).css(commonStyle).find('path').each(function (i) {
                     $(this).attr('stroke-width', baseScale * [2, 1][i]);
                 });
                 const pos = state.position(ent.index);
                 const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
-                const isInView = isInsideROI(roi, pos.x, pos.y);
-                state.setIsInView(ent.index, isInView);
                 const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
                 $(ent.cursor).find('g.labels text').each(function (i) {
                     $(this).attr(attr[i]);
