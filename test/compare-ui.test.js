@@ -457,6 +457,23 @@ describe('CompareUI', () => {
         });
     });
 
+    const ViewMock = function() {
+        return {
+            viewZoom: {},
+            addOnRemoveEntry: () => {}
+        };
+    };
+    const ModelMock = function() {
+        return {
+            events: {
+                addOnUpdateLayout: () => {},
+                addOnUpdateImageBox: () => {},
+                addOnUpdateEntryTransform: () => {},
+                addOnUpdateTransform: () => {}
+            }
+        };
+    };
+
     describe('CrossCursorState', () => {
         describe('isEnabled', () => {
             it('should have initial value false', () => {
@@ -563,6 +580,42 @@ describe('CompareUI', () => {
                 state.disable();
                 assert.deepStrictEqual(log, ['onShow', 'onUpdate(true)', 'onRemove']);
             });
+        });
+    });
+
+    describe('CrossCursor', () => {
+        it('should construct successfully', () => {
+            const view = ViewMock();
+            const model = ModelMock();
+            const crossCursor = compareUI.CrossCursor({ view, model });
+            assert.ok( crossCursor );
+        });
+    });
+    describe('Hud', () => {
+        it('should construct successfully', () => {
+            const view = ViewMock();
+            const model = ModelMock();
+            const crossCursor = compareUI.CrossCursor({ view, model });
+            const hud = compareUI.Hud({ view, model, crossCursor });
+            assert.ok( hud );
+        });
+    });
+    describe('ColorHUD', () => {
+        it('should construct successfully', () => {
+            const view = ViewMock();
+            const model = ModelMock();
+            const crossCursor = compareUI.CrossCursor({ view, model });
+            const hud = compareUI.Hud({ view, model, crossCursor });
+            const colorHUD = compareUI.ColorHUD({ view, crossCursor, hud });
+            assert.ok( colorHUD );
+        });
+    });
+    describe('RoiMap', () => {
+        it('should construct successfully', () => {
+            const view = ViewMock();
+            const model = ModelMock();
+            const roiMap = compareUI.RoiMap({ view, model });
+            assert.ok( roiMap );
         });
     });
 });
