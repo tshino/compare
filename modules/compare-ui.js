@@ -412,9 +412,15 @@ const CompareUI = function({ compareUtil }) {
         const setPosition = function(index, pos) {
             positions[index] = pos;
         };
-        const position = function (index) {
+        const position = function(index) {
             index = index !== undefined ? index : primaryIndex;
             return positions[index];
+        };
+        const setIsInView = function(index, isInView) {
+            if (!positions[index]) {
+                positions[index] = { x: 0, y: 0 };
+            }
+            positions[index].isInView = isInView;
         };
         const addObserver = function (onShow, onUpdate, onRemove) {
             if (onShow) {
@@ -427,9 +433,9 @@ const CompareUI = function({ compareUtil }) {
                 onRemoveCallback.push(onRemove);
             }
         };
-        const notifyUpdate = function(porintChanged) {
+        const notifyUpdate = function(pointChanged) {
             onUpdateCallback.forEach(
-                function (val) { val(porintChanged); }
+                function (val) { val(pointChanged); }
             );
         };
 
@@ -443,6 +449,7 @@ const CompareUI = function({ compareUtil }) {
             fixed: function() { return fixedPosition; },
             setPosition,
             position,
+            setIsInView,
             addObserver,
             notifyUpdate,
         };
@@ -570,17 +577,16 @@ const CompareUI = function({ compareUtil }) {
                 img.cursor = null;
             }
         };
-        const updateCrossCursor = function (img, x, y) {
+        const updateCrossCursor = function (img) {
             if (!img.element) {
                 return;
             }
-            x = compareUtil.clamp(x, 0, img.width - 1);
-            y = compareUtil.clamp(y, 0, img.height - 1);
-            const desc = makePathDesc(img, x, y);
+            const pos = state.position(img.index) || { x: 0, y: 0 };
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-            const isInView = isInsideROI(roi, x, y);
-            state.setPosition(img.index, { x, y, isInView });
-            const labelsAttr = makeLabelAttr(img, roi, x, y);
+            const isInView = isInsideROI(roi, pos.x, pos.y);
+            state.setIsInView(img.index, isInView);
+            const desc = makePathDesc(img, pos.x, pos.y);
+            const labelsAttr = makeLabelAttr(img, roi, pos.x, pos.y);
             if (0 === img.view.find('.cursor').length) {
                 addCrossCursor(img, desc);
             } else {
@@ -588,7 +594,7 @@ const CompareUI = function({ compareUtil }) {
             }
             img.cursor.find('path').attr('stroke-dasharray', state.fixed() ? 'none' : '4,1');
             img.cursor.find('g.labels text').each(function (i) {
-                $(this).attr(labelsAttr[i]).text(i === 0 ? x : y);
+                $(this).attr(labelsAttr[i]).text(i === 0 ? pos.x : pos.y);
             });
         };
         const setPosition = function (index, x, y) {
@@ -599,7 +605,8 @@ const CompareUI = function({ compareUtil }) {
             for (const img of view.getImages()) {
                 const ix = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
                 const iy = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
-                updateCrossCursor(img, ix, iy);
+                state.setPosition(img.index, { x: ix, y: iy });
+                updateCrossCursor(img);
             }
             state.notifyUpdate(true);
         };
@@ -665,10 +672,7 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateImageBox = function (img, w, h) {
             if (state.isEnabled()) {
-                const pos = state.position(img.index);
-                const x = pos ? (pos.x || 0) : 0;
-                const y = pos ? (pos.y || 0) : 0;
-                updateCrossCursor(img, x, y);
+                updateCrossCursor(img);
             } else {
                 removeCrossCursor(img);
             }
@@ -684,8 +688,8 @@ const CompareUI = function({ compareUtil }) {
                 });
                 const pos = state.position(ent.index);
                 const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
-                pos.isInView = isInsideROI(roi, pos.x, pos.y);
-                state.setPosition(ent.index, pos);
+                const isInView = isInsideROI(roi, pos.x, pos.y);
+                state.setIsInView(ent.index, isInView);
                 const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
                 $(ent.cursor).find('g.labels text').each(function (i) {
                     $(this).attr(attr[i]);
