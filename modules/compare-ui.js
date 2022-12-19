@@ -455,7 +455,73 @@ const CompareUI = function({ compareUtil }) {
         };
     };
 
-    const CrossCursor = function ({ view, model }) {
+    const CrossCursorView = function() {
+        const makePathDesc = function (img, x, y) {
+            const pos = img.interpretXY(x, y);
+            let desc = '';
+            desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
+            desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
+            desc += 'M 0,' + pos.y + ' l ' + img.canvasWidth + ',0 ';
+            desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
+            return desc;
+        };
+        const makeLabelAttrOnTransform = function (ent, roi, x, y, viewScale) {
+            const baseScale = ent.width / (ent.baseWidth * viewScale);
+            const sx = ent.flippedX ? -1 : 1;
+            const sy = ent.flippedY ? -1 : 1;
+            const pos = ent.interpretXY2(x, y);
+            const base = ent.interpretXY2(0, 0);
+            base.x += sx * (ent.transposed ? roi[1] : roi[0]);
+            base.y += sy * (ent.transposed ? roi[0] : roi[1]);
+            const t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
+            const t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
+            const s = 'scale(' + baseScale * sx + ' ' + baseScale * sy + ')';
+            const m = ent.transposed ? ' matrix(0 1 1 0 0 0)' : '';
+            const a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
+            return ent.transposed ? [a1, a0] : [a0, a1];
+        };
+        const makeLabelAttr = function (img, roi, x, y, viewScale) {
+            const attr = makeLabelAttrOnTransform(img, roi, x, y, viewScale);
+            attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
+            if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
+                attr[0]['dy'] = '40%';
+                attr[1]['dy'] = img.height * 0.9 < y ? '0%' : '40%';
+            } else {
+                attr[0]['dominant-baseline'] = 'hanging';
+                attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
+            }
+            return attr;
+        };
+        const addCrossCursor = function (img, desc) {
+            const size = { w: img.canvasWidth, h: img.canvasHeight };
+            const vbox = '0 0 ' + size.w + ' ' + size.h;
+            const filter_id = 'drop-shadow' + img.index;
+            const textElem = '<text filter="url(#' + filter_id + ')"></text>';
+            img.cursor = $(
+                '<svg class="imageOverlay cursor" viewBox="' + vbox + '" style="overflow:visible">' +
+                '<defs><filter id="' + filter_id + '">' +
+                '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
+                '<feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>' +
+                '</filter></defs>' +
+                '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
+                '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
+                '<g class="labels" font-size="16" fill="white">' +
+                textElem + textElem + '</g>' +
+                '</svg>').
+                width(size.w).
+                height(size.h);
+            img.view.append(img.cursor);
+        };
+
+        return {
+            makePathDesc,
+            makeLabelAttr,
+            makeLabelAttrOnTransform,
+            addCrossCursor,
+        };
+    };
+
+    const CrossCursor = function ({ view, model, crossCursorView = CrossCursorView() }) {
         const viewZoom = view.viewZoom;
         const state = CrossCursorState();
 
@@ -521,62 +587,6 @@ const CompareUI = function({ compareUtil }) {
                 }
             }
         };
-        const makePathDesc = function (img, x, y) {
-            const pos = img.interpretXY(x, y);
-            let desc = '';
-            desc += 'M ' + pos.x + ',0 l 0,' + img.canvasHeight + ' ';
-            desc += 'M ' + (pos.x + 1) + ',0 l 0,' + img.canvasHeight + ' ';
-            desc += 'M 0,' + pos.y + ' l ' + img.canvasWidth + ',0 ';
-            desc += 'M 0,' + (pos.y + 1) + ' l ' + img.canvasWidth + ',0 ';
-            return desc;
-        };
-        const makeLabelAttr = function (img, roi, x, y) {
-            const attr = makeLabelAttrOnTransform(img, roi, x, y);
-            attr[0]['text-anchor'] = img.width * 0.9 < x ? 'end' : '';
-            if (compareUtil.browserName === 'msie' || compareUtil.browserName === 'edge') {
-                attr[0]['dy'] = '40%';
-                attr[1]['dy'] = img.height * 0.9 < y ? '0%' : '40%';
-            } else {
-                attr[0]['dominant-baseline'] = 'hanging';
-                attr[1]['dominant-baseline'] = img.height * 0.9 < y ? 'alphabetic' : 'hanging';
-            }
-            return attr;
-        };
-        const makeLabelAttrOnTransform = function (ent, roi, x, y) {
-            const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
-            const sx = ent.flippedX ? -1 : 1;
-            const sy = ent.flippedY ? -1 : 1;
-            const pos = ent.interpretXY2(x, y);
-            const base = ent.interpretXY2(0, 0);
-            base.x += sx * (ent.transposed ? roi[1] : roi[0]);
-            base.y += sy * (ent.transposed ? roi[0] : roi[1]);
-            const t0 = 'translate(' + pos.x + ' ' + base.y + ') ';
-            const t1 = 'translate(' + base.x + ' ' + pos.y + ') ';
-            const s = 'scale(' + baseScale * sx + ' ' + baseScale * sy + ')';
-            const m = ent.transposed ? ' matrix(0 1 1 0 0 0)' : '';
-            const a0 = { transform: t0 + s + m }, a1 = { transform: t1 + s + m };
-            return ent.transposed ? [a1, a0] : [a0, a1];
-        };
-        const addCrossCursor = function (img, desc) {
-            const size = { w: img.canvasWidth, h: img.canvasHeight };
-            const vbox = '0 0 ' + size.w + ' ' + size.h;
-            const filter_id = 'drop-shadow' + img.index;
-            const textElem = '<text filter="url(#' + filter_id + ')"></text>';
-            img.cursor = $(
-                '<svg class="imageOverlay cursor" viewBox="' + vbox + '" style="overflow:visible">' +
-                '<defs><filter id="' + filter_id + '">' +
-                '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
-                '<feBlend in="SourceGraphic" in2="shadow" mode="normal"></feBlend>' +
-                '</filter></defs>' +
-                '<path stroke="black" fill="none" stroke-width="0.2" opacity="0.1" d="' + desc + '"></path>' +
-                '<path stroke="white" fill="none" stroke-width="0.1" opacity="0.6" d="' + desc + '"></path>' +
-                '<g class="labels" font-size="16" fill="white">' +
-                textElem + textElem + '</g>' +
-                '</svg>').
-                width(size.w).
-                height(size.h);
-            img.view.append(img.cursor);
-        };
         const removeCrossCursor = function (img) {
             if (img.cursor) {
                 $(img.cursor).remove();
@@ -585,15 +595,17 @@ const CompareUI = function({ compareUtil }) {
         };
         const updateCrossCursor = function (img) {
             const pos = state.position(img.index);
+            const fixed = state.fixed();
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-            const desc = makePathDesc(img, pos.x, pos.y);
-            const labelsAttr = makeLabelAttr(img, roi, pos.x, pos.y);
+            const desc = crossCursorView.makePathDesc(img, pos.x, pos.y);
+            const viewScale = viewZoom.scale;
+            const labelsAttr = crossCursorView.makeLabelAttr(img, roi, pos.x, pos.y, viewScale);
             if (0 === img.view.find('.cursor').length) {
-                addCrossCursor(img, desc);
+                crossCursorView.addCrossCursor(img, desc);
             } else {
                 img.cursor.find('path').attr('d', desc);
             }
-            img.cursor.find('path').attr('stroke-dasharray', state.fixed() ? 'none' : '4,1');
+            img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
             img.cursor.find('g.labels text').each(function (i) {
                 $(this).attr(labelsAttr[i]).text(i === 0 ? pos.x : pos.y);
             });
@@ -696,7 +708,8 @@ const CompareUI = function({ compareUtil }) {
                 });
                 const pos = state.position(ent.index);
                 const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
-                const attr = makeLabelAttrOnTransform(ent, roi, pos.x, pos.y);
+                const viewScale = viewZoom.scale;
+                const attr = crossCursorView.makeLabelAttrOnTransform(ent, roi, pos.x, pos.y, viewScale);
                 $(ent.cursor).find('g.labels text').each(function (i) {
                     $(this).attr(attr[i]);
                 });
