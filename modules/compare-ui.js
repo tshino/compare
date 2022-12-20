@@ -529,6 +529,17 @@ const CompareUI = function({ compareUtil }) {
         const updateImageBoxSize = function(img, w, h) {
             $(img.cursor).css({ width: w + 'px', height: h + 'px' });
         };
+        const updateTransform = function(img, commonStyle, pos, viewScale, viewCenter) {
+            const baseScale = img.width / (img.baseWidth * viewScale);
+            $(img.cursor).css(commonStyle).find('path').each(function (i) {
+                $(this).attr('stroke-width', baseScale * [2, 1][i]);
+            });
+            const roi = img.calcROI(viewScale, viewCenter);
+            const attr = makeLabelAttrOnTransform(img, roi, pos.x, pos.y, viewScale);
+            $(img.cursor).find('g.labels text').each(function (i) {
+                $(this).attr(attr[i]);
+            });
+        };
         const removeCrossCursor = function (img) {
             if (img.cursor) {
                 $(img.cursor).remove();
@@ -537,9 +548,9 @@ const CompareUI = function({ compareUtil }) {
         };
 
         return {
-            makeLabelAttrOnTransform,
             updateCrossCursor,
             updateImageBoxSize,
+            updateTransform,
             removeCrossCursor,
         };
     };
@@ -707,18 +718,11 @@ const CompareUI = function({ compareUtil }) {
         const onUpdateEntryTransform = function (ent, commonStyle) {
             if (ent.cursor) {
                 updateIsInView(ent);
-                const baseScale = ent.width / (ent.baseWidth * viewZoom.scale);
-                $(ent.cursor).css(commonStyle).find('path').each(function (i) {
-                    $(this).attr('stroke-width', baseScale * [2, 1][i]);
-                });
                 const pos = state.position(ent.index);
-                const roi = ent.calcROI(viewZoom.scale, viewZoom.getCenter());
                 const viewScale = viewZoom.scale;
-                const attr = crossCursorView.makeLabelAttrOnTransform(ent, roi, pos.x, pos.y, viewScale);
-                $(ent.cursor).find('g.labels text').each(function (i) {
-                    $(this).attr(attr[i]);
-                });
-            }
+                const viewCenter = viewZoom.getCenter();
+                crossCursorView.updateTransform(ent, commonStyle, pos, viewScale, viewCenter);
+            };
         };
         const onUpdateTransform = function () {
             if (state.isEnabled()) {
