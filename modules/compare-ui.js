@@ -512,12 +512,35 @@ const CompareUI = function({ compareUtil }) {
                 height(size.h);
             img.view.append(img.cursor);
         };
+        const updateCrossCursor = function (img, pos, fixed, viewScale, viewCenter) {
+            const roi = img.calcROI(viewScale, viewCenter);
+            const desc = makePathDesc(img, pos.x, pos.y);
+            const labelsAttr = makeLabelAttr(img, roi, pos.x, pos.y, viewScale);
+            if (0 === img.view.find('.cursor').length) {
+                addCrossCursor(img, desc);
+            } else {
+                img.cursor.find('path').attr('d', desc);
+            }
+            img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
+            img.cursor.find('g.labels text').each(function (i) {
+                $(this).attr(labelsAttr[i]).text(i === 0 ? pos.x : pos.y);
+            });
+        };
+        const updateImageBoxSize = function(img, w, h) {
+            $(img.cursor).css({ width: w + 'px', height: h + 'px' });
+        };
+        const removeCrossCursor = function (img) {
+            if (img.cursor) {
+                $(img.cursor).remove();
+                img.cursor = null;
+            }
+        };
 
         return {
-            makePathDesc,
-            makeLabelAttr,
             makeLabelAttrOnTransform,
-            addCrossCursor,
+            updateCrossCursor,
+            updateImageBoxSize,
+            removeCrossCursor,
         };
     };
 
@@ -587,28 +610,12 @@ const CompareUI = function({ compareUtil }) {
                 }
             }
         };
-        const removeCrossCursor = function (img) {
-            if (img.cursor) {
-                $(img.cursor).remove();
-                img.cursor = null;
-            }
-        };
         const updateCrossCursor = function (img) {
             const pos = state.position(img.index);
             const fixed = state.fixed();
-            const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
-            const desc = crossCursorView.makePathDesc(img, pos.x, pos.y);
             const viewScale = viewZoom.scale;
-            const labelsAttr = crossCursorView.makeLabelAttr(img, roi, pos.x, pos.y, viewScale);
-            if (0 === img.view.find('.cursor').length) {
-                crossCursorView.addCrossCursor(img, desc);
-            } else {
-                img.cursor.find('path').attr('d', desc);
-            }
-            img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
-            img.cursor.find('g.labels text').each(function (i) {
-                $(this).attr(labelsAttr[i]).text(i === 0 ? pos.x : pos.y);
-            });
+            const viewCenter = viewZoom.getCenter();
+            crossCursorView.updateCrossCursor(img, pos, fixed, viewScale, viewCenter);
         };
         const setPosition = function (index, x, y) {
             const ent = view.getEntry(index);
@@ -692,11 +699,9 @@ const CompareUI = function({ compareUtil }) {
                     updateIsInView(img);
                 }
                 updateCrossCursor(img);
+                crossCursorView.updateImageBoxSize(img, w, h);
             } else {
-                removeCrossCursor(img);
-            }
-            if (img.cursor) {
-                $(img.cursor).css({ width: w + 'px', height: h + 'px' });
+                crossCursorView.removeCrossCursor(img);
             }
         };
         const onUpdateEntryTransform = function (ent, commonStyle) {
