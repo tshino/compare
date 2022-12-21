@@ -226,9 +226,9 @@ const CompareUI = function({ compareUtil }) {
                     listener();
                 }
             };
-            const notifyUpdateEntryTransform = function(ent, style) {
+            const notifyUpdateEntryTransform = function(img, style) {
                 for (const listener of onUpdateEntryTransformListeners) {
-                    listener(ent, style);
+                    listener(img, style);
                 }
             };
 
@@ -366,9 +366,9 @@ const CompareUI = function({ compareUtil }) {
                     attr('opacity', opacity[index]);
             });
         };
-        const onUpdateEntryTransform = function (ent, commonStyle) {
-            if (ent.grid) {
-                updateGridStyle(ent.grid, ent.width, ent.baseWidth, view.viewZoom.scale, commonStyle);
+        const onUpdateEntryTransform = function (img, commonStyle) {
+            if (img.grid) {
+                updateGridStyle(img.grid, img.width, img.baseWidth, view.viewZoom.scale, commonStyle);
             }
         };
         model.events.addOnUpdateImageBox(onUpdateImageBox);
@@ -715,13 +715,13 @@ const CompareUI = function({ compareUtil }) {
                 crossCursorView.removeCrossCursor(img);
             }
         };
-        const onUpdateEntryTransform = function (ent, commonStyle) {
-            if (ent.cursor) {
-                updateIsInView(ent);
-                const pos = state.position(ent.index);
+        const onUpdateEntryTransform = function (img, commonStyle) {
+            if (img.cursor) {
+                updateIsInView(img);
+                const pos = state.position(img.index);
                 const viewScale = viewZoom.scale;
                 const viewCenter = viewZoom.getCenter();
-                crossCursorView.updateTransform(ent, commonStyle, pos, viewScale, viewCenter);
+                crossCursorView.updateTransform(img, commonStyle, pos, viewScale, viewCenter);
             };
         };
         const onUpdateTransform = function () {

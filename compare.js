@@ -296,18 +296,16 @@ const compareUI = CompareUI({ compareUtil });
       model.events.notifyUpdateLayout();
     };
     const doUpdateTransform = function(viewZoom) {
-      for (const ent of registry.entries()) {
-        if (ent.element) {
+      for (const img of registry.getImages()) {
           const style = {
             left        : '50%',
             top         : '50%',
             transform   : 'translate(-50%, -50%) ' +
-                          viewZoom.makeTransform(ent.index) +
-                          ent.orientationAsCSS
+                          viewZoom.makeTransform(img.index) +
+                          img.orientationAsCSS
           };
-          $(ent.element).css(style);
-          model.events.notifyUpdateEntryTransform(ent, style);
-        }
+          $(img.element).css(style);
+          model.events.notifyUpdateEntryTransform(img, style);
       }
       model.events.notifyUpdateTransform();
     };
@@ -3797,9 +3795,9 @@ const compareUI = CompareUI({ compareUtil });
         }
       }
     };
-    const onUpdateEntryTransform = function(ent, commonStyle) {
-      if (ent.contour) {
-        $(ent.contour).css(commonStyle);
+    const onUpdateEntryTransform = function(img, commonStyle) {
+      if (img.contour) {
+        $(img.contour).css(commonStyle);
       }
     };
     const currentMode = function() {
