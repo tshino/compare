@@ -606,7 +606,11 @@ const CompareUI = function({ compareUtil }) {
             );
         };
         const updateIsInView = function(img) {
-            const pos = state.position(img.index);
+            let pos = state.position(img.index);
+            if (!pos) {
+                pos = { x: 0, y: 0 };
+                state.setPosition(img.index, pos);
+            }
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
             const isInView = isInsideROI(roi, pos.x, pos.y);
             state.setIsInView(img.index, isInView);
@@ -622,7 +626,11 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const updateCrossCursor = function (img) {
-            const pos = state.position(img.index);
+            let pos = state.position(img.index);
+            if (!pos) {
+                pos = { x: 0, y: 0 };
+                state.setPosition(img.index, pos);
+            }
             const fixed = state.fixed();
             const viewScale = viewZoom.scale;
             const viewCenter = viewZoom.getCenter();
@@ -704,11 +712,6 @@ const CompareUI = function({ compareUtil }) {
         };
         const onUpdateImageBox = function (img, w, h) {
             if (state.isEnabled() && img.element) {
-                const pos = state.position(img.index);
-                if (!pos) {
-                    state.setPosition(img.index, { x: 0, y: 0 });
-                    updateIsInView(img);
-                }
                 updateCrossCursor(img);
                 crossCursorView.updateImageBoxSize(img, w, h);
             } else {
