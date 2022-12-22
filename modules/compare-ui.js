@@ -5,6 +5,7 @@ const CompareUI = function({ compareUtil }) {
             const entries = [];
             let images = [];
             const cacheProperties = [];
+            const onAddImageListeners = [];
             const onRemoveEntryListeners = [];
             let onDidRemoveEntry = null;
 
@@ -40,6 +41,9 @@ const CompareUI = function({ compareUtil }) {
                 ent.canvasWidth = width;
                 ent.canvasHeight = height;
                 ent.element = image;
+                for (const listener of onAddImageListeners) {
+                    listener(ent);
+                }
             };
             const setAltImage = function(index, image) {
                 const ent = entries[index];
@@ -97,6 +101,9 @@ const CompareUI = function({ compareUtil }) {
             const addCacheProperty = function (propName) {
                 cacheProperties.push(propName);
             };
+            const addOnAddImage = function(listener) {
+                onAddImageListeners.push(listener);
+            };
             const addOnRemoveEntry = function (listener) {
                 onRemoveEntryListeners.push(listener);
             };
@@ -123,6 +130,7 @@ const CompareUI = function({ compareUtil }) {
                 indexFromNumber,
                 findImageIndexOtherThan,
                 addCacheProperty,
+                addOnAddImage,
                 addOnRemoveEntry,
                 setOnDidRemoveEntry
             };
@@ -606,14 +614,15 @@ const CompareUI = function({ compareUtil }) {
             );
         };
         const updateIsInView = function(img) {
-            let pos = state.position(img.index);
-            if (!pos) {
-                pos = { x: 0, y: 0 };
-                state.setPosition(img.index, pos);
-            }
+            const pos = state.position(img.index);
             const roi = img.calcROI(viewZoom.scale, viewZoom.getCenter());
             const isInView = isInsideROI(roi, pos.x, pos.y);
             state.setIsInView(img.index, isInView);
+        };
+        const onAddImage = function(img) {
+            if (state.isEnabled()) {
+                state.setPosition(img.index, { x: 0, y: 0 });
+            }
         };
         const onRemoveEntry = function (index) {
             if (state.isEnabled() && state.primaryIndex() === index) {
@@ -626,11 +635,7 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const updateCrossCursor = function (img) {
-            let pos = state.position(img.index);
-            if (!pos) {
-                pos = { x: 0, y: 0 };
-                state.setPosition(img.index, pos);
-            }
+            const pos = state.position(img.index);
             const fixed = state.fixed();
             const viewScale = viewZoom.scale;
             const viewCenter = viewZoom.getCenter();
@@ -732,6 +737,7 @@ const CompareUI = function({ compareUtil }) {
                 state.notifyUpdate(false);
             }
         };
+        view.addOnAddImage(onAddImage);
         view.addOnRemoveEntry(onRemoveEntry);
         model.events.addOnUpdateImageBox(onUpdateImageBox);
         model.events.addOnUpdateEntryTransform(onUpdateEntryTransform);

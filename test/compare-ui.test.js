@@ -123,6 +123,15 @@ describe('CompareUI', () => {
                     assert.strictEqual(registry.ready(ent0.index), true);
                     assert.strictEqual(registry.visible(ent0.index), true);
                 });
+                it('should call onAddImage callback', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const log = [];
+                    registry.addOnAddImage((img) => { log.push(`called ${img.name}`); });
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    registry.setImage(ent0.index, {});
+                    assert.deepStrictEqual(log, ['called hello']);
+                });
             });
             describe('setAltImage', () => {
                 it('should set given element as alternative image', () => {
@@ -188,6 +197,16 @@ describe('CompareUI', () => {
                     assert.strictEqual(ent0.element, null);
                     assert.strictEqual(ent0.asCanvas, null);
                     assert.strictEqual(registry.visible(ent0.index), false);
+                });
+                it('should call onRemoveEntry callback', () => {
+                    const registry = compareUI.ViewModel().Registry();
+                    const log = [];
+                    registry.addOnRemoveEntry(() => { log.push('called'); });
+                    const ent0 = { name: 'hello' };
+                    registry.register(ent0);
+                    registry.setImage(ent0.index, {});
+                    registry.removeEntry(ent0.index);
+                    assert.deepStrictEqual(log, ['called']);
                 });
                 it('should call onDidRemoveEntry callback', () => {
                     const registry = compareUI.ViewModel().Registry();
@@ -460,6 +479,7 @@ describe('CompareUI', () => {
     const ViewMock = function() {
         return {
             viewZoom: {},
+            addOnAddImage: () => {},
             addOnRemoveEntry: () => {}
         };
     };

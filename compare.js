@@ -440,6 +440,7 @@ const compareUI = CompareUI({ compareUtil });
       numberFromIndex: registry.numberFromIndex,
       indexFromNumber: registry.indexFromNumber,
       addCacheProperty: registry.addCacheProperty,
+      addOnAddImage: registry.addOnAddImage,
       addOnRemoveEntry: registry.addOnRemoveEntry,
       findImageIndexOtherThan: registry.findImageIndexOtherThan,
       resetBaseAndTargetImage,
