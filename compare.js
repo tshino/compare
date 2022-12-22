@@ -3913,8 +3913,6 @@ const compareUI = CompareUI({ compareUtil });
   })();
   const nowLoadingDialog = NowLoadingDialog();
   const setEntryImage = function(entry, image, w, h) {
-    const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
-    view.setImage(entry.index, { image, canvas, width: w, height: h });
     entry.altViewMode = null;
     entry.orientationAsCSS = compareUtil.orientationUtil.getCSSTransform(entry.orientation);
     entry.transposed = compareUtil.orientationUtil.isTransposed(entry.orientation);
@@ -3930,6 +3928,8 @@ const compareUI = CompareUI({ compareUtil });
     const leftTop = entry.interpretXY2(0, 0);
     entry.flippedX = leftTop.x !== 0;
     entry.flippedY = leftTop.y !== 0;
+    const canvas = image.nodeName === 'CANVAS' ? image : compareUtil.figureUtil.canvasFromImage(image, w, h);
+    view.setImage(entry.index, { image, canvas, width: w, height: h });
     //
     view.updateDOM();
     nowLoadingDialog.update();
