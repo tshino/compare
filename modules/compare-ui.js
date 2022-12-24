@@ -569,18 +569,30 @@ const CompareUI = function({ compareUtil }) {
         const viewZoom = view.viewZoom;
         const state = CrossCursorState();
 
-        const makeInitialPosition = function (index) {
-            const img = view.getEntry(index);
-            const center = viewZoom.getCenter();
-            const x = (0.5 + center.x) * img.width;
-            const y = (0.5 + center.y) * img.height;
-            return { x, y };
+        const makePosition = function (index) {
+            const refIndex = state.primaryIndex();
+            const ref = state.position(refIndex);
+            if (ref) {
+                const refImg = view.getEntry(refIndex);
+                const rx = (Math.floor(ref.x) + 0.5) / refImg.width;
+                const ry = (Math.floor(ref.y) + 0.5) / refImg.height;
+                const img = view.getEntry(index);
+                const x = compareUtil.clamp(Math.floor(rx * img.width), 0, img.width - 1);
+                const y = compareUtil.clamp(Math.floor(ry * img.height), 0, img.height - 1);
+                return { x, y };
+            } else {
+                const img = view.getEntry(index);
+                const center = viewZoom.getCenter();
+                const x = (0.5 + center.x) * img.width;
+                const y = (0.5 + center.y) * img.height;
+                return { x, y };
+            }
         };
         const enable = function () {
             const index = view.getCurrentIndexOr(view.getFrontIndex());
             if (!state.isEnabled() && index !== null) {
                 state.enable(index);
-                const pos = makeInitialPosition(index);
+                const pos = makePosition(index);
                 setPosition(index, pos.x, pos.y);
                 view.updateLayout();
             }
@@ -623,7 +635,8 @@ const CompareUI = function({ compareUtil }) {
         };
         const onAddImage = function(img) {
             if (state.isEnabled()) {
-                state.setPosition(img.index, { x: 0, y: 0 });
+                const pos = makePosition(img.index);
+                state.setPosition(img.index, pos);
             }
         };
         const onRemoveEntry = function (index) {
