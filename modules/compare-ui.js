@@ -538,15 +538,17 @@ const CompareUI = function({ compareUtil }) {
             $(img.cursor).css({ width: w + 'px', height: h + 'px' });
         };
         const updateTransform = function(img, commonStyle, pos, viewScale, viewCenter) {
-            const baseScale = img.width / (img.baseWidth * viewScale);
-            $(img.cursor).css(commonStyle).find('path').each(function (i) {
-                $(this).attr('stroke-width', baseScale * [2, 1][i]);
-            });
-            const roi = img.calcROI(viewScale, viewCenter);
-            const attr = makeLabelAttrOnTransform(img, roi, pos.x, pos.y, viewScale);
-            $(img.cursor).find('g.labels text').each(function (i) {
-                $(this).attr(attr[i]);
-            });
+            if (img.cursor) {
+                const baseScale = img.width / (img.baseWidth * viewScale);
+                $(img.cursor).css(commonStyle).find('path').each(function (i) {
+                    $(this).attr('stroke-width', baseScale * [2, 1][i]);
+                });
+                const roi = img.calcROI(viewScale, viewCenter);
+                const attr = makeLabelAttrOnTransform(img, roi, pos.x, pos.y, viewScale);
+                $(img.cursor).find('g.labels text').each(function (i) {
+                    $(this).attr(attr[i]);
+                });
+            }
         };
         const removeCrossCursor = function (img) {
             if (img.cursor) {
@@ -724,13 +726,13 @@ const CompareUI = function({ compareUtil }) {
             }
         };
         const onUpdateEntryTransform = function (img, commonStyle) {
-            if (img.cursor) {
+            if (state.isEnabled()) {
                 updateIsInView(img);
                 const pos = state.position(img.index);
                 const viewScale = viewZoom.scale;
                 const viewCenter = viewZoom.getCenter();
                 crossCursorView.updateTransform(img, commonStyle, pos, viewScale, viewCenter);
-            };
+            }
         };
         const onUpdateTransform = function () {
             if (state.isEnabled()) {
