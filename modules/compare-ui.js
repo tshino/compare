@@ -505,7 +505,7 @@ const CompareUI = function({ compareUtil }) {
             const vbox = '0 0 ' + size.w + ' ' + size.h;
             const filter_id = 'drop-shadow' + img.index;
             const textElem = '<text filter="url(#' + filter_id + ')"></text>';
-            img.cursor = $(
+            img._cursor = $(
                 '<svg class="imageOverlay cursor" viewBox="' + vbox + '" style="overflow:visible">' +
                 '<defs><filter id="' + filter_id + '">' +
                 '<feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="1.5"></feGaussianBlur>' +
@@ -518,50 +518,50 @@ const CompareUI = function({ compareUtil }) {
                 '</svg>').
                 width(size.w).
                 height(size.h);
-            img.view.append(img.cursor);
+            img.view.append(img._cursor);
         };
-        const updateCrossCursor = function (img, pos, fixed, viewScale, viewCenter) {
+        const update = function (img, pos, fixed, viewScale, viewCenter) {
             const roi = img.calcROI(viewScale, viewCenter);
             const desc = makePathDesc(img, pos.x, pos.y);
             const labelsAttr = makeLabelAttr(img, roi, pos.x, pos.y, viewScale);
             if (0 === img.view.find('.cursor').length) {
                 addCrossCursor(img, desc);
             } else {
-                img.cursor.find('path').attr('d', desc);
+                img._cursor.find('path').attr('d', desc);
             }
-            img.cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
-            img.cursor.find('g.labels text').each(function (i) {
+            img._cursor.find('path').attr('stroke-dasharray', fixed ? 'none' : '4,1');
+            img._cursor.find('g.labels text').each(function (i) {
                 $(this).attr(labelsAttr[i]).text(i === 0 ? pos.x : pos.y);
             });
         };
         const updateImageBoxSize = function(img, w, h) {
-            $(img.cursor).css({ width: w + 'px', height: h + 'px' });
+            $(img._cursor).css({ width: w + 'px', height: h + 'px' });
         };
         const updateTransform = function(img, commonStyle, pos, viewScale, viewCenter) {
-            if (img.cursor) {
+            if (img._cursor) {
                 const baseScale = img.width / (img.baseWidth * viewScale);
-                $(img.cursor).css(commonStyle).find('path').each(function (i) {
+                $(img._cursor).css(commonStyle).find('path').each(function (i) {
                     $(this).attr('stroke-width', baseScale * [2, 1][i]);
                 });
                 const roi = img.calcROI(viewScale, viewCenter);
                 const attr = makeLabelAttrOnTransform(img, roi, pos.x, pos.y, viewScale);
-                $(img.cursor).find('g.labels text').each(function (i) {
+                $(img._cursor).find('g.labels text').each(function (i) {
                     $(this).attr(attr[i]);
                 });
             }
         };
-        const removeCrossCursor = function (img) {
-            if (img.cursor) {
-                $(img.cursor).remove();
-                img.cursor = null;
+        const remove = function (img) {
+            if (img._cursor) {
+                $(img._cursor).remove();
+                img._cursor = null;
             }
         };
 
         return {
-            updateCrossCursor,
+            update,
             updateImageBoxSize,
             updateTransform,
-            removeCrossCursor,
+            remove,
         };
     };
 
@@ -654,7 +654,7 @@ const CompareUI = function({ compareUtil }) {
             const fixed = state.fixed();
             const viewScale = viewZoom.scale;
             const viewCenter = viewZoom.getCenter();
-            crossCursorView.updateCrossCursor(img, pos, fixed, viewScale, viewCenter);
+            crossCursorView.update(img, pos, fixed, viewScale, viewCenter);
         };
         const setPosition = function (index, x, y) {
             const ent = view.getEntry(index);
@@ -735,7 +735,7 @@ const CompareUI = function({ compareUtil }) {
                 updateCrossCursor(img);
                 crossCursorView.updateImageBoxSize(img, w, h);
             } else {
-                crossCursorView.removeCrossCursor(img);
+                crossCursorView.remove(img);
             }
         };
         const onUpdateEntryTransform = function (img, commonStyle) {
