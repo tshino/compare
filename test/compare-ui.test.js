@@ -476,11 +476,19 @@ describe('CompareUI', () => {
         });
     });
 
-    const ViewMock = function() {
+    const ViewMock = function(logs = []) {
+        const entries = [
+            { index: 0, width: 640, height: 480, calcROI: () =>[0,0,640,480] }
+        ];
         return {
-            viewZoom: {},
+            viewZoom: { scale: 1, getCenter: () => ({ x: 0, y: 0 }) },
             addOnAddImage: () => {},
-            addOnRemoveEntry: () => {}
+            addOnRemoveEntry: () => {},
+            getCurrentIndexOr: () => 0,
+            getFrontIndex: () => 0,
+            getEntry: (index) => entries[index],
+            getImages: () => entries,
+            updateLayout: () => logs.push('view.updateLayout'),
         };
     };
     const ModelMock = function() {
@@ -604,11 +612,79 @@ describe('CompareUI', () => {
     });
 
     describe('CrossCursor', () => {
+        const CrossCursorViewMock = () => ({
+            update: () => {},
+            updateImageBoxSize: () => {},
+            updateTransform: () => {},
+            remove: () => {}
+        });
         it('should construct successfully', () => {
             const view = ViewMock();
             const model = ModelMock();
             const crossCursor = compareUI.CrossCursor({ view, model });
             assert.ok( crossCursor );
+        });
+        const createWithMocks = function(logs) {
+            const view = ViewMock(logs), model = ModelMock(), crossCursorView = CrossCursorViewMock();
+            const crossCursor = compareUI.CrossCursor({ view, model, crossCursorView });
+            crossCursor.addObserver(
+                () => { logs.push('add'); },
+                () => { logs.push('update'); },
+                () => { logs.push('remove'); }
+            );
+            return crossCursor;
+        };
+        describe('enable', () => {
+            it('should activate cross cursor', () => {
+                const logs = [], crossCursor = createWithMocks(logs);
+                crossCursor.enable();
+                assert.strictEqual(crossCursor.isEnabled(), true);
+                const pos = crossCursor.getPosition(0);
+                assert.strictEqual(pos.x, 320);
+                assert.strictEqual(pos.y, 240);
+                const npos = crossCursor.getNormalizedPosition();
+                assert.strictEqual(npos.x, 320.5/640);
+                assert.strictEqual(npos.y, 240.5/480);
+                assert.strictEqual(crossCursor.getIndex(), 0);
+                assert.deepStrictEqual(logs, [
+                    'add', 'update', 'view.updateLayout'
+                ]);
+            });
+        });
+        describe('disable', () => {
+            it('should deactivate cross cursor', () => {
+                const logs = [], crossCursor = createWithMocks(logs);
+                crossCursor.enable();
+                crossCursor.disable();
+                assert.strictEqual(crossCursor.isEnabled(), false);
+                assert.deepStrictEqual(logs, [
+                    'add', 'update', 'view.updateLayout', 'remove', 'view.updateLayout'
+                ]);
+            });
+        });
+        describe('toggle', () => {
+            it('should toggle cross cursor', () => {
+                const logs = [], crossCursor = createWithMocks(logs);
+                crossCursor.toggle();
+                crossCursor.toggle();
+                assert.strictEqual(crossCursor.isEnabled(), false);
+                assert.deepStrictEqual(logs, [
+                    'add', 'update', 'view.updateLayout', 'remove', 'view.updateLayout'
+                ]);
+            });
+        });
+        describe('processKeyDown', () => {
+            it('should move cross cursor', () => {
+                const logs = [], crossCursor = createWithMocks(logs);
+                crossCursor.enable();
+                crossCursor.processKeyDown({ keyCode: 37 });
+                const pos = crossCursor.getPosition(0);
+                assert.strictEqual(pos.x, 319);
+                assert.strictEqual(pos.y, 240);
+                assert.deepStrictEqual(logs, [
+                    'add', 'update', 'view.updateLayout', 'update'
+                ]);
+            });
         });
     });
     describe('Hud', () => {
