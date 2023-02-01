@@ -1806,4 +1806,49 @@ describe('CompareImageUtil', () => {
             assert.deepStrictEqual(compareImageUtil.mostFrequentColor(colors4), [0, 0, 0, 255]);
         });
     });
+
+    describe('growingTypedArray', () => {
+        it('should make a typed array that can grow', () => {
+            const a = compareImageUtil.growingTypedArray(Uint32Array, 4);
+            assert.strictEqual(a.length(), 0);
+            assert.strictEqual(a.capacity(), 4);
+            assert.strictEqual(a.buffer().length, 4);
+
+            const array1 = a.makeArray();
+            assert.strictEqual(array1.length, 0);
+
+            a.push(1234);
+            assert.strictEqual(a.length(), 1);
+            assert.strictEqual(a.capacity(), 4);
+            assert.strictEqual(a.buffer()[0], 1234);
+
+            const array2 = a.makeArray();
+            assert.strictEqual(array2.length, 1);
+            assert.strictEqual(array2[0], 1234);
+
+            a.push(2222);
+            a.push(3333);
+            a.push(4444);
+            assert.strictEqual(a.length(), 4);
+            assert.strictEqual(a.capacity(), 4);
+            assert.strictEqual(a.buffer()[1], 2222);
+            assert.strictEqual(a.buffer()[2], 3333);
+            assert.strictEqual(a.buffer()[3], 4444);
+
+            const array3 = a.makeArray();
+            assert.strictEqual(array3.length, 4);
+            assert.strictEqual(array3[1], 2222);
+            assert.strictEqual(array3[2], 3333);
+            assert.strictEqual(array3[3], 4444);
+
+            a.push(5555);
+            assert.strictEqual(a.length(), 5);
+            assert.strictEqual(a.capacity(), 8);
+            assert.strictEqual(a.buffer()[4], 5555);
+
+            const array4 = a.makeArray();
+            assert.strictEqual(array4.length, 5);
+            assert.strictEqual(array4[4], 5555);
+        });
+    });
 });
