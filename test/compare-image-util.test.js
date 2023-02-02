@@ -1853,7 +1853,7 @@ describe('CompareImageUtil', () => {
     });
 
     describe('mergeUniqueColors', () => {
-        it('should merge two set of unique colors', () => {
+        it('should merge two sets of unique colors', () => {
             const uc1 = {
                 colors: [0x000000, 0x111122, 0x222222, 0x223344, 0x778899],
                 counts: [1, 2, 3, 4, 5],
@@ -1884,6 +1884,32 @@ describe('CompareImageUtil', () => {
             assert.strictEqual(uc3.counts[6], 3);
             assert.strictEqual(uc3.counts[7], 4);
             assert.strictEqual(uc3.totalCount, 30);
+        });
+    });
+
+    describe('getUniqueColors', () => {
+        it('should extract a set of unique colors of given image', () => {
+            const imageData = {
+                width: 4, height: 4, data: [
+                    0, 0, 0, 255, 85, 85, 85, 255, 170, 170, 170, 255, 255, 255, 255, 255,
+                    255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 128, 128, 128, 255,
+                    0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 0, 255, 255, 255, 255, 255,
+                    0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255
+                ]
+            };
+            const uniqueColors = compareImageUtil.getUniqueColors(imageData);
+            assert.strictEqual(uniqueColors.colors.length, 11);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0x000000)], 5);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0xffffff)], 2);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0x555555)], 1);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0xaaaaaa)], 1);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0xff0000)], 1);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0x00ff00)], 1);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0x0000ff)], 1);
+            assert.strictEqual(uniqueColors.counts[uniqueColors.colors.indexOf(0x808080)], 1);
+            assert.ok(0 > uniqueColors.colors.indexOf(0x010101));
+            assert.ok(0 > uniqueColors.colors.indexOf(0x101010));
+            assert.strictEqual(uniqueColors.totalCount, 16);
         });
     });
 });
