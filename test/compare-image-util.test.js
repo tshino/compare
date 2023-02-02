@@ -1851,4 +1851,39 @@ describe('CompareImageUtil', () => {
             assert.strictEqual(array4[4], 5555);
         });
     });
+
+    describe('mergeUniqueColors', () => {
+        it('should merge two set of unique colors', () => {
+            const uc1 = {
+                colors: [0x000000, 0x111122, 0x222222, 0x223344, 0x778899],
+                counts: [1, 2, 3, 4, 5],
+                totalCount: 15
+            };
+            const uc2 = {
+                colors: [0x000000, 0x111111, 0x111122, 0x223344, 0xddeeff, 0xffeedd],
+                counts: [3, 2, 1, 2, 3, 4],
+                totalCount: 15
+            };
+            const uc3 = compareImageUtil.mergeUniqueColors(uc1, uc2);
+            assert.strictEqual(uc3.colors.length, 8);
+            assert.strictEqual(uc3.colors[0], 0x000000);
+            assert.strictEqual(uc3.colors[1], 0x111111);
+            assert.strictEqual(uc3.colors[2], 0x111122);
+            assert.strictEqual(uc3.colors[3], 0x222222);
+            assert.strictEqual(uc3.colors[4], 0x223344);
+            assert.strictEqual(uc3.colors[5], 0x778899);
+            assert.strictEqual(uc3.colors[6], 0xddeeff);
+            assert.strictEqual(uc3.colors[7], 0xffeedd);
+            assert.strictEqual(uc3.counts.length, 8);
+            assert.strictEqual(uc3.counts[0], 4);
+            assert.strictEqual(uc3.counts[1], 2);
+            assert.strictEqual(uc3.counts[2], 3);
+            assert.strictEqual(uc3.counts[3], 3);
+            assert.strictEqual(uc3.counts[4], 6);
+            assert.strictEqual(uc3.counts[5], 5);
+            assert.strictEqual(uc3.counts[6], 3);
+            assert.strictEqual(uc3.counts[7], 4);
+            assert.strictEqual(uc3.totalCount, 30);
+        });
+    });
 });
