@@ -1807,6 +1807,232 @@ describe('CompareImageUtil', () => {
         });
     });
 
+    describe('geometricTypeOfPixel', () => {
+        const getSlice4 = function (image, index) {
+            return [
+                image.data[index * 4], image.data[index * 4 + 1],
+                image.data[index * 4 + 2], image.data[index * 4 + 3]
+            ];
+        };
+        const checkGeometricTypeResult = function (label, w, h, result, getExpected) {
+            assert.strictEqual(result.typeMap.length, w * h);
+            assert.strictEqual(result.colorMap.width, w);
+            assert.strictEqual(result.colorMap.height, h);
+            assert.strictEqual(result.colorMap.data.length, w * h * 4);
+            const typeErrors = 0;
+            const colorErrors = 0;
+            for (let i = 0; i < w * h; i++) {
+                const x = i % w;
+                const y = Math.floor(i / w);
+                const expected = getExpected(x, y, i);
+                if (result.typeMap[i] !== expected.type) {
+                    if (typeErrors < 10) {
+                        const msg = 'type error at(' + x + ',' + y + ') of ' + label;
+                        assert.strictEqual(result.typeMap[i], expected.type, msg);
+                    }
+                    typeErrors += 1;
+                }
+                const expectedColor = expected.color.toString();
+                const actualColor = getSlice4(result.colorMap, i).toString();
+                if (actualColor !== expectedColor) {
+                    if (colorErrors < 10) {
+                        const msg = 'color error at(' + x + ',' + y + ') of ' + label;
+                        assert.strictEqual(actualColor, expectedColor, msg);
+                    }
+                    colorErrors += 1;
+                }
+            }
+            if (10 < typeErrors || 10 < colorErrors) {
+                console.warn('... and more');
+            }
+            assert.strictEqual(typeErrors, 0, 'type error count of ' + label);
+            assert.strictEqual(colorErrors, 0, 'color error count of ' + label);
+        };
+        const makeImage = compareImageUtil.makeImage;
+        const makeRegion = compareImageUtil.makeRegion;
+        const UNCLASSIFIED = 0, FLAT = 1, BORDER = 2;
+
+        it('should calculate a characteristics of image (1)', () => {
+            // complete flat image
+            const image1 = makeImage(200, 200);
+            compareImageUtil.fill(image1, 0, 0, 0, 255);
+            const result1 = compareImageUtil.geometricTypeOfPixel(image1);
+            checkGeometricTypeResult('result1', 200, 200, result1, function (x, y, i) {
+                // every pixels are flat
+                return { type: FLAT, color: getSlice4(image1, i) };
+            });
+
+            // ...with some rectangles are drawn
+            compareImageUtil.fill(makeRegion(image1, 50, 50, 20, 20), 255, 255, 255, 255);
+            compareImageUtil.fill(makeRegion(image1, 100, 50, 50, 50), 255, 0, 0, 255);
+            compareImageUtil.fill(makeRegion(image1, 0, 100, 100, 100), 0, 255, 0, 255);
+            compareImageUtil.fill(makeRegion(image1, 100, 100, 50, 50), 0, 0, 255, 255);
+            const result2 = compareImageUtil.geometricTypeOfPixel(image1);
+            checkGeometricTypeResult('result2', 200, 200, result2, function (x, y, i) {
+                // still every pixels belong to flat region
+                return { type: FLAT, color: getSlice4(image1, i) };
+            });
+
+            // ...with some thin lines with unique colors are drawn
+            compareImageUtil.fill(makeRegion(image1, 20, 0, 1, 200), 128, 0, 128, 255);
+            compareImageUtil.fill(makeRegion(image1, 0, 90, 200, 1), 45, 90, 135, 255);
+            const result3 = compareImageUtil.geometricTypeOfPixel(image1);
+            checkGeometricTypeResult('result3', 200, 200, result3, function (x, y, i) {
+                // pixels on the thin lines are not in flat region
+                return {
+                    type: (x === 20 || y === 90) ? UNCLASSIFIED : FLAT,
+                    color: getSlice4(image1, i)
+                };
+            });
+        });
+
+        it('should calculate a characteristics of image (2)', () => {
+            // white background and blue box with anti-aliasing-like border
+            const image2 = makeImage(200, 200);
+            compareImageUtil.fill(image2, 255, 255, 255, 255); // white
+            compareImageUtil.fill(makeRegion(image2, 50, 50, 100, 100), 0, 0, 255, 255); // blue
+            compareImageUtil.fill(makeRegion(image2, 50, 49, 100, 1), 64, 64, 255, 255); // light blue (top)
+            compareImageUtil.fill(makeRegion(image2, 50, 150, 100, 1), 192, 192, 255, 255); // light blue (bottom)
+            for (let i = 0; i < 100; i++) {
+                const gray1 = 254 - Math.round((254 - 128) * i / 99);
+                const gray2 = 128 + Math.round((254 - 128) * i / 99);
+                compareImageUtil.fill(makeRegion(image2, 49, 50 + i, 1, 1), gray1, gray1, 255, 255); // light blue (left)
+                compareImageUtil.fill(makeRegion(image2, 150, 50 + i, 1, 1), gray2, gray2, 255, 255); // light blue (right)
+            }
+            const result4 = compareImageUtil.geometricTypeOfPixel(image2);
+            checkGeometricTypeResult('result4', 200, 200, result4, function (x, y, i) {
+                // pixels on the border are classified as border
+                if ((x === 49 || x === 150) && (50 <= y && y <= 149)) {
+                    return { type: BORDER, color: [255, 255, 255, 255] };
+                }
+                if ((y === 49 || y === 150) && (50 <= x && x <= 149)) {
+                    return { type: BORDER, color: (y === 49 ? [0, 0, 255, 255] : [255, 255, 255, 255]) };
+                }
+                return { type: FLAT, color: getSlice4(image2, i) };
+            });
+        });
+
+        it('should calculate a characteristics of image (3)', () => {
+            // simple border lines
+            const simpleBorder = {
+                width: 4,
+                height: 4,
+                data: [
+                    0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+                    0, 0, 0, 255, 30, 30, 30, 255, 50, 50, 50, 255, 50, 50, 50, 255,
+                    0, 0, 0, 255, 50, 50, 50, 255, 90, 90, 90, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 50, 50, 50, 255, 90, 90, 90, 255, 90, 90, 90, 255
+                ]
+            };
+            const border1 = compareImageUtil.geometricTypeOfPixel(simpleBorder);
+            checkGeometricTypeResult('simpleBorder', 4, 4, border1, function (x, y, i) {
+                if (x === 0 || y === 0) {
+                    return { type: FLAT, color: [0, 0, 0, 255] };
+                } else if (x === 1 && y === 1) {
+                    return { type: BORDER, color: [0, 0, 0, 255] };
+                } else if (x === 1 || y === 1) {
+                    return { type: BORDER, color: [90, 90, 90, 255] };
+                } else {
+                    return { type: FLAT, color: [90, 90, 90, 255] };
+                }
+            });
+        });
+
+        it('should calculate a characteristics of image (4)', () => {
+            const simpleBorder2 = {
+                width: 4,
+                height: 4,
+                data: [
+                    50, 50, 50, 255, 90, 90, 90, 255, 90, 90, 90, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 50, 50, 50, 255, 90, 90, 90, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 0, 0, 0, 255, 50, 50, 50, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 50, 50, 50, 255
+                ]
+            };
+            const border2 = compareImageUtil.geometricTypeOfPixel(simpleBorder2);
+            checkGeometricTypeResult('simpleBorder2', 4, 4, border2, function (x, y, i) {
+                if (x === y) {
+                    return { type: BORDER, color: [90, 90, 90, 255] };
+                } else {
+                    return { type: FLAT, color: x < y ? [0, 0, 0, 255] : [90, 90, 90, 255] };
+                }
+            });
+        });
+
+        it('should calculate a characteristics of image (5)', () => {
+            const simpleBorder3 = {
+                width: 4,
+                height: 4,
+                data: [
+                    4, 4, 4, 255, 90, 90, 90, 255, 90, 90, 90, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 30, 30, 30, 255, 90, 90, 90, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 0, 0, 0, 255, 60, 60, 60, 255, 90, 90, 90, 255,
+                    0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 86, 86, 86, 255
+                ]
+            };
+            const border3 = compareImageUtil.geometricTypeOfPixel(simpleBorder3);
+            checkGeometricTypeResult('simpleBorder3', 4, 4, border3, function (x, y, i) {
+                if (x === y) {
+                    return { type: BORDER, color: x < 2 ? [0, 0, 0, 255] : [90, 90, 90, 255] };
+                } else {
+                    return { type: FLAT, color: x < y ? [0, 0, 0, 255] : [90, 90, 90, 255] };
+                }
+            });
+        });
+
+        it('should calculate a characteristics of image (6)', () => {
+            // gradation
+            const blueGradation = {
+                width: 4,
+                height: 4,
+                data: [
+                    0, 0, 0, 255, 0, 0, 2, 255, 0, 0, 4, 255, 0, 0, 6, 255,
+                    0, 0, 2, 255, 0, 0, 4, 255, 0, 0, 6, 255, 0, 0, 8, 255,
+                    0, 0, 4, 255, 0, 0, 6, 255, 0, 0, 8, 255, 0, 0, 10, 255,
+                    0, 0, 6, 255, 0, 0, 8, 255, 0, 0, 10, 255, 0, 0, 12, 255
+                ]
+            };
+            const result5 = compareImageUtil.geometricTypeOfPixel(blueGradation);
+            checkGeometricTypeResult('blueGradation', 4, 4, result5, function (x, y, i) {
+                return { type: FLAT, color: [0, 0, (x + y) * 2, 255] };
+            });
+        });
+
+        it('should calculate a characteristics of image (7)', () => {
+            const grayscaleGradation1 = {
+                width: 4,
+                height: 4,
+                data: [
+                    0, 0, 0, 255, 1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255,
+                    1, 1, 1, 255, 2, 2, 2, 255, 3, 3, 3, 255, 4, 4, 4, 255,
+                    2, 2, 2, 255, 3, 3, 3, 255, 4, 4, 4, 255, 5, 5, 5, 255,
+                    3, 3, 3, 255, 4, 4, 4, 255, 5, 5, 5, 255, 6, 6, 6, 255
+                ]
+            };
+            const result6 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation1);
+            checkGeometricTypeResult('grayscaleGradation1', 4, 4, result6, function (x, y, i) {
+                return { type: FLAT, color: [(x + y), (x + y), (x + y), 255] };
+            });
+        });
+
+        it('should calculate a characteristics of image (8)', () => {
+            const grayscaleGradation2 = {
+                width: 4,
+                height: 4,
+                data: [
+                    0, 0, 0, 255, 2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255,
+                    2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255,
+                    4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10, 10, 10, 255,
+                    6, 6, 6, 255, 8, 8, 8, 255, 10, 10, 10, 255, 12, 12, 12, 255
+                ]
+            };
+            const result7 = compareImageUtil.geometricTypeOfPixel(grayscaleGradation2);
+            checkGeometricTypeResult('grayscaleGradation2', 4, 4, result7, function (x, y, i) {
+                return { type: FLAT, color: [(x + y) * 2, (x + y) * 2, (x + y) * 2, 255] };
+            });
+        });
+    });
+
     describe('growingTypedArray', () => {
         it('should make a typed array that can grow', () => {
             const a = compareImageUtil.growingTypedArray(Uint32Array, 4);
