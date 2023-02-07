@@ -1,14 +1,39 @@
 ﻿'use strict';
-var workerLocation = workerLocation || location.href;
-var importScript = function(relativePath) {
-  var baseURL = workerLocation.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
-  var path = baseURL + relativePath;
-  importScripts(path);
+const isWorker = typeof importScripts !== 'undefined';
+
+const WorkerMock = function() {
+    let requestListener = null;
+    let responseListener = null;
+    const addEventListener = function(_event, callback) {
+        requestListener = callback;
+    };
+    const postMessage = function(msg) {
+        responseListener(msg);
+    };
+    return {
+        addEventListener,
+        postMessage,
+        getRequestListener: () => requestListener,
+        setResponseListener: callback => { responseListener = callback; }
+    };
 };
 
-importScript('compare-image-util.js');
+const worker = isWorker ? self : WorkerMock();
 
-self.addEventListener('message', function(e) {
+const importScript = function(relativePath) {
+    if (isWorker) {
+        const url = workerLocation || location.href;
+        const baseURL = url.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
+        const path = baseURL + relativePath;
+        importScripts(path);
+        return null;
+    } else {
+        return require('./' + relativePath);
+    }
+};
+this.compareImageUtil = importScript('compare-image-util.js') || compareImageUtil;
+
+worker.addEventListener('message', function(e) {
   const request = e.data;
   const data = request.data;
   var result = {};
@@ -61,7 +86,7 @@ self.addEventListener('message', function(e) {
     break;
   }
   const response = { data: result, requestId: request.requestId }
-  self.postMessage( response );
+  worker.postMessage( response );
 }, false);
 
 var srgb255ToLinear255 = (function() {
@@ -939,4 +964,8 @@ function calcDiff( a, b, options ) {
     image: image,
     summary:    summary
   };
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = worker;
 }
