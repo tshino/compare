@@ -137,4 +137,78 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result[512 + 255], 4);
         });
     });
+
+    describe('calcWaveform', () => {
+        beforeEach(reset);
+        const runTest = function(label, input, expected) {
+            label = ' in case ' + label;
+            const task = {
+                cmd: 'calcWaveform',
+                type: input.type,
+                auxTypes: input.auxTypes,
+                histW: input.histW,
+                transposed: input.transposed,
+                flipped: input.flipped,
+                imageData: input.imageData
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcWaveform', 'cmd' + label);
+            assert.strictEqual(responseData.result.length, expected.length, 'result.length' + label);
+            if (expected.length === responseData.result.length) {
+                let errorCount = 0;
+                for (let i = 0; i < expected.length; i++) {
+                    if (expected[i] !== responseData.result[i]) {
+                        errorCount += 1;
+                        if (3 < errorCount) {
+                            console.error('...Too many errors' + label);
+                            break;
+                        }
+                        assert.strictEqual(responseData.result[i], expected[i], 'result[' + i + ']' + label);
+                    }
+                }
+            }
+        };
+        const makeWaveform = function(w, list) {
+            const waveform = new Uint32Array(256 * w);
+            for (let i = 0; i < list.length; i++) {
+                for (let j = 0; j < list[i].length; j++) {
+                    waveform[i * 256 + list[i][j][0]] = list[i][j][1];
+                }
+            }
+            return waveform;
+        };
+        const imageData1 = [{
+            width: 4,
+            height: 4,
+            data: [
+                0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+                0, 0, 0, 255,  0, 0, 64, 255,  0, 0, 128, 255,  0, 0, 192, 255,
+                0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+                0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
+            ]
+        }];
+        it('should calculate waveform (1)', () => {
+            runTest(
+                'rgb test1',
+                {
+                    type: 0, // RGB
+                    auxTypes: [0, 0],
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+                        [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], // G
+                        [[0,4]], [[64,4]], [[128,4]], [[192,4]] // B
+                    ]
+                )
+            );
+        });
+    });
 });
