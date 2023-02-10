@@ -210,5 +210,27 @@ describe('compareWorker', () => {
                 )
             );
         });
+        it('should calculate waveform (2))', () => {
+            runTest(
+                'rgb test2',
+                {
+                    type: 0, // RGB
+                    auxTypes: [0, 0],
+                    histW: 4,
+                    transposed: true, // transposed!
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+                        [[0,4]], [[0,4]], [[1,4]], [[1,4]], // G
+                        [[0,1],[64,1],[128,1],[192,1]], [[0,1],[64,1],[128,1],[192,1]], // B
+                        [[0,1],[64,1],[128,1],[192,1]], [[0,1],[64,1],[128,1],[192,1]],
+                    ]
+                )
+            );
+        });
     });
 });
