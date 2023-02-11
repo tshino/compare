@@ -232,5 +232,24 @@ describe('compareWorker', () => {
                 )
             );
         });
+        it('should calculate waveform (3))', () => {
+            runTest(
+                'luminance test1',
+                {
+                    type: 1, // Luminance
+                    auxTypes: [0, 0],
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    4,
+                    [
+                        [[0,2],[1,2]], [[7,2],[8,2]], [[15,4]], [[22,4]]
+                    ]
+                )
+            );
+        });
     });
 });
