@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('assert');
 const compareWorker = require('../modules/compare-worker.js');
+const compareImageUtil = require('../modules/compare-image-util.js');
 
 describe('compareWorker', () => {
     let responseData = null;
@@ -270,6 +271,77 @@ describe('compareWorker', () => {
                         [[127,2],[128,2]], [[122,4]], [[117,4]], [[111,2],[112,2]], // Cr
                     ]
                 )
+            );
+        });
+    });
+
+    describe('calc3DWaveform', () => {
+        beforeEach(reset);
+        const runTest = function(label, input, expected) {
+            label = ' in case ' + label;
+            const task = {
+                cmd: 'calc3DWaveform',
+                imageData: [input.imageData]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calc3DWaveform', 'cmd' + label);
+            assert.strictEqual(responseData.result.width, expected.width, 'width' + label);
+            assert.strictEqual(responseData.result.height, expected.height, 'height' + label);
+            assert.strictEqual(responseData.result.waveform.length, expected.waveform.length, 'waveform.length' + label);
+            if (expected.waveform.length === responseData.result.waveform.length) {
+                let errorCount = 0;
+                for (let i = 0; i < expected.waveform.length; i++) {
+                    if (expected.waveform[i] !== responseData.result.waveform[i]) {
+                        errorCount += 1;
+                        if (3 < errorCount) {
+                            console.error('...Too many errors' + label);
+                            break;
+                        }
+                        assert.strictEqual(responseData.result.waveform[i], expected.waveform[i], 'waveform[' + i + ']' + label);
+                    }
+                }
+            }
+        };
+        const makeImage = compareImageUtil.makeImage;
+        const makeRegion = compareImageUtil.makeRegion;
+        const fill = compareImageUtil.fill;
+        const image40x30 = makeImage(40, 30);
+        const image30x40 = makeImage(30, 40);
+        const image1x999 = makeImage(1, 999);
+        const image999x1 = makeImage(999,1);
+        fill(image40x30, 0, 0, 0, 255);
+        fill(image30x40, 0, 0, 0, 255);
+        fill(image1x999, 255, 0, 0, 255);
+        fill(image999x1, 0, 255, 0, 255);
+        fill(makeRegion(image40x30, 0, 15, 20, 15), 0, 0, 255, 255);
+        fill(makeRegion(image30x40, 15, 0, 15, 20), 0, 255, 0, 255);
+        const expected40x30 = new Uint8Array(256 * 192 * 3);
+        const expected30x40 = new Uint8Array(192 * 256 * 3);
+        for (let y = 96; y < 192; y++) {
+            for (let x = 0; x < 128; x++) {
+                expected40x30[(y * 256 + x) * 3 + 2] = 255;
+                expected30x40[(x * 192 + y) * 3 + 1] = 255;
+            }
+        }
+        const expected1x999 = new Uint8Array(1 * 256 * 3);
+        const expected999x1 = new Uint8Array(256 * 1 * 3);
+        for (let y = 0; y < 256; y++) {
+            expected1x999[y * 3] = 255;
+            expected999x1[y * 3 + 1] = 255;
+        }
+        it('should calculate 3D waveform (1)', () => {
+            runTest(
+                'image40x30',
+                {
+                    imageData: image40x30
+                },
+                {
+                    width: 256,
+                    height: 192,
+                    waveform: expected40x30
+                }
             );
         });
     });

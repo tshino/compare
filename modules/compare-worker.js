@@ -21,17 +21,16 @@ const WorkerMock = function() {
 const worker = isWorker ? self : WorkerMock();
 
 const importScript = function(relativePath) {
-    if (isWorker) {
-        const url = workerLocation || location.href;
-        const baseURL = url.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
-        const path = baseURL + relativePath;
-        importScripts(path);
-        return null;
-    } else {
-        return require('./' + relativePath);
-    }
+    const url = workerLocation || location.href;
+    const baseURL = url.replace(/\\/g, '/').replace(/\/[^\/]*$/, '/');
+    const path = baseURL + relativePath;
+    importScripts(path);
 };
-this.compareImageUtil = importScript('compare-image-util.js') || compareImageUtil;
+if (isWorker) {
+    importScript('compare-image-util.js');
+} else {
+    global.compareImageUtil = require('./compare-image-util.js');
+}
 
 worker.addEventListener('message', function(e) {
   const request = e.data;
