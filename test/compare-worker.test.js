@@ -210,7 +210,7 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (2))', () => {
+        it('should calculate waveform (2)', () => {
             runTest(
                 'rgb test2',
                 {
@@ -232,7 +232,7 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (3))', () => {
+        it('should calculate waveform (3)', () => {
             runTest(
                 'luminance test1',
                 {
@@ -247,6 +247,27 @@ describe('compareWorker', () => {
                     4,
                     [
                         [[0,2],[1,2]], [[7,2],[8,2]], [[15,4]], [[22,4]]
+                    ]
+                )
+            );
+        });
+        it('should calculate waveform (4)', () => {
+            runTest(
+                'ycbcr test1',
+                {
+                    type: 2, // YCbCr
+                    auxTypes: [0, 0],
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,2],[1,2]], [[7,2],[8,2]], [[15,4]], [[22,4]], // Y
+                        [[127,2],[128,2]], [[159,2],[160,2]], [[191,2],[192,2]], [[223,2],[224,2]], // Cb
+                        [[127,2],[128,2]], [[122,4]], [[117,4]], [[111,2],[112,2]], // Cr
                     ]
                 )
             );
