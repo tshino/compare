@@ -370,5 +370,18 @@ describe('compareWorker', () => {
                 }
             );
         });
+        it('should calculate 3D waveform (4)', () => {
+            runTest(
+                'image999x1',
+                {
+                    imageData: image999x1
+                },
+                {
+                    width: 256,
+                    height: 1,
+                    waveform: expected999x1
+                }
+            );
+        });
     });
 });
