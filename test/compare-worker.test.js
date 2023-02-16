@@ -431,5 +431,27 @@ describe('compareWorker', () => {
                 }
             );
         });
+        it('should calculate reduced color table: exactly only two colors', () => {
+            runTest(
+                'exactly only two colors',
+                {
+                    width: 4,
+                    height: 4,
+                    data: [
+                        0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255,
+                        0,0,0,255, 255,0,128,255, 255,0,128,255, 0,0,0,255,
+                        0,0,0,255, 255,0,128,255, 255,0,128,255, 0,0,0,255,
+                        0,0,0,255,     0,0,0,255,     0,0,0,255, 0,0,0,255
+                    ]
+                },
+                {
+                    totalCount: 16,
+                    colorList: [
+                        [0, 12, 0, 0, 0],
+                        [0, 4, 4*255, 4*0, 4*128]
+                    ]
+                }
+            );
+        });
     });
 });
