@@ -384,4 +384,52 @@ describe('compareWorker', () => {
             );
         });
     });
+
+    describe('calcReducedColorTable', () => {
+        beforeEach(reset);
+        const runTest = function(label, input, expected) {
+            label = ' in case ' + label;
+            const task = {
+                cmd: 'calcReducedColorTable',
+                imageData: [input]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcReducedColorTable', 'cmd of ' + label);
+            assert.strictEqual(responseData.result.totalCount, expected.totalCount, 'totalCount of ' + label);
+            assert.strictEqual(responseData.result.colorList.length, expected.colorList.length, 'colorList.length of ' + label);
+            if (expected.colorList.length === responseData.result.colorList.length) {
+                for (let i = 0; i < expected.colorList.length; i++) {
+                    const s0 = 'colorList[' + i + ']', s1 = ' of ' + label;
+                    assert.strictEqual(responseData.result.colorList[i][1], expected.colorList[i][1], s0 + '[1]' + s1);
+                    assert.strictEqual(responseData.result.colorList[i][2], expected.colorList[i][2], s0 + '[2]' + s1);
+                    assert.strictEqual(responseData.result.colorList[i][3], expected.colorList[i][3], s0 + '[3]' + s1);
+                    assert.strictEqual(responseData.result.colorList[i][4], expected.colorList[i][4], s0 + '[4]' + s1);
+                }
+            }
+        };
+
+        it('should calculate reduced color table: single color', () => {
+            runTest(
+                'single color',
+                {
+                    width: 4,
+                    height: 4,
+                    data: [
+                        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+                        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+                        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+                        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255
+                    ]
+                },
+                {
+                    totalCount: 16,
+                    colorList: [
+                        [0, 16, 0, 0, 0]
+                    ]
+                }
+            );
+        });
+    });
 });
