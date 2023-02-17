@@ -453,5 +453,26 @@ describe('compareWorker', () => {
                 }
             );
         });
+        it('should calculate reduced color table: grayscale gradation', () => {
+            runTest(
+                'grayscaleGradation',
+                {
+                    width: 4,
+                    height: 4,
+                    data: [
+                        0, 0, 0, 255, 2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255,
+                        2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255,
+                        4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255,
+                        6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255
+                    ]
+                },
+                {
+                    totalCount: 16,
+                    colorList: [
+                        [0, 16, 16*6, 16*6, 16*6]
+                    ]
+                }
+            );
+        });
     });
 });
