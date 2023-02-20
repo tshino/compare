@@ -495,5 +495,25 @@ describe('compareWorker', () => {
                 }
             );
         });
+        it('should calculate reduced color table: stripe', () => {
+            const makeImage = compareImageUtil.makeImage;
+            const makeRegion = compareImageUtil.makeRegion;
+            const fill = compareImageUtil.fill;
+            const stripe = makeImage(50, 30);
+            fill(stripe, 255, 255, 255, 255);
+            fill(makeRegion(stripe, 10, 0, 10, 30), 0, 0, 255, 255);
+            fill(makeRegion(stripe, 30, 0, 10, 30), 0, 0, 255, 255);
+            runTest(
+                'stripe',
+                stripe,
+                {
+                    totalCount: 50 * 30,
+                    colorList: [
+                        [0, 900, 900*255, 900*255, 900*255],
+                        [0, 600, 600*0, 600*0, 600*255],
+                    ]
+                }
+            );
+        });
     });
 });
