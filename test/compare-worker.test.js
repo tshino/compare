@@ -516,4 +516,44 @@ describe('compareWorker', () => {
             );
         });
     });
+
+    describe('calcMetrics', () => {
+        const colorImage1 = {
+            width: 4,
+            height: 4,
+            data: [
+                0, 0, 0, 255, 0, 0, 64, 255, 0, 0, 128, 255, 0, 0, 192, 255,
+                0, 1, 0, 255, 0, 1, 64, 255, 0, 1, 128, 255, 0, 1, 192, 255,
+                0, 1, 0, 255, 0, 1, 64, 255, 0, 1, 128, 255, 0, 1, 192, 255,
+                0, 1, 0, 255, 0, 1, 64, 255, 0, 1, 128, 255, 0, 1, 192, 255,
+            ]
+        };
+        it('should calculate image quality metrics: exactly same images', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [colorImage1, colorImage1],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(responseData.auxTypes[0], 0);
+            assert.strictEqual(responseData.result.psnr, Infinity);
+            assert.strictEqual(responseData.result.sad, 0);
+            assert.strictEqual(responseData.result.ssd, 0);
+            assert.strictEqual( responseData.result.mae, 0);
+            assert.strictEqual( responseData.result.mse, 0);
+            assert.strictEqual( responseData.result.ncc, 1);
+            assert.strictEqual( responseData.result.y.psnr, Infinity);
+            assert.strictEqual( responseData.result.y.sad, 0);
+            assert.strictEqual( responseData.result.y.ssd, 0);
+            assert.strictEqual( responseData.result.y.mae, 0);
+            assert.strictEqual( responseData.result.y.mse, 0);
+            assert.strictEqual( responseData.result.y.ncc, 1);
+            assert.strictEqual( responseData.result.ae, 0);
+            assert.strictEqual( responseData.result.aeRgb, 0);
+            assert.strictEqual( responseData.result.aeAlpha, 0);
+        });
+    });
 });
