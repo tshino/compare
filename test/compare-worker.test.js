@@ -542,18 +542,55 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.psnr, Infinity);
             assert.strictEqual(responseData.result.sad, 0);
             assert.strictEqual(responseData.result.ssd, 0);
-            assert.strictEqual( responseData.result.mae, 0);
-            assert.strictEqual( responseData.result.mse, 0);
-            assert.strictEqual( responseData.result.ncc, 1);
-            assert.strictEqual( responseData.result.y.psnr, Infinity);
-            assert.strictEqual( responseData.result.y.sad, 0);
-            assert.strictEqual( responseData.result.y.ssd, 0);
-            assert.strictEqual( responseData.result.y.mae, 0);
-            assert.strictEqual( responseData.result.y.mse, 0);
-            assert.strictEqual( responseData.result.y.ncc, 1);
-            assert.strictEqual( responseData.result.ae, 0);
-            assert.strictEqual( responseData.result.aeRgb, 0);
-            assert.strictEqual( responseData.result.aeAlpha, 0);
+            assert.strictEqual(responseData.result.mae, 0);
+            assert.strictEqual(responseData.result.mse, 0);
+            assert.strictEqual(responseData.result.ncc, 1);
+            assert.strictEqual(responseData.result.y.psnr, Infinity);
+            assert.strictEqual(responseData.result.y.sad, 0);
+            assert.strictEqual(responseData.result.y.ssd, 0);
+            assert.strictEqual(responseData.result.y.mae, 0);
+            assert.strictEqual(responseData.result.y.mse, 0);
+            assert.strictEqual(responseData.result.y.ncc, 1);
+            assert.strictEqual(responseData.result.ae, 0);
+            assert.strictEqual(responseData.result.aeRgb, 0);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
+        // different with colorImage1 in only red component of every pixel
+        const colorImage2 = {
+            width: 4,
+            height: 4,
+            data: [
+                30, 0, 0, 255,  30, 0, 64, 255,  30, 0, 128, 255,  30, 0, 192, 255,
+                30, 1, 0, 255,  30, 1, 64, 255,  30, 1, 128, 255,  30, 1, 192, 255,
+                30, 1, 0, 255,  30, 1, 64, 255,  30, 1, 128, 255,  30, 1, 192, 255,
+                30, 1, 0, 255,  30, 1, 64, 255,  30, 1, 128, 255,  30, 1, 192, 255,
+            ]
+        };
+        it('should calculate image quality metrics: different images (1)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [colorImage1, colorImage2],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10((3*255*255) / (30*30)) - responseData.result.psnr), true);
+            assert.strictEqual(responseData.result.sad, 30*16);
+            assert.strictEqual(responseData.result.ssd, 30*30*16);
+            assert.strictEqual(responseData.result.mae, 30/3);
+            assert.strictEqual(responseData.result.mse, (30*30)/3);
+            //assert.strictEqual(responseData.result.ncc, ????); // non-trivial answer
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10((255*255) / (9*9)) - responseData.result.y.psnr), true);
+            assert.strictEqual(responseData.result.y.sad, 9*16);
+            assert.strictEqual(responseData.result.y.ssd, 9*9*16);
+            assert.strictEqual(responseData.result.y.mae, 9);
+            assert.strictEqual(responseData.result.y.mse, 9*9);
+            //assert.strictEqual(responseData.result.y.ncc, ????); // non-trivial answer
+            assert.strictEqual(responseData.result.ae, 16);
+            assert.strictEqual(responseData.result.aeRgb, 16);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
         });
     });
 });
