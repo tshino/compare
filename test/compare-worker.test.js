@@ -592,5 +592,32 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 16);
             assert.strictEqual(responseData.result.aeAlpha, 0);
         });
+        it('should calculate image quality metrics: different images (2)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [colorImage1, colorImage2],
+                auxTypes: [1] // *** bt709
+            };
+            runTask(task);
+
+            // expected luma values (bt709)
+            // 0, 0, 0   --> 0   30, 0, 0  --> 6      (+6)
+            // 0, 1, 0   --> 1   30, 1, 0  --> 7      (+6)
+            // 0, 0, 64  --> 5   30, 0, 64 --> 11     (+6)
+            // 0, 1, 64  --> 5   30, 1, 64 --> 12     (+7)
+            // 0, 0, 128 --> 9   30, 0, 128 --> 16    (+7)
+            // 0, 1, 128 --> 10  30, 1, 128 --> 16    (+6)
+            // 0, 0, 192 --> 14  30, 0, 192 --> 20    (+6)
+            // 0, 1, 192 --> 15  30, 1, 192 --> 21    (+6)
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(responseData.auxTypes[0], 1);
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10((255*255*16) / (6*6*12+7*7*4)) - responseData.result.y.psnr), true);
+            assert.strictEqual(responseData.result.y.sad, 6*12+7*4);
+            assert.strictEqual(responseData.result.y.ssd, 6*6*12+7*7*4);
+            assert.strictEqual(responseData.result.y.mae, 6.25);
+            assert.strictEqual(responseData.result.y.mse, 6*6*0.75+7*7*0.25);
+            //assert.strictEqual(responseData.result.y.ncc, ????); // non-trivial answer
+        });
     });
 });
