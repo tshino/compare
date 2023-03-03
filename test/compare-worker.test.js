@@ -619,5 +619,51 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.y.mse, 6*6*0.75+7*7*0.25);
             //assert.strictEqual(responseData.result.y.ncc, ????); // non-trivial answer
         });
+        const redImage = {
+            width: 4,
+            height: 4,
+            data: [
+                255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+                255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+                255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+                255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255
+            ]
+        };
+        const greenImage = {
+            width: 4,
+            height: 4,
+            data: [
+                0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+                0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+                0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255,
+                0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255, 0, 255
+            ]
+        };
+        it('should calculate image quality metrics: different images (3)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [redImage, greenImage],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10(1.5) - responseData.result.psnr), true);
+            assert.strictEqual(responseData.result.sad, 255 * 2 * 16);
+            assert.strictEqual(responseData.result.ssd, 255 * 255 * 2 * 16);
+            assert.strictEqual(responseData.result.mae, 255 * 2 / 3);
+            assert.strictEqual(responseData.result.mse, 255 * 255 * 2 / 3);
+            assert.strictEqual(responseData.result.ncc, -0.5);
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10((255*255) / (74*74)) - responseData.result.y.psnr), true);
+            assert.strictEqual(responseData.result.y.sad, 74 * 16);
+            assert.strictEqual(responseData.result.y.ssd, 74 * 74 * 16);
+            assert.strictEqual(responseData.result.y.mae, 74);
+            assert.strictEqual(responseData.result.y.mse, 74 * 74);
+            //assert.strictEqual(responseData.result.y.ncc, xxx);  //FIXME
+            assert.strictEqual(responseData.result.ae, 16);
+            assert.strictEqual(responseData.result.aeRgb, 16);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
     });
 });
