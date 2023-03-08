@@ -740,5 +740,42 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 0);
             assert.strictEqual(responseData.result.aeAlpha, 0);
         });
+        // different flat images
+        const whiteImage = {
+            width: 4,
+            height: 4,
+            data: [
+                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+            ]
+        };
+        it('should calculate image quality metrics: different flat images (1)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [blackImage, whiteImage],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(responseData.result.psnr, 0);
+            assert.strictEqual(responseData.result.sad, 255*3*16);
+            assert.strictEqual(responseData.result.ssd, 255*255*3*16);
+            assert.strictEqual(responseData.result.mae, 255);
+            assert.strictEqual(responseData.result.mse, 255 * 255);
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            assert.strictEqual(responseData.result.y.psnr, 0);
+            assert.strictEqual(responseData.result.y.sad, 255*16);
+            assert.strictEqual(responseData.result.y.ssd, 255*255*16);
+            assert.strictEqual(responseData.result.y.mae, 255);
+            assert.strictEqual(responseData.result.y.mse, 255 * 255);
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(responseData.result.ae, 16);
+            assert.strictEqual(responseData.result.aeRgb, 16);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
     });
 });
