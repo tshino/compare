@@ -777,5 +777,31 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 16);
             assert.strictEqual(responseData.result.aeAlpha, 0);
         });
+        it('should calculate image quality metrics: different flat images (2)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [blackImage, redImage],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10(3) - responseData.result.psnr), true);
+            assert.strictEqual(responseData.result.sad, 255 * 16);
+            assert.strictEqual(responseData.result.ssd, 255 * 255 * 16);
+            assert.strictEqual(responseData.result.mae, 255 / 3);
+            assert.strictEqual(responseData.result.mse, 255 * 255 / 3);
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            assert.strictEqual(1e-14 > Math.abs(10 * Math.log10((255*255) / (76*76)) - responseData.result.y.psnr), true);
+            assert.strictEqual(responseData.result.y.sad, 76 * 16);
+            assert.strictEqual(responseData.result.y.ssd, 76 * 76 * 16);
+            assert.strictEqual(responseData.result.y.mae, 76);
+            assert.strictEqual(responseData.result.y.mse, 76 * 76);
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(responseData.result.ae, 16);
+            assert.strictEqual(responseData.result.aeRgb, 16);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
     });
 });
