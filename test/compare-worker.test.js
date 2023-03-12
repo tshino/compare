@@ -803,5 +803,31 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 16);
             assert.strictEqual(responseData.result.aeAlpha, 0);
         });
+        it('should calculate image quality metrics: different flat images (3)', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [blackImage, transparent],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(responseData.result.psnr, Infinity);
+            assert.strictEqual(responseData.result.sad, 0);
+            assert.strictEqual(responseData.result.ssd, 0);
+            assert.strictEqual(responseData.result.mae, 0);
+            assert.strictEqual(responseData.result.mse, 0);
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            assert.strictEqual(responseData.result.y.psnr, Infinity);
+            assert.strictEqual(responseData.result.y.sad, 0);
+            assert.strictEqual(responseData.result.y.ssd, 0);
+            assert.strictEqual(responseData.result.y.mae, 0);
+            assert.strictEqual(responseData.result.y.mse, 0);
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(responseData.result.ae, 16);
+            assert.strictEqual(responseData.result.aeRgb, 0);
+            assert.strictEqual(responseData.result.aeAlpha, 16);
+        });
     });
 });
