@@ -829,5 +829,32 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 0);
             assert.strictEqual(responseData.result.aeAlpha, 16);
         });
+        // different images, one is flat
+        it('should calculate image quality metrics: different images, one is flat', () => {
+            const task = {
+                cmd: 'calcMetrics',
+                imageData: [blackImage, colorImage1],
+                auxTypes: [0]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            //assert.strictEqual( ???, data.result.psnr );
+            //assert.strictEqual( ???, data.result.sad );
+            //assert.strictEqual( ???, data.result.ssd );
+            //assert.strictEqual( ???, data.result.mae );
+            //assert.strictEqual( ???, data.result.mse );
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            //assert.strictEqual( ???, data.result.y.psnr );
+            //assert.strictEqual( ???, data.result.y.sad );
+            //assert.strictEqual( ???, data.result.y.ssd );
+            //assert.strictEqual( ???, data.result.y.mae );
+            //assert.strictEqual( ???, data.result.y.mse );
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(responseData.result.ae, 15);
+            assert.strictEqual(responseData.result.aeRgb, 15);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
     });
 });
