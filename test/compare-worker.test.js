@@ -856,5 +856,47 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.aeRgb, 15);
             assert.strictEqual(responseData.result.aeAlpha, 0);
         });
+
+        // size/orientation tests
+        const image3x2 = {
+            width: 3,
+            height: 2,
+            data: [
+                0,0,0,0,     85,85,85,85,     170,170,170,170,
+                85,85,85,85, 170,170,170,170, 255,255,255,255
+            ]
+        };
+        const image2x3 = {
+            width: 2,
+            height: 3,
+            data: [
+                0,0,0,0,         85,85,85,85,
+                85,85,85,85,     170,170,170,170,
+                170,170,170,170, 255,255,255,255
+            ]
+        };
+        // different size => error
+        it('should calculate image quality metrics: different size => error', () => {
+            const task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3] };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(isNaN(responseData.result.psnr), true);
+            assert.strictEqual(isNaN(responseData.result.sad), true);
+            assert.strictEqual(isNaN(responseData.result.ssd), true);
+            assert.strictEqual(isNaN(responseData.result.mae), true);
+            assert.strictEqual(isNaN(responseData.result.mse), true);
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            assert.strictEqual(isNaN(responseData.result.y.psnr), true);
+            assert.strictEqual(isNaN(responseData.result.y.sad), true);
+            assert.strictEqual(isNaN(responseData.result.y.ssd), true);
+            assert.strictEqual(isNaN(responseData.result.y.mae), true);
+            assert.strictEqual(isNaN(responseData.result.y.mse), true);
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(isNaN(responseData.result.ae), true);
+            assert.strictEqual(isNaN(responseData.result.aeRgb), true);
+            assert.strictEqual(isNaN(responseData.result.aeAlpha), true);
+        });
     });
 });
