@@ -924,5 +924,27 @@ describe('compareWorker', () => {
             assert.strictEqual(isNaN(responseData.result.aeRgb), true);
             assert.strictEqual(isNaN(responseData.result.aeAlpha), true);
         });
+        it('should calculate image quality metrics: invalid size => error (2)', () => {
+            const task = { cmd: 'calcMetrics', imageData: [image2x3, imageEmpty] };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(isNaN(responseData.result.psnr), true);
+            assert.strictEqual(isNaN(responseData.result.sad), true);
+            assert.strictEqual(isNaN(responseData.result.ssd), true);
+            assert.strictEqual(isNaN(responseData.result.mae), true);
+            assert.strictEqual(isNaN(responseData.result.mse), true);
+            assert.strictEqual(isNaN(responseData.result.ncc), true);
+            assert.strictEqual(isNaN(responseData.result.y.psnr), true);
+            assert.strictEqual(isNaN(responseData.result.y.sad), true);
+            assert.strictEqual(isNaN(responseData.result.y.ssd), true);
+            assert.strictEqual(isNaN(responseData.result.y.mae), true);
+            assert.strictEqual(isNaN(responseData.result.y.mse), true);
+            assert.strictEqual(isNaN(responseData.result.y.ncc), true);
+            assert.strictEqual(isNaN(responseData.result.ae), true);
+            assert.strictEqual(isNaN(responseData.result.aeRgb), true);
+            assert.strictEqual(isNaN(responseData.result.aeAlpha), true);
+        });
     });
 });
