@@ -946,5 +946,30 @@ describe('compareWorker', () => {
             assert.strictEqual(isNaN(responseData.result.aeRgb), true);
             assert.strictEqual(isNaN(responseData.result.aeAlpha), true);
         });
+
+        // different orientation and resulting same image
+        it('should calculate image quality metrics: different orientation and resulting same image', () => {
+            const options = { orientationA: 1, orientationB: 5 };
+            const task = { cmd: 'calcMetrics', imageData: [image3x2, image2x3], options: options };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcMetrics');
+            assert.strictEqual(responseData.result.psnr, Infinity);
+            assert.strictEqual(responseData.result.sad, 0);
+            assert.strictEqual(responseData.result.ssd, 0);
+            assert.strictEqual(responseData.result.mae, 0);
+            assert.strictEqual(responseData.result.mse, 0);
+            assert.strictEqual(responseData.result.ncc, 1);
+            assert.strictEqual(responseData.result.y.psnr, Infinity);
+            assert.strictEqual(responseData.result.y.sad, 0);
+            assert.strictEqual(responseData.result.y.ssd, 0);
+            assert.strictEqual(responseData.result.y.mae, 0);
+            assert.strictEqual(responseData.result.y.mse, 0);
+            assert.strictEqual(responseData.result.y.ncc, 1);
+            assert.strictEqual(responseData.result.ae, 0);
+            assert.strictEqual(responseData.result.aeRgb, 0);
+            assert.strictEqual(responseData.result.aeAlpha, 0);
+        });
     });
 });
