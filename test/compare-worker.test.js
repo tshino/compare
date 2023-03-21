@@ -982,8 +982,13 @@ describe('compareWorker', () => {
             10,10,10,10, 20,20,20,20, 30,30,30,30,
             30,30,30,30, 30,30,30,30, 30,30,30,30
         ]};
-        it('should calculate tone curve data', () => {
-            const task = { cmd: 'calcToneCurve', type: 0, auxTypes: [0], imageData: [image1, image2] };
+        it('should calculate tone curve data (1)', () => {
+            const task = {
+                cmd: 'calcToneCurve',
+                type: 0,
+                auxTypes: [0],
+                imageData: [image1, image2]
+            };
             runTask(task);
 
             assert.ok(responseData);
@@ -1005,6 +1010,42 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256], 3);
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 65536], 3);
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 131072], 3);
+        });
+        const image3 = { width: 2, height: 3, data: [
+            20,20,20,20, 10,10,10,10,
+            30,30,30,30, 20,20,20,20,
+            50,50,50,50, 30,30,30,30
+        ]};
+        it('should calculate tone curve data (2)', () => {
+            const options = { orientationA: 1, orientationB: 8 };
+            const task = {
+                cmd: 'calcToneCurve',
+                type: 0,
+                auxTypes: [0],
+                imageData: [image1, image3],
+                options: options
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcToneCurve');
+            assert.strictEqual(responseData.type, 0);
+            assert.strictEqual(responseData.auxTypes[0], 0);
+            assert.strictEqual(responseData.result.components.length, 3);
+            assert.strictEqual(responseData.result.toneMap.dist.length, 256 * 256 * 3);
+            assert.strictEqual(responseData.result.toneMap.max, 3 * 2);
+            assert.strictEqual(responseData.result.toneMap.dist[0 + (255-10)*256], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[0 + (255-10)*256 + 65536], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[0 + (255-10)*256 + 131072], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[85 + (255-20)*256], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[85 + (255-20)*256 + 65536], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[85 + (255-20)*256 + 131072], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 65536], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 131072], 2);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-50)*256], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-50)*256 + 65536], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-50)*256 + 131072], 1);
         });
     });
 });
