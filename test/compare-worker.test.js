@@ -1058,7 +1058,7 @@ describe('compareWorker', () => {
             0,0,0,0,     80,80,80,80,     160,160,160,160,
             80,80,80,80, 160,160,160,160, 255,255,255,255
         ]};
-        const makeTask = () => ({
+        const newTask = () => ({
             cmd: 'calcDiff', imageData: [image1, image2],
             options: {
                 ignoreAE: 0,
@@ -1072,8 +1072,8 @@ describe('compareWorker', () => {
                 orientationB: null,
             }
         });
-        it('should calculate image diff', () => {
-            const task = makeTask();
+        it('should calculate image diff (1)', () => {
+            const task = newTask();
             runTask(task);
 
             assert.ok(responseData);
@@ -1102,6 +1102,25 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.options.offsetY, task.options.offsetY);
             assert.strictEqual(responseData.options.orentationA, task.options.orentationA);
             assert.strictEqual(responseData.options.orentationB, task.options.orentationB);
+        });
+        it('should calculate image diff (2)', () => {
+            const task = newTask();
+            task.options.ignoreAE = 5;
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcDiff');
+            assert.strictEqual(responseData.result.summary.unmatch, 2);
+            assert.strictEqual(responseData.result.summary.match, 4);
+            assert.strictEqual(responseData.result.summary.total, 6);
+            assert.strictEqual(responseData.result.summary.countIgnoreAE, 2);
+            assert.strictEqual(responseData.result.summary.maxAE, 10);
+            assert.strictEqual(responseData.result.summary.histogram[0], 2);
+            assert.strictEqual(responseData.result.summary.histogram[1], 0);
+            assert.strictEqual(responseData.result.summary.histogram[5], 2);
+            assert.strictEqual(responseData.result.summary.histogram[10], 2);
+            assert.strictEqual(responseData.result.summary.histogram[15], 0);
+            assert.strictEqual(responseData.result.summary.histogram[255], 0);
         });
     });
 });
