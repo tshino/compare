@@ -1122,5 +1122,14 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.summary.histogram[15], 0);
             assert.strictEqual(responseData.result.summary.histogram[255], 0);
         });
+        it('should calculate image diff (3)', () => {
+            const task = newTask();
+            task.options.ignoreAE = 1;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.summary.unmatch, 4);
+            assert.strictEqual(responseData.result.summary.match, 2);
+            assert.strictEqual(responseData.result.summary.countIgnoreAE, 0);
+        });
     });
 });
