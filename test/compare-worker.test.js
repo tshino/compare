@@ -1140,5 +1140,32 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.summary.match, 2);
             assert.strictEqual(responseData.result.summary.countIgnoreAE, 0);
         });
+        it('should calculate image diff (5)', () => {
+            const task = newTask();
+            task.options.ignoreAE = 6;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.summary.unmatch, 2);
+            assert.strictEqual(responseData.result.summary.match, 4);
+            assert.strictEqual(responseData.result.summary.countIgnoreAE, 2);
+        });
+        it('should calculate image diff (6)', () => {
+            const task = newTask();
+            task.options.ignoreAE = 10;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.summary.unmatch, 0);
+            assert.strictEqual(responseData.result.summary.match, 6);
+            assert.strictEqual(responseData.result.summary.countIgnoreAE, 4);
+        });
+        it('should calculate image diff (7)', () => {
+            const task = newTask();
+            task.options.ignoreAE = 11;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.summary.unmatch, 0);
+            assert.strictEqual(responseData.result.summary.match, 6);
+            assert.strictEqual(responseData.result.summary.countIgnoreAE, 4);
+        });
     });
 });
