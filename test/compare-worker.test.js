@@ -1167,5 +1167,29 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.summary.match, 6);
             assert.strictEqual(responseData.result.summary.countIgnoreAE, 4);
         });
+        it('should calculate image diff (8)', () => {
+            const task = newTask();
+            task.options.imageType = 1;  // Grayscale
+            task.options.ignoreAE = 0;
+            runTask(task);
+
+            assert.strictEqual(responseData.cmd, 'calcDiff');
+            assert.strictEqual(responseData.options.imageType, 1);
+            assert.strictEqual(responseData.result.image.width, 3);
+            assert.strictEqual(responseData.result.image.height, 2);
+            assert.strictEqual(responseData.result.image.data.length, 3 * 2 * 4);
+            assert.strictEqual(responseData.result.image.data[0], 0);
+            assert.strictEqual(responseData.result.image.data[1], 0);
+            assert.strictEqual(responseData.result.image.data[2], 0);
+            assert.strictEqual(responseData.result.image.data[3], 255);
+            assert.strictEqual(responseData.result.image.data[4], 5);
+            assert.strictEqual(responseData.result.image.data[5], 5);
+            assert.strictEqual(responseData.result.image.data[6], 5);
+            assert.strictEqual(responseData.result.image.data[7], 255);
+            assert.strictEqual(responseData.result.image.data[8], 10);
+            assert.strictEqual(responseData.result.image.data[12], 5);
+            assert.strictEqual(responseData.result.image.data[16], 10);
+            assert.strictEqual(responseData.result.image.data[20], 0);
+        });
     });
 });
