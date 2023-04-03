@@ -190,7 +190,7 @@ describe('compareWorker', () => {
                 0, 1, 0, 255,  0, 1, 64, 255,  0, 1, 128, 255,  0, 1, 192, 255,
             ]
         }];
-        it('should calculate waveform (1)', () => {
+        it('should calculate waveform: RGB', () => {
             runTest(
                 'rgb test1',
                 {
@@ -211,7 +211,7 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (2)', () => {
+        it('should calculate waveform: RGB transposed', () => {
             runTest(
                 'rgb test2',
                 {
@@ -233,7 +233,7 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (3)', () => {
+        it('should calculate waveform: luminance bt601', () => {
             runTest(
                 'luminance test1',
                 {
@@ -252,7 +252,26 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (4)', () => {
+        it('should calculate waveform: luminance bt709', () => {
+            runTest(
+                'luminance test1',
+                {
+                    type: 1, // Luminance
+                    auxTypes: [0, 1], // bt709
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    4,
+                    [
+                        [[0,2],[1,2]], [[5,4]], [[9,2],[10,2]], [[14,2],[15,2]]
+                    ]
+                )
+            );
+        });
+        it('should calculate waveform: YCbCr bt601', () => {
             runTest(
                 'ycbcr test1',
                 {
@@ -273,7 +292,28 @@ describe('compareWorker', () => {
                 )
             );
         });
-        it('should calculate waveform (5)', () => {
+        it('should calculate waveform: YCbCr bt709', () => {
+            runTest(
+                'ycbcr test1',
+                {
+                    type: 2, // YCbCr
+                    auxTypes: [0, 1], // bt709
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,2],[1,2]], [[5,4]], [[9,2],[10,2]], [[14,2],[15,2]], // Y
+                        [[127,2],[128,2]], [[159,2],[160,2]], [[191,2],[192,2]], [[223,2],[224,2]], // Cb
+                        [[127,2],[128,2]], [[124,2],[125,2]], [[121,2],[122,2]], [[118,2],[119,2]], // Cr
+                    ]
+                )
+            );
+        });
+        it('should calculate waveform: Linear RGB', () => {
             runTest(
                 'linear rgb test',
                 {
