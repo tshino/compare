@@ -273,6 +273,27 @@ describe('compareWorker', () => {
                 )
             );
         });
+        it('should calculate waveform (5)', () => {
+            runTest(
+                'linear rgb test',
+                {
+                    type: 0, // RGB
+                    auxTypes: [1, 0], // linear
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // G
+                        [[0,4]], [[13,4]], [[55,4]], [[134,4]] // B
+                    ]
+                )
+            );
+        });
     });
 
     describe('calc3DWaveform', () => {

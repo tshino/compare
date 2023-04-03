@@ -88,11 +88,11 @@ worker.addEventListener('message', function(e) {
   worker.postMessage( response );
 }, false);
 
-var srgb255ToLinear255 = (function() {
-  var srgb255ToLinear255 = new Float32Array(256);
-  for (var i = 0; i < 256; ++i) {
-    var c = i / 255;
-    var linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+const srgb255ToLinear255 = (function() {
+  const srgb255ToLinear255 = new Float32Array(256);
+  for (let i = 0; i < 256; ++i) {
+    const c = i / 255;
+    const linear = c < 0.040450 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
     srgb255ToLinear255[i] = linear * 255;
   }
   return srgb255ToLinear255;
