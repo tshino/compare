@@ -30,7 +30,16 @@ describe('compareWorker', () => {
 
     describe('calcHistogram', () => {
         beforeEach(reset);
-        it('should calculate histogram (1)', () => {
+        const makeHistogram = function(nonZeroElems) {
+            const hist = new Uint32Array(256 * nonZeroElems.length);
+            for (let i = 0; i < nonZeroElems.length; i++) {
+                for (let j = 0; j < nonZeroElems[i].length; j++) {
+                    hist[i * 256 + nonZeroElems[i][j][0]] = nonZeroElems[i][j][1];
+                }
+            }
+            return hist;
+        };
+        it('should calculate histogram: RGB', () => {
             const task = {
                 cmd: 'calcHistogram',
                 type: 0, // RGB
@@ -51,21 +60,13 @@ describe('compareWorker', () => {
             assert.ok(responseData);
             assert.strictEqual(responseData.cmd, 'calcHistogram');
             assert.strictEqual(responseData.result.length, 256 * 3);
-            assert.strictEqual(responseData.result[0], 16);
-            assert.strictEqual(responseData.result[1], 0);
-            assert.strictEqual(responseData.result[255], 0);
-            assert.strictEqual(responseData.result[256], 8);
-            assert.strictEqual(responseData.result[256 + 1], 8);
-            assert.strictEqual(responseData.result[256 + 2], 0);
-            assert.strictEqual(responseData.result[256 + 255], 0);
-            assert.strictEqual(responseData.result[512], 4);
-            assert.strictEqual(responseData.result[512 + 1], 0);
-            assert.strictEqual(responseData.result[512 + 64], 4);
-            assert.strictEqual(responseData.result[512 + 128], 4);
-            assert.strictEqual(responseData.result[512 + 192], 4);
-            assert.strictEqual(responseData.result[512 + 255], 0);
+            assert.deepStrictEqual(responseData.result, makeHistogram([
+                [[0,16]],
+                [[0,8], [1,8]],
+                [[0,4], [64,4], [128,4], [192,4]]
+            ]));
         });
-        it('should calculate histogram (2)', () => {
+        it('should calculate histogram: Grayscale', () => {
             const task = {
                 cmd: 'calcHistogram',
                 type: 1, // Grayscale
@@ -86,16 +87,36 @@ describe('compareWorker', () => {
             assert.ok(responseData);
             assert.strictEqual(responseData.cmd, 'calcHistogram');
             assert.strictEqual(responseData.result.length, 256);
-            assert.strictEqual(responseData.result[0], 4);
-            assert.strictEqual(responseData.result[1], 4);
-            assert.strictEqual(responseData.result[2], 0);
-            assert.strictEqual(responseData.result[63], 0);
-            assert.strictEqual(responseData.result[64], 4);
-            assert.strictEqual(responseData.result[65], 0);
-            assert.strictEqual(responseData.result[254], 0);
-            assert.strictEqual(responseData.result[255], 4);
+            assert.deepStrictEqual(responseData.result, makeHistogram([
+                [[0,4], [1,4], [64,4], [255,4]]
+            ]));
         });
-        it('should calculate histogram (3)', () => {
+        it('should calculate histogram: Grayscale bt709', () => {
+            const task = {
+                cmd: 'calcHistogram',
+                type: 1, // Grayscale
+                auxTypes: [1], // bt709
+                imageData: [{
+                    width: 4,
+                    height: 4,
+                    data: [
+                        0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+                        0, 0, 64, 255, 0, 0, 64, 255, 0, 0, 64, 255, 0, 0, 64, 255,
+                        255, 64, 0, 255, 255, 64, 0, 255, 255, 64, 0, 255, 255, 64, 0, 255,
+                        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                    ]
+                }]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcHistogram');
+            assert.strictEqual(responseData.result.length, 256);
+            assert.deepStrictEqual(responseData.result, makeHistogram([
+                [[0,4], [5,4], [100,4], [255,4]]
+            ]));
+        });
+        it('should calculate histogram: YCbCr', () => {
             const task = {
                 cmd: 'calcHistogram',
                 type: 2, // YCbCr
@@ -121,21 +142,11 @@ describe('compareWorker', () => {
             assert.ok(responseData);
             assert.strictEqual(responseData.cmd, 'calcHistogram');
             assert.strictEqual(responseData.result.length, 256 * 3);
-            assert.strictEqual(responseData.result[0], 4);
-            assert.strictEqual(responseData.result[1], 0);
-            assert.strictEqual(responseData.result[29], 3);
-            assert.strictEqual(responseData.result[76], 4);
-            assert.strictEqual(responseData.result[128], 4);
-            assert.strictEqual(responseData.result[226], 1);
-            assert.strictEqual(responseData.result[256], 1);
-            assert.strictEqual(responseData.result[256 + 84], 4);
-            assert.strictEqual(responseData.result[256 + 128], 8);
-            assert.strictEqual(responseData.result[256 + 255], 3);
-            assert.strictEqual(responseData.result[512], 0);
-            assert.strictEqual(responseData.result[512 + 107], 3);
-            assert.strictEqual(responseData.result[512 + 128], 8);
-            assert.strictEqual(responseData.result[512 + 148], 1);
-            assert.strictEqual(responseData.result[512 + 255], 4);
+            assert.deepStrictEqual(responseData.result, makeHistogram([
+                [[0,4], [29,3], [76,4], [128,4], [226,1]],
+                [[0,1], [84,4], [128,8], [255,3]],
+                [[107,3], [128,8], [148,1], [255,4]]
+            ]));
         });
     });
 
@@ -233,6 +244,48 @@ describe('compareWorker', () => {
                 )
             );
         });
+        it('should calculate waveform: RGB flipped', () => {
+            runTest(
+                'rgb test3',
+                {
+                    type: 0, // RGB
+                    auxTypes: [0, 0],
+                    histW: 4,
+                    transposed: false,
+                    flipped: true,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+                        [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], [[0,2],[1,2]], // G
+                        [[192,4]], [[128,4]], [[64,4]], [[0,4]] // B
+                    ]
+                )
+            );
+        });
+        it('should calculate waveform: Linear RGB', () => {
+            runTest(
+                'linear rgb test',
+                {
+                    type: 0, // RGB
+                    auxTypes: [1, 0], // linear
+                    histW: 4,
+                    transposed: false,
+                    flipped: false,
+                    imageData: imageData1
+                },
+                makeWaveform(
+                    3 * 4,
+                    [
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
+                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // G
+                        [[0,4]], [[13,4]], [[55,4]], [[134,4]] // B
+                    ]
+                )
+            );
+        });
         it('should calculate waveform: luminance bt601', () => {
             runTest(
                 'luminance test1',
@@ -309,27 +362,6 @@ describe('compareWorker', () => {
                         [[0,2],[1,2]], [[5,4]], [[9,2],[10,2]], [[14,2],[15,2]], // Y
                         [[127,2],[128,2]], [[159,2],[160,2]], [[191,2],[192,2]], [[223,2],[224,2]], // Cb
                         [[127,2],[128,2]], [[124,2],[125,2]], [[121,2],[122,2]], [[118,2],[119,2]], // Cr
-                    ]
-                )
-            );
-        });
-        it('should calculate waveform: Linear RGB', () => {
-            runTest(
-                'linear rgb test',
-                {
-                    type: 0, // RGB
-                    auxTypes: [1, 0], // linear
-                    histW: 4,
-                    transposed: false,
-                    flipped: false,
-                    imageData: imageData1
-                },
-                makeWaveform(
-                    3 * 4,
-                    [
-                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // R
-                        [[0,4]], [[0,4]], [[0,4]], [[0,4]], // G
-                        [[0,4]], [[13,4]], [[55,4]], [[134,4]] // B
                     ]
                 )
             );
