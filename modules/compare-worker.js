@@ -350,8 +350,8 @@ function calcVectorscope( imageData, type, colorMode, auxTypes )
 function calc3DWaveform(imageData, baseSize)
 {
   baseSize = baseSize || 256;
-  var w = imageData.width;
-  var h = imageData.height;
+  let w = imageData.width;
+  let h = imageData.height;
   if (w < h) {
     w = Math.max(1, Math.round(baseSize * w / h));
     h = baseSize;
@@ -359,12 +359,12 @@ function calc3DWaveform(imageData, baseSize)
     h = Math.max(1, Math.round(baseSize * h / w));
     w = baseSize;
   }
-  var input = compareImageUtil.makeImage(imageData);
-  var resized = compareImageUtil.makeImage(w, h);
+  const input = compareImageUtil.makeImage(imageData);
+  const resized = compareImageUtil.makeImage(w, h);
   compareImageUtil.resizeNN(resized, input);
-  var waveform3d = new Uint8Array(w * h * 3);
+  const waveform3d = new Uint8Array(w * h * 3);
   // RGB
-  for (var i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 3) {
+  for (let i = 0, k = 0, n = 4 * w * h; i < n; i += 4, k += 3) {
     waveform3d[k + 0] = resized.data[i + 0];
     waveform3d[k + 1] = resized.data[i + 1];
     waveform3d[k + 2] = resized.data[i + 2];
