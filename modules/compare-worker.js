@@ -35,7 +35,7 @@ if (isWorker) {
 worker.addEventListener('message', function(e) {
   const request = e.data;
   const data = request.data;
-  var result = {};
+  const result = {};
   result.cmd    = data.cmd;
   result.index  = data.index;
   switch (data.cmd) {
