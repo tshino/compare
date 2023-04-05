@@ -395,6 +395,42 @@ describe('compareWorker', () => {
         });
     });
 
+    describe('calcVectorscope', () => {
+        beforeEach(reset);
+        const imageData1 = {
+            width: 4,
+            height: 4,
+            data: [
+                0, 0, 0, 255, 0, 0, 64, 255, 0, 0, 128, 255, 0, 0, 192, 255,
+                0, 0, 0, 255, 0, 0, 64, 255, 0, 0, 128, 255, 0, 0, 192, 255,
+                0, 32, 0, 255, 0, 64, 0, 255, 0, 96, 0, 255, 0, 128, 0, 255,
+                85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255,
+            ]
+        };
+        const makeVectorscopeDist = function(offx, offy, list) {
+            const dist = new Uint32Array(320 * 320);
+            for (const e of list) {
+                dist[offx+e[0] + 320*(offy+e[1])] = e[2];
+            }
+            return dist;
+        };
+        it('should create vectorscope image: G-B', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 2, // G-B
+                color: false, // colorMode
+                auxTypes: [0,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(responseData.result.dist, makeVectorscopeDist(32, 287, [
+                [0,0,6], [0,-64,2], [0,-128,2], [0,-192,2],
+                [32,0,1], [64,0,1], [96,0,1], [128,0,1]
+            ]));
+        });
+    });
+
     describe('calc3DWaveform', () => {
         beforeEach(reset);
         const runTest = function(label, input, expected) {
