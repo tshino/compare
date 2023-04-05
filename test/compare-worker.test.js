@@ -148,6 +148,33 @@ describe('compareWorker', () => {
                 [[107,3], [128,8], [148,1], [255,4]]
             ]));
         });
+        it('should calculate histogram: YCbCr bt709', () => {
+            const task = {
+                cmd: 'calcHistogram',
+                type: 2, // YCbCr
+                auxTypes: [1], // bt709
+                imageData: [{
+                    width: 4,
+                    height: 4,
+                    data: [
+                        0, 0, 0, 255, 0, 0, 0, 255, 128, 128, 128, 255, 128, 128, 128, 255,
+                        0, 0, 0, 255, 0, 0, 0, 255, 128, 128, 128, 255, 128, 128, 128, 255,
+                        255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
+                        0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 255, 255, 0, 255,
+                    ]
+                }]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcHistogram');
+            assert.strictEqual(responseData.result.length, 256 * 3);
+            assert.deepStrictEqual(responseData.result, makeHistogram([
+                [[0,4], [18,3], [54,4], [128,4], [237,1]],
+                [[0,1], [98,4], [128,8], [255,3]],
+                [[116,3], [128,8], [139,1], [255,4]]
+            ]));
+        });
     });
 
     describe('calcWaveform', () => {
