@@ -429,6 +429,37 @@ describe('compareWorker', () => {
                 [32,0,1], [64,0,1], [96,0,1], [128,0,1]
             ]));
         });
+        it('should create vectorscope image: G-R', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 3, // G-R
+                color: false, // colorMode
+                auxTypes: [0,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(responseData.result.dist, makeVectorscopeDist(32, 287, [
+                [0,0,8],
+                [32,0,1], [64,0,1], [96,0,1], [128,0,1],
+                [0,-85,4]
+            ]));
+        });
+        it('should create vectorscope image: B-R', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 4, // B-R
+                color: false, // colorMode
+                auxTypes: [0,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(responseData.result.dist, makeVectorscopeDist(32, 287, [
+                [0,0,6], [64,0,2], [128,0,2], [192,0,2],
+                [0,-85,4]
+            ]));
+        });
     });
 
     describe('calc3DWaveform', () => {
