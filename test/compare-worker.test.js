@@ -407,6 +407,16 @@ describe('compareWorker', () => {
                 85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255,
             ]
         };
+        const nonzeroEleements = function(array, offx, offy) {
+            const elems = [];
+            for (let i = 0; i < array.length; i++) {
+                if (array[i] !== 0) {
+                    const x = i % 320, y = (i - x) / 320;
+                    elems.push([x-160,y-160,array[i]]);
+                }
+            }
+            return elems;
+        }
         const makeVectorscopeDist = function(offx, offy, list) {
             const dist = new Uint32Array(320 * 320);
             for (const e of list) {
@@ -414,6 +424,21 @@ describe('compareWorker', () => {
             }
             return dist;
         };
+        it('should create vectorscope image: Cb-Cr', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 0, // Cb-Cr
+                color: false, // colorMode
+                auxTypes: [0,0], // bt601
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(nonzeroEleements(responseData.result.dist, 160, 160), [
+                [-15,-43,4], [0,0,2], [32,5,2], [64,10,2], [-11,13,1],
+                [96,15,2], [-22,26,1], [-32,40,1], [-43,53,1]
+            ]);
+        });
         it('should create vectorscope image: G-B', () => {
             runTask({
                 cmd: 'calcVectorscope',
