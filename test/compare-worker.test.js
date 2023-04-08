@@ -407,12 +407,12 @@ describe('compareWorker', () => {
                 85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255, 85, 0, 0, 255,
             ]
         };
-        const nonzeroEleements = function(array, offx, offy) {
+        const nonzeroElems = function(array, offx, offy) {
             const elems = [];
             for (let i = 0; i < array.length; i++) {
                 if (array[i] !== 0) {
                     const x = i % 320, y = (i - x) / 320;
-                    elems.push([x-160,y-160,array[i]]);
+                    elems.push([x-offx,y-offy,array[i]]);
                 }
             }
             return elems;
@@ -434,9 +434,24 @@ describe('compareWorker', () => {
             });
             assert.strictEqual(responseData.cmd, 'calcVectorscope');
             assert.strictEqual(responseData.result.dist.length, 320*320);
-            assert.deepStrictEqual(nonzeroEleements(responseData.result.dist, 160, 160), [
+            assert.deepStrictEqual(nonzeroElems(responseData.result.dist, 160, 160), [
                 [-15,-43,4], [0,0,2], [32,5,2], [64,10,2], [-11,13,1],
                 [96,15,2], [-22,26,1], [-32,40,1], [-43,53,1]
+            ]);
+        });
+        it('should create vectorscope image: x-y', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 1, // x-y
+                color: false, // colorMode
+                auxTypes: [0,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            console.log(nonzeroElems(responseData.result.dist, 160, 160));
+            assert.deepStrictEqual(nonzeroElems(responseData.result.dist, 160, 160), [
+                [-13,-103,4], [-8,1,2], [117,1,4], [-71,104,6]
             ]);
         });
         it('should create vectorscope image: G-B', () => {
