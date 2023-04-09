@@ -469,6 +469,34 @@ describe('compareWorker', () => {
                 [32,0,1], [64,0,1], [96,0,1], [128,0,1]
             ]));
         });
+        it('should create vectorscope image: G-B with colormap', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 2, // G-B
+                color: true, // colorMode
+                auxTypes: [0,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(responseData.result.dist, makeVectorscopeDist(32, 287, [
+                [0,0,6], [0,-64,2], [0,-128,2], [0,-192,2],
+                [32,0,1], [64,0,1], [96,0,1], [128,0,1]
+            ]));
+            assert.strictEqual(responseData.result.colorMap.length, 320*320*3);
+            assert.deepStrictEqual(
+                nonzeroElems(responseData.result.colorMap.slice(0,320*320), 32, 287),
+                [[0,0,85*4]] // R
+            );
+            assert.deepStrictEqual(
+                nonzeroElems(responseData.result.colorMap.slice(320*320,2*320*320), 32, 287),
+                [[32,0,32*1], [64,0,64*1], [96,0,96*1], [128,0,128*1]] // G
+            );
+            assert.deepStrictEqual(
+                nonzeroElems(responseData.result.colorMap.slice(2*320*320,3*320*320), 32, 287),
+                [[0,-192,192*2], [0,-128,128*2], [0,-64,64*2]] // B
+            );
+        });
         it('should create vectorscope image: G-R', () => {
             runTask({
                 cmd: 'calcVectorscope',
