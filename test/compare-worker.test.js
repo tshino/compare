@@ -472,6 +472,21 @@ describe('compareWorker', () => {
                 [32,0,1], [64,0,1], [96,0,1], [128,0,1]
             ]));
         });
+        it('should create vectorscope image: G-B in linear RGB', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 2, // G-B
+                color: false, // colorMode
+                auxTypes: [1,0],
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(nonzeroElems(responseData.result.dist, 32, 287), [[
+                [0,-134,2], [0,-55,2], [0,-13,2], [0,0,6],
+                [4,0,1], [13,0,1], [30,0,1], [55,0,1]
+            ]]);
+        });
         it('should create vectorscope image: G-B with colormap', () => {
             runTask({
                 cmd: 'calcVectorscope',
