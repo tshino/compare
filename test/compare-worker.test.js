@@ -421,11 +421,11 @@ describe('compareWorker', () => {
             }
             return result;
         };
-        it('should create vectorscope image: Cb-Cr', () => {
+        it('should create vectorscope image: Cb-Cr with colormap', () => {
             runTask({
                 cmd: 'calcVectorscope',
                 type: 0, // Cb-Cr
-                color: false, // colorMode
+                color: true, // colorMode
                 auxTypes: [0,0], // bt601
                 imageData: [imageData1]
             });
@@ -435,6 +435,28 @@ describe('compareWorker', () => {
                 [-15,-43,4], [0,0,2], [32,5,2], [64,10,2], [-11,13,1],
                 [96,15,2], [-22,26,1], [-32,40,1], [-43,53,1]
             ]]);
+            assert.strictEqual(responseData.result.colorMap.length, 320*320*3);
+            assert.deepStrictEqual(nonzeroElems(responseData.result.colorMap, 160, 160), [
+                [[-15,-43,85*4]],
+                [[-11,13,32*1], [-22,26,64*1], [-32,40,96*1], [-43,53,128*1]],
+                [[32,5,64*2], [64,10,128*2], [96,15,192*2]]
+            ]);
+        });
+        it('should create vectorscope image: Cb-Cr in bt709', () => {
+            runTask({
+                cmd: 'calcVectorscope',
+                type: 0, // Cb-Cr
+                color: false, // colorMode
+                auxTypes: [0,1], // bt709
+                imageData: [imageData1]
+            });
+            assert.strictEqual(responseData.cmd, 'calcVectorscope');
+            assert.strictEqual(responseData.result.dist.length, 320*320);
+            assert.deepStrictEqual(nonzeroElems(responseData.result.dist, 160, 160), [[
+                [-10,-43,4], [0,0,2], [32,2,2], [64,5,2], [96,8,2],
+                [-13,14,1], [-25,29,1], [-37,43,1], [-50,58,1]
+            ]]);
+            assert.ok(!responseData.result.colorMap);
         });
         it('should create vectorscope image: x-y', () => {
             runTask({
@@ -450,7 +472,7 @@ describe('compareWorker', () => {
                 [-13,-103,4], [-8,1,2], [117,1,4], [-71,104,6]
             ]]);
         });
-        it('should create vectorscope image: G-B', () => {
+        it('should create vectorscope image: G-B without colormap', () => {
             runTask({
                 cmd: 'calcVectorscope',
                 type: 2, // G-B
