@@ -462,7 +462,7 @@ describe('compareWorker', () => {
             runTask({
                 cmd: 'calcVectorscope',
                 type: 1, // x-y
-                color: false, // colorMode
+                color: true, // colorMode
                 auxTypes: [0,0],
                 imageData: [imageData1]
             });
@@ -471,6 +471,12 @@ describe('compareWorker', () => {
             assert.deepStrictEqual(nonzeroElems(responseData.result.dist, 160, 160), [[
                 [-13,-103,4], [-8,1,2], [117,1,4], [-71,104,6]
             ]]);
+            assert.strictEqual(responseData.result.colorMap.length, 320*320*3);
+            assert.deepStrictEqual(nonzeroElems(responseData.result.colorMap, 160, 160), [
+                [[117,1,85*4]],
+                [[-13,-103,32+64+96+128]],
+                [[-71,104,64*2+128*2+192*2]]
+            ]);
         });
         it('should create vectorscope image: G-B without colormap', () => {
             runTask({
