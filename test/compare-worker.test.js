@@ -1307,7 +1307,7 @@ describe('compareWorker', () => {
             10,10,10,10, 20,20,20,20, 30,30,30,30,
             30,30,30,30, 30,30,30,30, 30,30,30,30
         ]};
-        it('should calculate tone curve data (1)', () => {
+        it('should calculate tone curve data (1) RGB', () => {
             const task = {
                 cmd: 'calcToneCurve',
                 type: 0,
@@ -1335,6 +1335,27 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256], 3);
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 65536], 3);
             assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256 + 131072], 3);
+        });
+        it('should calculate tone curve data (1) Luminance', () => {
+            const task = {
+                cmd: 'calcToneCurve',
+                type: 1,
+                auxTypes: [0],
+                imageData: [image1, image2]
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcToneCurve');
+            assert.strictEqual(responseData.type, 1);
+            assert.strictEqual(responseData.auxTypes[0], 0);
+            assert.strictEqual(responseData.result.components.length, 1);
+            assert.strictEqual(responseData.result.toneMap.dist.length, 256 * 256 * 1);
+            assert.strictEqual(responseData.result.toneMap.max, 3 * 2);
+            assert.strictEqual(responseData.result.toneMap.dist[0 + (255-10)*256], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[85 + (255-20)*256], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[85 + (255-30)*256], 1);
+            assert.strictEqual(responseData.result.toneMap.dist[170 + (255-30)*256], 3);
         });
         const image3 = { width: 2, height: 3, data: [
             20,20,20,20, 10,10,10,10,
