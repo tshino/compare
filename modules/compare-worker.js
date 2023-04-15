@@ -703,11 +703,11 @@ var calcToneCurveByHistogram = function(hist, offset, total) {
   }
   return result;
 };
-var calcToneMap = function(a, b, type, auxTypes) {
-  var w = Math.min(a.width, b.width);
-  var h = Math.min(a.height, b.height);
-  var sampleA = compareImageUtil.makeImage(a);
-  var sampleB = compareImageUtil.makeImage(b);
+const calcToneMap = function(a, b, type, auxTypes) {
+  const w = Math.min(a.width, b.width);
+  const h = Math.min(a.height, b.height);
+  let sampleA = compareImageUtil.makeImage(a);
+  let sampleB = compareImageUtil.makeImage(b);
   if (w !== a.width || h !== a.height) {
     sampleA = compareImageUtil.makeImage(w, h);
     compareImageUtil.resize(sampleA, a);
@@ -716,41 +716,42 @@ var calcToneMap = function(a, b, type, auxTypes) {
     sampleB = compareImageUtil.makeImage(w, h);
     compareImageUtil.resize(sampleB, b);
   }
-  var dist = new Uint32Array(256 * 256 * (type === 0 ? 3 : 1));
+  const dist = new Uint32Array(256 * 256 * (type === 0 ? 3 : 1));
   if (type === 0) { // RGB
-    for (var y = 0; y < h; ++y) {
-      var ka = 4 * (sampleA.offset + y * sampleA.pitch);
-      var kb = 4 * (sampleB.offset + y * sampleB.pitch);
-      for (var e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
-        var ra = sampleA.data[ka + 0];
-        var ga = sampleA.data[ka + 1];
-        var ba = sampleA.data[ka + 2];
-        var rb = sampleB.data[kb + 0];
-        var gb = sampleB.data[kb + 1];
-        var bb = sampleB.data[kb + 2];
+    for (let y = 0; y < h; ++y) {
+      let ka = 4 * (sampleA.offset + y * sampleA.pitch);
+      let kb = 4 * (sampleB.offset + y * sampleB.pitch);
+      for (const e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
+        const ra = sampleA.data[ka + 0];
+        const ga = sampleA.data[ka + 1];
+        const ba = sampleA.data[ka + 2];
+        const rb = sampleB.data[kb + 0];
+        const gb = sampleB.data[kb + 1];
+        const bb = sampleB.data[kb + 2];
         dist[ra + 256 * (255 - rb)] += 1;
         dist[ga + 256 * (255 - gb) + 65536] += 1;
         dist[ba + 256 * (255 - bb) + 131072] += 1;
       }
     }
   } else { // Luminance
+    let m0, m1, m2;
     if (auxTypes[0] === 0) { // 0: bt601
-      var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+      m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
     } else { // 1: bt709
-      var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+      m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
     }
-    for (var y = 0; y < h; ++y) {
-      var ka = 4 * (sampleA.offset + y * sampleA.pitch);
-      var kb = 4 * (sampleB.offset + y * sampleB.pitch);
-      for (var e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
-        var ra = sampleA.data[ka + 0];
-        var ga = sampleA.data[ka + 1];
-        var ba = sampleA.data[ka + 2];
-        var ya = Math.round(m0 * ra + m1 * ga + m2 * ba);
-        var rb = sampleB.data[kb + 0];
-        var gb = sampleB.data[kb + 1];
-        var bb = sampleB.data[kb + 2];
-        var yb = Math.round(m0 * rb + m1 * gb + m2 * bb);
+    for (let y = 0; y < h; ++y) {
+      let ka = 4 * (sampleA.offset + y * sampleA.pitch);
+      let kb = 4 * (sampleB.offset + y * sampleB.pitch);
+      for (const e = ka + 4 * w; ka < e; ka += 4, kb += 4) {
+        const ra = sampleA.data[ka + 0];
+        const ga = sampleA.data[ka + 1];
+        const ba = sampleA.data[ka + 2];
+        const ya = Math.round(m0 * ra + m1 * ga + m2 * ba);
+        const rb = sampleB.data[kb + 0];
+        const gb = sampleB.data[kb + 1];
+        const bb = sampleB.data[kb + 2];
+        const yb = Math.round(m0 * rb + m1 * gb + m2 * bb);
         dist[ya + 256 * (255 - yb)] += 1;
       }
     }
@@ -760,14 +761,14 @@ var calcToneMap = function(a, b, type, auxTypes) {
     max : w * h
   };
 };
-var calcToneCurve = function(a, b, type, auxTypes, options) {
+const calcToneCurve = function(a, b, type, auxTypes, options) {
   options = options || {};
-  var result = {
+  const result = {
       components : []
   };
   // tone curve by Histogram
-  var hist = [calcHistogram(a, type, auxTypes), calcHistogram(b, type, auxTypes)];
-  var total = [a.width * a.height, b.width * b.height ];
+  const hist = [calcHistogram(a, type, auxTypes), calcHistogram(b, type, auxTypes)];
+  const total = [a.width * a.height, b.width * b.height];
   if (type === 0) { // RGB
     result.components[0] = calcToneCurveByHistogram(hist, 0, total);
     result.components[1] = calcToneCurveByHistogram(hist, 256, total);
