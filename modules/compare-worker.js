@@ -378,30 +378,30 @@ function calc3DWaveform(imageData, baseSize)
 
 function calcReducedColorTable( imageData )
 {
-  var rgbToYcbcr = function(r, g, b) {
-    var y = 0.299 * r + 0.587 * g + 0.114 * b;
-    var cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
-    var cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
+  const rgbToYcbcr = function(r, g, b) {
+    const y = 0.299 * r + 0.587 * g + 0.114 * b;
+    const cb = -0.1687 * r + -0.3313 * g + 0.5000 * b + 127.5;
+    const cr = 0.5000 * r + -0.4187 * g + -0.0813 * b + 127.5;
     return [y, cb, cr];
   };
-  var colorTable = compareImageUtil.getUniqueColors(imageData);
-  var colors_org = colorTable.colors;
-  var counts_org = colorTable.counts;
-  var length_org = counts_org.length;
+  const colorTable = compareImageUtil.getUniqueColors(imageData);
+  const colors_org = colorTable.colors;
+  const counts_org = colorTable.counts;
+  const length_org = counts_org.length;
   //
   // very fast and simple clustering using quantization of color components
   //
-  var colorList = [];
-  for (var k = 0; k < length_org; k++) {
-    var r = colors_org[k] >> 16;
-    var g = (colors_org[k] >> 8) & 255;
-    var b = colors_org[k] & 255;
-    var ycbcr = rgbToYcbcr(r, g, b);
-    var y = Math.round(Math.round((ycbcr[0] / 255) * 3) / 3 * 255);
-    var div = y < 128 ? 4 : 6;
-    var cb = Math.round(Math.round((ycbcr[1] / 255) * div) / div * 255);
-    var cr = Math.round(Math.round((ycbcr[2] / 255) * div) / div * 255);
-    var count = counts_org[k];
+  let colorList = [];
+  for (let k = 0; k < length_org; k++) {
+    const r = colors_org[k] >> 16;
+    const g = (colors_org[k] >> 8) & 255;
+    const b = colors_org[k] & 255;
+    const ycbcr = rgbToYcbcr(r, g, b);
+    const y = Math.round(Math.round((ycbcr[0] / 255) * 3) / 3 * 255);
+    const div = y < 128 ? 4 : 6;
+    const cb = Math.round(Math.round((ycbcr[1] / 255) * div) / div * 255);
+    const cr = Math.round(Math.round((ycbcr[2] / 255) * div) / div * 255);
+    const count = counts_org[k];
     colorList[k] = [
         (y << 16) + (cb << 8) + cr,
         count,
@@ -413,8 +413,8 @@ function calcReducedColorTable( imageData )
   colorList.sort(function(a, b) {
     return b[0] - a[0]; // by color
   });
-  var uniqueCount = 1;
-  for (var k = 1; k < colorList.length; k++) {
+  let uniqueCount = 1;
+  for (let k = 1; k < colorList.length; k++) {
     if (colorList[k - 1][0] !== colorList[k][0]) {
       uniqueCount += 1;
       colorList[uniqueCount - 1] = colorList[k];
@@ -430,24 +430,24 @@ function calcReducedColorTable( imageData )
   // merge nearest clusters iteratively
   //
   for (;;) {
-    var DistanceThreshold = 100 * colorList.length / (8 + colorList.length);
-    var IniD = 256 * 3;
-    var minD = IniD, minI, minJ;
-    for (var i = 0; i + 1 < colorList.length; i++) {
-      var n = colorList[i][1];
-      var rgbI = [
+    const DistanceThreshold = 100 * colorList.length / (8 + colorList.length);
+    const IniD = 256 * 3;
+    let minD = IniD, minI, minJ;
+    for (let i = 0; i + 1 < colorList.length; i++) {
+      let n = colorList[i][1];
+      const rgbI = [
         colorList[i][2] / n,
         colorList[i][3] / n,
         colorList[i][4] / n
       ];
-      for (var j = i + 1; j < colorList.length; j++) {
+      for (let j = i + 1; j < colorList.length; j++) {
         n = colorList[j][1];
-        var rgbJ = [
+        const rgbJ = [
           colorList[j][2] / n,
           colorList[j][3] / n,
           colorList[j][4] / n
         ];
-        var d =
+        const d =
             Math.abs(rgbI[0] - rgbJ[0]) +
             Math.abs(rgbI[1] - rgbJ[1]) +
             Math.abs(rgbI[2] - rgbJ[2]);
@@ -466,7 +466,7 @@ function calcReducedColorTable( imageData )
       colorList[minI][2] += colorList[minJ][2];
       colorList[minI][3] += colorList[minJ][3];
       colorList[minI][4] += colorList[minJ][4];
-      for (var j = minJ; j + 1 < colorList.length; j++) {
+      for (let j = minJ; j + 1 < colorList.length; j++) {
         colorList[j][1] = colorList[j + 1][1];
         colorList[j][2] = colorList[j + 1][2];
         colorList[j][3] = colorList[j + 1][3];
