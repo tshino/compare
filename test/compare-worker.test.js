@@ -820,6 +820,32 @@ describe('compareWorker', () => {
                 }
             );
         });
+        it('should calculate reduced color table: two regions of grayscale gradation', () => {
+            runTest(
+                'grayscaleGradation',
+                {
+                    width: 4,
+                    height: 8,
+                    data: [
+                        0, 0, 0, 255, 2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255,
+                        2, 2, 2, 255, 4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255,
+                        4, 4, 4, 255, 6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255,
+                        6, 6, 6, 255, 8, 8, 8, 255, 10,10,10,255, 12,12,12,255,
+                        200, 200, 200, 255, 203, 203, 203, 255, 206, 206, 206, 255, 209, 209, 209, 255,
+                        203, 203, 203, 255, 206, 206, 206, 255, 209, 209, 209, 255, 212, 212, 212, 255,
+                        206, 206, 206, 255, 209, 209, 209, 255, 212, 212, 212, 255, 215, 215, 215, 255,
+                        209, 209, 209, 255, 212, 212, 212, 255, 215, 215, 215, 255, 218, 218, 218, 255
+                    ]
+                },
+                {
+                    totalCount: 32,
+                    colorList: [
+                        [0, 16, 16*209, 16*209, 16*209],
+                        [0, 16, 16*6, 16*6, 16*6]
+                    ]
+                }
+            );
+        });
         it('should calculate reduced color table: stripe', () => {
             const makeImage = compareImageUtil.makeImage;
             const makeRegion = compareImageUtil.makeRegion;
