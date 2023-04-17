@@ -845,22 +845,22 @@ function calcOpticalFlow( a, b, options ) {
   };
 }
 
-var makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
-  var w = a.width, h = a.height;
-  var out = compareImageUtil.makeImage(w, h);
-  var histogram = summary.histogram;
-  var d0 = a.data, d1 = b.data, o = out.data;
-  var i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
-  for (var y = 0; y < h; y++) {
-    for (var x = 0; x < w; x++, i += 4, j += 4, k += 4) {
-      var r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
-      var r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
-      var ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
+const makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
+  const w = a.width, h = a.height;
+  const out = compareImageUtil.makeImage(w, h);
+  const histogram = summary.histogram;
+  const d0 = a.data, d1 = b.data, o = out.data;
+  let i = a.offset * 4, j = b.offset * 4, k = out.offset * 4;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++, i += 4, j += 4, k += 4) {
+      const r0 = d0[i + 0], g0 = d0[i + 1], b0 = d0[i + 2], a0 = d0[i + 3];
+      const r1 = d1[j + 0], g1 = d1[j + 1], b1 = d1[j + 2], a1 = d1[j + 3];
+      let ae = Math.max(Math.abs(r0 - r1), Math.abs(g0 - g1), Math.abs(b0 - b1), Math.abs(a0 - a1));
       histogram[ae] += 1;
       if (imageType === 0) { // 0:Red-Blue
-        var y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
-        var y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
-        var mean = Math.round((y0 * a0 + y1 * a1) * (0.30 / 255));
+        const y0 = 0.299 * r0 + 0.587 * g0 + 0.114 * b0;
+        const y1 = 0.299 * r1 + 0.587 * g1 + 0.114 * b1;
+        const mean = Math.round((y0 * a0 + y1 * a1) * (0.30 / 255));
         if (ae === 0) {
           o[k    ] = mean;
           o[k + 2] = mean;
@@ -882,10 +882,10 @@ var makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
     j += (b.pitch - w) * 4;
     k += (out.pitch - w) * 4;
   }
-  var unmatch = 0;
-  var maxAE = 0;
-  var countIgnoreAE = 0;
-  for (var ae = 0; ae < 256; ae++) {
+  let unmatch = 0;
+  let maxAE = 0;
+  let countIgnoreAE = 0;
+  for (let ae = 0; ae < 256; ae++) {
     if (0 < histogram[ae]) {
       maxAE = ae;
       if (ignoreAE < ae) {
