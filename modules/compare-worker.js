@@ -644,47 +644,47 @@ function calcMetrics( a, b, options, auxTypes )
   return result;
 }
 
-var calcToneCurveByHistogram = function(hist, offset, total) {
-  var result = {
+const calcToneCurveByHistogram = function(hist, offset, total) {
+  const result = {
       cum : [ new Float32Array(1 + 256), new Float32Array(1 + 256) ],
       min : [ 0, 0 ],
       max : [ 255, 255 ]
   };
-  for (var k = 0; k < 2; ++k) {
-    var sum = 0;
+  for (let k = 0; k < 2; ++k) {
+    let sum = 0;
     result.cum[k][0] = 0;
-    for (var i = 0; i < 256; ++i) {
+    for (let i = 0; i < 256; ++i) {
       sum += hist[k][i + offset];
       result.cum[k][i + 1] = sum / total[k];
     }
     result.cum[k][256] = 1;
-    for (var i = 0; i < 256; ++i) {
+    for (let i = 0; i < 256; ++i) {
       if (0 < result.cum[k][1 + i]) {
         result.min[k] = i;
         break;
       }
     }
-    for (var i = 255; i >= 0; --i) {
+    for (let i = 255; i >= 0; --i) {
       if (1 > result.cum[k][i]) {
         result.max[k] = i;
         break;
       }
     }
   }
-  var N = 1000;
+  const N = 1000;
   result.points = [];
   result.points[0] = [result.min[0], result.min[1]];
   result.points[N] = [result.max[0] + 1, result.max[1] + 1];
-  var j = [1, 1];
-  for (var i = 1; i < N; ++i) {
-    var a = i / N;
-    var point = [];
-    for (var k = 0; k < 2; ++k) {
+  const j = [1, 1];
+  for (let i = 1; i < N; ++i) {
+    const a = i / N;
+    const point = [];
+    for (let k = 0; k < 2; ++k) {
       while (result.cum[k][j[k]] < a) {
         j[k] += 1;
       }
-      var step = result.cum[k][j[k]] - result.cum[k][j[k] - 1];
-      var delta = a - result.cum[k][j[k] - 1];
+      const step = result.cum[k][j[k]] - result.cum[k][j[k] - 1];
+      const delta = a - result.cum[k][j[k] - 1];
       point[k] = (j[k] - 1) + delta / step;
     }
     result.points[i] = point;
@@ -692,11 +692,11 @@ var calcToneCurveByHistogram = function(hist, offset, total) {
   result.conf = [];
   result.conf[0] = 0;
   result.conf[N] = 0;
-  var thresh = 1.5 * (256 / N);
-  for (var i = 0; i < N; ++i) {
-    var conf = [];
-    for (var k = 0; k < 2; ++k) {
-      var d = result.points[i + 1][k] - result.points[i][k];
+  const thresh = 1.5 * (256 / N);
+  for (let i = 0; i < N; ++i) {
+    const conf = [];
+    for (let k = 0; k < 2; ++k) {
+      const d = result.points[i + 1][k] - result.points[i][k];
       conf[k] = d < thresh ? 1 : Math.pow(thresh / d, 0.3);
     }
     result.conf[i] = Math.min(conf[0], conf[1]);
