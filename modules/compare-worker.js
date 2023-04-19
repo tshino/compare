@@ -496,7 +496,7 @@ function calcMetrics( a, b, options, auxTypes )
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var result = {
+  const result = {
     psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN,
     y: { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN },
     ae: NaN, aeRgb: NaN, aeAlpha: NaN
@@ -506,20 +506,21 @@ function calcMetrics( a, b, options, auxTypes )
     // error
     return result;
   }
+  let m0,m1,m2;
   if (auxTypes[0] === 0) { // 0: bt601
-    var m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
+    m0 = 0.2990, m1 = 0.5870, m2 = 0.1140;
   } else { // 1: bt709
-    var m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
+    m0 = 0.2126, m1 = 0.7152, m2 = 0.0722;
   }
-  var w = a.width;
-  var h = a.height;
-  var sum12 = function(data) {
-    var sum1 = 0, sum2 = 0, sumY1 = 0, sumY2 = 0;
-    for (var i = 0, y = 0; y < h; ++y) {
-      var lineSum1 = 0, lineSum2 = 0, lineSumY1 = 0, lineSumY2 = 0;
-      for (var x = 0; x < w; ++x, i += 4) {
-        var r = data[i + 0], g = data[i + 1], b = data[i + 2];
-        var y0 = Math.round(m0 * r + m1 * g + m2 * b);
+  const w = a.width;
+  const h = a.height;
+  const sum12 = function(data) {
+    let sum1 = 0, sum2 = 0, sumY1 = 0, sumY2 = 0;
+    for (let i = 0, y = 0; y < h; ++y) {
+      let lineSum1 = 0, lineSum2 = 0, lineSumY1 = 0, lineSumY2 = 0;
+      for (let x = 0; x < w; ++x, i += 4) {
+        const r = data[i + 0], g = data[i + 1], b = data[i + 2];
+        const y0 = Math.round(m0 * r + m1 * g + m2 * b);
         lineSum1 += r + g + b;
         lineSum2 += r * r + g * g + b * b;
         lineSumY1 += y0;
@@ -532,47 +533,47 @@ function calcMetrics( a, b, options, auxTypes )
     }
     return [sum1, sum2, sumY1, sumY2];
   };
-  var sdsum2 = function(sum12) {
+  const sdsum2 = function(sum12) {
     return [
       sum12[1] * (w * h * 3) - sum12[0] * sum12[0],
       sum12[3] * (w * h) - sum12[2] * sum12[2]
     ];
   };
-  var calcNCC = function(dataA, dataB) {
-    var sum12A = sum12(dataA), sum12B = sum12(dataB);
-    var sdsumA = sdsum2(sum12A), sdsumB = sdsum2(sum12B);
-    var sum = 0, sumY = 0;
-    for (var i = 0, y = 0; y < h; ++y) {
-      var lineSum = 0, lineSumY = 0;
-      for (var x = 0; x < w; ++x, i += 4) {
-        var r0 = dataA[i + 0], r1 = dataB[i + 0];
-        var g0 = dataA[i + 1], g1 = dataB[i + 1];
-        var b0 = dataA[i + 2], b1 = dataB[i + 2];
-        var y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
-        var y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
+  const calcNCC = function(dataA, dataB) {
+    const sum12A = sum12(dataA), sum12B = sum12(dataB);
+    const sdsumA = sdsum2(sum12A), sdsumB = sdsum2(sum12B);
+    let sum = 0, sumY = 0;
+    for (let i = 0, y = 0; y < h; ++y) {
+      let lineSum = 0, lineSumY = 0;
+      for (let x = 0; x < w; ++x, i += 4) {
+        const r0 = dataA[i + 0], r1 = dataB[i + 0];
+        const g0 = dataA[i + 1], g1 = dataB[i + 1];
+        const b0 = dataA[i + 2], b1 = dataB[i + 2];
+        const y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
+        const y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
         lineSum += r0 * r1 + g0 * g1 + b0 * b1;
         lineSumY += y0 * y1;
       }
       sum += lineSum;
       sumY += lineSumY;
     }
-    var den = Math.sqrt(sdsumA[0] * sdsumB[0]);
-    var denY = Math.sqrt(sdsumA[1] * sdsumB[1]);
-    var ncc = den === 0 ? NaN : (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
-    var y_ncc = denY === 0 ? NaN : (sumY * (w * h) - sum12A[2] * sum12B[2]) / denY;
-    return { ncc: ncc, y_ncc: y_ncc };
+    const den = Math.sqrt(sdsumA[0] * sdsumB[0]);
+    const denY = Math.sqrt(sdsumA[1] * sdsumB[1]);
+    const ncc = den === 0 ? NaN : (sum * (w * h * 3) - sum12A[0] * sum12B[0]) / den;
+    const y_ncc = denY === 0 ? NaN : (sumY * (w * h) - sum12A[2] * sum12B[2]) / denY;
+    return { ncc, y_ncc };
   };
-  var ncc = calcNCC(a.data, b.data);
+  const ncc = calcNCC(a.data, b.data);
   result.ncc = ncc.ncc;
   result.y.ncc = ncc.y_ncc;
-  var calcAE = function(a, b) {
-    var countRgba = 0, countRgb = 0, countA = 0;
-    for (var i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
-      var diff_rgb =
+  const calcAE = function(a, b) {
+    let countRgba = 0, countRgb = 0, countA = 0;
+    for (let i = 0, n = a.width * a.height * 4; i !== n; i += 4) {
+      const diff_rgb =
           a.data[i + 0] !== b.data[i + 0] ||
           a.data[i + 1] !== b.data[i + 1] ||
           a.data[i + 2] !== b.data[i + 2];
-      var diff_a =
+      const diff_a =
           a.data[i + 3] !== b.data[i + 3];
       countRgb += diff_rgb ? 1 : 0;
       countA += diff_a ? 1 : 0;
@@ -580,22 +581,22 @@ function calcMetrics( a, b, options, auxTypes )
     }
     return { rgba: countRgba, rgb: countRgb, a: countA };
   };
-  var aeCounts = calcAE(a, b);
+  const aeCounts = calcAE(a, b);
   result.ae = aeCounts.rgba;
   result.aeRgb = aeCounts.rgb;
   result.aeAlpha = aeCounts.a;
-  var calcSumOfDifference = function(dataA, dataB) {
-    var sumAE = 0, sumSE = 0, sumYAE = 0, sumYSE = 0;
-    for (var i = 0, y = 0; y < h; ++y) {
-      var lineAE = 0, lineSE = 0;
-      var lineYAE = 0, lineYSE = 0;
-      for (var x = 0; x < w; ++x, i += 4) {
-        var r0 = dataA[i + 0], r1 = dataB[i + 0];
-        var g0 = dataA[i + 1], g1 = dataB[i + 1];
-        var b0 = dataA[i + 2], b1 = dataB[i + 2];
-        var y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
-        var y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
-        var r = r0 - r1, g = g0 - g1, b = b0 - b1, dy = y0 - y1;
+  const calcSumOfDifference = function(dataA, dataB) {
+    let sumAE = 0, sumSE = 0, sumYAE = 0, sumYSE = 0;
+    for (let i = 0, y = 0; y < h; ++y) {
+      let lineAE = 0, lineSE = 0;
+      let lineYAE = 0, lineYSE = 0;
+      for (let x = 0; x < w; ++x, i += 4) {
+        const r0 = dataA[i + 0], r1 = dataB[i + 0];
+        const g0 = dataA[i + 1], g1 = dataB[i + 1];
+        const b0 = dataA[i + 2], b1 = dataB[i + 2];
+        const y0 = Math.round(m0 * r0 + m1 * g0 + m2 * b0);
+        const y1 = Math.round(m0 * r1 + m1 * g1 + m2 * b1);
+        const r = r0 - r1, g = g0 - g1, b = b0 - b1, dy = y0 - y1;
         lineAE += Math.abs(r) + Math.abs(g) + Math.abs(b);
         lineSE += r * r + g * g + b * b;
         lineYAE += Math.abs(dy);
@@ -606,7 +607,7 @@ function calcMetrics( a, b, options, auxTypes )
       sumYAE += lineYAE;
       sumYSE += lineYSE;
     }
-    var wh = w * h;
+    const wh = w * h;
     return {
       sad: sumAE,
       ssd: sumSE,
@@ -618,7 +619,7 @@ function calcMetrics( a, b, options, auxTypes )
       y_mse: sumYSE / wh
     };
   };
-  var m = calcSumOfDifference(a.data, b.data);
+  const m = calcSumOfDifference(a.data, b.data);
   result.sad = m.sad;
   result.ssd = m.ssd;
   result.mae = m.mae;
@@ -627,7 +628,7 @@ function calcMetrics( a, b, options, auxTypes )
     // a === b;
     result.psnr = Infinity;
   } else {
-    var max = 255 * 255;
+    const max = 255 * 255;
     result.psnr = 10 * Math.log(max / result.mse) / Math.LN10;
   }
   result.y.sad = m.y_sad;
@@ -638,7 +639,7 @@ function calcMetrics( a, b, options, auxTypes )
     // a === b;
     result.y.psnr = Infinity;
   } else {
-    var max = 255 * 255;
+    const max = 255 * 255;
     result.y.psnr = 10 * Math.log(max / result.y.mse) / Math.LN10;
   }
   return result;
