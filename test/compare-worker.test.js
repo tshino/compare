@@ -1421,6 +1421,48 @@ describe('compareWorker', () => {
         });
     });
 
+    describe('calcOpticalFlow', () => {
+        it('should calculate optical flow between two input images', () => {
+            const makeRegion = compareImageUtil.makeRegion;
+            const fill = compareImageUtil.fill;
+            const image1 = compareImageUtil.makeImage(100, 80);
+            const image2 = compareImageUtil.makeImage(100, 80);
+            fill(image1, 255, 255, 255, 255);
+            fill(makeRegion(image1, 20, 30, 50, 30), 0, 0, 0, 255);
+            fill(image2, 255, 255, 255, 255);
+            fill(makeRegion(image2, 30, 20, 50, 30), 0, 0, 0, 255);
+            const task = {
+                cmd: 'calcOpticalFlow',
+                imageData: [image1, image2],
+                options: {}
+            };
+            runTask(task);
+
+            assert.ok(responseData);
+            assert.strictEqual(responseData.cmd, 'calcOpticalFlow');
+            assert.strictEqual(responseData.result.image.width, 100);
+            assert.strictEqual(responseData.result.image.height, 80);
+            assert.strictEqual(responseData.result.image.data.length, 100*80*4);
+            assert.strictEqual(responseData.result.points.length, 4);
+            assert.strictEqual(Math.abs(responseData.result.points[0].x0 - 19.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[0].y0 - 29.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[0].x1 - 29.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[0].y1 - 19.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[1].x0 - 69.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[1].y0 - 29.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[1].x1 - 79.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[1].y1 - 19.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[2].x0 - 19.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[2].y0 - 59.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[2].x1 - 29.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[2].y1 - 49.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[3].x0 - 69.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[3].y0 - 59.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[3].x1 - 79.5) < 0.1, true);
+            assert.strictEqual(Math.abs(responseData.result.points[3].y1 - 49.5) < 0.1, true);
+        });
+    });
+
     describe('calcDiff', () => {
         const image1 = { width: 3, height: 2, data: [
             0,0,0,0,     85,85,85,85,     170,170,170,170,
