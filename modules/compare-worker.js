@@ -790,7 +790,7 @@ const calcToneCurve = function(a, b, type, auxTypes, options) {
   return result;
 };
 
-function calcOpticalFlow( a, b, options ) {
+const calcOpticalFlow = function( a, b, options ) {
   a = compareImageUtil.makeImage(a);
   b = compareImageUtil.makeImage(b);
   if (options.orientationA && options.orientationA !== 1) {
@@ -799,25 +799,25 @@ function calcOpticalFlow( a, b, options ) {
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var w = Math.min(a.width, b.width);
-  var h = Math.min(a.height, b.height);
+  const w = Math.min(a.width, b.width);
+  const h = Math.min(a.height, b.height);
   if (a.width !== w || a.height !== h) {
-    var new_a = compareImageUtil.makeImage(w, h);
+    const new_a = compareImageUtil.makeImage(w, h);
     compareImageUtil.resize(new_a, a);
     a = new_a;
   }
   if (b.width !== w || b.height !== h) {
-    var new_b = compareImageUtil.makeImage(w, h);
+    const new_b = compareImageUtil.makeImage(w, h);
     compareImageUtil.resize(new_b, b);
     b = new_b;
   }
-  var grayA = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
-  var grayB = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
+  const grayA = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
+  const grayB = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
   compareImageUtil.convertToGrayscale(grayA, a);
   compareImageUtil.convertToGrayscale(grayB, b);
-  var figImage = compareImageUtil.makeImage(w, h);
-  for (var y = 0, i = 0; y < h; y++) {
-    for (var x = 0; x < w; x++, i++) {
+  const figImage = compareImageUtil.makeImage(w, h);
+  for (let y = 0, i = 0; y < h; y++) {
+    for (let x = 0; x < w; x++, i++) {
       figImage.data[i * 4 + 0] = 0.5 * a.data[i * 4 + 0];
       figImage.data[i * 4 + 1] = 0.5 * b.data[i * 4 + 1];
       figImage.data[i * 4 + 2] = 0.5 * b.data[i * 4 + 2];
@@ -826,11 +826,11 @@ function calcOpticalFlow( a, b, options ) {
   }
   a = null;
   b = null;
-  var pointsA = compareImageUtil.findCornerPoints(grayA);
+  const pointsA = compareImageUtil.findCornerPoints(grayA);
   compareImageUtil.adjustCornerPointsSubPixel(grayA, pointsA);
-  var pointsB = compareImageUtil.sparseOpticalFlow(grayA, grayB, pointsA);
+  const pointsB = compareImageUtil.sparseOpticalFlow(grayA, grayB, pointsA);
   const points = [];
-  for (var i = 0; i < pointsB.length; i++) {
+  for (let i = 0; i < pointsB.length; i++) {
     if (pointsB[i]) {
       points.push({
         x0: pointsA[i].x,
@@ -844,7 +844,7 @@ function calcOpticalFlow( a, b, options ) {
     image:      figImage,
     points:     points
   };
-}
+};
 
 const makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
   const w = a.width, h = a.height;
