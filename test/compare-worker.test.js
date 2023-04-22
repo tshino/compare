@@ -1645,5 +1645,22 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.image.data[16], 10);
             assert.strictEqual(responseData.result.image.data[20], 0);
         });
+        it('should calculate image diff (9)', () => {
+            const task = newTask();
+            task.options.imageType = 1;  // Grayscale
+            task.options.ignoreAE = 0;
+            task.options.orientationA = 2;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.image.width, 3);
+            assert.strictEqual(responseData.result.image.height, 2);
+            assert.strictEqual(responseData.result.image.data.length, 3 * 2 * 4);
+            assert.strictEqual(responseData.result.image.data[0], 170);
+            assert.strictEqual(responseData.result.image.data[4], 5);
+            assert.strictEqual(responseData.result.image.data[8], 160);
+            assert.strictEqual(responseData.result.image.data[12], 175);
+            assert.strictEqual(responseData.result.image.data[16], 10);
+            assert.strictEqual(responseData.result.image.data[20], 170);
+        });
     });
 });
