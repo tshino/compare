@@ -1513,7 +1513,8 @@ describe('compareWorker', () => {
             80,80,80,80, 160,160,160,160, 255,255,255,255
         ]};
         const newTask = () => ({
-            cmd: 'calcDiff', imageData: [image1, image2],
+            cmd: 'calcDiff',
+            imageData: [image1, image2],
             options: {
                 ignoreAE: 0,
                 imageType: 0,
@@ -1645,7 +1646,7 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.image.data[16], 10);
             assert.strictEqual(responseData.result.image.data[20], 0);
         });
-        it('should calculate image diff (9)', () => {
+        it('should calculate image diff: with orientation', () => {
             const task = newTask();
             task.options.imageType = 1;  // Grayscale
             task.options.ignoreAE = 0;
@@ -1661,6 +1662,60 @@ describe('compareWorker', () => {
             assert.strictEqual(responseData.result.image.data[12], 175);
             assert.strictEqual(responseData.result.image.data[16], 10);
             assert.strictEqual(responseData.result.image.data[20], 170);
+        });
+        const image2tall = { width: 3, height: 4, data: [
+            0,0,0,0,     80,80,80,80,     160,160,160,160,
+            0,0,0,0,     80,80,80,80,     160,160,160,160,
+            80,80,80,80, 160,160,160,160, 255,255,255,255,
+            80,80,80,80, 160,160,160,160, 255,255,255,255
+        ]};
+        it('should calculate image diff: with different sizes and resize', () => {
+            const task = newTask();
+            task.imageData[1] = image2tall;
+            task.options.imageType = 1;  // Grayscale
+            task.options.resizeToLarger = true;
+            task.options.resizeMethod = 'nn';
+            task.options.orientationB = 2;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.image.width, 3);
+            assert.strictEqual(responseData.result.image.height, 4);
+            assert.strictEqual(responseData.result.image.data.length, 3 * 4 * 4);
+            assert.strictEqual(responseData.result.image.data[0], 160);
+            assert.strictEqual(responseData.result.image.data[4], 5);
+            assert.strictEqual(responseData.result.image.data[8], 170);
+            assert.strictEqual(responseData.result.image.data[12], 160);
+            assert.strictEqual(responseData.result.image.data[16], 5);
+            assert.strictEqual(responseData.result.image.data[20], 170);
+            assert.strictEqual(responseData.result.image.data[24], 170);
+            assert.strictEqual(responseData.result.image.data[28], 10);
+            assert.strictEqual(responseData.result.image.data[32], 175);
+            assert.strictEqual(responseData.result.image.data[36], 170);
+            assert.strictEqual(responseData.result.image.data[40], 10);
+            assert.strictEqual(responseData.result.image.data[44], 175);
+        });
+        it('should calculate image diff: with different sizes and no resize', () => {
+            const task = newTask();
+            task.imageData[1] = image2tall;
+            task.options.imageType = 1;  // Grayscale
+            task.options.resizeToLarger = false;
+            runTask(task);
+
+            assert.strictEqual(responseData.result.image.width, 3);
+            assert.strictEqual(responseData.result.image.height, 4);
+            assert.strictEqual(responseData.result.image.data.length, 3 * 4 * 4);
+            assert.strictEqual(responseData.result.image.data[0], 0);
+            assert.strictEqual(responseData.result.image.data[4], 5);
+            assert.strictEqual(responseData.result.image.data[8], 10);
+            assert.strictEqual(responseData.result.image.data[12], 85);
+            assert.strictEqual(responseData.result.image.data[16], 90);
+            assert.strictEqual(responseData.result.image.data[20], 95);
+            assert.strictEqual(responseData.result.image.data[24], 80);
+            assert.strictEqual(responseData.result.image.data[28], 160);
+            assert.strictEqual(responseData.result.image.data[32], 255);
+            assert.strictEqual(responseData.result.image.data[36], 80);
+            assert.strictEqual(responseData.result.image.data[40], 160);
+            assert.strictEqual(responseData.result.image.data[44], 255);
         });
     });
 });
