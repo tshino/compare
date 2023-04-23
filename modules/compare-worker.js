@@ -910,36 +910,33 @@ function calcDiff( a, b, options ) {
   if (options.orientationB && options.orientationB !== 1) {
     b = compareImageUtil.applyOrientation(b, options.orientationB);
   }
-  var minW = Math.min(a.width, b.width);
-  var minH = Math.min(a.height, b.height);
-  var maxW = Math.max(a.width, b.width);
-  var maxH = Math.max(a.height, b.height);
-  var useLargerSize = options.resizeToLarger || !options.ignoreRemainder;
-  var regionW = useLargerSize ? maxW : minW;
-  var regionH = useLargerSize ? maxH : minH;
+  const minW = Math.min(a.width, b.width);
+  const minH = Math.min(a.height, b.height);
+  const maxW = Math.max(a.width, b.width);
+  const maxH = Math.max(a.height, b.height);
+  const useLargerSize = options.resizeToLarger || !options.ignoreRemainder;
+  let regionW = useLargerSize ? maxW : minW;
+  let regionH = useLargerSize ? maxH : minH;
   a = compareImageUtil.makeRegion(a, 0, 0, regionW, regionH);
   b = compareImageUtil.makeRegion(b, 0, 0, regionW, regionH);
-  if (a.width < regionW || a.height < regionH) {
-    var new_a = compareImageUtil.makeImage(regionW, regionH);
+  const resizeToCommonSize = function(img, commonW, commonH, options) {
+    const newImg = compareImageUtil.makeImage(commonW, commonH);
     if (options.resizeToLarger) {
-      compareImageUtil.resize(new_a, a, options.resizeMethod);
+      compareImageUtil.resize(newImg, img, options.resizeMethod);
     } else {
-      compareImageUtil.copy(new_a, a);
+      compareImageUtil.copy(newImg, img);
     }
-    a = new_a;
+    return newImg;
+  };
+  if (a.width < regionW || a.height < regionH) {
+    a = resizeToCommonSize(a, regionW, regionH, options);
   }
   if (b.width < regionW || b.height < regionH) {
-    var new_b = compareImageUtil.makeImage(regionW, regionH);
-    if (options.resizeToLarger) {
-      compareImageUtil.resize(new_b, b, options.resizeMethod);
-    } else {
-      compareImageUtil.copy(new_b, b);
-    }
-    b = new_b;
+    b = resizeToCommonSize(b, regionW, regionH, options);
   }
   if (options.offsetX !== 0 || options.offsetY !== 0) {
-    var ox = Math.max(-regionW, Math.min(regionW, options.offsetX));
-    var oy = Math.max(-regionH, Math.min(regionH, options.offsetY));
+    const ox = Math.max(-regionW, Math.min(regionW, options.offsetX));
+    const oy = Math.max(-regionH, Math.min(regionH, options.offsetY));
     regionW -= Math.abs(ox);
     regionH -= Math.abs(oy);
     a = compareImageUtil.makeRegion(a,
@@ -953,20 +950,20 @@ function calcDiff( a, b, options ) {
                              regionW,
                              regionH);
   }
-  var summary = {
+  const summary = {
     total: 0,
     countIgnoreAE: 0,
     unmatch: 0,
     maxAE: 0,
     histogram: new Uint32Array(256)
   };
-  var ignoreAE = options.ignoreAE;
-  var imageType = options.imageType || 0;
-  var image = makeDiffImage(a, b, ignoreAE, imageType, summary);
+  const ignoreAE = options.ignoreAE;
+  const imageType = options.imageType || 0;
+  const image = makeDiffImage(a, b, ignoreAE, imageType, summary);
   summary.match = summary.total - summary.unmatch;
   return {
-    image: image,
-    summary:    summary
+    image,
+    summary
   };
 }
 
