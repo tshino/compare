@@ -537,6 +537,20 @@ describe('CompareImageUtil', () => {
                 ],
             );
         });
+
+        it('should do nothing if the numbers of channels differ', () => {
+            const image1 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_U8x4);
+            const image2 = compareImageUtil.makeImage(2, 2, compareImageUtil.FORMAT_F32x1);
+            for (let i = 0; i < image1.data.length; ++i) {
+                image1.data[i] = 55;
+            }
+            for (let i = 0; i < image2.data.length; ++i) {
+                image2.data[i] = 77;
+            }
+            compareImageUtil.copy(image2, image1);
+
+            assert.deepStrictEqual(Array.from(image2.data), [77, 77, 77, 77]);
+        });
     });
 
     describe('rotateCW', () => {
