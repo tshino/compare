@@ -793,24 +793,26 @@ const calcToneCurve = function(a, b, type, auxTypes, options) {
 const calcOpticalFlow = function( a, b, options ) {
   a = compareImageUtil.makeImage(a);
   b = compareImageUtil.makeImage(b);
-  if (options.orientationA && options.orientationA !== 1) {
-    a = compareImageUtil.applyOrientation(a, options.orientationA);
-  }
-  if (options.orientationB && options.orientationB !== 1) {
-    b = compareImageUtil.applyOrientation(b, options.orientationB);
-  }
+  const applyOrientation = function(img, orientation) {
+    if (orientation && orientation !== 1) {
+      img = compareImageUtil.applyOrientation(img, orientation);
+    }
+    return img;
+  };
+  a = applyOrientation(a, options.orientationA);
+  b = applyOrientation(b, options.orientationB);
   const w = Math.min(a.width, b.width);
   const h = Math.min(a.height, b.height);
-  if (a.width !== w || a.height !== h) {
-    const new_a = compareImageUtil.makeImage(w, h);
-    compareImageUtil.resize(new_a, a);
-    a = new_a;
-  }
-  if (b.width !== w || b.height !== h) {
-    const new_b = compareImageUtil.makeImage(w, h);
-    compareImageUtil.resize(new_b, b);
-    b = new_b;
-  }
+  const adjustImageSize = function(img, w, h) {
+    if (img.width !== w || img.height !== h) {
+      const newImg = compareImageUtil.makeImage(w, h);
+      compareImageUtil.resize(newImg, img);
+      img = newImg;
+    }
+    return img;
+  };
+  a = adjustImageSize(a, w, h);
+  b = adjustImageSize(b, w, h);
   const grayA = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
   const grayB = compareImageUtil.makeImage(w, h, compareImageUtil.FORMAT_F32x1);
   compareImageUtil.convertToGrayscale(grayA, a);
