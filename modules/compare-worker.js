@@ -921,21 +921,20 @@ function calcDiff( a, b, options ) {
   let regionH = useLargerSize ? maxH : minH;
   a = compareImageUtil.makeRegion(a, 0, 0, regionW, regionH);
   b = compareImageUtil.makeRegion(b, 0, 0, regionW, regionH);
-  const resizeToCommonSize = function(img, commonW, commonH, options) {
-    const newImg = compareImageUtil.makeImage(commonW, commonH);
-    if (options.resizeToLarger) {
-      compareImageUtil.resize(newImg, img, options.resizeMethod);
-    } else {
-      compareImageUtil.copy(newImg, img);
+  const adjustImageSize = function(img, commonW, commonH, options) {
+    if (img.width < commonW || img.height < commonH) {
+      const newImg = compareImageUtil.makeImage(commonW, commonH);
+      if (options.resizeToLarger) {
+        compareImageUtil.resize(newImg, img, options.resizeMethod);
+      } else {
+        compareImageUtil.copy(newImg, img);
+      }
+      img = newImg;
     }
-    return newImg;
+    return img;
   };
-  if (a.width < regionW || a.height < regionH) {
-    a = resizeToCommonSize(a, regionW, regionH, options);
-  }
-  if (b.width < regionW || b.height < regionH) {
-    b = resizeToCommonSize(b, regionW, regionH, options);
-  }
+  a = adjustImageSize(a, regionW, regionH, options);
+  b = adjustImageSize(b, regionW, regionH, options);
   if (options.offsetX !== 0 || options.offsetY !== 0) {
     const ox = Math.max(-regionW, Math.min(regionW, options.offsetX));
     const oy = Math.max(-regionH, Math.min(regionH, options.offsetY));
