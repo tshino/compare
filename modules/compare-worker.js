@@ -707,16 +707,17 @@ const calcToneCurveByHistogram = function(hist, offset, total) {
 const calcToneMap = function(a, b, type, auxTypes) {
   const w = Math.min(a.width, b.width);
   const h = Math.min(a.height, b.height);
-  let sampleA = compareImageUtil.makeImage(a);
-  let sampleB = compareImageUtil.makeImage(b);
-  if (w !== a.width || h !== a.height) {
-    sampleA = compareImageUtil.makeImage(w, h);
-    compareImageUtil.resize(sampleA, a);
-  }
-  if (w !== b.width || h !== b.height) {
-    sampleB = compareImageUtil.makeImage(w, h);
-    compareImageUtil.resize(sampleB, b);
-  }
+  const adjustImageSize = function(img, w, h) {
+    if (w !== img.width || h !== img.height) {
+      const newImg = compareImageUtil.makeImage(w, h);
+      compareImageUtil.resize(newImg, img);
+      return newImg;
+    } else {
+      return compareImageUtil.makeImage(img);
+    }
+  };
+  const sampleA = adjustImageSize(a, w, h);
+  const sampleB = adjustImageSize(b, w, h);
   const dist = new Uint32Array(256 * 256 * (type === 0 ? 3 : 1));
   if (type === 0) { // RGB
     for (let y = 0; y < h; ++y) {
