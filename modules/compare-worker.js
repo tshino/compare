@@ -903,12 +903,8 @@ const makeDiffImage = function(a, b, ignoreAE, imageType, summary) {
 };
 
 function calcDiff( a, b, options ) {
-  if (options.orientationA && options.orientationA !== 1) {
-    a = compareImageUtil.applyOrientation(a, options.orientationA);
-  }
-  if (options.orientationB && options.orientationB !== 1) {
-    b = compareImageUtil.applyOrientation(b, options.orientationB);
-  }
+  a = applyOrientation(a, options.orientationA);
+  b = applyOrientation(b, options.orientationB);
   const minW = Math.min(a.width, b.width);
   const minH = Math.min(a.height, b.height);
   const maxW = Math.max(a.width, b.width);
