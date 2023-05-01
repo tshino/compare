@@ -763,6 +763,12 @@ const calcToneMap = function(a, b, type, auxTypes) {
     max : w * h
   };
 };
+const applyOrientation = function(img, orientation) {
+  if (orientation && orientation !== 1) {
+    img = compareImageUtil.applyOrientation(img, orientation);
+  }
+  return img;
+};
 const calcToneCurve = function(a, b, type, auxTypes, options) {
   options = options || {};
   const result = {
@@ -781,12 +787,8 @@ const calcToneCurve = function(a, b, type, auxTypes, options) {
   // tone map
   a = compareImageUtil.makeImage(a);
   b = compareImageUtil.makeImage(b);
-  if (options.orientationA && options.orientationA !== 1) {
-    a = compareImageUtil.applyOrientation(a, options.orientationA);
-  }
-  if (options.orientationB && options.orientationB !== 1) {
-    b = compareImageUtil.applyOrientation(b, options.orientationB);
-  }
+  a = applyOrientation(a, options.orientationA);
+  b = applyOrientation(b, options.orientationB);
   result.toneMap = calcToneMap(a, b, type, auxTypes);
   return result;
 };
@@ -794,12 +796,6 @@ const calcToneCurve = function(a, b, type, auxTypes, options) {
 const calcOpticalFlow = function( a, b, options ) {
   a = compareImageUtil.makeImage(a);
   b = compareImageUtil.makeImage(b);
-  const applyOrientation = function(img, orientation) {
-    if (orientation && orientation !== 1) {
-      img = compareImageUtil.applyOrientation(img, orientation);
-    }
-    return img;
-  };
   a = applyOrientation(a, options.orientationA);
   b = applyOrientation(b, options.orientationB);
   const w = Math.min(a.width, b.width);
