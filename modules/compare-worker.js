@@ -486,16 +486,18 @@ function calcReducedColorTable( imageData )
   };
 }
 
+const applyOrientation = function(img, orientation) {
+  if (orientation && orientation !== 1) {
+    img = compareImageUtil.applyOrientation(img, orientation);
+  }
+  return img;
+};
 function calcMetrics( a, b, options, auxTypes )
 {
   options = options || {};
   auxTypes = auxTypes || [0];
-  if (options.orientationA && options.orientationA !== 1) {
-    a = compareImageUtil.applyOrientation(a, options.orientationA);
-  }
-  if (options.orientationB && options.orientationB !== 1) {
-    b = compareImageUtil.applyOrientation(b, options.orientationB);
-  }
+  a = applyOrientation(a, options.orientationA);
+  b = applyOrientation(b, options.orientationB);
   const result = {
     psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN,
     y: { psnr: NaN, sad: NaN, ssd: NaN, mae: NaN, mse: NaN, ncc: NaN },
@@ -762,12 +764,6 @@ const calcToneMap = function(a, b, type, auxTypes) {
     dist : dist,
     max : w * h
   };
-};
-const applyOrientation = function(img, orientation) {
-  if (orientation && orientation !== 1) {
-    img = compareImageUtil.applyOrientation(img, orientation);
-  }
-  return img;
 };
 const calcToneCurve = function(a, b, type, auxTypes, options) {
   options = options || {};
