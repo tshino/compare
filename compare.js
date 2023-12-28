@@ -3982,6 +3982,8 @@ const compareUI = CompareUI({ compareUtil });
           message += ' Maybe not an image file.';
         } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
           message += ' Maybe unsupported format for the browser.';
+        } else {
+          message += ` The format might be ${format} though.`;
         }
         setEntryError(entry, message);
       });
