@@ -3965,7 +3965,7 @@ const compareUI = CompareUI({ compareUtil });
     }
     const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     const img = new Image;
-    $(img).on('load', function() {
+    img.onload = () => {
         let w = img.naturalWidth;
         let h = img.naturalHeight;
         if (entry.format === 'SVG' && (w === 0 && h === 0)) {
@@ -3975,8 +3975,8 @@ const compareUI = CompareUI({ compareUtil });
         }
         const mainImage = useCanvasToDisplay ? compareUtil.figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
-      }).
-      on('error', function() {
+    };
+    img.onerror = () => {
         let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
@@ -3986,7 +3986,7 @@ const compareUI = CompareUI({ compareUtil });
           message += ` The format might be ${format} though.`;
         }
         setEntryError(entry, message);
-      });
+    };
     img.src = dataURI;
   };
   const setupEntryWithCanvas = function(entry, canvas) {
