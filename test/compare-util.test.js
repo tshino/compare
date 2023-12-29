@@ -355,6 +355,52 @@ describe('CompareUtil', () => {
         });
     });
 
+    describe('binaryFromArrayBuffer', () => {
+        // Hello, world!\n
+        const array = Uint8Array.from([0x48,0x65,0x6c,0x6c,0x6f,0x2c,0x20,0x77,0x6f,0x72,0x6c,0x64,0x21,0x0a]);
+        const buffer = array.buffer;
+        it('should make binary reader from ArrayBuffer', () => {
+            const binary = compareUtil.binaryFromArrayBuffer(buffer);
+
+            assert.strictEqual(array[0], 0x48 /* H */);
+            assert.strictEqual(array[1], 0x65 /* H */);
+
+            assert.strictEqual(binary.length, 14);
+            assert.strictEqual(binary.at(0), 0x48 /* H */);
+            assert.strictEqual(binary.at(1), 0x65 /* e */);
+            assert.strictEqual(binary.at(2), 0x6c /* l */);
+            assert.strictEqual(binary.at(3), 0x6c /* l */);
+            assert.strictEqual(binary.at(4), 0x6f /* o */);
+            assert.strictEqual(binary.at(5), 0x2c /* , */);
+            assert.strictEqual(binary.at(6), 0x20 /*   */);
+            assert.strictEqual(binary.at(7), 0x77 /* w */);
+            assert.strictEqual(binary.at(8), 0x6f /* o */);
+            assert.strictEqual(binary.at(9), 0x72 /* r */);
+            assert.strictEqual(binary.at(10), 0x6c /* l */);
+            assert.strictEqual(binary.at(11), 0x64 /* d */);
+            assert.strictEqual(binary.at(12), 0x21 /* ! */);
+            assert.strictEqual(binary.at(13), 0x0a /* \n */);
+
+            assert.strictEqual(binary.at(14), null);
+            // assert.strictEqual( binary.at(-1), null );
+
+            assert.strictEqual(binary.big16(0), 0x4865 /* He */);
+            assert.strictEqual(binary.big16(1), 0x656c /* el */);
+            assert.strictEqual(binary.big16(2), 0x6c6c /* ll */);
+            assert.strictEqual(binary.big16(3), 0x6c6f /* lo */);
+            assert.strictEqual(binary.little16(0), 0x6548 /* eH */);
+            assert.strictEqual(binary.little16(1), 0x6c65 /* le */);
+            assert.strictEqual(binary.little16(2), 0x6c6c /* ll */);
+            assert.strictEqual(binary.little16(3), 0x6f6c /* ol */);
+            assert.strictEqual(binary.big32(0), 0x48656c6c /* Hell */);
+            assert.strictEqual(binary.big32(1), 0x656c6c6f /* ello */);
+            assert.strictEqual(binary.big32(2), 0x6c6c6f2c /* llo, */);
+            assert.strictEqual(binary.little32(0), 0x6c6c6548 /* lleH */);
+            assert.strictEqual(binary.little32(1), 0x6f6c6c65 /* olle */);
+            assert.strictEqual(binary.little32(2), 0x2c6f6c6c /* ,oll */);
+        });
+    });
+
     describe('detectExifOrientation', () => {
         const detect = function (content) {
             const u8array = new Uint8Array(content);

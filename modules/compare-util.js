@@ -356,13 +356,16 @@ const CompareUtil = function(window) {
   // such as > 10MBytes takes unnecessary long execution time.
   // This binary view object provides O(1) random access of dataURI.
   //
-  const binaryFromDataURI = function(dataURI) {
-    const offset = dataURI.indexOf(',') + 1;
-    const isBase64 = 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
+  const makeBinaryReader = function({ dataURI, buffer }) {
+    const offset = dataURI ? dataURI.indexOf(',') + 1 : 0;
+    const isBase64 = dataURI && 0 <= dataURI.slice(0, offset - 1).indexOf(';base64');
     let binary = null;
     let len;
 
-    if (isBase64) {
+    if (buffer) {
+      binary = new Uint8Array(buffer);
+      len = binary.length;
+    } else if (isBase64) {
       len = (dataURI.length - offset) / 4 * 3;
       if (3 <= len) {
         len = len - 3 +
@@ -377,7 +380,9 @@ const CompareUtil = function(window) {
       if (addr >= len) {
         return null;
       }
-      if (isBase64) {
+      if (buffer) {
+        return binary[addr];
+      } else if (isBase64) {
         const mod = addr % 3;
         const pos = (addr - mod) / 3 * 4;
         const bytes = atob(dataURI.slice(offset + pos, offset + pos + 4));
@@ -408,6 +413,12 @@ const CompareUtil = function(window) {
       big32:    readBig32,
       little32: readLittle32
     };
+  };
+  const binaryFromDataURI = function(dataURI) {
+    return makeBinaryReader({ dataURI });
+  };
+  const binaryFromArrayBuffer = function(buffer) {
+    return makeBinaryReader({ buffer });
   };
 
   const findPNGChunk = function(binary, callback) {
@@ -2306,6 +2317,7 @@ const CompareUtil = function(window) {
     convertColorListRgbToHsl,
     convertColorListRgbToHslLinear,
     binaryFromDataURI,
+    binaryFromArrayBuffer,
     detectPNGChunk,
     detectMPFIdentifier,
     detectExifOrientation,
