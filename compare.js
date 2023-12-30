@@ -3940,8 +3940,10 @@ const compareUI = CompareUI({ compareUtil });
     view.updateDOM();
     nowLoadingDialog.update();
   };
-  const setupEntryWithDataURI = function(entry, dataURI) {
-    const binary = compareUtil.binaryFromDataURI(dataURI);
+  const setupEntryWithFileData = function(entry, { dataURI, arrayBuffer }) {
+    const binary = dataURI ?
+        compareUtil.binaryFromDataURI(dataURI) :
+        compareUtil.binaryFromArrayBuffer(arrayBuffer);
     const formatInfo = compareUtil.detectImageFormat(binary);
     const format = formatInfo ? formatInfo.toString() : null;
     const isPNG  = format && 0 <= format.indexOf('PNG');
@@ -3987,7 +3989,18 @@ const compareUI = CompareUI({ compareUtil });
         }
         setEntryError(entry, message);
     };
-    img.src = dataURI;
+    if (dataURI) {
+      img.src = dataURI;
+    } else {
+      const blob = new Blob([arrayBuffer]);
+      img.src = window.URL.createObjectURL(blob);
+    }
+  };
+  const setupEntryWithDataURI = function(entry, dataURI) {
+    setupEntryWithFileData(entry, { dataURI });
+  };
+  const setupEntryWithArrayBuffer = function(entry, arrayBuffer) {
+    setupEntryWithFileData(entry, { arrayBuffer });
   };
   const setupEntryWithCanvas = function(entry, canvas) {
     setEntryImage(entry, canvas, canvas.width, canvas.height);
@@ -4028,6 +4041,8 @@ const compareUI = CompareUI({ compareUtil });
       const entry = newEntry(file);
       nowLoadingDialog.add(entry);
 
+      const useDataURI = false;
+
       const reader = new FileReader();
       reader.onprogress = function(e) {
         if (e.lengthComputable && 0 < e.total) {
@@ -4037,7 +4052,11 @@ const compareUI = CompareUI({ compareUtil });
       };
       reader.onload = function(e) {
         try {
-          setupEntryWithDataURI(entry, e.target.result);
+          if (useDataURI) {
+            setupEntryWithDataURI(entry, e.target.result);
+          } else {
+            setupEntryWithArrayBuffer(entry, e.target.result);
+          }
         } catch (e) {
           setEntryError(entry, 'Failed. ' + (e.message || ''));
         }
@@ -4045,7 +4064,11 @@ const compareUI = CompareUI({ compareUtil });
       reader.onerror = function(e) {
         setEntryError(entry, 'Failed. File could not be read. (' + reader.error.name + ')');
       };
-      reader.readAsDataURL(file);
+      if (useDataURI) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.readAsArrayBuffer(file);
+      }
   };
   const addFiles = function(files) {
     const sorted = Array.from(files);
