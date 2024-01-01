@@ -3946,10 +3946,7 @@ const compareUI = CompareUI({ compareUtil });
         compareUtil.binaryFromArrayBuffer(arrayBuffer);
     const formatInfo = compareUtil.detectImageFormat(binary);
     const format = formatInfo ? formatInfo.toString() : null;
-    const isPNG  = format && 0 <= format.indexOf('PNG');
     const isJPEG = format && 0 <= format.indexOf('JPEG');
-    const isGIF  = format && 0 <= format.indexOf('GIF');
-    const isBMP  = format && 0 <= format.indexOf('BMP');
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
@@ -3979,6 +3976,9 @@ const compareUI = CompareUI({ compareUtil });
         setEntryImage(entry, mainImage, w, h);
     };
     img.onerror = () => {
+        const isPNG  = format && 0 <= format.indexOf('PNG');
+        const isGIF  = format && 0 <= format.indexOf('GIF');
+        const isBMP  = format && 0 <= format.indexOf('BMP');
         let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
