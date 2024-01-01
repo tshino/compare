@@ -3976,15 +3976,16 @@ const compareUI = CompareUI({ compareUtil });
         setEntryImage(entry, mainImage, w, h);
     };
     img.onerror = () => {
-        const isPNG  = format && 0 <= format.indexOf('PNG');
-        const isGIF  = format && 0 <= format.indexOf('GIF');
-        const isBMP  = format && 0 <= format.indexOf('BMP');
+        const format = entry.formatInfo ? entry.formatInfo.toString() : '';
+        const isPNG  = 0 <= format.indexOf('PNG');
+        const isGIF  = 0 <= format.indexOf('GIF');
+        const isBMP  = 0 <= format.indexOf('BMP');
         let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
         } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
           message += ' Maybe unsupported format for the browser.';
-        } else {
+        } else if (format) {
           message += ` The format might be ${format} though.`;
         }
         setEntryError(entry, message);
