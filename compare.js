@@ -3993,7 +3993,12 @@ const compareUI = CompareUI({ compareUtil });
     if (dataURI) {
       img.src = dataURI;
     } else {
-      const blob = new Blob([arrayBuffer]);
+      let blob;
+      if (entry.fileType) {
+        blob = new Blob([arrayBuffer], { type: entry.fileType });
+      } else {
+        blob = new Blob([arrayBuffer]);
+      }
       img.src = window.URL.createObjectURL(blob);
     }
   };
