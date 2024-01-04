@@ -3946,7 +3946,6 @@ const compareUI = CompareUI({ compareUtil });
         compareUtil.binaryFromArrayBuffer(arrayBuffer);
     const formatInfo = compareUtil.detectImageFormat(binary);
     const format = formatInfo ? formatInfo.toString() : null;
-    const isJPEG = format && 0 <= format.indexOf('JPEG');
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
@@ -3956,6 +3955,7 @@ const compareUI = CompareUI({ compareUtil });
       altView.enableAlpha();
     }
     entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
+    const isJPEG = 0 <= entry.format.indexOf('JPEG');
     if (isJPEG) {
       entry.orientationExif = compareUtil.detectExifOrientation(binary);
       if (!drawImageAwareOfOrientation) {
@@ -3966,9 +3966,9 @@ const compareUI = CompareUI({ compareUtil });
     img.onload = () => {
         let w = img.naturalWidth;
         let h = img.naturalHeight;
-        const format = entry.formatInfo ? entry.formatInfo.toString() : '';
-        const isJPEG = 0 <= format.indexOf('JPEG');
-        if (entry.format === 'SVG' && (w === 0 && h === 0)) {
+        const isJPEG = 0 <= entry.format.indexOf('JPEG');
+        const isSVG = 0 <= entry.format.indexOf('SVG');
+        if (isSVG && (w === 0 && h === 0)) {
           w = 150;
           h = 150;
           entry.sizeUnknown = true;
@@ -3978,18 +3978,17 @@ const compareUI = CompareUI({ compareUtil });
         setEntryImage(entry, mainImage, w, h);
     };
     img.onerror = () => {
-        const format = entry.formatInfo ? entry.formatInfo.toString() : '';
-        const isJPEG = 0 <= format.indexOf('JPEG');
-        const isPNG  = 0 <= format.indexOf('PNG');
-        const isGIF  = 0 <= format.indexOf('GIF');
-        const isBMP  = 0 <= format.indexOf('BMP');
+        const isJPEG = 0 <= entry.format.indexOf('JPEG');
+        const isPNG  = 0 <= entry.format.indexOf('PNG');
+        const isGIF  = 0 <= entry.format.indexOf('GIF');
+        const isBMP  = 0 <= entry.format.indexOf('BMP');
         let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
         } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
           message += ' Maybe unsupported format for the browser.';
-        } else if (format) {
-          message += ` The format might be ${format} though.`;
+        } else if (entry.formatInfo) {
+          message += ` The format might be ${entry.formatInfo.toString()} though.`;
         }
         setEntryError(entry, message);
     };
