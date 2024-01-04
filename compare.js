@@ -3962,21 +3962,24 @@ const compareUI = CompareUI({ compareUtil });
         entry.orientation = entry.orientationExif;
       }
     }
-    const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
     const img = new Image;
     img.onload = () => {
         let w = img.naturalWidth;
         let h = img.naturalHeight;
+        const format = entry.formatInfo ? entry.formatInfo.toString() : '';
+        const isJPEG = 0 <= format.indexOf('JPEG');
         if (entry.format === 'SVG' && (w === 0 && h === 0)) {
           w = 150;
           h = 150;
           entry.sizeUnknown = true;
         }
+        const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
         const mainImage = useCanvasToDisplay ? compareUtil.figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
     };
     img.onerror = () => {
         const format = entry.formatInfo ? entry.formatInfo.toString() : '';
+        const isJPEG = 0 <= format.indexOf('JPEG');
         const isPNG  = 0 <= format.indexOf('PNG');
         const isGIF  = 0 <= format.indexOf('GIF');
         const isBMP  = 0 <= format.indexOf('BMP');
