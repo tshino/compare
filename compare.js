@@ -3955,8 +3955,12 @@ const compareUI = CompareUI({ compareUtil });
       altView.enableAlpha();
     }
     entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
-    const isJPEG = 0 <= entry.format.indexOf('JPEG');
-    if (isJPEG) {
+    entry.isJPEG = () => 0 <= entry.format.indexOf('JPEG');
+    entry.isPNG = () => 0 <= entry.format.indexOf('PNG');
+    entry.isGIF = () => 0 <= entry.format.indexOf('GIF');
+    entry.isBMP = () => 0 <= entry.format.indexOf('BMP');
+    entry.isSVG = () => 0 <= entry.format.indexOf('SVG');
+    if (entry.isJPEG()) {
       entry.orientationExif = compareUtil.detectExifOrientation(binary);
       if (!drawImageAwareOfOrientation) {
         entry.orientation = entry.orientationExif;
@@ -3966,26 +3970,20 @@ const compareUI = CompareUI({ compareUtil });
     img.onload = () => {
         let w = img.naturalWidth;
         let h = img.naturalHeight;
-        const isJPEG = 0 <= entry.format.indexOf('JPEG');
-        const isSVG = 0 <= entry.format.indexOf('SVG');
-        if (isSVG && (w === 0 && h === 0)) {
+        if (entry.isSVG() && (w === 0 && h === 0)) {
           w = 150;
           h = 150;
           entry.sizeUnknown = true;
         }
-        const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && isJPEG;
+        const useCanvasToDisplay = NEEDS_IOS_EXIF_WORKAROUND && entry.isJPEG();
         const mainImage = useCanvasToDisplay ? compareUtil.figureUtil.canvasFromImage(img, w, h) : img;
         setEntryImage(entry, mainImage, w, h);
     };
     img.onerror = () => {
-        const isJPEG = 0 <= entry.format.indexOf('JPEG');
-        const isPNG  = 0 <= entry.format.indexOf('PNG');
-        const isGIF  = 0 <= entry.format.indexOf('GIF');
-        const isBMP  = 0 <= entry.format.indexOf('BMP');
         let message = 'Failed.';
         if (!entry.fileType || !(/^image\/.+$/.test(entry.fileType))) {
           message += ' Maybe not an image file.';
-        } else if (!isPNG && !isJPEG && !isGIF && !isBMP) {
+        } else if (!entry.isPNG() && !entry.isJPEG() && !entry.isGIF() && !entry.isBMP()) {
           message += ' Maybe unsupported format for the browser.';
         } else if (entry.formatInfo) {
           message += ` The format might be ${entry.formatInfo.toString()} though.`;
