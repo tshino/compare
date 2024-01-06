@@ -3940,7 +3940,7 @@ const compareUI = CompareUI({ compareUtil });
     view.updateDOM();
     nowLoadingDialog.update();
   };
-  const setupEntryWithFileData = function(entry, { dataURI, arrayBuffer }) {
+  const fillEntryFormatInfo = function(entry, { dataURI, arrayBuffer }) {
     const binary = dataURI ?
         compareUtil.binaryFromDataURI(dataURI) :
         compareUtil.binaryFromArrayBuffer(arrayBuffer);
@@ -3949,11 +3949,6 @@ const compareUI = CompareUI({ compareUtil });
     entry.formatInfo = formatInfo;
     entry.format = format || (entry.fileType ? '('+entry.fileType+')' : '(unknown)');
     entry.color = (formatInfo && formatInfo.color) || '';
-    if (0 <= entry.color.indexOf('RGBA') ||
-        0 <= entry.color.indexOf('Alpha') ||
-        0 <= entry.color.indexOf('Transparent')) {
-      altView.enableAlpha();
-    }
     entry.numFrames = (formatInfo && formatInfo.anim) ? formatInfo.anim.frameCount : null;
     entry.isJPEG = () => 0 <= entry.format.indexOf('JPEG');
     entry.isPNG = () => 0 <= entry.format.indexOf('PNG');
@@ -3965,6 +3960,14 @@ const compareUI = CompareUI({ compareUtil });
       if (!drawImageAwareOfOrientation) {
         entry.orientation = entry.orientationExif;
       }
+    }
+  };
+  const setupEntryWithFileData = function(entry, { dataURI, arrayBuffer }) {
+    fillEntryFormatInfo(entry, { dataURI, arrayBuffer });
+    if (0 <= entry.color.indexOf('RGBA') ||
+        0 <= entry.color.indexOf('Alpha') ||
+        0 <= entry.color.indexOf('Transparent')) {
+      altView.enableAlpha();
     }
     const img = new Image;
     img.onload = () => {
