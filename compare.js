@@ -3919,7 +3919,7 @@ const compareUI = CompareUI({ compareUtil });
     entry.transposed = compareUtil.orientationUtil.isTransposed(entry.orientation);
     entry.width = entry.transposed ? h : w;
     entry.height = entry.transposed ? w : h;
-    entry.progress   = 100;
+    entry.progress = 100;
     entry.interpretXY = function(x, y) {
       return compareUtil.orientationUtil.interpretXY(entry.orientation, w, h, x, y);
     };
