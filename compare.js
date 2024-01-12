@@ -3961,12 +3961,15 @@ const compareUI = CompareUI({ compareUtil });
         entry.orientation = entry.orientationExif;
       }
     }
+    entry.hasTransparency = () => (
+        0 <= entry.color.indexOf('RGBA') ||
+        0 <= entry.color.indexOf('Alpha') ||
+        0 <= entry.color.indexOf('Transparent')
+    );
   };
   const setupEntryWithFileData = function(entry, { dataURI, arrayBuffer }) {
     fillEntryFormatInfo(entry, { dataURI, arrayBuffer });
-    if (0 <= entry.color.indexOf('RGBA') ||
-        0 <= entry.color.indexOf('Alpha') ||
-        0 <= entry.color.indexOf('Transparent')) {
+    if (entry.hasTransparency()) {
       altView.enableAlpha();
     }
     const img = new Image;
