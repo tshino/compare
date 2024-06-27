@@ -6,7 +6,7 @@
     },
     "devDependencies": {
         "eslint": "^8.57.0",
-        "mocha": "^10.4.0",
+        "mocha": "^10.5.1",
         "nyc": "^17.0.0"
     },
     "eslintConfig": {
