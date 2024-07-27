@@ -6,13 +6,8 @@
     },
     "devDependencies": {
         "eslint": "^8.57.0",
+        "globals": "^15.8.0",
         "mocha": "^10.6.0",
         "nyc": "^17.0.0"
-    },
-    "eslintConfig": {
-        "root": true,
-        "parserOptions": {
-            "ecmaVersion": "latest"
-        }
     }
 }
