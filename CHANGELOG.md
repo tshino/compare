@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the Keyboard Macro Bata extension will be documented in this file.
+All notable changes to this application Compare.html will be documented in this file.
 
 ### [v2.0] - 2017-10-09
 
