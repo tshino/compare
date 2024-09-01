@@ -2,6 +2,11 @@
 
 All notable changes to this application Compare.html will be documented in this file.
 
+### [v3.0] - 2024-09-01
+
+A lot of new features and improvements.
+
+
 ### [v2.0] - 2017-10-09
 
 New Feature
