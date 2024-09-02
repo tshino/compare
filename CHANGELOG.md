@@ -6,6 +6,18 @@ All notable changes to this application Compare.html will be documented in this 
 
 A lot of new features and improvements.
 
+New Feature
+- Channel View [#27](https://github.com/tshino/compare/issues/27), [#29](https://github.com/tshino/compare/issues/29), [#31](https://github.com/tshino/compare/issues/31)
+- Color format detection [#32](https://github.com/tshino/compare/issues/32), [#33](https://github.com/tshino/compare/issues/33)
+- Optical Flow [#36](https://github.com/tshino/compare/issues/36)
+- and more.
+
+Enhancement / Improvement
+- Fixed a bug on zooming on Image Diff. [#26](https://github.com/tshino/compare/issues/26)
+- Made the diff image larger. [#28](https://github.com/tshino/compare/issues/28)
+- Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
+- and more.
+
 
 ### [v2.0] - 2017-10-09
 
