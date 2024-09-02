@@ -10,12 +10,15 @@ New Feature
 - Channel View [#27](https://github.com/tshino/compare/issues/27), [#29](https://github.com/tshino/compare/issues/29), [#31](https://github.com/tshino/compare/issues/31)
 - Color format detection [#32](https://github.com/tshino/compare/issues/32), [#33](https://github.com/tshino/compare/issues/33)
 - Optical Flow [#36](https://github.com/tshino/compare/issues/36)
+- Pixelated rendering option [#38](https://github.com/tshino/compare/issues/38)
 - and more.
 
 Enhancement / Improvement
 - Fixed a bug on zooming on Image Diff. [#26](https://github.com/tshino/compare/issues/26)
 - Made the diff image larger. [#28](https://github.com/tshino/compare/issues/28)
 - Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
+- Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
+- Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
 - and more.
 
 
