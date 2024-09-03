@@ -11,6 +11,8 @@ New Feature
 - Color format detection [#32](https://github.com/tshino/compare/issues/32), [#33](https://github.com/tshino/compare/issues/33)
 - Optical Flow [#36](https://github.com/tshino/compare/issues/36)
 - Pixelated rendering option [#38](https://github.com/tshino/compare/issues/38)
+- Web cam support [#41](https://github.com/tshino/compare/issues/41)
+- Background color option [#45](https://github.com/tshino/compare/issues/45)
 - and more.
 
 Enhancement / Improvement
