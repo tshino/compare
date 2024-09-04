@@ -10,9 +10,11 @@ New Feature
 - Channel View [#27](https://github.com/tshino/compare/issues/27), [#29](https://github.com/tshino/compare/issues/29), [#31](https://github.com/tshino/compare/issues/31)
 - Color format detection [#32](https://github.com/tshino/compare/issues/32), [#33](https://github.com/tshino/compare/issues/33)
 - Optical Flow [#36](https://github.com/tshino/compare/issues/36)
-- Pixelated rendering option [#38](https://github.com/tshino/compare/issues/38)
 - Web cam support [#41](https://github.com/tshino/compare/issues/41)
-- Background color option [#45](https://github.com/tshino/compare/issues/45)
+- Settings Dialog [#47](https://github.com/tshino/compare/issues/47)
+    - Pixelated rendering option [#38](https://github.com/tshino/compare/issues/38)
+    - Background color config [#45](https://github.com/tshino/compare/issues/45)
+    - Grid interval config [#48](https://github.com/tshino/compare/issues/48)
 - and more.
 
 Enhancement / Improvement
