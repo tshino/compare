@@ -23,6 +23,8 @@ Enhancement / Improvement
 - Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
 - Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
+- Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
+- Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
 - and more.
 
 
