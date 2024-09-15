@@ -25,6 +25,8 @@ Enhancement / Improvement
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
 - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
 - Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
+- Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
+- Graphical icon for Exif orientation. [#55](https://github.com/tshino/compare/issues/55)
 - and more.
 
 
