@@ -27,6 +27,12 @@ Enhancement / Improvement
 - Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
 - Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
 - Graphical icon for Exif orientation. [#55](https://github.com/tshino/compare/issues/55)
+- Grid lines on figures. [#56](https://github.com/tshino/compare/issues/56)
+- Orientation support on figures/calculations:
+    - Image Diff [#57](https://github.com/tshino/compare/issues/57)
+    - Optical Flow [#58](https://github.com/tshino/compare/issues/58)
+    - Image Quality Metrics [#59](https://github.com/tshino/compare/issues/59)
+    - Tone Curve Estimation [#60](https://github.com/tshino/compare/issues/60)
 - and more.
 
 
