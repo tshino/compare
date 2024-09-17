@@ -33,6 +33,8 @@ Enhancement / Improvement
     - Optical Flow [#58](https://github.com/tshino/compare/issues/58)
     - Image Quality Metrics [#59](https://github.com/tshino/compare/issues/59)
     - Tone Curve Estimation [#60](https://github.com/tshino/compare/issues/60)
+- Clarify how to treat alpha channels in Image Quality Metrics [#61](https://github.com/tshino/compare/issues/61)
+- MAE, SAD and SSD [#62](https://github.com/tshino/compare/issues/62)
 - and more.
 
 
