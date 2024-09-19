@@ -35,7 +35,9 @@ Enhancement / Improvement
     - Tone Curve Estimation [#60](https://github.com/tshino/compare/issues/60)
 - Clarify how to treat alpha channels in Image Quality Metrics [#61](https://github.com/tshino/compare/issues/61)
 - MAE, SAD and SSD [#62](https://github.com/tshino/compare/issues/62)
-- Fixed error handling on quality metrics for images of different sizes [#63](https://github.com/tshino/compare/issues/63)
+- Fixed error handling issue on quality metrics for images of different sizes [#63](https://github.com/tshino/compare/issues/63)
+- Fixed incorrect response of number key on dialogs [#64](https://github.com/tshino/compare/issues/64)
+- Grayscale mode for Image Quality Metrics [#65](https://github.com/tshino/compare/issues/65)
 - and more.
 
 
