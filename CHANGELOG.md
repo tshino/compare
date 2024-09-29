@@ -38,6 +38,7 @@ Enhancement / Improvement
 - Fixed error handling issue on quality metrics for images of different sizes [#63](https://github.com/tshino/compare/issues/63)
 - Fixed incorrect response of number key on dialogs [#64](https://github.com/tshino/compare/issues/64)
 - Grayscale mode for Image Quality Metrics [#65](https://github.com/tshino/compare/issues/65)
+- Color space option for 3D Color Distribution [#66](https://github.com/tshino/compare/issues/66)
 - and more.
 
 
