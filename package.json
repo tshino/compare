@@ -6,7 +6,7 @@
     },
     "devDependencies": {
         "eslint": "^9.11.1",
-        "globals": "^15.9.0",
+        "globals": "^15.10.0",
         "mocha": "^10.7.3",
         "nyc": "^17.1.0"
     }
