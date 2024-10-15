@@ -41,6 +41,8 @@ Enhancement / Improvement
 - Color space option for 3D Color Distribution [#66](https://github.com/tshino/compare/issues/66)
 - Fixed allocation failure ignored [#68](https://github.com/tshino/compare/issues/68)
 - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
+- Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
+- Next/Previous button [#74](https://github.com/tshino/compare/issues/74)
 - and more.
 
 
