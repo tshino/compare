@@ -42,7 +42,9 @@ Enhancement / Improvement
 - Fixed allocation failure ignored [#68](https://github.com/tshino/compare/issues/68)
 - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
-- Next/Previous button [#74](https://github.com/tshino/compare/issues/74)
+- Next/previous button [#74](https://github.com/tshino/compare/issues/74)
+- Visualization of absolute differences [#76](https://github.com/tshino/compare/issues/76)
+- Linear RGB mode for 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
 - and more.
 
 
