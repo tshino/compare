@@ -44,7 +44,9 @@ Enhancement / Improvement
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
 - Next/previous button [#74](https://github.com/tshino/compare/issues/74)
 - Visualization of absolute differences [#76](https://github.com/tshino/compare/issues/76)
+- Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
 - Linear RGB mode for 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
+- Linear RGB mode for Vectorscope [#80](https://github.com/tshino/compare/issues/80)
 - and more.
 
 
