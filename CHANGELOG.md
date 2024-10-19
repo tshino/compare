@@ -15,6 +15,7 @@ New Feature
     - Pixelated rendering option [#38](https://github.com/tshino/compare/issues/38)
     - Background color config [#45](https://github.com/tshino/compare/issues/45)
     - Grid interval config [#48](https://github.com/tshino/compare/issues/48)
+- 3D Waveform [#81](https://github.com/tshino/compare/issues/81)
 - and more.
 
 Enhancement / Improvement
@@ -47,6 +48,7 @@ Enhancement / Improvement
 - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
 - Linear RGB mode for 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
 - Linear RGB mode for Vectorscope [#80](https://github.com/tshino/compare/issues/80)
+- BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - and more.
 
 
