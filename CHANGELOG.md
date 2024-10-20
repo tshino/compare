@@ -48,6 +48,7 @@ Enhancement / Improvement
 - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
 - Linear RGB mode for 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
 - Linear RGB mode for Vectorscope [#80](https://github.com/tshino/compare/issues/80)
+- Linear RGB mode for Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - and more.
 
