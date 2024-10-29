@@ -16,6 +16,7 @@ New Feature
     - Background color config [#45](https://github.com/tshino/compare/issues/45)
     - Grid interval config [#48](https://github.com/tshino/compare/issues/48)
 - 3D Waveform [#81](https://github.com/tshino/compare/issues/81)
+- WebP format detection [#84](https://github.com/tshino/compare/issues/84)
 - and more.
 
 Enhancement / Improvement
