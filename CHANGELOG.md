@@ -7,7 +7,7 @@ All notable changes to this application Compare.html will be documented in this 
 A lot of new features and improvements.
 
 New Feature
-- Channel View [#27](https://github.com/tshino/compare/issues/27), [#29](https://github.com/tshino/compare/issues/29), [#31](https://github.com/tshino/compare/issues/31)
+- Channel View [#27](https://github.com/tshino/compare/issues/27), [#29](https://github.com/tshino/compare/issues/29), [#31](https://github.com/tshino/compare/issues/31), [#86](https://github.com/tshino/compare/issues/86)
 - Color format detection [#32](https://github.com/tshino/compare/issues/32), [#33](https://github.com/tshino/compare/issues/33)
 - Optical Flow [#36](https://github.com/tshino/compare/issues/36)
 - Web cam support [#41](https://github.com/tshino/compare/issues/41)
