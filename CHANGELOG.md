@@ -54,6 +54,7 @@ Enhancement / Improvement
 - Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
 - 3 Column Waveform [#87](https://github.com/tshino/compare/issues/87)
 - Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
+- 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
 - and more.
 
 
