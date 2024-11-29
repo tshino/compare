@@ -52,9 +52,10 @@ Enhancement / Improvement
 - Linear RGB mode for Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
-- 3 Column Waveform [#87](https://github.com/tshino/compare/issues/87)
+- 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
 - Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
 - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
+- YCbCr Histogram [#90](https://github.com/tshino/compare/issues/90)
 - and more.
 
 
