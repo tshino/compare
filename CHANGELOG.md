@@ -56,6 +56,7 @@ Enhancement / Improvement
 - Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
 - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
 - YCbCr Histogram [#90](https://github.com/tshino/compare/issues/90)
+- YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
 - and more.
 
 
