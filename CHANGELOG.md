@@ -57,6 +57,7 @@ Enhancement / Improvement
 - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
 - YCbCr Histogram [#90](https://github.com/tshino/compare/issues/90)
 - YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
+- Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - and more.
 
 
