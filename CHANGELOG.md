@@ -59,6 +59,7 @@ Enhancement / Improvement
 - YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
+- Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
 - and more.
 
 
