@@ -60,6 +60,7 @@ Enhancement / Improvement
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
 - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
+- Number of animation frames for GIF,APNG,WebP [#97](https://github.com/tshino/compare/issues/97)
 - and more.
 
 
