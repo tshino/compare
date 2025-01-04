@@ -62,6 +62,7 @@ Enhancement / Improvement
 - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
 - Number of animation frames for GIF,APNG,WebP [#97](https://github.com/tshino/compare/issues/97)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
+- Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
 - and more.
 
 
