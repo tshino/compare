@@ -63,6 +63,7 @@ Enhancement / Improvement
 - Number of animation frames for GIF,APNG,WebP [#97](https://github.com/tshino/compare/issues/97)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
+- Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
 - and more.
 
 
