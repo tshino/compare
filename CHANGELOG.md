@@ -64,6 +64,7 @@ Enhancement / Improvement
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
+- Enlarge a bit of x-y chromaticity diagram of Vectorscope [#106](https://github.com/tshino/compare/issues/106)
 - and more.
 
 
