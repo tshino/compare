@@ -47,9 +47,10 @@ Enhancement / Improvement
 - Next/previous button [#74](https://github.com/tshino/compare/issues/74)
 - Visualization of absolute differences [#76](https://github.com/tshino/compare/issues/76)
 - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
-- Linear RGB mode for 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
-- Linear RGB mode for Vectorscope [#80](https://github.com/tshino/compare/issues/80)
-- Linear RGB mode for Waveform [#83](https://github.com/tshino/compare/issues/83)
+- Linear RGB mode for:
+    - 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
+    - Vectorscope [#80](https://github.com/tshino/compare/issues/80)
+    - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
 - 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
