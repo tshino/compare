@@ -22,7 +22,10 @@ New Feature
 Enhancement / Improvement
 - Fixed a bug on zooming on Image Diff. [#26](https://github.com/tshino/compare/issues/26)
 - Made the diff image larger. [#28](https://github.com/tshino/compare/issues/28)
-- Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
+- Unit testing:
+    - Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
+    - Migrated unit tests from handcrafted framework to Mocha [#110](https://github.com/tshino/compare/issues/110)
+    - Coverage reporting [#115](https://github.com/tshino/compare/pull/115)
 - Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
 - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
