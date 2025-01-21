@@ -31,7 +31,10 @@ Enhancement / Improvement
 - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
 - Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
 - Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
-- Graphical icon for Exif orientation. [#55](https://github.com/tshino/compare/issues/55)
+- Image Information:
+    - Graphical icon for Exif orientation. [#55](https://github.com/tshino/compare/issues/55)
+    - Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
+    - Number of animation frames for GIF,APNG,WebP [#97](https://github.com/tshino/compare/issues/97)
 - Grid lines on figures. [#56](https://github.com/tshino/compare/issues/56)
 - Orientation support on figures/calculations:
     - Image Diff [#57](https://github.com/tshino/compare/issues/57)
@@ -55,7 +58,6 @@ Enhancement / Improvement
     - Vectorscope [#80](https://github.com/tshino/compare/issues/80)
     - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
-- Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
 - 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
 - Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
 - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
@@ -64,7 +66,6 @@ Enhancement / Improvement
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
 - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
-- Number of animation frames for GIF,APNG,WebP [#97](https://github.com/tshino/compare/issues/97)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
