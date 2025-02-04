@@ -30,7 +30,11 @@ Enhancement / Improvement
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
 - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
 - Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
-- Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
+- 3D Color Distribution:
+    - Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
+    - Color space option for 3D Color Distribution [#66](https://github.com/tshino/compare/issues/66)
+    - Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
+    - Enlarge a bit of CIE xyY 3D Color Distribution diagram [#108](https://github.com/tshino/compare/issues/108)
 - Image Information:
     - Graphical icon for Exif orientation. [#55](https://github.com/tshino/compare/issues/55)
     - Fixed TIFF color format detection failure [#85](https://github.com/tshino/compare/issues/85)
@@ -48,7 +52,6 @@ Enhancement / Improvement
     - Grayscale mode for Image Quality Metrics [#65](https://github.com/tshino/compare/issues/65)
     - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
 - Fixed incorrect response of number key on dialogs [#64](https://github.com/tshino/compare/issues/64)
-- Color space option for 3D Color Distribution [#66](https://github.com/tshino/compare/issues/66)
 - Fixed allocation failure ignored [#68](https://github.com/tshino/compare/issues/68)
 - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
@@ -68,10 +71,8 @@ Enhancement / Improvement
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
-- Improve visibility of axes on 3D Color Distribution [#104](https://github.com/tshino/compare/issues/104)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
 - Enlarge a bit of x-y chromaticity diagram of Vectorscope [#106](https://github.com/tshino/compare/issues/106)
-- Enlarge a bit of CIE xyY 3D Color Distribution diagram [#108](https://github.com/tshino/compare/issues/108)
 - and more.
 
 
