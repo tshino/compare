@@ -28,7 +28,9 @@ Enhancement / Improvement
     - Coverage reporting [#115](https://github.com/tshino/compare/pull/115)
 - Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
-- Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
+- Vectorscope:
+    - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
+    - Enlarge a bit of x-y chromaticity diagram of Vectorscope [#106](https://github.com/tshino/compare/issues/106)
 - Renumbering images when an image removed. [#52](https://github.com/tshino/compare/issues/52)
 - 3D Color Distribution:
     - Coloring option button of 3D Color Distribution. [#54](https://github.com/tshino/compare/issues/54)
@@ -72,7 +74,6 @@ Enhancement / Improvement
 - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
-- Enlarge a bit of x-y chromaticity diagram of Vectorscope [#106](https://github.com/tshino/compare/issues/106)
 - and more.
 
 
