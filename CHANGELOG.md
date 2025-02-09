@@ -20,8 +20,11 @@ New Feature
 - and more.
 
 Enhancement / Improvement
-- Fixed a bug on zooming on Image Diff. [#26](https://github.com/tshino/compare/issues/26)
-- Made the diff image larger. [#28](https://github.com/tshino/compare/issues/28)
+- Image Diff:
+    - Fixed a bug on zooming on Image Diff. [#26](https://github.com/tshino/compare/issues/26)
+    - Made the diff image larger. [#28](https://github.com/tshino/compare/issues/28)
+    - Visualization of absolute differences [#76](https://github.com/tshino/compare/issues/76)
+    - Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
 - Unit testing:
     - Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
     - Migrated unit tests from handcrafted framework to Mocha [#110](https://github.com/tshino/compare/issues/110)
@@ -62,7 +65,6 @@ Enhancement / Improvement
 - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
 - Next/previous button [#74](https://github.com/tshino/compare/issues/74)
-- Visualization of absolute differences [#76](https://github.com/tshino/compare/issues/76)
 - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
 - Linear RGB mode for:
     - 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
@@ -70,7 +72,6 @@ Enhancement / Improvement
     - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
-- Visualization of absolute difference using grayscale [#88](https://github.com/tshino/compare/issues/88)
 - YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
