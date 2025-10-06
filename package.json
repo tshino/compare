@@ -5,7 +5,7 @@
         "test": "nyc --reporter=text --reporter=html mocha test/*.test.js"
     },
     "devDependencies": {
-        "eslint": "^9.36.0",
+        "eslint": "^9.37.0",
         "globals": "^16.4.0",
         "mocha": "^11.7.4",
         "nyc": "^17.1.0"
