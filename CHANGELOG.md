@@ -28,6 +28,7 @@ Enhancement / Improvement
 - Unit testing:
     - Introduced unit testing. [#34](https://github.com/tshino/compare/issues/34), [#35](https://github.com/tshino/compare/issues/35)
     - Migrated unit tests from handcrafted framework to Mocha [#110](https://github.com/tshino/compare/issues/110)
+        - Removed old tests that use a hand-crafted test framework. [#136](https://github.com/tshino/compare/pull/136)
     - Coverage reporting [#115](https://github.com/tshino/compare/pull/115)
 - Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
 - Histogram:
