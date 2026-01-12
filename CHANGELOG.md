@@ -30,7 +30,6 @@ Enhancement / Improvement
     - Migrated unit tests from handcrafted framework to Mocha [#110](https://github.com/tshino/compare/issues/110)
         - Removed old tests that use a hand-crafted test framework. [#136](https://github.com/tshino/compare/pull/136)
     - Coverage reporting [#115](https://github.com/tshino/compare/pull/115)
-    - Unit test on GitHub Actions [#112](https://github.com/tshino/compare/issues/112)
 - Use minus sign rather than hyphen for negative numbers. [#39](https://github.com/tshino/compare/issues/39)
 - Histogram:
     - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
@@ -78,6 +77,9 @@ Enhancement / Improvement
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
+- CI
+    - Unit test on GitHub Actions [#112](https://github.com/tshino/compare/issues/112)
+    - Setup Dependabot version updates [#113](https://github.com/tshino/compare/issues/113)
 - and more.
 
 
