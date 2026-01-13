@@ -35,6 +35,9 @@ Enhancement / Improvement
     - 3-Row Histogram [#89](https://github.com/tshino/compare/issues/89)
     - YCbCr Histogram [#90](https://github.com/tshino/compare/issues/90)
     - Numerical info on mouse over on histogram [#96](https://github.com/tshino/compare/issues/96)
+- Waveform:
+    - 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
+    - YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
 - Added grid overlay to figures like Histogram. [#40](https://github.com/tshino/compare/issues/40)
 - Vectorscope:
     - Coloring option of Vectorscope. [#50](https://github.com/tshino/compare/issues/50)
@@ -72,8 +75,6 @@ Enhancement / Improvement
     - Vectorscope [#80](https://github.com/tshino/compare/issues/80)
     - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
-- 3-Column Waveform [#87](https://github.com/tshino/compare/issues/87)
-- YCbCr Waveform [#91](https://github.com/tshino/compare/issues/91)
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
