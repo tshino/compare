@@ -82,6 +82,7 @@ Enhancement / Improvement
     - Unit test on GitHub Actions [#112](https://github.com/tshino/compare/issues/112)
     - Setup Dependabot version updates [#113](https://github.com/tshino/compare/issues/113)
     - ESLint on GitHub Actions [#114](https://github.com/tshino/compare/issues/114)
+- Fixed an issue on Firefox [#159](https://github.com/tshino/compare/issues/159)
 - and more.
 
 
