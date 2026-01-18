@@ -64,9 +64,6 @@ Enhancement / Improvement
     - Fixed error handling issue on quality metrics for images of different sizes [#63](https://github.com/tshino/compare/issues/63)
     - Grayscale mode for Image Quality Metrics [#65](https://github.com/tshino/compare/issues/65)
     - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
-- Fixed incorrect response of number key on dialogs [#64](https://github.com/tshino/compare/issues/64)
-- Fixed allocation failure ignored [#68](https://github.com/tshino/compare/issues/68)
-- Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
 - Next/previous button [#74](https://github.com/tshino/compare/issues/74)
 - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
@@ -77,12 +74,16 @@ Enhancement / Improvement
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
 - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
 - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
-- Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
 - CI
     - Unit test on GitHub Actions [#112](https://github.com/tshino/compare/issues/112)
     - Setup Dependabot version updates [#113](https://github.com/tshino/compare/issues/113)
     - ESLint on GitHub Actions [#114](https://github.com/tshino/compare/issues/114)
-- Fixed an issue on Firefox [#159](https://github.com/tshino/compare/issues/159)
+- Fixed issues:
+    - Fixed incorrect response of number key on dialogs [#64](https://github.com/tshino/compare/issues/64)
+    - Fixed allocation failure ignored [#68](https://github.com/tshino/compare/issues/68)
+    - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
+    - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
+    - Fixed an issue on Firefox [#159](https://github.com/tshino/compare/issues/159)
 - and more.
 
 
