@@ -84,6 +84,7 @@ Enhancement / Improvement
     - Fixed unexpected page zoom by pinch-out on touch pad [#71](https://github.com/tshino/compare/issues/71)
     - Fixed: double application of Exif orientation [#105](https://github.com/tshino/compare/issues/105)
     - Fixed an issue on Firefox [#159](https://github.com/tshino/compare/issues/159)
+    - Fixed: Can't open SVG [#160](https://github.com/tshino/compare/issues/160)
 - and more.
 
 
