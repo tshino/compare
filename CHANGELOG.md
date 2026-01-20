@@ -72,8 +72,9 @@ Enhancement / Improvement
     - Vectorscope [#80](https://github.com/tshino/compare/issues/80)
     - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
-- Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
-- Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
+- Improvements on other figures:
+    - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
+    - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - CI
     - Unit test on GitHub Actions [#112](https://github.com/tshino/compare/issues/112)
     - Setup Dependabot version updates [#113](https://github.com/tshino/compare/issues/113)
