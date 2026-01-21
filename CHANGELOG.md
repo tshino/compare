@@ -66,13 +66,13 @@ Enhancement / Improvement
     - Explanation for value absence of Image Quality Metrics [#94](https://github.com/tshino/compare/issues/94)
 - Show X,Y coordinate beside cross cursor [#72](https://github.com/tshino/compare/issues/72)
 - Next/previous button [#74](https://github.com/tshino/compare/issues/74)
-- Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
 - Linear RGB mode for:
     - 3D Color Distribution [#78](https://github.com/tshino/compare/issues/78)
     - Vectorscope [#80](https://github.com/tshino/compare/issues/80)
     - Waveform [#83](https://github.com/tshino/compare/issues/83)
 - BT.709 option on everywhere luminance or YCbCr is used [#82](https://github.com/tshino/compare/issues/82)
-- Improvements on other figures:
+- Enhancements/improvements on across figures:
+    - Apply 'pixelated' to figures [#79](https://github.com/tshino/compare/issues/79)
     - Side by side comparison of Tone Curve Estimation [#93](https://github.com/tshino/compare/issues/93)
     - Improve visibility of start point of each line of Optical Flow [#98](https://github.com/tshino/compare/issues/98)
 - CI
